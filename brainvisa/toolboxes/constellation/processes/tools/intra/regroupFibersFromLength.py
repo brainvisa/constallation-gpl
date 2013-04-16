@@ -35,12 +35,12 @@ def initialization ( self ):
 def execution ( self, context ):
   context.write( 'For a given cortex region, regroup fibers from length...' )
   
-  context.system( 'testFibersLength',
+  context.system( 'constelFibersLength',
     '-i', self.gyrus_tracts_MeshClosestPoint,
     '-o', self.fiberlength_MeshClosestPoint
   )
   
-  context.system( 'testFibersLength',
+  context.system( 'constelFibersLength',
     '-i', self.gyrus_tracts_MeshIntersectPoint,
     '-o', self.fiberlength_MeshIntersectPoint
   )
