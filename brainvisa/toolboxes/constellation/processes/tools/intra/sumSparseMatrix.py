@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 name = '08 - Sum Sparse matrix'
 userLevel = 2
 

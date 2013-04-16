@@ -4,6 +4,12 @@ from brainvisa.group_utils import Subject
 from soma.minf.api import registerClass, readMinf
 from soma.path import find_in_path
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 name = '06 - Clustering of Group'
 userLevel = 2
 

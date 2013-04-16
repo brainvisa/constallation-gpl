@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 name = '10 - Convert Sparse Matrix to Ima'
 userLevel = 2
 

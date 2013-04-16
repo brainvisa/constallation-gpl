@@ -1,5 +1,11 @@
 from brainvisa.processes import *
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 name = 'Freesurfer BrainVisa Intra pipeline'
 userLevel = 2
 
@@ -200,8 +206,8 @@ def initialization( self ):
                        'ConnectivityMatrixToBassins.gyri_segmentation' )
   
   ### Clustering IntraSubjects 
-  eNode.addChild( 'ClusteringIntraSubjects',
-                  ProcessExecutionNode( 'ClusteringIntraSubjects',
+  eNode.addChild( 'ClusteringIntrasubject',
+                  ProcessExecutionNode( 'ClusteringIntrasubject',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'ClusteringIntraSubjects.connectivity_matrix_reduced',

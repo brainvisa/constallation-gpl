@@ -2,6 +2,13 @@
 from brainvisa.processes import *
 import numpy as np
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
+
 name = '05 - Select Fibers From Length'
 userLevel = 2
 

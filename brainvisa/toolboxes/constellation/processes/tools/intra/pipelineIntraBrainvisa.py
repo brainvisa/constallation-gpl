@@ -1,5 +1,12 @@
 from brainvisa.processes import *
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
+
 name = 'Brainvisa Intra pipeline'
 userLevel = 2
 
@@ -174,7 +181,7 @@ def initialization( self ):
 
   ### 15 - Clustering IntraSubjects
   eNode.addChild( 'ClusteringIntraSubjects',
-                  ProcessExecutionNode( 'ClusteringIntraSubjects',
+                  ProcessExecutionNode( 'ClusteringIntrasubject',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'ClusteringIntraSubjects.connectivity_matrix_reduced',

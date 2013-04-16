@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 name = '06 - Fiber Oversampler'
 userLevel = 2
 

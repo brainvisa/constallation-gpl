@@ -2,6 +2,12 @@
 from brainvisa.processes import *
 from soma.path import find_in_path
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 name = '02 - Bundles Select For A LAbel'
 userLevel = 2
 

@@ -3,6 +3,13 @@ from brainvisa.processes import *
 from soma import aims
 import pylab
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
+
 name = '11 - Threshold Mean Connectivity Profile'
 userLevel = 2
 

@@ -3,6 +3,13 @@ from brainvisa.processes import *
 from soma.path import find_in_path
 import glob
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
+
 name = '02/03 - Filtering Per Gyrus'
 userLevel = 2
 

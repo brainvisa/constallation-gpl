@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 name = '03 - Normed Connectivity Profile of Group'
 userLevel = 2
 

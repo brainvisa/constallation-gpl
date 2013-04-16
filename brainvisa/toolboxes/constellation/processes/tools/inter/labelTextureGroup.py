@@ -1,5 +1,12 @@
 from brainvisa.processes import *
 from soma.path import find_in_path
+
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 import gyri_texture_cleaning
 from brainvisa.group_utils import Subject
 from soma.minf.api import registerClass, readMinf

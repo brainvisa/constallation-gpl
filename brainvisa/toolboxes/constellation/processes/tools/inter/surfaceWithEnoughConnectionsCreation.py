@@ -5,6 +5,12 @@ from soma.minf.api import registerClass, readMinf
 from soma.path import find_in_path
 from soma import aims
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 name = '01 - Creation of a mask'
 userLevel = 2
 

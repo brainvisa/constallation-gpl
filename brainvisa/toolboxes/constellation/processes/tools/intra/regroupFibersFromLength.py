@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
+
 name = '04 - Regroup Fibers From Length'
 userLevel = 2
 

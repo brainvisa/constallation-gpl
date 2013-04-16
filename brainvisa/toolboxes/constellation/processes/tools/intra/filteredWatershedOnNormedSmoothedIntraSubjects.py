@@ -2,6 +2,13 @@
 from brainvisa.processes import *
 from soma import aims
 import numpy as N
+
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 import pylab
 import roca.lib.textureTools as TT
 

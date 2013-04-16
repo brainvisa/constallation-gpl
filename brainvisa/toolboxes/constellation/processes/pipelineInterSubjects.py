@@ -1,5 +1,11 @@
 from brainvisa.processes import *
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 name = 'Freesurfer BrainVisa Inter pipeline'
 userLevel = 2
 

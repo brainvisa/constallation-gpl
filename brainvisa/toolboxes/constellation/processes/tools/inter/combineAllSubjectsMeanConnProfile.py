@@ -3,6 +3,12 @@ from brainvisa.processes import *
 from brainvisa.group_utils import Subject
 from soma.minf.api import registerClass, readMinf
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 name = '02 - Conectivity Profile of Group'
 userLevel = 2
 

@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
 from soma import aims
+
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 import pylab
 import roca.lib.textureTools as TT
 

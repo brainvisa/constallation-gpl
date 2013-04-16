@@ -1,6 +1,12 @@
 from brainvisa.processes import *
 from soma import aims
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 name = '14 - Construction of Reduced Connectivity Matrix'
 userLevel = 2
 

@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
 
+def validation():
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
+
 name = '07 - Mean Connectivity Profile'
 userLevel = 2
 
