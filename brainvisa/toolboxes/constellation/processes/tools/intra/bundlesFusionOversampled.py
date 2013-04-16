@@ -20,7 +20,7 @@ def initialization( self ):
 
 def execution ( self, context ):
   context.write( 'Gyrus tracts Oversampling.' )
-  context.system( 'testFiberOversampler',
+  context.system( 'comistFiberOversampler',
     '-i', self.length_filtered_tracts_MeshIntersectPoint,
     '-o', self.oversampled_tracts_MeshIntersectPoint,
     '-points', 3,
