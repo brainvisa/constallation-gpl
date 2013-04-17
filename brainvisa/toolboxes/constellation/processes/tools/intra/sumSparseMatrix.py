@@ -25,7 +25,7 @@ def initialization( self ):
 
 def execution ( self, context ):
   context.write( 'Sum sparse matrix (categories : between two connected regions or one place in the brain).' )
-  context.system( 'testSumSparseMatrix',
+  context.system( 'AimsSumSparseMatrix',
     '-i', self.connectivity_matrix_MeshIntersectPoint,
     '-i', self.connectivity_matrix_MeshClosestPoint,
     '-o', self.connectivity_matrix_full
