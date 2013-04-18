@@ -54,7 +54,7 @@ def initialization( self ):
 
   ## Delete Intermediate Fibers
   eNode.addChild( 'deleteTracts',
-                  ProcessExecutionNode( 'deleteBundles',
+                  ProcessExecutionNode( 'removeUnnecessaryBundles',
                   optional = 1,
                   selected = 0 ) )
 
@@ -66,7 +66,7 @@ def initialization( self ):
 
   ### 06 - Bundles Fusion Oversampled
   eNode.addChild( 'ConnectivityCortexMatrix',
-                  ProcessExecutionNode( 'bundlesFusionOversampled',
+                  ProcessExecutionNode( 'fiberOversampler',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'ConnectivityCortexMatrix.length_filtered_tracts_MeshIntersectPoint',
@@ -74,7 +74,7 @@ def initialization( self ):
 
   ### 07 - Connectivity Matrix  Smooothed
   eNode.addChild( 'Smoothing',
-                  ProcessExecutionNode( 'connectivityMatrixToAllCortex',
+                  ProcessExecutionNode( 'createConnectivityMatrix',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'Smoothing.oversampled_tracts_MeshIntersectPoint',
@@ -105,7 +105,7 @@ def initialization( self ):
 
   ### 09 - Mean Connectivity Profile Texture intraSubjects
   eNode.addChild( 'ProfileComputing',
-                  ProcessExecutionNode( 'meanConnectivityProfileTextureIntraSubjects',
+                  ProcessExecutionNode( 'createMeanConnectivityProfile',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'ProfileComputing.connectivity_matrix_full',
@@ -116,7 +116,7 @@ def initialization( self ):
 
   ### 11 - Normed Smoothed Mean Connectivity Profile IntraSubjects
   eNode.addChild( 'ProfileNormalization',
-                  ProcessExecutionNode( 'normedSmoothedMeanConnectivityProfileIntraSubjects',
+                  ProcessExecutionNode( 'removeInternalConnections',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'ProfileNormalization.gyrus_mean_connectivity_profile',
@@ -130,7 +130,7 @@ def initialization( self ):
 
   ### 12 - Watershed On Normed Smoothed IntraSubjects
   eNode.addChild( 'Watershed',
-                  ProcessExecutionNode( 'watershedOnNormedSmoothedIntraSubjects',
+                  ProcessExecutionNode( 'watershedReflectingConnectionsToGyrus',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'Watershed.norm_mean_connectivity_profile',
@@ -141,7 +141,7 @@ def initialization( self ):
 
   ### 13 - Filtered Watershed On Normed Smoothed IntraSubjects
   eNode.addChild( 'ConnectivityMatrixToBassins',
-                  ProcessExecutionNode( 'filteredWatershedOnNormedSmoothedIntraSubjects',
+                  ProcessExecutionNode( 'filteringWatershed',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'ConnectivityMatrixToBassins.connectivity_matrix_full',
@@ -156,7 +156,7 @@ def initialization( self ):
   # 14 - Connectivity Matrix to Watershed Basins IntraSubjects
 
   eNode.addChild( 'ConnectivityMatrixWatershedToBassins',
-                  ProcessExecutionNode( 'connectivityMatrixToWatershedBassins',
+                  ProcessExecutionNode( 'createReducedConnectivityMatrix',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'ConnectivityMatrixWatershedToBassins.connectivity_matrix_full',

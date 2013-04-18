@@ -44,7 +44,7 @@ def initialization( self ):
 
   ## 02 Combine All Subjects Mean Conectivity Profile
   eNode.addChild( 'combineMeanInter',
-                  ProcessExecutionNode( 'combineAllSubjectsMeanConnProfile',
+                  ProcessExecutionNode( 'createConnectivityProfileOnRangeOfSubjects',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'combineMeanInter.study_name',
@@ -64,7 +64,7 @@ def initialization( self ):
 
   ## 03 Thresholding Average Mean Connectivity Profile
   eNode.addChild( 'meanInter',
-                  ProcessExecutionNode( 'thresholdingAverageMeanConnectivityProfile',
+                  ProcessExecutionNode( 'removeInternalConnectionsOnRangeOfSubjects',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'meanInter.mask',
@@ -75,7 +75,7 @@ def initialization( self ):
 
   ## 04 Watershed On Normed Smoothed InterSubjects
   eNode.addChild( 'watershedInter',
-                  ProcessExecutionNode( 'watershedInterSubjects',
+                  ProcessExecutionNode( 'filteringWatershedOnRangeOfSubjects',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'watershedInter.average_mesh',
@@ -86,7 +86,7 @@ def initialization( self ):
 
   ## 05 Connectivity Matrix to Watershed Bassins InterSubjects
   eNode.addChild( 'connMatrixBasinInter',
-                  ProcessExecutionNode( 'ConnectivityMatrixToBassinsInterSubjects',
+                  ProcessExecutionNode( 'createReducedConnectivityMatrixOnRangeOfSubjects',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'connMatrixBasinInter.study_name',
