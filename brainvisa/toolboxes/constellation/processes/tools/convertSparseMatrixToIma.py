@@ -7,7 +7,7 @@ def validation():
   except:
     raise ValidationError( 'module roca is not here.' )
 
-name = '10 - Convert Sparse Matrix to Ima'
+name = 'Convert Sparse Matrix to Ima'
 userLevel = 2
 
 signature = Signature(
