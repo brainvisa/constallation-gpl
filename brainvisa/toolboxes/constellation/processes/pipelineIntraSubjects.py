@@ -142,15 +142,7 @@ def initialization( self ):
                        
   eNode.addDoubleLink( 'ProfileComputing.white_mesh',
                        'FreeSurferPipeline.FreeSurferPipeline.freesurferConcatenate.BothWhite' )
-  
-  ### Mean Connectivity Profile Thresholding IntraSubjects 
-  eNode.addChild( 'ProfileThresholding',
-                  ProcessExecutionNode( 'connectivityMatrixToAllCortexIntraSubjects',
-                  optional = 1 ) )
-                  
-  eNode.addDoubleLink( 'ProfileThresholding.connectivity_matrix_full',
-                       'ProfileComputing.connectivity_matrix_full' )
-  
+
   ### Mean Connectivity Profile Norm/Smooth IntraSubjects  
   eNode.addChild( 'ProfileNormalization',
                   ProcessExecutionNode( 'normedSmoothedMeanConnectivityProfileIntraSubjects',
@@ -182,7 +174,7 @@ def initialization( self ):
                   optional = 1 ) )
   
   eNode.addDoubleLink( 'ConnectivityMatrixToBassins.connectivity_matrix_full',
-                       'ProfileThresholding.connectivity_matrix_full' )
+                       'ProfileComputing.connectivity_matrix_full' )
                        
   eNode.addDoubleLink( 'ConnectivityMatrixToBassins.white_mesh',
                        'Watershed.white_mesh' )
