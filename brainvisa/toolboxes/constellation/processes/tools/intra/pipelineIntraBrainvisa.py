@@ -117,14 +117,6 @@ def initialization( self ):
   eNode.addDoubleLink( 'ProfileComputing.white_mesh',
                        'white_mesh' )
 
-  ### 10 - Pacth Connectivity Matrix To All Cortex IntraSubjects
-  eNode.addChild( 'ProfileThresholding',
-                  ProcessExecutionNode( 'connectivityMatrixToAllCortexIntraSubjects',
-                  optional = 1 ) )
-
-  eNode.addDoubleLink( 'ProfileThresholding.connectivity_matrix_full',
-                       'ProfileComputing.connectivity_matrix_full' )
-
   ### 11 - Normed Smoothed Mean Connectivity Profile IntraSubjects
   eNode.addChild( 'ProfileNormalization',
                   ProcessExecutionNode( 'normedSmoothedMeanConnectivityProfileIntraSubjects',
@@ -156,7 +148,7 @@ def initialization( self ):
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'ConnectivityMatrixToBassins.connectivity_matrix_full',
-                       'ProfileThresholding.connectivity_matrix_full' )
+                       'ProfileComputing.connectivity_matrix_full' )
 
   eNode.addDoubleLink( 'ConnectivityMatrixToBassins.gyri_segmentation',
                        'gyri_segmentation')
