@@ -114,9 +114,6 @@ def initialization( self ):
   eNode.addDoubleLink( 'ProfileComputing.gyri_segmentation',
                        'gyri_segmentation' )
 
-  eNode.addDoubleLink( 'ProfileComputing.white_mesh',
-                       'white_mesh' )
-
   ### 11 - Normed Smoothed Mean Connectivity Profile IntraSubjects
   eNode.addChild( 'ProfileNormalization',
                   ProcessExecutionNode( 'normedSmoothedMeanConnectivityProfileIntraSubjects',

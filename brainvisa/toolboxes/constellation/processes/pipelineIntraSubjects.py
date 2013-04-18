@@ -139,9 +139,6 @@ def initialization( self ):
                                      
   eNode.addDoubleLink( 'ProfileComputing.gyri_segmentation',
                        'FreeSurferPipeline.FreeSurferPipeline.freesurferConcatTex.Gyri' )
-                       
-  eNode.addDoubleLink( 'ProfileComputing.white_mesh',
-                       'FreeSurferPipeline.FreeSurferPipeline.freesurferConcatenate.BothWhite' )
 
   ### Mean Connectivity Profile Norm/Smooth IntraSubjects  
   eNode.addChild( 'ProfileNormalization',
