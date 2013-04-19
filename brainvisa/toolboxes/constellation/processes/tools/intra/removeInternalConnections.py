@@ -10,7 +10,7 @@ def validation():
     raise ValidationError( 'module roca is not here.' )
 
 
-name = '11 - Threshold Mean Connectivity Profile'
+name = '11 - Remove Internal Connections'
 userLevel = 2
 
 signature = Signature(

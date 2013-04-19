@@ -7,7 +7,7 @@ def validation():
   except:
     raise ValidationError( 'module roca is not here.' )
 
-name = '07 - Mean Connectivity Profile'
+name = '07 - Connectivity Matrix'
 userLevel = 2
 
 signature = Signature(

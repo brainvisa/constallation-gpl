@@ -7,7 +7,7 @@ def validation():
   except:
     raise ValidationError( 'module roca is not here.' )
 
-name = '14 - Construction of Reduced Connectivity Matrix'
+name = '14 - Reduced Connectivity Matrix'
 userLevel = 2
 
 signature = Signature(

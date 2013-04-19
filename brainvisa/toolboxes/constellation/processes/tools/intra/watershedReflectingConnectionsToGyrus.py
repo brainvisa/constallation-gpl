@@ -12,7 +12,7 @@ import pylab
 import roca.lib.textureTools as TT
 
 
-name = '12 - Mesh Watershed Processing'
+name = '12 - Watershed'
 userLevel = 2
 
 signature = Signature(

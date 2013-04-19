@@ -12,7 +12,7 @@ def validation():
 import pylab
 import roca.lib.textureTools as TT
 
-name = '13 - Removal of patches with few connections'
+name = '13 - Filtering Watershed'
 userLevel = 2
 
 signature = Signature(

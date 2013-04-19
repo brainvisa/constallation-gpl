@@ -10,7 +10,7 @@ def validation():
     raise ValidationError( 'module roca is not here.' )
 
 
-name = '09 - Mean Connectivity Profile From Matrix'
+name = '09 - Mean Connectivity Profile'
 userLevel = 2
 
 signature = Signature(

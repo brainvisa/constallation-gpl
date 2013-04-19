@@ -7,7 +7,7 @@ def validation():
   except:
     raise ValidationError( 'module roca is not here.' )
 
-name = '08 - Sum Sparse matrix'
+name = '08 - Sum Sparse Matrix Smoothing'
 userLevel = 2
 
 signature = Signature(
