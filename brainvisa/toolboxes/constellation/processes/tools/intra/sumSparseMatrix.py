@@ -13,8 +13,10 @@ userLevel = 2
 signature = Signature(
     'connectivity_matrix_MeshClosestPoint', ReadDiskItem( 'Gyrus Connectivity Matrix Mesh Closest Point', 'Matrix sparse' ),
   'connectivity_matrix_MeshIntersectPoint', ReadDiskItem( 'Gyrus Connectivity Matrix Mesh Intersect Point', 'Matrix sparse' ),
+                       'gyri_segmentation', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
                               'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
                                   'smooth', Float(),
+                             'patch_label', Integer(),
   
   'connectivity_matrix_full', WriteDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ),
 )
@@ -35,7 +37,9 @@ def execution ( self, context ):
     '-i', self.connectivity_matrix_full,
     '-m', self.white_mesh,
     '-o', self.connectivity_matrix_full,
-    '-s', self.smooth
+    '-s', self.smooth,
+    '-l', self.gyri_segmentation,
+    '-p', self.patch_label,
   )
   
   context.write( 'OK' )
