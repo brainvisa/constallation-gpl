@@ -68,14 +68,14 @@ def execution( self, context ):
     context.write( 'For a given cortex region, the fibers associated are retained.')
     i = 0
     for tractfile in self.listof_reorganized_subset_of_tracts:
-      context.system( 'python', find_in_path( 'BundlesSelectForALabel.py' ),
+      context.system( 'python', find_in_path( 'constelSelectBundlesByLabel.py' ),
         '--inputparcelstex', self.gyri_segmentation,
         '--label',  self.patch_label,
         '--bundles', self.listof_reorganized_subset_of_tracts[i],
         '--obundles', self.gyrus_subsets_of_tracts_MeshClosestPoint[i],
         '--verbose', 1
       )
-      context.system( 'selectBundlesFromNames',
+      context.system( 'constelSelectBundlesFromNames',
         '-i', self.listof_reorganized_subset_of_tracts[i],
         '-o', self.gyrus_subsets_of_tracts_MeshIntersectPoint[i],
         '-names', str(self.patch_label) + '_notInMesh',
