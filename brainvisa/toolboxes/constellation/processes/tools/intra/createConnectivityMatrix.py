@@ -41,7 +41,7 @@ def execution ( self, context ):
     patch_label = os.path.basename( os.path.dirname( os.path.dirname( self.oversampled_tracts_MeshIntersectPoint.fullPath() ) ) )
     patch_label = patch_label.strip('G')
   context.write('patch_label = ', patch_label, '    Is it correct?')
-  context.system( 'testMeanConnectivityProfile',
+  context.system( 'constelConnectivityMatrix',
     '-bundles', self.oversampled_tracts_MeshIntersectPoint,
     '-connmatrix', self.connectivity_matrix_MeshIntersectPoint,
     '-vertexindextype', 'both',
@@ -61,7 +61,7 @@ def execution ( self, context ):
     '-verbose', 1
   )
   
-  context.system( 'testMeanConnectivityProfile',
+  context.system( 'constelConnectivityMatrix',
     '-bundles', self.length_filtered_tracts_MeshClosestPoint,    
     '-connmatrix', self.connectivity_matrix_MeshClosestPoint,
     '-vertexindextype', 'both',
