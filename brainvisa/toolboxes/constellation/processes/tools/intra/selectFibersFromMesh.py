@@ -81,7 +81,7 @@ def execution( self, context ):
   context.write( 'For each cortex region, select fibers from mesh.' )
   i = 0
   for ssTract in self.listOf_subset_of_tract:
-    context.system( 'constelSelectFiberFromMesh',
+    context.system( 'constelSelectFibersFromMesh',
       '-i', self.listOf_subset_of_tract[i],
       '-o', self.reorganized_subsets_of_tracts[i],
       '-mesh', self.white_mesh,
