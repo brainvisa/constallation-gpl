@@ -103,6 +103,12 @@ def initialization( self ):
   eNode.addDoubleLink( 'Sum.white_mesh',
                        'white_mesh' )
 
+  eNode.addDoubleLink( 'Sum.gyri_segmentation',
+                       'gyri_segmentation' )
+                       
+  eNode.addDoubleLink( 'Sum.patch_label',
+                       'patch_label' )
+
   ### 09 - Mean Connectivity Profile Texture intraSubjects
   eNode.addChild( 'ProfileComputing',
                   ProcessExecutionNode( 'createMeanConnectivityProfile',
