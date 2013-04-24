@@ -28,14 +28,13 @@ def initialization ( self ):
 
 def execution ( self, context ):
   context.write( 'A watershed is performed to obtain different patches of interest. These patches correspond to cortex sites with a strong connection to the gyrus.' )
-  commandMeshWatershedProcessing = [ 'MeshWatershedProcessing.py',
+  commandMeshWatershedProcessing = [ 'AimsMeshWatershed.py',
     '-i', self.norm_mean_connectivity_profile,
     '-m', self.white_mesh,
-    '--group', 'value',
-    '--ksize', 10,
-    '--kdepth', 0.05, 
-    '--mode', 'and', 
-    '--threshold', 0.05,
+    '-k', 10,
+    '-q', 0.05,
+    '-z', 'or',
+    '-t', 0.05,
     '-o', self.watershed
   ]
   context.system( *commandMeshWatershedProcessing )
