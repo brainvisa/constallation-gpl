@@ -16,7 +16,7 @@ signature = Signature(
             'texture_name', String(),
          'subset_of_tract', ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ),
                 #'protocol', String(),
-                 'subject', WriteDiskItem( 'subject', 'directory' ),
+                 'subject', ReadDiskItem( 'subject', 'directory' ),
   'listOf_subset_of_tract', ListOf( ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ) ),
               'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
        'gyri_segmentation', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
@@ -33,11 +33,15 @@ def initialization( self ):
       listBundles = glob.glob( d+'/*.bundles' )
       return listBundles
   def linkTracts( self, dummy ):
+    if self.subject is None:
+      return None
     if self.listOf_subset_of_tract is not None:
       li = []
       i = 0
       for ssTract in self.listOf_subset_of_tract:
-        tracts = os.path.basename( self.listOf_subset_of_tract[i].fullPath() )
+        if ssTract is None:
+          continue
+        tracts = os.path.basename( ssTract.fullPath() )
         #subject = os.path.basename( os.path.dirname( os.path.dirname( os.path.dirname( os.path.dirname( os.path.dirname( self.subset_of_tract.fullPath() ) ) ) ) ) )
         #subject = self.subject.get( 'subject' )
         i1 = tracts.rfind( '_' )
@@ -45,7 +49,7 @@ def initialization( self ):
         index = tracts[ i0: i1 ]
         n0 = tracts.rfind( '_' ) + 1
         number = tracts[ n0:tracts.rfind( '.' ) ]
-        attrs = dict( self.listOf_subset_of_tract[i].hierarchyAttributes() )
+        attrs = dict( ssTract.hierarchyAttributes() )
         attrs.update( self.subject.hierarchyAttributes() )
         #attrs['protocol'] = self.protocol
         #attrs['subject'] = subject
@@ -69,6 +73,7 @@ def initialization( self ):
   self.linkParameters( 'listOf_subset_of_tract', 'subset_of_tract', lef )
   self.linkParameters( 'reorganized_subsets_of_tracts', ( 'listOf_subset_of_tract', 'study_name', 'texture_name', 'subject' ), linkTracts )
   self.linkParameters( 'reorganized_subsets_of_tracts_bundlesnames', 'reorganized_subsets_of_tracts' )
+  self.linkParameters( 'white_mesh', 'subject' )
   self.linkParameters( 'gyri_segmentation', 'white_mesh' )
   self.linkParameters( 'subject', 'subset_of_tract', linkSubject )
 
