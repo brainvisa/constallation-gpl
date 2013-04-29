@@ -9,8 +9,12 @@ def validation():
   except:
     raise ValidationError( 'module roca is not here.' )
 
+try :
+  import roca.lib.textureTools as TT
+except :
+  pass
+
 import pylab
-import roca.lib.textureTools as TT
 
 name = '13 - Filtering Watershed'
 userLevel = 2

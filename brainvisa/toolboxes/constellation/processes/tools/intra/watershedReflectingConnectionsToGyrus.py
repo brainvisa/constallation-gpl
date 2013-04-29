@@ -9,7 +9,7 @@ def validation():
     raise ValidationError( 'module roca is not here.' )
 
 import pylab
-import roca.lib.textureTools as TT
+#import roca.lib.textureTools as TT
 
 
 name = '12 - Watershed'

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from brainvisa.processes import *
 from soma.path import find_in_path
 
@@ -7,7 +8,7 @@ def validation():
   except:
     raise ValidationError( 'module roca is not here.' )
 
-import gyri_texture_cleaning
+#import gyri_texture_cleaning
 from brainvisa.group_utils import Subject
 from soma.minf.api import registerClass, readMinf
 
@@ -41,6 +42,7 @@ def initialization ( self ):
   self.linkParameters( 'gyri_segmentations', 'group_freesurfer' )
 
 def execution ( self, context ):
+  
   registerClass('minf_2.0', Subject, 'Subject')
   groupOfSubjects = readMinf(self.group_freesurfer.fullPath())
 

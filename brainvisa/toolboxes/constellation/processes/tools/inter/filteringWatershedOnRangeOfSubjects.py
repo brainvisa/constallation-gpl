@@ -8,8 +8,12 @@ def validation():
   except:
     raise ValidationError( 'module roca is not here.' )
 
+try :
+  import roca.lib.textureTools as TT
+except :
+  pass
+    
 import pylab
-import roca.lib.textureTools as TT
 import numpy as np
 
 name = '04 - Watershed of Group'
@@ -28,6 +32,7 @@ def initialization ( self ):
   self.linkParameters( 'filtered_watershed', 'watershed_on_mean_connectivity_profile' )
 
 def execution ( self, context ):
+  
   context.write( 'Watershed and filtered watershed...' )
   '''
   A watershed is performed to obtain different patches of interest. These patches correspond to cortex sites with a strong connection to the gyrus.
