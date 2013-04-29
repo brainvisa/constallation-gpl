@@ -11,11 +11,12 @@ name = 'Brainvisa Intra pipeline'
 userLevel = 2
 
 signature = Signature(
-         'reorganized_subset_of_tract', ReadDiskItem( 'Gyri Regrouped Subset of Tracts', 'Aims bundles' ),
-       'gyri_segmentation', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
-              'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
-  'diff_to_anat_transform', ReadDiskItem( 'Transformation matrix', 'Transformation matrix' ),
-             'patch_label', Integer(),
+  'reorganized_subset_of_tract', ReadDiskItem( 'Gyri Regrouped Subset of Tracts', 'Aims bundles' ),
+            'gyri_segmentation', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+                   'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
+       'diff_to_anat_transform', ReadDiskItem( 'Transformation matrix', 'Transformation matrix' ),
+                  'patch_label', Integer(),
+                       'smooth', Float(),
 )
 
 def initialization( self ):
@@ -108,6 +109,9 @@ def initialization( self ):
                        
   eNode.addDoubleLink( 'Sum.patch_label',
                        'patch_label' )
+
+  eNode.addDoubleLink( 'Sum.smooth',
+                       'smooth' )
 
   ### 09 - Mean Connectivity Profile Texture intraSubjects
   eNode.addChild( 'ProfileComputing',
