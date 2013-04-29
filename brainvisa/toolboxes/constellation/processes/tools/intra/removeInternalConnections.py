@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
-from soma import aims
-import pylab
+try:
+  from soma import aims
+except:
+  pass
 
 def validation():
   try:
-    import roca
+    import soma.aims
   except:
-    raise ValidationError( 'module roca is not here.' )
+    raise ValidationError( 'module soma.aims is not here.' )
 
 
 name = '11 - Remove Internal Connections'
@@ -38,27 +40,21 @@ def execution ( self, context ):
   context.write('patch_label = ', patch_label, '    Is it correct?')
   mask = aims.read( self.gyri_segmentation.fullPath() )
   smoothMeanConnectivityProfileTex = aims.read( self.gyrus_mean_connectivity_profile.fullPath() )
+  marr =  mask[0].arraydata()
+  smcarr = smoothMeanConnectivityProfileTex[0].arraydata()
   for i in xrange( smoothMeanConnectivityProfileTex[0].nItem() ):
-    if mask[0][i] == int(patch_label):
-      smoothMeanConnectivityProfileTex[0][i] = 0
+    smcarr[marr==patch_label] = 0
   aims.write( smoothMeanConnectivityProfileTex, self.thresholded_mean_connectivity_profile.fullPath() )
   meanConnectivityProfileTexture_filename = self.thresholded_mean_connectivity_profile
-  
+
   context.write( 'Normalized between 0 And 1 mean connectivity profiles.' )
-  tex = aims.read( meanConnectivityProfileTexture_filename.fullPath() )
-  tex_ar = tex[0].arraydata()
   dividende_coef = 0
-  dividende_coef = tex_ar.max()
+  dividende_coef = smcarr.max()
   print "max connections value:", dividende_coef
   if dividende_coef > 0:
     z = 1./dividende_coef
-    for i in xrange(tex[0].nItem()):
-      value = tex[0][i]
-      tex[0][i]= z*value
-  aims.write( tex, self.norm_mean_connectivity_profile.fullPath() )
+    smcarr *= z
+  aims.write( smoothMeanConnectivityProfileTex, self.norm_mean_connectivity_profile.fullPath() )
   context.write( 'OK' )
-  
-  
-  
-  
-  
+
+
