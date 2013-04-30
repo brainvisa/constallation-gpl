@@ -81,7 +81,7 @@ def execution ( self, context ):
     print self.gyri_segmentation[g]
     print self.connectivity_matrix_reduced[n]
     print '--------------------------------'
-    context.system( "testConnMatrixToTargetsFromMatrix",
+    context.system( "constelConnectionDensityTexture",
       '-mesh', self.average_mesh,
       '-connmatrixfile', matrix,
       '-connfmt', 'binar_sparse',
