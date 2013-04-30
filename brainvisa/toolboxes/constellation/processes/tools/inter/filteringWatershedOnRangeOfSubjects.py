@@ -4,12 +4,12 @@ from soma import aims
 
 def validation():
   try:
-    import roca
+    import constel
   except:
     raise ValidationError( 'module roca is not here.' )
 
 try :
-  import roca.lib.textureTools as TT
+  import constel.lib.texturetools as TT
 except :
   pass
     
@@ -57,5 +57,5 @@ def execution ( self, context ):
   for basin_label in basins_labels:
     if np.where( basinTex_ar == basin_label )[0].size < minVertex_nb:
       labelsToRemove_list.append( basin_label )
-  filteredBasins_tex = TT.removeParcellsFromLabeledTexture( basins_tex, labelsToRemove_list )
+  filteredBasins_tex = TT.removeLabelsFromTexture( basins_tex, labelsToRemove_list )
   aims.write( filteredBasins_tex, self.filtered_watershed.fullPath() )

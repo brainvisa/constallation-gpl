@@ -5,16 +5,15 @@ import numpy as N
 
 def validation():
   try:
-    import roca
+    import constel
   except:
     raise ValidationError( 'module roca is not here.' )
 
 try :
-  import roca.lib.textureTools as TT
+  import constel.lib.texturetools as TT
 except :
   pass
 
-import pylab
 
 name = '13 - Filtering Watershed'
 userLevel = 2
@@ -92,6 +91,7 @@ def execution ( self, context ):
     if labelsToRemove_list.count( label ) == 0:
       labelsToRemove_list.append( label )
   
-  filteredWatershedBasins_tex = TT.removeParcellsFromLabeledTexture( subjectWatershedBasins_tex,labelsToRemove_list )
+  filteredWatershedBasins_tex = TT.removeLabelsFromTexture(
+    subjectWatershedBasins_tex,labelsToRemove_list )
   aims.write( filteredWatershedBasins_tex, self.filtered_watershed.fullPath() )
   context.write( 'OK' )
