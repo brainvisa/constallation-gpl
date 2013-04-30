@@ -58,7 +58,7 @@ def execution ( self, context ):
   context.write(str([i for i in gyri_segmentations]))
 
   #context.system('python', '-c', 'from lefranc.average_texture_labels_test import average_texture_labels_test as f; f(\"%s\", %s);'%(self.average_gyri_segmentation.fullPath(), str([i for i in gyri_segmentations])))
-  context.system('python', '-m', 'lefranc.average_texture_labels', self.average_gyri_segmentation.fullPath(), *gyri_segmentations)
+  context.system('python', '-m', 'constel.cmd.average_texture_labels', self.average_gyri_segmentation.fullPath(), *gyri_segmentations)
 
   # Computing connected component:
   context.system('python', find_in_path( '/volatile/sandrine/svn/brainvisa/perso/roca/trunk/ensemble_du_code_hors_depot/code_test/scripts/gyri_texture_cleaning.py' ),
