@@ -29,7 +29,7 @@ signature = Signature(
 
 def initialization ( self ):
   self.linkParameters( 'watershed_on_mean_connectivity_profile', 'normed_thresholded_mean_connectivity_profile' )
-  self.linkParameters( 'filtered_watershed', 'watershed_on_mean_connectivity_profile' )
+  self.linkParameters( 'filtered_watershed', 'normed_thresholded_mean_connectivity_profile' )
 
 def execution ( self, context ):
   
@@ -37,14 +37,13 @@ def execution ( self, context ):
   '''
   A watershed is performed to obtain different patches of interest. These patches correspond to cortex sites with a strong connection to the gyrus.
   '''
-  context.system( 'MeshWatershedProcessing.py',
+  context.system( 'AimsMeshWatershed.py',
     '-i', self.normed_thresholded_mean_connectivity_profile,
     '-m', self.average_mesh,
-    '--group', 'value',
-    '--ksize', 10,
-    '--kdepth', 0.05,
-    '--mode', 'or',
-    '--threshold', 0.05,
+    '-k', 10,
+    '-q', 0.05,
+    '-z', 'or',
+    '-t', 0.05,
     '-o', self.watershed_on_mean_connectivity_profile
   )
 
