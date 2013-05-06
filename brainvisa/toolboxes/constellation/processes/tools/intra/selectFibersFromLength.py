@@ -15,6 +15,8 @@ userLevel = 2
 signature = Signature(
     'tracts_by_length_MeshClosestPoint', ReadDiskItem( 'Gyrus Regrouped By Length Tracts Mesh Closest Point', 'Aims bundles' ),
   'tracts_by_length_MeshIntersectPoint', ReadDiskItem( 'Gyrus Regrouped By Length Tracts Mesh Intersect Point', 'Aims bundles' ),
+          'min_length_fibersNearCortex', Integer(),
+             'min_length_distantFibers', Integer(),
   
     'length_filtered_tracts_MeshClosestPoint', WriteDiskItem( 'Gyrus Length Interval Tracts Mesh Closest Point', 'Aims bundles' ),
   'length_filtered_tracts_MeshIntersectPoint', WriteDiskItem( 'Gyrus Length Interval Tracts Mesh Intersect Point', 'Aims bundles' ),
@@ -23,27 +25,39 @@ signature = Signature(
 )
   
 def initialization ( self ):
+  self.min_length_fibersNearCortex = 20
+  self.min_length_distantFibers = 20
+  def linkLengthIn( self, dummy ):
+    if self.tracts_by_length_MeshClosestPoint is not None and self.min_length_fibersNearCortex is not None:
+      attrs = dict( self.tracts_by_length_MeshClosestPoint.hierarchyAttributes() )
+      attrs['minlengthoffibersIn'] = str( self.min_length_fibersNearCortex )
+      x = self.signature['length_filtered_tracts_MeshClosestPoint'].findValue( attrs )
+      return x
+  def linkLengthOut( self, dummy ):
+    if self.tracts_by_length_MeshIntersectPoint is not None and self.min_length_distantFibers is not None:
+      attrs = dict( self.tracts_by_length_MeshIntersectPoint.hierarchyAttributes() )
+      attrs['minlengthoffibersOut'] = str( self.min_length_distantFibers )
+      x = self.signature['length_filtered_tracts_MeshIntersectPoint'].findValue( attrs )
+      return x
   self.linkParameters( 'tracts_by_length_MeshIntersectPoint', 'tracts_by_length_MeshClosestPoint' )
-  self.linkParameters( 'length_filtered_tracts_MeshClosestPoint', 'tracts_by_length_MeshClosestPoint' )
-  self.linkParameters( 'length_filtered_tracts_MeshIntersectPoint', 'tracts_by_length_MeshIntersectPoint' )
-  self.linkParameters( 'tracts_20percent_MeshClosestPoint','tracts_by_length_MeshClosestPoint' )
-  self.linkParameters( 'tracts_20percent_MeshIntersectPoint', 'tracts_by_length_MeshIntersectPoint' )
+  self.linkParameters( 'length_filtered_tracts_MeshClosestPoint', ( 'tracts_by_length_MeshClosestPoint', 'min_length_fibersNearCortex' ), linkLengthIn )
+  self.linkParameters( 'length_filtered_tracts_MeshIntersectPoint', ( 'tracts_by_length_MeshIntersectPoint', 'min_length_distantFibers' ), linkLengthOut )
+  self.linkParameters( 'tracts_20percent_MeshClosestPoint', ('length_filtered_tracts_MeshClosestPoint', 'min_length_fibersNearCortex' ) )
+  self.linkParameters( 'tracts_20percent_MeshIntersectPoint', ( 'length_filtered_tracts_MeshIntersectPoint', 'min_length_distantFibers' ) )
 
 def execution ( self, context ):
   context.write( 'For a given cortex region, select fibers from length...' )
-  length_min_MeshClosestPoint = 60
-  length_min_MeshIntersectPoint = 20
-  length_max = 500  
+  length_max = 500 # sufficient length
   context.system( 'constelSelectBundlesFromNames',
     '-i', self.tracts_by_length_MeshClosestPoint,
     '-o', self.length_filtered_tracts_MeshClosestPoint,
-    '-names', *[ str(x) for x in xrange( length_min_MeshClosestPoint, length_max + 1 ) ]
+    '-names', *[ str(x) for x in xrange( self.min_length_fibersNearCortex, length_max + 1 ) ]
   )
   
   context.system( 'constelSelectBundlesFromNames',
     '-i', self.tracts_by_length_MeshIntersectPoint,
     '-o', self.length_filtered_tracts_MeshIntersectPoint,
-    '-names', *[ str(x) for x in xrange( length_min_MeshIntersectPoint, length_max + 1 ) ]
+    '-names', *[ str(x) for x in xrange( self.min_length_distantFibers, length_max + 1 ) ]
   )
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
