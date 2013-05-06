@@ -14,9 +14,9 @@ insert( '{protocol}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_sessi
               'filteredTracts', SetContent(
                 '<subject>_<texture>_<gyrus>_fibersNearCortex_groupByLength_5%', SetType( 'Gyrus Tracts Mesh Closest Point 5%' ),
                 '<subject>_<texture>_<gyrus>_distantFibers_groupByLength_5%', SetType( 'Gyrus Tracts Mesh Intersect Point 5%' ),
-                '<subject>_<texture>_<gyrus>_fibersNearCortex_60to500mm_20%', SetType( 'Gyrus Length Interval Tracts Mesh Closest Point 20%' ),
-                '<subject>_<texture>_<gyrus>_distantFibers_20to500mm_20%', SetType( 'Gyrus Length Interval Tracts Mesh Intersect Point 20%' ),
-                '<subject>_<texture>_<gyrus>_distantFibers_20to500mm_oversampled', SetType( 'Gyrus Oversampled Length Interval Tracts Mesh Intersect Point' ),
+                '<subject>_<texture>_<gyrus>_fibersNearCortex_{minlengthoffibersIn}to500mm_20%', SetType( 'Gyrus Length Interval Tracts Mesh Closest Point 20%' ),
+                '<subject>_<texture>_<gyrus>_distantFibers_{minlengthoffibersOut}to500mm_20%', SetType( 'Gyrus Length Interval Tracts Mesh Intersect Point 20%' ),
+                '<subject>_<texture>_<gyrus>_distantFibers_{minlengthoffibersOut}to500mm_oversampled', SetType( 'Gyrus Oversampled Length Interval Tracts Mesh Intersect Point' ),
                 '<subject>_<texture>_<gyrus>_fibersNearCortex_{trackingfileindex}_{maxnumberoffile}', SetType( 'Gyrus Subset of Tracts Mesh Closest Point' ),
                 '<subject>_<texture>_<gyrus>_distantFibers_{trackingfileindex}_{maxnumberoffile}', SetType( 'Gyrus Subset of Tracts Mesh Intersect Point' ),
                 '<subject>_<texture>_<gyrus>_fibersNearCortex_full', SetType( 'Gyrus Tracts Mesh Closest Point' ),
@@ -25,8 +25,8 @@ insert( '{protocol}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_sessi
                 '<subject>_<texture>_<gyrus>_distantFibers_length', SetType( 'List of Fibers Length Mesh Intersect Point' ),
                 '<subject>_<texture>_<gyrus>_fibersNearCortex_groupByLength', SetType( 'Gyrus Regrouped By Length Tracts Mesh Closest Point' ),
                 '<subject>_<texture>_<gyrus>_distantFibers_groupByLength', SetType( 'Gyrus Regrouped By Length Tracts Mesh Intersect Point' ),
-                '<subject>_<texture>_<gyrus>_fibersNearCortex_60to500mm', SetType( 'Gyrus Length Interval Tracts Mesh Closest Point' ),
-                '<subject>_<texture>_<gyrus>_distantFibers_20to500mm', SetType( 'Gyrus Length Interval Tracts Mesh Intersect Point' ),
+                '<subject>_<texture>_<gyrus>_fibersNearCortex_{minlengthoffibersIn}to500mm', SetType( 'Gyrus Length Interval Tracts Mesh Closest Point' ),
+                '<subject>_<texture>_<gyrus>_distantFibers_{minlengthoffibersOut}to500mm', SetType( 'Gyrus Length Interval Tracts Mesh Intersect Point' ),
                 '<subject>_<texture>_<gyrus>_allFibers_groupByLength', SetType( 'One FreeSurfer Gyrus Length Interval Tracts To All Cortex' ),
               ),
     
