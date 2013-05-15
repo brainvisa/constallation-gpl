@@ -5,9 +5,9 @@ from soma.minf.api import registerClass, readMinf
 
 def validation():
   try:
-    import roca
+    import soma.aims
   except:
-    raise ValidationError( 'module roca is not here.' )
+    raise ValidationError( 'aims module is not here.' )
 
 name = '02 - Conectivity Profile of Group'
 userLevel = 2

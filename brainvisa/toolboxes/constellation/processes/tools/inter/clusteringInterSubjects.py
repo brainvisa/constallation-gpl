@@ -5,6 +5,8 @@ from soma.minf.api import registerClass, readMinf
 from soma.path import find_in_path
 
 def validation():
+  if not find_in_path('clusteringIntersubjects.py'):
+    raise ValidationError( 'constellation module is not here.' )
   try:
     import roca
   except:

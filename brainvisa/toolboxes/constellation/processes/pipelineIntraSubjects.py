@@ -7,6 +7,10 @@ def validation():
   except:
     raise ValidationError( 'constellation module is not here.' )
   testFreesurferCommand()
+  try:
+    import roca
+  except:
+    raise ValidationError( 'module roca is not here.' )
 
 name = 'Freesurfer BrainVisa + Constellation Intra pipeline'
 userLevel = 2

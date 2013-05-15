@@ -6,7 +6,7 @@ def validation():
   try:
     import constel
   except:
-    raise ValidationError( 'module roca is not here.' )
+    raise ValidationError( 'constellation module is not here.' )
 
 try :
   import constel.lib.texturetools as TT
@@ -58,3 +58,4 @@ def execution ( self, context ):
       labelsToRemove_list.append( basin_label )
   filteredBasins_tex = TT.removeLabelsFromTexture( basins_tex, labelsToRemove_list )
   aims.write( filteredBasins_tex, self.filtered_watershed.fullPath() )
+

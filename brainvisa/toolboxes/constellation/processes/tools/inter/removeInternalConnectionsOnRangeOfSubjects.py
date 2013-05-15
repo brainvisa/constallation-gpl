@@ -3,9 +3,9 @@ from brainvisa.processes import *
 
 def validation():
   try:
-    import roca
+    import soma.aims
   except:
-    raise ValidationError( 'module roca is not here.' )
+    raise ValidationError( 'aims module is not here.' )
 
 name = '03 - Normed Connectivity Profile of Group'
 userLevel = 2
@@ -43,7 +43,5 @@ def execution ( self, context ):
       value = tex[0][i]
       tex[0][i]= z*value
   aims.write(tex, self.norm_thresholded_mean_connectivity_profile.fullPath() )
-  
-  
-  
-  
+
+

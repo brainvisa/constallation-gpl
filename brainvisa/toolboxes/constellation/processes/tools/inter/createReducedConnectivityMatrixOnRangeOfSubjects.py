@@ -4,10 +4,8 @@ from brainvisa.group_utils import Subject
 from soma.minf.api import registerClass, readMinf
 
 def validation():
-  try:
-    import roca
-  except:
-    raise ValidationError( 'module roca is not here.' )
+  if not findInPath( 'constelConnectionDensityTexture' ):
+    raise ValidationError( 'constellation module is not here.' )
 
 name = '05 - Connectivity Matrix Reduced'
 userLevel = 2
@@ -101,3 +99,4 @@ def execution ( self, context ):
       g += 1
   listReducedMatrix = self.connectivity_matrix_reduced
   context.write( 'OK' )
+
