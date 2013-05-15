@@ -5,7 +5,7 @@ from soma.minf.api import registerClass, readMinf
 from soma.path import find_in_path
 
 def validation():
-  if not find_in_path('clusteringIntersubjects.py'):
+  if not find_in_path('constelInterSubjectClustering.py'):
     raise ValidationError( 'constellation module is not here.' )
   try:
     import roca
@@ -113,7 +113,7 @@ def execution ( self, context ):
   for v in self.vertex_index:
     cmd_args += [ '-v', v ]
   cmd_args += [ '-m', self.average_mesh, '-l', patch_label, '-a', self.areaMin_threshold, '-s', self.study, '-g', self.group_matrix, '-x', self.clustering_results, '-r', Rclustering_filename ]
-  context.system( 'python', find_in_path('clusteringIntersubjects.py'),
+  context.system( 'python', find_in_path('constelInterSubjectClustering.py'),
     *cmd_args
   )
 
