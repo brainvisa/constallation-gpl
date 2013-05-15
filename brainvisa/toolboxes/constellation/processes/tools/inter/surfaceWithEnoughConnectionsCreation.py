@@ -6,7 +6,7 @@ from soma.path import find_in_path
 from soma import aims
 
 def validation():
-  if not find_in_path( 'mask.py' ):
+  if not find_in_path( 'constelConnectivityProfileOverlapMask.py' ):
     raise ValidationError( 'constellation module is not here.' )
 
 name = '01 - Creation of a mask'
@@ -58,8 +58,9 @@ def execution ( self, context ):
   for x in self.individual_connectivity_profile:
     args += [ '-p', x ]
   args += [ '-o', self.mask ]
-  context.system('python', find_in_path( 'mask.py' ),
-   *args
+  context.system('python', 
+    find_in_path( 'constelConnectivityProfileOverlapMask.py' ),
+    *args
   )
   context.write( 'OK' )
 
