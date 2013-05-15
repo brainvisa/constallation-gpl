@@ -48,7 +48,7 @@ def execution ( self, context ):
     patch_label = os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_full.fullPath() ) ) )
     patch_label = patch_label.strip('G')
   context.write('patch_label = ', patch_label, '    Is it correct?')
-  context.system( 'testConnMatrixToTargetsFromMatrix',
+  context.system( 'constelConnectionDensityTexture',
     '-mesh', self.white_mesh,
     '-connfmt', 'binar_sparse', 
     '-connmatrixfile', self.connectivity_matrix_full,
