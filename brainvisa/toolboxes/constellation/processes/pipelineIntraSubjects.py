@@ -1,12 +1,14 @@
 from brainvisa.processes import *
+from freesurfer.brainvisaFreesurfer import testFreesurferCommand
 
 def validation():
   try:
-    import roca
+    import constel
   except:
-    raise ValidationError( 'module roca is not here.' )
+    raise ValidationError( 'constellation module is not here.' )
+  testFreesurferCommand()
 
-name = 'Freesurfer BrainVisa Intra pipeline'
+name = 'Freesurfer BrainVisa + Constellation Intra pipeline'
 userLevel = 2
 
 signature = Signature(
@@ -195,17 +197,17 @@ def initialization( self ):
                        'ConnectivityMatrixToBassins.gyri_segmentation' )
   
   ### Clustering IntraSubjects 
-  eNode.addChild( 'ClusteringIntrasubject',
+  eNode.addChild( 'ClusteringIntraSubject',
                   ProcessExecutionNode( 'ClusteringIntrasubject',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'ClusteringIntraSubjects.connectivity_matrix_reduced',
+  eNode.addDoubleLink( 'ClusteringIntraSubject.connectivity_matrix_reduced',
                        'ConnectivityMatrixWatershedToBassins.connectivity_matrix_reduced' )
         
-  eNode.addDoubleLink( 'ClusteringIntraSubjects.gyri_segmentation',
+  eNode.addDoubleLink( 'ClusteringIntraSubject.gyri_segmentation',
                        'FreeSurferPipeline.FreeSurferPipeline.freesurferConcatTex.Gyri' )
 
-  eNode.addDoubleLink( 'ClusteringIntraSubjects.white_mesh',
+  eNode.addDoubleLink( 'ClusteringIntraSubject.white_mesh',
                        'FreeSurferPipeline.FreeSurferPipeline.freesurferConcatenate.BothWhite' )
                        
   self.setExecutionNode( eNode )
