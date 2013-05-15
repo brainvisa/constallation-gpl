@@ -2,10 +2,8 @@
 from brainvisa.processes import *
 
 def validation():
-  try:
-    import roca
-  except:
-    raise ValidationError( 'module roca is not here.' )
+  if not findInPath( 'comistBundlesFusion_old' ):
+    raise ValidationError( 'connectomist module is not here.' )
 
 
 name = '03 - Fusion All Bundles'
@@ -47,13 +45,5 @@ def execution ( self, context ):
   context.system( "comistBundlesFusion_old", *cmd_args2 )
 
   context.write( 'OK' )
-      
-      
-      
-  
-  
-  
-  
 
-  
-  
+
