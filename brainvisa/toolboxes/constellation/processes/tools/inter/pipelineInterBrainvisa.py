@@ -5,10 +5,6 @@ def validation():
     import constel
   except:
     raise ValidationError( 'constellation module is not here.' )
-  try:
-    import roca
-  except:
-    raise ValidationError( 'module roca is not here.' )
 
 name = 'Pipeline InterSubject'
 userLevel = 2

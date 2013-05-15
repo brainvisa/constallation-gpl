@@ -7,10 +7,6 @@ from soma.path import find_in_path
 def validation():
   if not find_in_path('constelInterSubjectClustering.py'):
     raise ValidationError( 'constellation module is not here.' )
-  try:
-    import roca
-  except:
-    raise ValidationError( 'module roca is not here.' )
 
 name = '06 - Clustering of Group'
 userLevel = 2

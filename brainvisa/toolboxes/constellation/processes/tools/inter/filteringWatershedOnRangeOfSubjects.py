@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
 from soma import aims
+import numpy as np
 
 def validation():
   try:
@@ -13,8 +14,6 @@ try :
 except :
   pass
     
-import pylab
-import numpy as np
 
 name = '04 - Watershed of Group'
 userLevel = 2
