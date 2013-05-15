@@ -95,7 +95,7 @@ def execution ( self, context ):
   for x in self.individual_reduced_matrix:
     args += [ '-m', x ]
   args += [ '-o', self.group_matrix, '-s', self.study ]
-  context.system('python', find_in_path( 'calculateMatrixGroup.py' ),
+  context.system('python', find_in_path( 'constelCalculateGroupMatrix.py' ),
    *args
   )
   
