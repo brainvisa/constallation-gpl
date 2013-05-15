@@ -81,6 +81,9 @@ def initialization( self ):
   eNode.addDoubleLink( 'Smoothing.oversampled_tracts_MeshIntersectPoint',
                        'ConnectivityCortexMatrix.oversampled_tracts_MeshIntersectPoint' )
 
+  eNode.addDoubleLink( 'Smoothing.length_filtered_tracts_MeshClosestPoint',
+                       'LengthFiltering.length_filtered_tracts_MeshClosestPoint' )
+
   #eNode.Smoothing.removeLink( 'gyri_segmentation',
                               #'oversampled_tracts_MeshIntersectPoint' )
 
