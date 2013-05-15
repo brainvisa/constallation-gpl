@@ -2,10 +2,8 @@
 from brainvisa.processes import *
 
 def validation():
-  try:
-    import roca
-  except:
-    raise ValidationError( 'module roca is not here.' )
+  if not findInPath( 'AimsSparseMatrixToDense.py' ):
+    raise ValidationError( 'aims module is not here.' )
 
 name = 'Convert Sparse Matrix to Ima'
 userLevel = 2
@@ -20,9 +18,8 @@ def initialization ( self ):
 
 def execution ( self, context ):
   context.write( 'Convert sparse matrix to ima.' )
-  context.system( 'testConvertSparseMatrixToIma',
+  context.system( 'AimsSparseMatrixToDense.py',
     '-i', self.connectivity_matrix_full,
     '-o', self.patch_connectivity_matrix,
-    '-inputfmt', 'binar_sparse'
   )
   context.write( 'OK' )
