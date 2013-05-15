@@ -3,10 +3,8 @@ from brainvisa.processes import *
 from soma.path import find_in_path
 
 def validation():
-  try:
-    import roca
-  except:
-    raise ValidationError( 'module roca is not here.' )
+  if not find_in_path( 'clusteringIntrasubject.py' ):
+    raise ValidationError( 'constellation module is not here.' )
 
 name = '15 - Clustering'
 userLevel = 2

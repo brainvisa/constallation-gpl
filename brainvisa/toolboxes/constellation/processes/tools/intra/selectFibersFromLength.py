@@ -4,9 +4,9 @@ import numpy as np
 
 def validation():
   try:
-    import roca
+    import constel
   except:
-    raise ValidationError( 'module roca is not here.' )
+    raise ValidationError( 'constellation module is not here.' )
 
 
 name = '05 - Select Fibers From Length'

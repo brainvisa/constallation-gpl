@@ -3,10 +3,8 @@ from brainvisa.processes import *
 import glob
 
 def validation():
-  try:
-    import roca
-  except:
-    raise ValidationError( 'module roca is not here.' )
+  if not findInPath( 'constelSelectFibersFromMesh' ):
+    raise ValidationError( 'constellation module is not here.' )
 
 name = '01 - Select Fibers From Mesh'
 userLevel = 2

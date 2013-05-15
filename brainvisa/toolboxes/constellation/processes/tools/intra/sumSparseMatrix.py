@@ -2,10 +2,9 @@
 from brainvisa.processes import *
 
 def validation():
-  try:
-    import roca
-  except:
-    raise ValidationError( 'module roca is not here.' )
+  if not findInPath( 'AimsSumSparseMatrix' ) \
+      or not findInPath( 'AimsSparseMatrixSmoothing' ):
+    raise ValidationError( 'aims module is not here.' )
 
 name = '08 - Sum Sparse Matrix Smoothing'
 userLevel = 2

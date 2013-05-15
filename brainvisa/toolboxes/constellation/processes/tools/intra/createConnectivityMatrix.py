@@ -3,9 +3,9 @@ from brainvisa.processes import *
 
 def validation():
   try:
-    import roca
+    import constel
   except:
-    raise ValidationError( 'module roca is not here.' )
+    raise ValidationError( 'constellation module is not here.' )
 
 name = '07 - Connectivity Matrix'
 userLevel = 2

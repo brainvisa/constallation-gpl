@@ -2,10 +2,8 @@
 from brainvisa.processes import *
 
 def validation():
-  try:
-    import roca
-  except:
-    raise ValidationError( 'module roca is not here.' )
+  if not findInPath( 'comistFiberOversampler' ):
+    raise ValidationError( 'connectomist module is not here.' )
 
 name = '06 - Fiber Oversampler'
 userLevel = 2

@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
 from soma import aims
-import pylab
 
 def validation():
-  try:
-    import roca
-  except:
-    raise ValidationError( 'module roca is not here.' )
+  if not findInPath( 'constelMeanConnectivityProfileFromMatrix' ):
+    raise ValidationError( 'constellation module is not here.' )
 
 
 name = '09 - Mean Connectivity Profile'

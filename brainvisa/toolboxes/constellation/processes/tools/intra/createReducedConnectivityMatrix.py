@@ -2,10 +2,8 @@ from brainvisa.processes import *
 from soma import aims
 
 def validation():
-  try:
-    import roca
-  except:
-    raise ValidationError( 'module roca is not here.' )
+  if not findInPath( 'constelConnectionDensityTexture' ):
+    raise ValidationError( 'constellation module is not here.' )
 
 name = '14 - Reduced Connectivity Matrix'
 userLevel = 2

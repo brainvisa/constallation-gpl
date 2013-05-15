@@ -7,7 +7,7 @@ def validation():
   try:
     import constel
   except:
-    raise ValidationError( 'module roca is not here.' )
+    raise ValidationError( 'constellation module is not here.' )
 
 try :
   import constel.lib.texturetools as TT

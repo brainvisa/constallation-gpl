@@ -3,13 +3,8 @@ from brainvisa.processes import *
 from soma import aims
 
 def validation():
-  try:
-    import roca
-  except:
-    raise ValidationError( 'module roca is not here.' )
-
-import pylab
-#import roca.lib.textureTools as TT
+  if not findInPath( 'AimsMeshWatershed.py' ):
+    raise ValidationError( 'aims module is not here.' )
 
 
 name = '12 - Watershed'
@@ -28,7 +23,8 @@ def initialization ( self ):
 
 def execution ( self, context ):
   context.write( 'A watershed is performed to obtain different patches of interest. These patches correspond to cortex sites with a strong connection to the gyrus.' )
-  commandMeshWatershedProcessing = [ 'AimsMeshWatershed.py',
+  commandMeshWatershedProcessing = [ sys.executable,
+    findInPath( 'AimsMeshWatershed.py' ),
     '-i', self.norm_mean_connectivity_profile,
     '-m', self.white_mesh,
     '-k', 10,
