@@ -52,11 +52,10 @@ def initialization ( self ):
       groupOfSubjects = readMinf(self.group.fullPath())
       vertexf = []
       for subject in groupOfSubjects:
-        proto = 'subjects'
         study = self.study_name
         texture = self.texture_in
         gyrus = 'G' + str(self.patch_label)
-        vertexf.append( ReadDiskItem( 'Vertex Index', 'Text file' ).findValue( { 'protocol': proto, 'study': study, 'texture': texture, 'gyrus': gyrus }, subject.attributes() ) )
+        vertexf.append( ReadDiskItem( 'Vertex Index', 'Text file' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus }, subject.attributes() ) )
       return vertexf
   def linkMatrix( self, dummy ):
     if self.group is not None:

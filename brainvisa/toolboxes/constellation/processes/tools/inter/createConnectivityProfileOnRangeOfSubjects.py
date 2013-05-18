@@ -31,11 +31,10 @@ def initialization ( self ):
       groupOfSubjects = readMinf(self.group.fullPath())
       profiles = []
       for subject in groupOfSubjects:
-        proto = 'subjects'
         study = self.study_name
         texture = self.texture_in
         gyrus = 'G' + str(self.patch_label)
-        profiles.append( ReadDiskItem( 'Normed Connectivity Profile', 'Aims texture formats' ).findValue( { 'protocol': proto, 'study': study, 'texture': texture, 'gyrus': gyrus }, subject.attributes() ) )
+        profiles.append( ReadDiskItem( 'Normed Connectivity Profile', 'Aims texture formats' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus }, subject.attributes() ) )
       return profiles
   def linkProfiles( self, dummy ):
     if self.thresholded_mean_connectivity_profile and self.group is not None:

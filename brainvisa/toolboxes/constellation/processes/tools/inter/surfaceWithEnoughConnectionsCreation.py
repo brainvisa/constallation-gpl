@@ -29,11 +29,10 @@ def initialization ( self ):
       groupOfSubjects = readMinf(self.group.fullPath())
       profiles = []
       for subject in groupOfSubjects:
-        proto = 'subjects'
         study = self.study_name
         texture = self.texture_in
         gyrus = 'G' + str(self.patch_label)
-        profiles.append( ReadDiskItem( 'Gyrus Connectivity Profile', 'Aims texture formats' ).findValue( { 'protocol': proto, 'study': study, 'texture': texture, 'gyrus': gyrus }, subject.attributes() ) )
+        profiles.append( ReadDiskItem( 'Gyrus Connectivity Profile', 'Aims texture formats' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus }, subject.attributes() ) )
         print profiles
       return profiles
   def linkGroupProfiles( self, dummy ):

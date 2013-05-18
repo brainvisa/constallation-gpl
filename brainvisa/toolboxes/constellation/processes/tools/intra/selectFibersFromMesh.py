@@ -13,7 +13,6 @@ signature = Signature(
               'study_name', String(),
             'texture_name', String(),
          'subset_of_tract', ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ),
-                #'protocol', String(),
                  'subject', ReadDiskItem( 'subject', 'directory' ),
   'listOf_subset_of_tract', ListOf( ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ) ),
               'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
@@ -49,8 +48,6 @@ def initialization( self ):
         number = tracts[ n0:tracts.rfind( '.' ) ]
         attrs = dict( ssTract.hierarchyAttributes() )
         attrs.update( self.subject.hierarchyAttributes() )
-        #attrs['protocol'] = self.protocol
-        #attrs['subject'] = subject
         attrs['study'] = self.study_name
         attrs['texture'] = self.texture_name
         attrs['trackingfileindex'] = index
@@ -75,7 +72,6 @@ def initialization( self ):
   self.linkParameters( 'gyri_segmentation', 'white_mesh' )
   self.linkParameters( 'subject', 'subset_of_tract', linkSubject )
 
-  #self.protocol = 'subjects'
   self.signature['listOf_subset_of_tract'].userLevel = 2
   self.signature['reorganized_subsets_of_tracts'].userLevel = 2
   self.signature['reorganized_subsets_of_tracts_bundlesnames'].userLevel = 2
