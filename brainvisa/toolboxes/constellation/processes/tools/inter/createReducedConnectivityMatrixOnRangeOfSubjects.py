@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
+from soma.path import find_in_path
 from brainvisa.group_utils import Subject
 from soma.minf.api import registerClass, readMinf
 
 def validation():
-  if not findInPath( 'constelConnectionDensityTexture' ):
+  if not find_in_path( 'constelConnectionDensityTexture' ):
     raise ValidationError( 'constellation module is not here.' )
 
 name = '05 - Connectivity Matrix Reduced'
@@ -40,15 +41,15 @@ def initialization ( self ):
   def linkProfiles( self, dummy ):
     if self.individual_matrix_sparse and self.group is not None:
       profiles = []
-      i = 0
       for p in self.individual_matrix_sparse:
+        if p is not None:
+          continue
         atts = dict( self.group.hierarchyAttributes() )
-        atts[ 'study' ] = self.individual_matrix_sparse[i].get( 'study' )
+        atts[ 'study' ] = p.get( 'study' )
         atts[ 'texture' ] = self.texture_out
-        atts[ 'gyrus' ] = self.individual_matrix_sparse[i].get( 'gyrus' )
-        atts[ 'subject' ] = self.individual_matrix_sparse[i].get( 'subject' )
+        atts[ 'gyrus' ] = p.get( 'gyrus' )
+        atts[ 'subject' ] = p.get( 'subject' )
         profiles.append( WriteDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' ).findValue( atts ) )
-        i += 1
       return profiles
   self.linkParameters( 'individual_matrix_sparse', ( 'group', 'study_name', 'texture_in', 'patch_label' ), linkIndividualProfiles )
   self.linkParameters( 'filtered_watershed', ( 'group', 'patch_label', 'texture_out' ) )

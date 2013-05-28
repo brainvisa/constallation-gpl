@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
+from soma.path import find_in_path
 from soma import aims
 
 def validation():
-  if not findInPath( 'constelMeanConnectivityProfileFromMatrix' ):
+  if not find_in_path( 'constelMeanConnectivityProfileFromMatrix' ):
     raise ValidationError( 'constellation module is not here.' )
 
 

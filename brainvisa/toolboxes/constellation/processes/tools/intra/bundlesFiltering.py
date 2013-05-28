@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
+from soma.path import find_in_path
 #import glob
 
 def validation():
-  if not findInPath( 'constelBundlesFiltering' ):
+  if not find_in_path( 'constelBundlesFiltering' ):
     raise ValidationError( 'constellation module is not here.' )
 
 name = 'Bundles Filtering'

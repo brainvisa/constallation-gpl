@@ -1,8 +1,9 @@
 from brainvisa.processes import *
 from soma import aims
+from soma.path import find_in_path
 
 def validation():
-  if not findInPath( 'constelConnectionDensityTexture' ):
+  if not find_in_path( 'constelConnectionDensityTexture' ):
     raise ValidationError( 'constellation module is not here.' )
 
 name = '14 - Reduced Connectivity Matrix'

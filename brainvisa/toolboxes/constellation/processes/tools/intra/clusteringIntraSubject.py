@@ -46,7 +46,7 @@ def execution ( self, context ):
   else:
     patch_label = os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_reduced.fullPath() ) ) )
     patch_label = patch_label.strip('G')
-  context.system( 'python', find_in_path( 'constelIntraSubjectClustering.py' ),
+  context.system( sys.executable, find_in_path( 'constelIntraSubjectClustering.py' ),
     '-m', self.connectivity_matrix_reduced,
     '-p', patch_label,
     '-g', self.gyri_segmentation,

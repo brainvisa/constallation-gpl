@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
+from soma.path import find_in_path
 import glob
 
 def validation():
-  if not findInPath( 'constelSelectFibersFromMesh' ):
+  if not find_in_path( 'constelSelectFibersFromMesh' ):
     raise ValidationError( 'constellation module is not here.' )
 
-name = '01 - Select Fibers From Mesh'
+name = 'Select Fibers From Mesh'
 userLevel = 2
 
 signature = Signature(

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
+from soma.path import find_in_path
 
 def validation():
-  if not findInPath( 'AimsSumSparseMatrix' ) \
-      or not findInPath( 'AimsSparseMatrixSmoothing' ):
+  if not find_in_path( 'AimsSumSparseMatrix' ) \
+      or not find_in_path( 'AimsSparseMatrixSmoothing' ):
     raise ValidationError( 'aims module is not here.' )
 
 name = '08 - Sum Sparse Matrix Smoothing'

@@ -25,7 +25,7 @@ signature = Signature(
 )
   
 def initialization ( self ):
-  self.min_length_fibersNearCortex = 20
+  self.min_length_fibersNearCortex = 30
   self.min_length_distantFibers = 20
   def linkLengthIn( self, dummy ):
     if self.tracts_by_length_MeshClosestPoint is not None and self.min_length_fibersNearCortex is not None:

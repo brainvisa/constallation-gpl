@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from brainvisa.processes import *
 from soma import aims
+from soma.path import find_in_path
 
 def validation():
-  if not findInPath( 'AimsMeshWatershed.py' ):
+  if not find_in_path( 'AimsMeshWatershed.py' ):
     raise ValidationError( 'aims module is not here.' )
 
 
@@ -24,7 +25,7 @@ def initialization ( self ):
 def execution ( self, context ):
   context.write( 'A watershed is performed to obtain different patches of interest. These patches correspond to cortex sites with a strong connection to the gyrus.' )
   commandMeshWatershedProcessing = [ sys.executable,
-    findInPath( 'AimsMeshWatershed.py' ),
+    find_in_path( 'AimsMeshWatershed.py' ),
     '-i', self.norm_mean_connectivity_profile,
     '-m', self.white_mesh,
     '-k', 10,
