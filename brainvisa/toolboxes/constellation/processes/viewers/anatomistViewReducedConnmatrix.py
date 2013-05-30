@@ -11,15 +11,18 @@ def validation():
         raise ValidationError( _t_( 'Anatomist not available' ) )
 
 
-name = 'Anatomist view connectivity matrix'
+name = 'Anatomist view reduced connectivity matrix'
 roles = ( 'viewer', )
 userLevel = 0
 
 signature = Signature(
     'connectivity_matrix',
-        ReadDiskItem( 'Gyrus connectivity matrix', 'Matrix sparse' ),
+        ReadDiskItem( 'Reduced connectivity matrix',
+          'aims readable volume formats' ),
     'white_mesh', ReadDiskItem( 'AimsBothWhite', 'anatomist mesh formats' ),
     'gyrus_texture',
+        ReadDiskItem( 'Label texture', 'anatomist texture formats' ),
+    'basins_texture',
         ReadDiskItem( 'Label texture', 'anatomist texture formats' ),
 )
 
@@ -27,6 +30,7 @@ signature = Signature(
 def initialization( self ):
     self.linkParameters( 'white_mesh', 'connectivity_matrix' )
     self.linkParameters( 'gyrus_texture', 'connectivity_matrix' )
+    self.linkParameters( 'basins_texture', 'connectivity_matrix' )
 
 
 def execution( self, context ):
@@ -34,7 +38,8 @@ def execution( self, context ):
     mesh = a.loadObject( self.white_mesh )
     patch = a.loadObject( self.gyrus_texture )
     sparse = a.loadObject( self.connectivity_matrix )
-    conn = a.fusionObjects( [ mesh, patch, sparse ],
+    basins = a.loadObject( self.basins_texture )
+    conn = a.fusionObjects( [ mesh, patch, sparse, basins ],
         method='ConnectivityMatrixFusionMethod' )
     if conn is None:
         raise ValueError( 'could not fusion objects - matrix, mesh and ' \
@@ -43,5 +48,5 @@ def execution( self, context ):
     win.addObjects( conn )
     win.setControl( 'ConnectivityMatrixControl' )
 
-    return [ win, conn ]
+    return [ win, conn, basins ]
 
