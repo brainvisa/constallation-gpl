@@ -42,7 +42,7 @@ def initialization ( self ):
     if self.individual_matrix_sparse and self.group is not None:
       profiles = []
       for p in self.individual_matrix_sparse:
-        if p is not None:
+        if p is None:
           continue
         atts = dict( self.group.hierarchyAttributes() )
         atts[ 'study' ] = p.get( 'study' )
