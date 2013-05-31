@@ -43,7 +43,7 @@ def execution ( self, context ):
   marr =  mask[0].arraydata()
   smcarr = smoothMeanConnectivityProfileTex[0].arraydata()
   for i in xrange( smoothMeanConnectivityProfileTex[0].nItem() ):
-    smcarr[marr==patch_label] = 0
+    smcarr[marr==int(patch_label)] = 0
   aims.write( smoothMeanConnectivityProfileTex, self.thresholded_mean_connectivity_profile.fullPath() )
   meanConnectivityProfileTexture_filename = self.thresholded_mean_connectivity_profile
 
