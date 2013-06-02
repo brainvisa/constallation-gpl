@@ -8,7 +8,7 @@ def validation():
   except:
     raise ValidationError( 'module roca is not here.' )
 
-name = '02 - Bundles Select For A LAbel'
+name = '02 - Bundles Select For A Label'
 userLevel = 2
 
 signature = Signature(
