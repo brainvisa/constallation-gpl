@@ -26,6 +26,15 @@ signature = Signature(
   'connectivity_matrix_reduced', ListOf( WriteDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' ) ),
 )
 
+def linkGyri( self, key, value ):
+  if self.gyri_segmentation:
+    eNode = self.executionNode()
+    isnode = [ x == key for x in eNode.childrenNames() ]
+    ind = isnode.index( True )
+    if len( self.gyri_segmentation ) <= ind:
+      ind = len( self.gyri_segmentation ) - 1
+    return self.gyri_segmentation[ ind ]
+
 
 def afterChildAddedCallback( self, parent, key, child ):
   # Set default values
@@ -36,6 +45,7 @@ def afterChildAddedCallback( self, parent, key, child ):
   child.signature[ 'filtered_watershed' ] \
     = parent.signature[ 'filtered_watershed' ]
   child.signature[ 'white_mesh' ] = parent.signature[ 'average_mesh' ]
+  child.signature[ 'connectivity_matrix_reduced' ] = WriteDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' )
 
   child.patch_label = parent.patch_label
   child.filtered_watershed = parent.filtered_watershed
@@ -45,12 +55,15 @@ def afterChildAddedCallback( self, parent, key, child ):
   parent.addLink( key + '.filtered_watershed', 'filtered_watershed' )
   parent.addLink( key + '.patch_label', 'patch_label' )
   parent.addLink( key + '.white_mesh', 'average_mesh' )
+  parent.addLink( key + '.gyri_segmentation', 'gyri_segmentation',
+    partial( self.linkGyri, key ) )
 
 
 def beforeChildRemovedCallback( self, parent, key, child ):
   parent.removeLink( key + '.filtered_watershed', 'filtered_watershed' )
   parent.removeLink( key + '.patch_label', 'patch_label' )
   parent.removeLink( key + '.white_mesh', 'average_mesh' )
+  parent.remove( key + '.gyri_segmentation', 'gyri_segmentation' )
 
 
 def initialization ( self ):
@@ -87,12 +100,17 @@ def initialization ( self ):
       atts[ 'study' ] = self.study_name
       #print 'atts:', atts
       return ReadDiskItem( 'Averaged Filtered Watershed', 'Aims texture formats' ).findValue( atts )
+  def linkMesh( self, dummy ):
+    if self.group is not None:
+      atts = { 'freesurfer_group_of_subjects' : self.group.get( 'group_of_subjects' ) }
+      return self.signature[ 'average_mesh' ].findValue( atts )
 
   self.linkParameters( 'individual_matrix_sparse', ( 'group', 'study_name', 'texture_in', 'patch_label' ), linkIndividualProfiles )
   self.linkParameters( 'filtered_watershed', ( 'group', 'patch_label', 'texture_out', 'study_name' ), linkWatershed )
   self.linkParameters( 'connectivity_matrix_reduced', ( 'group','individual_matrix_sparse', 'texture_out') , linkProfiles )
   self.linkParameters( 'vertex_index', 'individual_matrix_sparse')
   self.signature['individual_matrix_sparse'].userLevel = 2
+  self.linkParameters( 'average_mesh', 'group', linkMesh )
 
   eNode = ParallelExecutionNode( 'Reduced_connectivity_matrix',
                                  parameterized = self,
@@ -139,13 +157,13 @@ def initialization ( self ):
                           defaultProcess = 'createReducedConnectivityMatrix',
                           name='createReducedConnectivityMatrix' ) )
 
-  eNode.addLink( None,
-                 'gyri_segmentation',
-                 partial( brainvisa.processes.mapValuesToChildrenParameters,
-                          eNode,
-                          eNode,
-                          'gyri_segmentation',
-                          'gyri_segmentation',
-                          defaultProcess = 'createReducedConnectivityMatrix',
-                          name='createReducedConnectivityMatrix' ) )
+  #eNode.addLink( None,
+                 #'gyri_segmentation',
+                 #partial( brainvisa.processes.mapValuesToChildrenParameters,
+                          #eNode,
+                          #eNode,
+                          #'gyri_segmentation',
+                          #'gyri_segmentation',
+                          #defaultProcess = 'createReducedConnectivityMatrix',
+                          #name='createReducedConnectivityMatrix' ) )
 
