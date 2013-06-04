@@ -7,29 +7,29 @@ def validation():
       or not find_in_path( 'AimsSparseMatrixSmoothing' ):
     raise ValidationError( 'aims module is not here.' )
 
-name = '08 - Sum Sparse Matrix Smoothing'
+name = 'Sum Sparse Matrix Smoothing'
 userLevel = 2
 
 signature = Signature(
-    'connectivity_matrix_MeshClosestPoint', ReadDiskItem( 'Gyrus Connectivity Matrix Mesh Closest Point', 'Matrix sparse' ),
-  'connectivity_matrix_MeshIntersectPoint', ReadDiskItem( 'Gyrus Connectivity Matrix Mesh Intersect Point', 'Matrix sparse' ),
-                       'gyri_segmentation', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
-                              'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
-                                  'smooth', Float(),
-                             'patch_label', Integer(),
+  'connectivity_matrix_fibersNearCortex', ReadDiskItem( 'Gyrus Connectivity Matrix Mesh Closest Point', 'Matrix sparse' ),
+     'connectivity_matrix_distantFibers', ReadDiskItem( 'Gyrus Connectivity Matrix Mesh Intersect Point', 'Matrix sparse' ),
+                          'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+                            'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
+                             'smoothing', Float(),
+                                 'gyrus', Integer(),
   
   'connectivity_matrix_full', WriteDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ),
 )
 
 def initialization( self ):
-  self.linkParameters( 'connectivity_matrix_MeshIntersectPoint', 'connectivity_matrix_MeshClosestPoint' )
-  self.linkParameters( 'connectivity_matrix_full', 'connectivity_matrix_MeshIntersectPoint' )
+  self.linkParameters( 'connectivity_matrix_distantFibers', 'connectivity_matrix_fibersNearCortex' )
+  self.linkParameters( 'connectivity_matrix_full', 'connectivity_matrix_distantFibers' )
 
 def execution ( self, context ):
   context.write( 'Sum sparse matrix (categories : between two connected regions or one place in the brain).' )
   context.system( 'AimsSumSparseMatrix',
-    '-i', self.connectivity_matrix_MeshIntersectPoint,
-    '-i', self.connectivity_matrix_MeshClosestPoint,
+    '-i', self.connectivity_matrix_distantFibers,
+    '-i', self.connectivity_matrix_fibersNearCortex,
     '-o', self.connectivity_matrix_full
   )
 
@@ -37,9 +37,9 @@ def execution ( self, context ):
     '-i', self.connectivity_matrix_full,
     '-m', self.white_mesh,
     '-o', self.connectivity_matrix_full,
-    '-s', self.smooth,
-    '-l', self.gyri_segmentation,
-    '-p', self.patch_label,
+    '-s', self.smoothing,
+    '-l', self.gyri_texture,
+    '-p', self.gyrus,
   )
   
   context.write( 'OK' )

@@ -10,7 +10,7 @@ def validation():
     raise ValidationError( 'constellation module is not here.' )
 
 
-name = '02/03 - Filtering Per Gyrus'
+name = 'Filtering Per Gyrus'
 userLevel = 2
 
 signature = Signature(

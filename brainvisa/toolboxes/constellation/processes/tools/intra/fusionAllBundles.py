@@ -7,7 +7,7 @@ def validation():
     raise ValidationError( 'connectomist module is not here.' )
 
 
-name = '03 - Fusion All Bundles'
+name = 'Fusion All Bundles'
 userLevel = 2
 
 signature = Signature(

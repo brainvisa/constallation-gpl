@@ -8,37 +8,37 @@ def validation():
     raise ValidationError( 'constellation module is not here.' )
 
 
-name = '09 - Mean Connectivity Profile'
+name = 'Mean Connectivity Profile'
 userLevel = 2
 
 signature = Signature(
   'connectivity_matrix_full', ReadDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ),
-         'gyri_segmentation', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
-               'patch_label', Integer(),
+              'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+                     'gyrus', Integer(),
                
-                     'vertex_index', WriteDiskItem( 'Vertex Index', 'Text file' ),
-  'gyrus_mean_connectivity_profile', WriteDiskItem( 'Gyrus Connectivity Profile', 'Aims texture formats' ),
+                'vertex_index', WriteDiskItem( 'Vertex Index', 'Text file' ),
+  'gyrus_connectivity_profile', WriteDiskItem( 'Gyrus Connectivity Profile', 'Aims texture formats' ),
 )
 
 def initialization ( self ):
-  self.setOptional( 'patch_label' )
+  self.setOptional( 'gyrus' )
   self.linkParameters( 'vertex_index','connectivity_matrix_full' )
-  self.linkParameters( 'gyrus_mean_connectivity_profile', 'connectivity_matrix_full' )
+  self.linkParameters( 'gyrus_connectivity_profile', 'connectivity_matrix_full' )
 
 def execution ( self, context ):
   context.write( 'The mean connectivity profile over this region is represented as a texture on the cortex.' )
-  if self.patch_label is not None:
-    patch_label = self.patch_label
+  if self.gyrus is not None:
+    gyrus = self.gyrus
   else:
-    patch_label = os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_full.fullPath() ) ) )
-    patch_label = patch_label.strip('G')
-  context.write('patch_label = ', patch_label, '    Is it correct?')
+    gyrus = os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_full.fullPath() ) ) )
+    gyrus = gyrus.strip('G')
+  context.write('gyrus = ', gyrus, '    Is it correct?')
   context.system( 'constelMeanConnectivityProfileFromMatrix',
     '-connfmt', 'binar_sparse',
     '-connmatrixfile', self.connectivity_matrix_full,
-    '-outconntex', self.gyrus_mean_connectivity_profile, 
-    '-seedregionstex', self.gyri_segmentation,
-    '-seedlabel', patch_label,
+    '-outconntex', self.gyrus_connectivity_profile,
+    '-seedregionstex', self.gyri_texture,
+    '-seedlabel', gyrus,
     '-outseedvertex', self.vertex_index,
     '-verbose', 1,
     '-type', 'seed_mean_connectivity_profile',

@@ -15,16 +15,16 @@ except :
   pass
 
 
-name = '13 - Filtering Watershed'
+name = 'Filtering Watershed'
 userLevel = 2
 
 signature = Signature(
   'connectivity_matrix_full', ReadDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ),
                  'watershed', ReadDiskItem( 'Watershed', 'Aims texture formats' ),
-         'gyri_segmentation', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+              'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
                 'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
               'vertex_index', ReadDiskItem( 'Vertex Index', 'Text file' ),
-               'patch_label', Integer(),
+                     'gyrus', Integer(),
   
   'watershed_fiber_nb_mesh', WriteDiskItem( 'Gyrus Watershed Bassins Fiber Nb Mesh', 'Aims texture formats' ),
        'watershed_fiber_nb', WriteDiskItem( 'Gyrus Watershed Bassins Fiber Nb', 'Aims texture formats' ),
@@ -32,7 +32,7 @@ signature = Signature(
 )
 
 def initialization ( self ):
-  self.setOptional( 'patch_label' )
+  self.setOptional( 'gyrus' )
   self.linkParameters( 'vertex_index','connectivity_matrix_full' )
   self.linkParameters( 'watershed', 'connectivity_matrix_full' )
   self.linkParameters( 'watershed_fiber_nb_mesh', 'connectivity_matrix_full' )
@@ -42,19 +42,19 @@ def initialization ( self ):
 
 def execution ( self, context ):
   context.write( 'The connectivity profiles are reduced according to the patches.' )
-  if self.patch_label is not None:
-    patch_label = self.patch_label
+  if self.gyrus is not None:
+    gyrus = self.gyrus
   else:
-    patch_label = os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_full.fullPath() ) ) )
-    patch_label = patch_label.strip('G')
-  context.write('patch_label = ', patch_label, '    Is it correct?')
+    gyrus = os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_full.fullPath() ) ) )
+    gyrus = gyrus.strip('G')
+  context.write('gyrus = ', gyrus, '    Is it correct?')
   context.system( 'constelConnectionDensityTexture',
     '-mesh', self.white_mesh,
     '-connfmt', 'binar_sparse', 
     '-connmatrixfile', self.connectivity_matrix_full,
     '-targetregionstex', self.watershed, 
-    '-seedregionstex', self.gyri_segmentation,
-    '-seedlabel', patch_label,
+    '-seedregionstex', self.gyri_texture,
+    '-seedlabel', gyrus,
     '-type', 'oneSeedRegion_to_targets',
     '-outconntex', self.watershed_fiber_nb_mesh,
     '-outconntargets', self.watershed_fiber_nb,

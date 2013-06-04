@@ -9,7 +9,7 @@ def validation():
     raise ValidationError( 'constellation module is not here.' )
 
 
-name = '05 - Select Fibers From Length'
+name = 'Select Fibers From Length'
 userLevel = 2
 
 signature = Signature(

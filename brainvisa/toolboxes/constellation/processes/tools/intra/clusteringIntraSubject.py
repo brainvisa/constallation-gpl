@@ -6,16 +6,16 @@ def validation():
   if not find_in_path( 'constelIntraSubjectClustering.py' ):
     raise ValidationError( 'constellation module is not here.' )
 
-name = '15 - Clustering'
+name = 'Clustering'
 userLevel = 2
 
 signature = Signature(
   'connectivity_matrix_reduced', ReadDiskItem( 'Reduced Connectivity Matrix', 'GIS image' ),
-            'gyri_segmentation', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+                 'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
                    'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
             'areaMin_threshold', Integer(),
                  'vertex_index', ReadDiskItem( 'Vertex Index', 'Text file' ),
-                  'patch_label', Integer(),
+                        'gyrus', Integer(),
                   
                'clustering_kopt', WriteDiskItem( 'Clustering kOpt', 'Aims texture formats' ),
                'clustering_time', WriteDiskItem( 'Clustering Time', 'Aims texture formats' ),
@@ -28,7 +28,7 @@ signature = Signature(
 
 def initialization ( self ):
   self.areaMin_threshold = 400.0
-  self.setOptional( 'patch_label' )
+  self.setOptional( 'gyrus' )
   self.linkParameters( 'clustering_kopt', 'connectivity_matrix_reduced' )
   self.linkParameters( 'clustering_time', 'clustering_kopt' )
   self.linkParameters( 'clustering_k_medoids', 'clustering_time' )
@@ -37,19 +37,19 @@ def initialization ( self ):
   self.linkParameters( 'vertex_index','connectivity_matrix_reduced' )
   self.linkParameters( 'clustering_result_gyrus','connectivity_matrix_reduced' )
   self.linkParameters( 'clustering_result_full','connectivity_matrix_reduced' )
-  self.linkParameters( 'gyri_segmentation', 'white_mesh' )
+  self.linkParameters( 'gyri_texture', 'white_mesh' )
 
 def execution ( self, context ):
   context.write( 'The connectivity profiles of the region are clustered using k-medoids approach.' )
-  if self.patch_label is not None:
-    patch_label = self.patch_label # keep internal connections, put 0
+  if self.gyrus is not None:
+    gyrus = self.gyrus # keep internal connections, put 0
   else:
-    patch_label = os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_reduced.fullPath() ) ) )
-    patch_label = patch_label.strip('G')
+    gyrus = os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_reduced.fullPath() ) ) )
+    gyrus = gyrus.strip('G')
   context.system( sys.executable, find_in_path( 'constelIntraSubjectClustering.py' ),
     '-m', self.connectivity_matrix_reduced,
-    '-p', patch_label,
-    '-g', self.gyri_segmentation,
+    '-p', gyrus,
+    '-g', self.gyri_texture,
     '-w', self.white_mesh,
     '-a', self.areaMin_threshold,
     '-v', self.vertex_index,

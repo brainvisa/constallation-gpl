@@ -8,7 +8,7 @@ def validation():
     raise ValidationError( 'constellation module is not here.' )
 
 
-name = '04 - Regroup Fibers From Length'
+name = 'Regroup Fibers From Length'
 userLevel = 2
 
 signature = Signature(
