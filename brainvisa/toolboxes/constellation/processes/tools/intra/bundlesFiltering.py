@@ -14,6 +14,7 @@ signature = Signature(
                     'study', String(),
                   'texture', String(),
                     'gyrus', String(),
+                  'subject', ReadDiskItem( 'subject', 'directory' ),
           'subset_of_tract', ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ),
   'listOf_subsets_of_tract', ListOf( ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ) ),
                'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
@@ -24,20 +25,47 @@ signature = Signature(
 'min_distant_fibers_length', Float(),
 'max_distant_fibers_length', Float(),
 
-  'subsets_of_tracts_FibersNearCortex', WriteDiskItem( 'Gyrus Subset of Tracts Mesh Closest Point', 'Aims bundles' ),
-     'subsets_of_tracts_distantFibers', WriteDiskItem( 'Gyrus Subset of Tracts Mesh Intersect Point', 'Aims bundles' ),
+  'subsets_of_tracts_FibersNearCortex', WriteDiskItem( 'Gyrus Length Interval Tracts Mesh Closest Point', 'Aims bundles' ),
+     'subsets_of_tracts_distantFibers', WriteDiskItem( 'Gyrus Length Interval Tracts Mesh Intersect Point', 'Aims bundles' ),
 )
 
 
 def initialization( self ):
-  def lef(self, dummy):
+  def lef( self, dummy ):
     if self.subset_of_tract is not None:
       d = os.path.dirname( self.subset_of_tract.fullPath() )
       listBundles = glob.glob( os.path.join( d, '*.bundles' ) )
       return listBundles
-
+  def linkProfile( self, dummy ):
+    if self.subject is None:
+      return None
+    if self.subset_of_tract is not None and self.gyrus is not None and self.study is not None and self.texture is not None and self.min_cortex_length is not None:
+      attrs = dict( self.subset_of_tract.hierarchyAttributes() )
+      attrs.update( self.subject.hierarchyAttributes() )
+      attrs['study'] = self.study
+      attrs['texture'] = self.texture
+      attrs['gyrus'] = 'G' + str( self.gyrus )
+      attrs['minlengthoffibersIn'] = str( int(self.min_cortex_length) )
+      filename = self.signature[ 'subsets_of_tracts_FibersNearCortex' ].findValue( attrs )
+      return filename
+  def linkProfileDistantFibers( self, dummy ):
+    if self.subject is None:
+      return None
+    if self.subset_of_tract is not None and self.gyrus is not None and self.study is not None and self.texture is not None and self.min_distant_fibers_length is not None:
+      attrs = dict( self.subset_of_tract.hierarchyAttributes() )
+      attrs.update( self.subject.hierarchyAttributes() )
+      attrs['study'] = self.study
+      attrs['texture'] = self.texture
+      attrs['gyrus'] = 'G' + str( self.gyrus )
+      attrs['minlengthoffibersOut'] = str( int( self.min_distant_fibers_length ) )
+      filename = self.signature[ 'subsets_of_tracts_distantFibers' ].findValue( attrs )     
+      return filename 
   self.linkParameters( 'listOf_subsets_of_tract', 'subset_of_tract', lef )
-
+  self.linkParameters( 'subsets_of_tracts_FibersNearCortex', ( 'subset_of_tract', 'subject', 'study', 'texture', 'gyrus', 'min_cortex_length' ), linkProfile )
+  self.linkParameters( 'subsets_of_tracts_distantFibers', ( 'subset_of_tract', 'subject', 'study', 'texture', 'gyrus', 'min_distant_fibers_length' ), linkProfileDistantFibers )
+  self.linkParameters( 'white_mesh', 'subject' )
+  self.linkParameters( 'dw_to_t1', 'subset_of_tract' )
+  
   self.signature['listOf_subsets_of_tract'].userLevel = 2
   self.min_cortex_length = 30.
   self.max_cortex_length = 500.
