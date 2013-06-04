@@ -50,7 +50,7 @@ def initialization( self ):
                   ProcessExecutionNode( 'fiberOversampler',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'ConnectivityCortexMatrix.length_filtered_tracts_MeshIntersectPoint',
+  eNode.addDoubleLink( 'ConnectivityCortexMatrix.length_filtered_tracts_distantFibers',
                        'Filter.subsets_of_tracts_distantFibers' )
 
   ### Connectivity Matrix
@@ -58,14 +58,14 @@ def initialization( self ):
                   ProcessExecutionNode( 'createConnectivityMatrix',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'Smoothing.oversampled_tracts_MeshIntersectPoint',
-                       'ConnectivityCortexMatrix.oversampled_tracts_MeshIntersectPoint' )
+  eNode.addDoubleLink( 'Smoothing.oversampled_tracts_distantFibers',
+                       'ConnectivityCortexMatrix.oversampled_tracts_distantFibers' )
 
-  eNode.addDoubleLink( 'Smoothing.length_filtered_tracts_MeshClosestPoint',
+  eNode.addDoubleLink( 'Smoothing.length_filtered_tracts_fibersNearCortex',
                        'Filter.subsets_of_tracts_FibersNearCortex' )
 
   #eNode.Smoothing.removeLink( 'gyri_texture',
-                              #'oversampled_tracts_MeshIntersectPoint' )
+                              #'oversampled_tracts_distantFibers' )
 
   eNode.addDoubleLink( 'Smoothing.gyri_texture',
                        'gyri_texture' )
@@ -73,7 +73,7 @@ def initialization( self ):
   eNode.addDoubleLink( 'Smoothing.white_mesh',
                        'white_mesh' )
                        
-  eNode.addDoubleLink( 'Smoothing.diff_to_anat_transform',
+  eNode.addDoubleLink( 'Smoothing.dw_to_t1',
                        'dw_to_t1' )
 
   ### Sum Sparse Matrix
@@ -81,8 +81,8 @@ def initialization( self ):
                   ProcessExecutionNode( 'sumSparseMatrix',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'Sum.connectivity_matrix_MeshClosestPoint',
-                       'Smoothing.connectivity_matrix_MeshClosestPoint' )
+  eNode.addDoubleLink( 'Sum.connectivity_matrix_fibersNearCortex',
+                       'Smoothing.connectivity_matrix_fibersNearCortex' )
 
   eNode.addDoubleLink( 'Sum.white_mesh',
                        'white_mesh' )
@@ -90,10 +90,10 @@ def initialization( self ):
   eNode.addDoubleLink( 'Sum.gyri_texture',
                        'gyri_texture' )
                        
-  eNode.addDoubleLink( 'Sum.patch_label',
+  eNode.addDoubleLink( 'Sum.gyrus',
                        'gyrus' )
 
-  eNode.addDoubleLink( 'Sum.smooth',
+  eNode.addDoubleLink( 'Sum.smoothing',
                        'smoothing' )
 
   ### Mean Connectivity Profile
@@ -193,14 +193,14 @@ def initialization( self ):
 #eNode.addChild( 'TractsReorganisation',
                 #ProcessExecutionNode( 'regroupFibersFromLength',
                 #optional = 1 ) )
-#eNode.addDoubleLink( 'TractsReorganisation.gyrus_tracts_MeshClosestPoint',
-                     #'PrepareTracts.gyrus_tracts_MeshClosestPoint' )
+#eNode.addDoubleLink( 'TractsReorganisation.gyrus_tracts_fibersNearCortex',
+                     #'PrepareTracts.gyrus_tracts_fibersNearCortex' )
 #### 05 - Select Fibers From Length
 #eNode.addChild( 'LengthFiltering',
                 #ProcessExecutionNode( 'selectFibersFromLength',
                 #optional = 1 ) )
-#eNode.addDoubleLink( 'LengthFiltering.tracts_by_length_MeshClosestPoint',
-                     #'TractsReorganisation.tracts_by_length_MeshClosestPoint' )
+#eNode.addDoubleLink( 'LengthFiltering.tracts_by_length_fibersNearCortex',
+                     #'TractsReorganisation.tracts_by_length_fibersNearCortex' )
 ### Delete Intermediate Fibers
 #eNode.addChild( 'deleteTracts',
                 #ProcessExecutionNode( 'removeUnnecessaryBundles',
