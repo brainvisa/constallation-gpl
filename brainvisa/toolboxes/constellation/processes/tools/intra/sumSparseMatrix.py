@@ -22,11 +22,18 @@ signature = Signature(
 )
 
 def initialization( self ):
+  self.setOptional( 'gyrus' )
   self.linkParameters( 'connectivity_matrix_distantFibers', 'connectivity_matrix_fibersNearCortex' )
   self.linkParameters( 'connectivity_matrix_full', 'connectivity_matrix_distantFibers' )
 
 def execution ( self, context ):
   context.write( 'Sum sparse matrix (categories : between two connected regions or one place in the brain).' )
+  if self.gyrus is not None:
+    gyrus = self.gyrus
+  else:
+    gyrus = os.path.basename( os.path.dirname( os.path.dirname( self.gyrus_connectivity_profile.fullPath() ) ) )
+    gyrus = gyrus.strip('G')
+  context.write('gyrus = ', gyrus, '    Is it correct?')
   context.system( 'AimsSumSparseMatrix',
     '-i', self.connectivity_matrix_distantFibers,
     '-i', self.connectivity_matrix_fibersNearCortex,
