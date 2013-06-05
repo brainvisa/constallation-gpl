@@ -7,7 +7,7 @@ def validation():
     raise ValidationError( 'constellation module is not here.' )
 
 
-name = 'Brainvisa Intra pipeline'
+name = 'Brainvisa Constellation Intra pipeline'
 userLevel = 2
 
 signature = Signature(
@@ -176,37 +176,3 @@ def initialization( self ):
                        'white_mesh' )
 
   self.setExecutionNode( eNode )
-
-
-
-#### 02/03 - Filtering per gyrus
-#eNode.addChild( 'PrepareTracts',
-                #ProcessExecutionNode( 'filteringPerGyrus',
-                #optional = 1 ) )
-#eNode.addDoubleLink( 'PrepareTracts.reorganized_subset_of_tract',
-                     #'reorganized_subset_of_tract' )
-#eNode.addDoubleLink( 'PrepareTracts.gyri_texture',
-                     #'gyri_texture' )
-#eNode.addDoubleLink( 'PrepareTracts.gyrus',
-                     #'gyrus' )
-#### 04 - Regroup Fibers From Length
-#eNode.addChild( 'TractsReorganisation',
-                #ProcessExecutionNode( 'regroupFibersFromLength',
-                #optional = 1 ) )
-#eNode.addDoubleLink( 'TractsReorganisation.gyrus_tracts_fibersNearCortex',
-                     #'PrepareTracts.gyrus_tracts_fibersNearCortex' )
-#### 05 - Select Fibers From Length
-#eNode.addChild( 'LengthFiltering',
-                #ProcessExecutionNode( 'selectFibersFromLength',
-                #optional = 1 ) )
-#eNode.addDoubleLink( 'LengthFiltering.tracts_by_length_fibersNearCortex',
-                     #'TractsReorganisation.tracts_by_length_fibersNearCortex' )
-### Delete Intermediate Fibers
-#eNode.addChild( 'deleteTracts',
-                #ProcessExecutionNode( 'removeUnnecessaryBundles',
-                #optional = 1,
-                #selected = 0 ) )
-#eNode.addDoubleLink( 'deleteTracts.reorganized_subset_of_tract',
-                     #'PrepareTracts.reorganized_subset_of_tract' )
-#eNode.addDoubleLink( 'deleteTracts.gyrus',
-                     #'gyrus' )
