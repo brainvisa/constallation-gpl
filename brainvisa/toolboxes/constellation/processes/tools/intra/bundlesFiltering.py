@@ -14,6 +14,7 @@ signature = Signature(
                     'study', String(),
                   'texture', String(),
                     'gyrus', String(),
+                 'database', Choice(),
                   'subject', ReadDiskItem( 'subject', 'directory' ),
           'subset_of_tract', ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ),
   'listOf_subsets_of_tract', ListOf( ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ) ),
@@ -31,6 +32,12 @@ signature = Signature(
 
 
 def initialization( self ):
+  databases=[h.name for h in neuroHierarchy.hierarchies() if h.fso.name == 'brainvisa-3.2.0']
+  self.signature['database'].setChoices(*databases)
+  if len( databases ) != 0:
+    self.database=databases[0]
+  else:
+    self.signature[ 'database' ] = OpenChoice()
   def lef( self, dummy ):
     if self.subset_of_tract is not None:
       d = os.path.dirname( self.subset_of_tract.fullPath() )
@@ -39,30 +46,27 @@ def initialization( self ):
   def linkProfile( self, dummy ):
     if self.subject is None:
       return None
-    if self.subset_of_tract is not None and self.gyrus is not None and self.study is not None and self.texture is not None and self.min_cortex_length is not None:
+    if self.subset_of_tract is not None and self.gyrus is not None and self.study is not None and self.texture is not None and self.min_cortex_length is not None and self.database is not None and self.subject is not None:
       attrs = dict( self.subset_of_tract.hierarchyAttributes() )
       attrs.update( self.subject.hierarchyAttributes() )
       attrs['study'] = self.study
       attrs['texture'] = self.texture
+      attrs['_database'] = self.database
+      attrs['subject'] = os.path.basename( self.subject.fullPath() )
       attrs['gyrus'] = 'G' + str( self.gyrus )
       attrs['minlengthoffibersIn'] = str( int(self.min_cortex_length) )
       filename = self.signature[ 'subsets_of_tracts_FibersNearCortex' ].findValue( attrs )
+      print attrs
       return filename
   def linkProfileDistantFibers( self, dummy ):
-    if self.subject is None:
-      return None
-    if self.subset_of_tract is not None and self.gyrus is not None and self.study is not None and self.texture is not None and self.min_distant_fibers_length is not None:
-      attrs = dict( self.subset_of_tract.hierarchyAttributes() )
-      attrs.update( self.subject.hierarchyAttributes() )
-      attrs['study'] = self.study
-      attrs['texture'] = self.texture
-      attrs['gyrus'] = 'G' + str( self.gyrus )
+    if self.subsets_of_tracts_FibersNearCortex is not None:
+      attrs = dict( self.subsets_of_tracts_FibersNearCortex.hierarchyAttributes() )
       attrs['minlengthoffibersOut'] = str( int( self.min_distant_fibers_length ) )
-      filename = self.signature[ 'subsets_of_tracts_distantFibers' ].findValue( attrs )     
-      return filename 
+      filename = self.signature[ 'subsets_of_tracts_distantFibers' ].findValue( attrs )
+      return filename
   self.linkParameters( 'listOf_subsets_of_tract', 'subset_of_tract', lef )
-  self.linkParameters( 'subsets_of_tracts_FibersNearCortex', ( 'subset_of_tract', 'subject', 'study', 'texture', 'gyrus', 'min_cortex_length' ), linkProfile )
-  self.linkParameters( 'subsets_of_tracts_distantFibers', ( 'subset_of_tract', 'subject', 'study', 'texture', 'gyrus', 'min_distant_fibers_length' ), linkProfileDistantFibers )
+  self.linkParameters( 'subsets_of_tracts_FibersNearCortex', ( 'database', 'subset_of_tract', 'subject', 'study', 'texture', 'gyrus', 'min_cortex_length' ), linkProfile )
+  self.linkParameters( 'subsets_of_tracts_distantFibers', ( 'subsets_of_tracts_FibersNearCortex', 'min_distant_fibers_length' ), linkProfileDistantFibers )
   self.linkParameters( 'white_mesh', 'subject' )
   self.linkParameters( 'dw_to_t1', 'subset_of_tract' )
   

@@ -15,6 +15,7 @@ signature = Signature(
             'study', String(),
           'texture', String(),
             'gyrus', String(),
+         'database', Choice(),
           'subject', ReadDiskItem( 'subject', 'directory' ),
   'subset_of_tract', ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ),
      'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
@@ -24,7 +25,13 @@ signature = Signature(
 )
 
 def initialization( self ):
-
+  databases=[h.name for h in neuroHierarchy.hierarchies() if h.fso.name == 'brainvisa-3.2.0']
+  self.signature['database'].setChoices(*databases)
+  if len( databases ) != 0:
+    self.database=databases[0]
+  else:
+    self.signature[ 'database' ] = OpenChoice()
+ 
   eNode = SerialExecutionNode( self.name, parameterized=self )
 
   ### Bundles Fitering
@@ -38,6 +45,8 @@ def initialization( self ):
                        'texture' )
   eNode.addDoubleLink( 'Filter.gyrus',
                        'gyrus' )
+  eNode.addDoubleLink( 'Filter.database',
+                       'database' )
   eNode.addDoubleLink( 'Filter.subject',
                        'subject' )
   eNode.addDoubleLink( 'Filter.subset_of_tract',
