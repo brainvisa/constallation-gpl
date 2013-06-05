@@ -10,8 +10,8 @@ name = 'Fiber Oversampler'
 userLevel = 2
 
 signature = Signature(
-  'length_filtered_tracts_distantFibers', ReadDiskItem( 'Gyrus Length Interval Tracts Mesh Intersect Point', 'Aims bundles' ),
-      'oversampled_tracts_distantFibers', WriteDiskItem( 'Gyrus Oversampled Length Interval Tracts Mesh Intersect Point', 'Aims bundles' ),
+  'length_filtered_tracts_distantFibers', ReadDiskItem( 'Gyrus Length Interval Tracts Distant Fibers', 'Aims bundles' ),
+      'oversampled_tracts_distantFibers', WriteDiskItem( 'Gyrus Oversampled Length Interval Tracts Distant Fibers', 'Aims bundles' ),
 )
 
 def initialization( self ):

@@ -6,7 +6,7 @@ def validation():
   except:
     raise ValidationError( 'constellation module is not here.' )
 
-name = 'Pipeline InterSubject'
+name = 'Brainvisa Constellation Inter Pipeline'
 userLevel = 2
 
 signature = Signature(
@@ -16,9 +16,23 @@ signature = Signature(
    'patch_label', Integer(),
          'group', ReadDiskItem('Group definition', 'XML' ),
   'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 'BrainVISA mesh formats' ),
+  'gyri_texture', ListOf( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ) ),
 )
 
+def linkGroup( self, param1 ):
+  print 'linkGroup', param1
+  print 'self:', self
+  eNode = self.executionNode()
+  for node in eNode.children():
+    print node.name()
+    if node.name() == 'Parallel Node':
+      node.addChild( 'N%d' % len(list(node.children())), ProcessExecutionNode( 'createReducedConnectivityMatrixOnRangeOfSubjects',
+                  optional = 1) )
+      print 'added. Nb nodes:', len(list(node.children()))
+
 def initialization( self ):
+
+  self.addLink( None, 'group', self.linkGroup )
 
   eNode = SerialExecutionNode( self.name, parameterized=self )
 
@@ -107,8 +121,8 @@ def initialization( self ):
   eNode.addDoubleLink( 'connMatrixBasinInter.average_mesh',
                        'average_mesh' )
 
-  #eNode.addDoubleLink( 'connMatrixBasinInter.gyri_segmentation',
-                       #'gyri_segmentation' )
+  eNode.addDoubleLink( 'connMatrixBasinInter.gyri_segmentation',
+                       'gyri_texture' )
 
   eNode.addDoubleLink( 'connMatrixBasinInter.filtered_watershed',
                        'watershedInter.filtered_watershed' )
@@ -138,7 +152,8 @@ def initialization( self ):
 
   eNode.addDoubleLink( 'clusteringInter.average_mesh',
                        'average_mesh' )
-
+  eNode.addDoubleLink( 'clusteringInter.gyri_segmentation',
+                       'connMatrixBasinInter.gyri_segmentation' )
   eNode.addDoubleLink( 'clusteringInter.individual_reduced_matrix',
                        'connMatrixBasinInter.connectivity_matrix_reduced' )
 

@@ -47,27 +47,31 @@ def afterChildAddedCallback( self, parent, key, child ):
   child.signature[ 'white_mesh' ] = parent.signature[ 'average_mesh' ]
   child.signature[ 'connectivity_matrix_reduced' ] = WriteDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' )
 
-  child.patch_label = parent.patch_label
+  child.gyrus = parent.patch_label
   child.filtered_watershed = parent.filtered_watershed
   child.white_mesh = parent.average_mesh
 
+  print 'key:', key
+  print 'self:', self
+  print 'parent:', parent
+  print 'child:', child
   ## Add link between eNode.ListOf_Input_3dImage and pNode.Input_3dImage
   parent.addLink( key + '.filtered_watershed', 'filtered_watershed' )
-  parent.addLink( key + '.patch_label', 'patch_label' )
+  parent.addLink( key + '.gyrus', 'patch_label' )
   parent.addLink( key + '.white_mesh', 'average_mesh' )
-  parent.addLink( key + '.gyri_segmentation', 'gyri_segmentation',
+  parent.addLink( key + '.gyri_texture', 'gyri_segmentation',
     partial( self.linkGyri, key ) )
 
 
 def beforeChildRemovedCallback( self, parent, key, child ):
   parent.removeLink( key + '.filtered_watershed', 'filtered_watershed' )
-  parent.removeLink( key + '.patch_label', 'patch_label' )
+  parent.removeLink( key + '.gyrus', 'patch_label' )
   parent.removeLink( key + '.white_mesh', 'average_mesh' )
-  parent.remove( key + '.gyri_segmentation', 'gyri_segmentation' )
+  parent.remove( key + '.gyri_texture', 'gyri_segmentation' )
 
 
 def initialization ( self ):
-  def linkIndividualProfiles( self, dummy ):
+  def linkIndividualMatrices( self, dummy ):
     if self.group is not None:
       registerClass('minf_2.0', Subject, 'Subject')
       groupOfSubjects = readMinf(self.group.fullPath())
@@ -76,7 +80,9 @@ def initialization ( self ):
         study = self.study_name
         texture = self.texture_in
         gyrus = 'G' + str(self.patch_label)
-        profiles.append( WriteDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus }, subject.attributes() ) )
+        profile = ReadDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus }, subject.attributes() )
+        if profile is not None:
+          profiles.append( profile )
       return profiles
   def linkProfiles( self, dummy ):
     if self.individual_matrix_sparse and self.group is not None:
@@ -98,16 +104,15 @@ def initialization ( self ):
       atts[ 'texture' ] = self.texture_out
       atts[ 'gyrus' ] = 'G' + str(self.patch_label)
       atts[ 'study' ] = self.study_name
-      #print 'atts:', atts
       return ReadDiskItem( 'Averaged Filtered Watershed', 'Aims texture formats' ).findValue( atts )
   def linkMesh( self, dummy ):
     if self.group is not None:
       atts = { 'freesurfer_group_of_subjects' : self.group.get( 'group_of_subjects' ) }
       return self.signature[ 'average_mesh' ].findValue( atts )
 
-  self.linkParameters( 'individual_matrix_sparse', ( 'group', 'study_name', 'texture_in', 'patch_label' ), linkIndividualProfiles )
+  self.linkParameters( 'individual_matrix_sparse', ( 'group', 'study_name', 'texture_in', 'patch_label' ), linkIndividualMatrices )
   self.linkParameters( 'filtered_watershed', ( 'group', 'patch_label', 'texture_out', 'study_name' ), linkWatershed )
-  self.linkParameters( 'connectivity_matrix_reduced', ( 'group','individual_matrix_sparse', 'texture_out') , linkProfiles )
+  self.linkParameters( 'connectivity_matrix_reduced', ( 'group', 'individual_matrix_sparse', 'texture_out') , linkProfiles )
   self.linkParameters( 'vertex_index', 'individual_matrix_sparse')
   self.signature['individual_matrix_sparse'].userLevel = 2
   self.linkParameters( 'average_mesh', 'group', linkMesh )
