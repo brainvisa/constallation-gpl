@@ -35,6 +35,7 @@ from brainvisa import anatomist as ana
 from soma import aims
 import numpy
 import roca.lib.textureTools as TT
+import roca.lib.connectivity.matrix.tools as Mat
 
 name = 'Anatomist view connectivity texture on small brains'
 userLevel = 2
@@ -58,16 +59,21 @@ def execution_mainthread( self, context ):
   #matrix = a.loadObject( self.connectivity_matrix )
   #basins = a.loadObject( self.basins_texture )
   anaclusters = a.loadObject( self.clustering_texture )
+  anaclusters.setPalette( palette='Blue-Red-fusion' )
+  a.execute( "TexturingParams", objects=[anaclusters], interpolation = 'rgb' )
   matrix = aims.read( self.connectivity_matrix.fullPath() )
-  mat = numpy.asarray( matrix )
-  mat = mat.reshape( mat.shape[:2] )
+  matrix = numpy.asarray( matrix )
+  matrix = matrix.reshape( matrix.shape[:2] )
   basins = aims.read( self.basins_texture.fullPath() )
   # abasins = basins[0].arraydata()
   clusters = a.toAimsObject( anaclusters )
   aclusters = clusters[0].arraydata()
   aimsmesh = a.toAimsObject( mesh )
   avertex = numpy.asarray( aimsmesh.vertex() )
-
+  reducedMatrix = Mat.connMatrixParcelsToTargets( matrix, clusters, 0 )
+  mat = numpy.asarray( reducedMatrix )
+  mat = mat.reshape( mat.shape[:2] )
+  
   graph = aims.Graph( 'RoiArg' )
   bbmin, bbmax = mesh.boundingbox()
   graph[ 'boundingbox_min' ] = list( bbmin )
@@ -78,12 +84,14 @@ def execution_mainthread( self, context ):
     aims.GraphManip.storeAims( graph, vertex, 'aims_Tmtktri', aimsmesh )
 
   anagraph = a.toAObject( graph )
+  anagraph.releaseAppRef()
   anagraph.setReferentialInheritance( mesh )
   a.unmapObject( anagraph )
   for i, vertex in enumerate( graph.vertices() ):
     anavertex = vertex[ 'ana_object' ]
     current_tex = TT.oneTargetDensityTargetsRegroupTexture( mat[i], basins )
     anatex = a.toAObject( current_tex )
+    anatex.releaseAppRef()
     a.unmapObject( anatex )
     mesh2 = mesh.clone( True ) # shallow copy
     mesh2.setReferential( mesh.referential )
@@ -101,14 +109,23 @@ def execution_mainthread( self, context ):
   anagraph.setChanged()
   anagraph.notifyObservers()
   a.mapObject( anagraph )
+  anagraph.setMaterial( diffuse=[ 0.8, 0.8, 0.8, 1. ] )
+  
+  tex = a.fusionObjects( [ mesh, anaclusters  ], method='FusionTexSurfMethod' )
 
-  win = a.createWindow( '3D' )
-  br = a.createWindow( 'Browser' )
+  wgroup = a.createWindowsBlock( nbCols=2 )
+  win = a.createWindow( '3D', block=wgroup )
+  win2 = a.createWindow( '3D', block=wgroup )
+  br = a.createWindow( 'Browser', block=wgroup )
+  win.addObjects( tex )
   win.addObjects( anagraph )
   br.addObjects( anagraph )
+  #a.execute( 'Select', objects=[ x[ 'ana_object' ] for x in graph.vertices() ] )
   a.execute( 'SetControl', windows=[win], control='BundlesSelectionControl' )
+  action = win.view().controlSwitch().getAction( 'BundlesSelectionAction' )
+  action.secondaryView = win2
 
-  return [ mesh, anagraph, anaclusters, win, br ]
+  return [ mesh, anagraph, anaclusters, win, br, tex, win2 ]
 
 def execution( self, context ):
   return mainThreadActions().call( self.execution_mainthread, context )
