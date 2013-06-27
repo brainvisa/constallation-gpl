@@ -37,8 +37,9 @@ FileType( 'Gyrus Watershed Bassins Fiber Nb', 'Label Texture' )
 FileType( 'Patch Clustering Kmedoids Time', 'Label Texture' )
 FileType( 'Patch Clustering Vertex Silhouette Width Time', 'Label Texture' )
 FileType( 'Patch Clustering Silhouette Width Time', 'Label Texture' )
-FileType( 'Clustering Time', 'Label Texture' )
-FileType( 'Clustering kOpt', 'Label Texture' )
+FileType( 'Clustering Texture', 'Label Texture' )
+FileType( 'Clustering Time', 'Clustering Texture' )
+FileType( 'Clustering kOpt', 'Clustering Texture' )
 FileType( 'Mean Connectivity Profile Mask', 'Label Texture' ),
 FileType( 'Averaged Connectivity Profile', 'Label Texture' ),
 FileType( 'Averaged Normed Connectivity Profile', 'Label Texture' ),
