@@ -61,7 +61,7 @@ def execution ( self, context ):
   context.system('python', '-m', 'constel.cmd.average_texture_labels', self.average_gyri_segmentation.fullPath(), *gyri_segmentations)
 
   # Computing connected component:
-  context.system('python', find_in_path( '/volatile/sandrine/svn/brainvisa/perso/roca/trunk/ensemble_du_code_hors_depot/code_test/scripts/gyri_texture_cleaning.py' ),
+  context.system('python', find_in_path( 'constelGyriTextureCleaningIsolatedVertices.py' ),
     '-i', self.average_gyri_segmentation,
     '-m', self.BothAverageMesh,
     '-o', self.average_gyri_segmentation
