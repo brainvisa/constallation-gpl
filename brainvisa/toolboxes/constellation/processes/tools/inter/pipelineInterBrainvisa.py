@@ -129,7 +129,7 @@ def initialization( self ):
 
   ## 06 Clustering InterSubjects
   eNode.addChild( 'clusteringInter',
-                  ProcessExecutionNode( 'ClusteringInterSubjects',
+                  ProcessExecutionNode( 'clusteringInterSubjects',
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'clusteringInter.study_name',

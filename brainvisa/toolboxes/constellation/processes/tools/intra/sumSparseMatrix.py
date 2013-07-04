@@ -11,8 +11,8 @@ name = 'Sum Sparse Matrix Smoothing'
 userLevel = 2
 
 signature = Signature(
-  'connectivity_matrix_fibersNearCortex', ReadDiskItem( 'Gyrus Connectivity Matrix Fibers Near Cortex', 'Matrix sparse' ),
-     'connectivity_matrix_distantFibers', ReadDiskItem( 'Gyrus Connectivity Matrix Distant Fibers', 'Matrix sparse' ),
+  'connectivity_matrix_fibersNearCortex', ReadDiskItem( 'Connectivity Matrix Fibers Near Cortex', 'Matrix sparse' ),
+     'connectivity_matrix_distantFibers', ReadDiskItem( 'Connectivity Matrix Outside Fibers Of Cortex', 'Matrix sparse' ),
                           'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
                             'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
                              'smoothing', Float(),

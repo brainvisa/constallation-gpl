@@ -11,11 +11,11 @@ name = '03 - Normed Connectivity Profile of Group'
 userLevel = 2
 
 signature = Signature(
-                        'mask', ReadDiskItem( 'Mean Connectivity Profile Mask', 'Aims texture formats' ),
-  'connectivity_profile_group', ReadDiskItem( 'Averaged Connectivity Profile', 'Aims texture formats' ),
+                        'mask', ReadDiskItem( 'Avg Connectivity Mask', 'Aims texture formats' ),
+  'connectivity_profile_group', ReadDiskItem( 'Avg Connectivity Profile', 'Aims texture formats' ),
   
-       'thresholded_mean_connectivity_profile', WriteDiskItem( 'Averaged Thresholded Connectivity Profile', 'Aims texture formats' ),
-  'norm_thresholded_mean_connectivity_profile', WriteDiskItem( 'Averaged Normed Connectivity Profile', 'Aims texture formats' ),
+       'thresholded_mean_connectivity_profile', WriteDiskItem( 'Avg Thresholded Connectivity Profile', 'Aims texture formats' ),
+  'norm_thresholded_mean_connectivity_profile', WriteDiskItem( 'Avg Normed Connectivity Profile', 'Aims texture formats' ),
 )
 
 def initialization ( self ):

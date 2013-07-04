@@ -21,7 +21,7 @@ signature = Signature(
   'individual_norm_mean_connectivity_profile', ListOf( ReadDiskItem( 'Normed Connectivity Profile', 'Aims texture formats' ) ),
       'thresholded_mean_connectivity_profile', ListOf( ReadDiskItem( 'Thresholded Connectivity Profile', 'Aims texture formats' ) ),
    'norm_mean_connectivity_profile_nb_normed', ListOf( WriteDiskItem( 'Group Normed Connectivity Profile', 'Aims texture formats' ) ),
-                 'connectivity_profile_group', WriteDiskItem( 'Averaged Connectivity Profile', 'Aims texture formats' ),
+                 'connectivity_profile_group', WriteDiskItem( 'Avg Connectivity Profile', 'Aims texture formats' ),
 )
 
 def initialization ( self ):

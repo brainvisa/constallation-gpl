@@ -17,17 +17,17 @@ signature = Signature(
                 'texture_out', String(),
                 'patch_label', Integer(),
                       'group', ReadDiskItem('Group definition', 'XML' ),
+                      'study', Choice( 'Average', 'Concatenate' ),
   'individual_reduced_matrix', ListOf( ReadDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' ) ),
           'gyri_segmentation', ListOf( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ) ),
                'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 'BrainVISA mesh formats' ),
           'areaMin_threshold', Integer(),
                'vertex_index', ListOf( ReadDiskItem( 'Vertex Index', 'Text file' ) ),
-                      'study', Choice( 'Average', 'Concatenate' ),
 
            'group_matrix', WriteDiskItem( 'Group Matrix', 'GIS image'),
-  'clustering_silhouette', ListOf( WriteDiskItem( 'Group Clustering Silhouette', 'Aims texture formats' ) ),
-        'clustering_time', ListOf( WriteDiskItem( 'Group Clustering Time', 'Aims texture formats' ) ),
-        'clustering_Kopt', ListOf( WriteDiskItem( 'Group Clustering Kopt', 'Aims texture formats' ) ),
+  'clustering_silhouette', ListOf( WriteDiskItem( 'Group Clustering Silhouette', 'BrainVISA texture formats' ) ),
+        'clustering_time', ListOf( WriteDiskItem( 'Group Clustering Time', 'BrainVISA texture formats' ) ),
+        'clustering_Kopt', ListOf( WriteDiskItem( 'Group Clustering Kopt', 'BrainVISA texture formats' ) ),
      'clustering_results', WriteDiskItem( 'Group Clustering Results', 'Text file' ),
 )
 
@@ -51,11 +51,19 @@ def initialization ( self ):
       registerClass('minf_2.0', Subject, 'Subject')
       groupOfSubjects = readMinf(self.group.fullPath())
       vertexf = []
-      for subject in groupOfSubjects:
+      if self.study == 'Average':
         study = self.study_name
         texture = self.texture_in
         gyrus = 'G' + str(self.patch_label)
-        vertexf.append( ReadDiskItem( 'Vertex Index', 'Text file' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus }, subject.attributes() ) )
+        print self.group[0]
+        subject = self.group[0]
+        vertexf = ReadDiskItem( 'Vertex Index', 'Text file' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus, 'subject': subject } )
+      else:
+        for subject in groupOfSubjects:
+          study = self.study_name
+          texture = self.texture_in
+          gyrus = 'G' + str(self.patch_label)
+          vertexf.append( ReadDiskItem( 'Vertex Index', 'Text file' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus }, subject.attributes() ) )
       return vertexf
   def linkMatrix( self, dummy ):
     if self.group is not None:

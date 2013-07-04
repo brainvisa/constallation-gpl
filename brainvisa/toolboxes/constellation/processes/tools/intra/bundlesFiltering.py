@@ -26,8 +26,8 @@ signature = Signature(
 'min_distant_fibers_length', Float(),
 'max_distant_fibers_length', Float(),
 
-  'subsets_of_tracts_FibersNearCortex', WriteDiskItem( 'Gyrus Length Interval Tracts Fibers Near Cortex', 'Aims bundles' ),
-     'subsets_of_tracts_distantFibers', WriteDiskItem( 'Gyrus Length Interval Tracts Distant Fibers', 'Aims bundles' ),
+  'subsets_of_tracts_FibersNearCortex', WriteDiskItem( 'Fibers Near Cortex', 'Aims bundles' ),
+     'subsets_of_tracts_distantFibers', WriteDiskItem( 'Very OutSide Fibers Of Cortex', 'Aims bundles' ),
 )
 
 

@@ -19,11 +19,11 @@ name = '04 - Watershed of Group'
 userLevel = 2
 
 signature = Signature(
-  'normed_thresholded_mean_connectivity_profile', ReadDiskItem( 'Averaged Normed Connectivity Profile', 'Aims texture formats' ),
+  'normed_thresholded_mean_connectivity_profile', ReadDiskItem( 'Avg Normed Connectivity Profile', 'Aims texture formats' ),
                                   'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 'MESH mesh' ),
   
-  'watershed_on_mean_connectivity_profile', WriteDiskItem( 'Averaged Watershed', 'Aims texture formats' ),
-                      'filtered_watershed', WriteDiskItem( 'Averaged Filtered Watershed', 'Aims texture formats' ),
+  'watershed_on_mean_connectivity_profile', WriteDiskItem( 'Avg Watershed Texture', 'Aims texture formats' ),
+                      'filtered_watershed', WriteDiskItem( 'Avg Filtered Watershed', 'Aims texture formats' ),
 )
 
 def initialization ( self ):

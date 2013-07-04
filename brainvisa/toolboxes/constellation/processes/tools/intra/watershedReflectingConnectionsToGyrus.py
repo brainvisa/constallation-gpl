@@ -15,7 +15,7 @@ signature = Signature(
   'norm_connectivity_profile', ReadDiskItem( 'Normed Connectivity Profile', 'Aims texture formats' ),
                  'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
   
-  'watershed', WriteDiskItem( 'Watershed', 'Aims texture formats' ),
+  'watershed', WriteDiskItem( 'Watershed Texture', 'Aims texture formats' ),
 )
 
 def initialization ( self ):

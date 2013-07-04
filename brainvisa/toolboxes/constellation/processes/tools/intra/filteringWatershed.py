@@ -20,14 +20,14 @@ userLevel = 2
 
 signature = Signature(
   'connectivity_matrix_full', ReadDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ),
-                 'watershed', ReadDiskItem( 'Watershed', 'Aims texture formats' ),
+                 'watershed', ReadDiskItem( 'Watershed Texture', 'Aims texture formats' ),
               'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
                 'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
               'vertex_index', ReadDiskItem( 'Vertex Index', 'Text file' ),
                      'gyrus', Integer(),
   
-  'watershed_fiber_nb_mesh', WriteDiskItem( 'Gyrus Watershed Bassins Fiber Nb Mesh', 'Aims texture formats' ),
-       'watershed_fiber_nb', WriteDiskItem( 'Gyrus Watershed Bassins Fiber Nb', 'Aims texture formats' ),
+  'watershed_fiber_nb_mesh', WriteDiskItem( 'Sum Values From Region', 'Aims texture formats' ),
+       'watershed_fiber_nb', WriteDiskItem( 'Spread Value On Region', 'Aims texture formats' ),
        'filtered_watershed', WriteDiskItem( 'Filtered Watershed', 'Aims texture formats' ),
 )
 

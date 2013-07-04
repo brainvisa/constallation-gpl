@@ -11,17 +11,17 @@ name = 'Connectivity Matrix'
 userLevel = 2
 
 signature = Signature(
-         'oversampled_tracts_distantFibers', ReadDiskItem( 'Gyrus Oversampled Length Interval Tracts Distant Fibers', 'Aims bundles' ),
-  'length_filtered_tracts_fibersNearCortex', ReadDiskItem( 'Gyrus Length Interval Tracts Fibers Near Cortex', 'Aims bundles' ),
+         'oversampled_tracts_distantFibers', ReadDiskItem( 'Oversampled Fibers', 'Aims bundles' ),
+  'length_filtered_tracts_fibersNearCortex', ReadDiskItem( 'Fibers Near Cortex', 'Aims bundles' ),
                              'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
                                'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
                                  'dw_to_t1', ReadDiskItem( 'Transformation matrix', 'Transformation matrix' ),
                                     'gyrus', Integer(),
   
-      'connectivity_matrix_distantFibers', WriteDiskItem( 'Gyrus Connectivity Matrix Distant Fibers', 'Matrix sparse' ),
-   'connectivity_matrix_fibersNearCortex', WriteDiskItem( 'Gyrus Connectivity Matrix Fibers Near Cortex', 'Matrix sparse' ),
-  'connectivity_profile_fibersNearCortex', WriteDiskItem( 'Gyrus Connectivity Profile Fibers Near Cortex', 'Aims texture formats' ),
-     'connectivity_profile_distantFibers', WriteDiskItem( 'Gyrus Connectivity Profile Distant Fibers', 'Aims texture formats' ),
+      'connectivity_matrix_distantFibers', WriteDiskItem( 'Connectivity Matrix Outside Fibers Of Cortex', 'Matrix sparse' ),
+   'connectivity_matrix_fibersNearCortex', WriteDiskItem( 'Connectivity Matrix Fibers Near Cortex', 'Matrix sparse' ),
+  'connectivity_profile_fibersNearCortex', WriteDiskItem( 'Connectivity Profile Fibers Near Cortex', 'Aims texture formats' ),
+     'connectivity_profile_distantFibers', WriteDiskItem( 'Connectivity Profile Outside Fibers Of Cortex', 'Aims texture formats' ),
 )
 
 def initialization( self ):

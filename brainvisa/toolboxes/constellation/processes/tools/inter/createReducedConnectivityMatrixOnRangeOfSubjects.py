@@ -18,7 +18,7 @@ signature = Signature(
                'texture_out', String(),
                'patch_label', Integer(),
                      'group', ReadDiskItem('Group definition', 'XML' ),
-        'filtered_watershed', ReadDiskItem( 'Averaged Filtered Watershed', 'Aims texture formats' ),
+        'filtered_watershed', ReadDiskItem( 'Avg Filtered Watershed', 'Aims texture formats' ),
   'individual_matrix_sparse', ListOf( ReadDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ) ),
               'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 'BrainVISA mesh formats' ),
          'gyri_segmentation', ListOf( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ) ),

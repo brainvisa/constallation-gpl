@@ -19,9 +19,9 @@ signature = Signature(
                   
                'clustering_kopt', WriteDiskItem( 'Clustering kOpt', 'Aims texture formats' ),
                'clustering_time', WriteDiskItem( 'Clustering Time', 'Aims texture formats' ),
-          'clustering_k_medoids', WriteDiskItem( 'Patch Clustering Kmedoids Time', 'Aims texture formats' ),
-         'clustering_silhouette', WriteDiskItem( 'Patch Clustering Silhouette Width Time', 'Aims texture formats' ),
-  'clustering_vertex_silhouette', WriteDiskItem( 'Patch Clustering Vertex Silhouette Width Time', 'Aims texture formats' ),
+          'clustering_k_medoids', WriteDiskItem( 'Patch Clustering Time', 'Aims texture formats' ),
+         'clustering_silhouette', WriteDiskItem( 'Clustering Silhouette Time', 'Aims texture formats' ),
+  'clustering_vertex_silhouette', WriteDiskItem( 'Clustering Vertex Silhouette Time', 'Aims texture formats' ),
        'clustering_result_gyrus', WriteDiskItem( 'Gyrus Clustering Result', 'Text file' ),
         'clustering_result_full', WriteDiskItem( 'Full Clustering Result', 'Text file' ),      
 )

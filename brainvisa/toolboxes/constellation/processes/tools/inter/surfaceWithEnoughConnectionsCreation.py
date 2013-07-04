@@ -20,7 +20,7 @@ signature = Signature(
                       'patch_label', Integer(),
                             'group', ReadDiskItem( 'Group definition', 'XML' ),
   'individual_connectivity_profile', ListOf( ReadDiskItem( 'Gyrus Connectivity Profile', 'Aims texture formats' ) ),
-                             'mask', WriteDiskItem( 'Mean Connectivity Profile Mask', 'Aims texture formats' ),
+                             'mask', WriteDiskItem( 'Avg Connectivity Mask', 'Aims texture formats' ),
 )
 
 def initialization ( self ):

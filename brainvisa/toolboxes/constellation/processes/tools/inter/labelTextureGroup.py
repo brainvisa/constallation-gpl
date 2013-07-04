@@ -17,30 +17,16 @@ userLevel = 2
 
 signature = Signature(
   'group_freesurfer', ReadDiskItem('Freesurfer Group definition', 'XML' ),
-  'gyri_segmentations', ListOf( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ) ),
-  'BothAverageMesh', ReadDiskItem('BothAverageBrainWhite', 'MESH mesh'),
-  'average_gyri_segmentation', WriteDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+  'gyri_textures', ListOf( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ) ),
+  'mesh', ReadDiskItem('BothAverageBrainWhite', 'MESH mesh'),
+  'avg_gyri_texture', WriteDiskItem( 'BothAverageResampledGyri', 'BrainVISA texture formats' ),
 )
 
 def initialization ( self ):
-  #def linkGyri( self, dummy ):
-    #if self.group_freesurfer is not None:
-      #registerClass('minf_2.0', Subject, 'Subject')
-      #groupOfSubjects = readMinf(self.group_freesurfer.fullPath())
-      #print groupOfSubjects
-      #tex = []
-      #for subject in groupOfSubjects:
-        #print subject
-        #if self.database is not None:
-          #subject = subject
-          #dirname = self.database
-          #filename = os.path.join( dirname, subject, 'label/bh.r.aparc.annot.gii' )
-          #print filename
-          #if filename is not None:
-            #tex.append( filename )
-        #return tex
-  self.linkParameters( 'gyri_segmentations', 'group_freesurfer' )
-
+  self.linkParameters( 'gyri_textures', 'group_freesurfer' )
+  self.linkParameters( 'mesh', 'group_freesurfer' )
+  self.linkParameters( 'avg_gyri_texture', 'group_freesurfer' )
+  
 def execution ( self, context ):
   
   registerClass('minf_2.0', Subject, 'Subject')
@@ -51,19 +37,18 @@ def execution ( self, context ):
     subjects.append( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ).findValue( subject.attributes() ) )
   context.write(str([i for i in subjects]))
   
-  gyri_segmentations = []
-  for gyri_segmentation in self.gyri_segmentations:
-    gyri_segmentations.append(gyri_segmentation)
+  gyri_textures = []
+  for gyri_segmentation in self.gyri_textures:
+    gyri_textures.append(gyri_segmentation)
 
-  context.write(str([i for i in gyri_segmentations]))
+  context.write(str([i for i in gyri_textures]))
 
-  #context.system('python', '-c', 'from lefranc.average_texture_labels_test import average_texture_labels_test as f; f(\"%s\", %s);'%(self.average_gyri_segmentation.fullPath(), str([i for i in gyri_segmentations])))
-  context.system('python', '-m', 'constel.cmd.average_texture_labels', self.average_gyri_segmentation.fullPath(), *gyri_segmentations)
+  context.system('python', '-m', 'constel.cmd.average_texture_labels', self.avg_gyri_texture.fullPath(), *gyri_textures)
 
   # Computing connected component:
   context.system('python', find_in_path( 'constelGyriTextureCleaningIsolatedVertices.py' ),
-    '-i', self.average_gyri_segmentation,
-    '-m', self.BothAverageMesh,
-    '-o', self.average_gyri_segmentation
+    '-i', self.avg_gyri_texture,
+    '-m', self.mesh,
+    '-o', self.avg_gyri_texture
   )
   
