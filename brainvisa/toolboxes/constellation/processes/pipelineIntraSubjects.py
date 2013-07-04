@@ -19,7 +19,6 @@ signature = Signature(
          'database', Choice(),
           'subject', ReadDiskItem( 'subject', 'directory' ),
   'subset_of_tract', ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ),
-     'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),  
          'dw_to_t1', ReadDiskItem( 'Transformation matrix', 'Transformation matrix' ),
         'smoothing', Float(),
 )
@@ -43,6 +42,14 @@ def initialization( self ):
   eNode.addDoubleLink( 'FreeSurferPipeline.RawT1Image', 
                        'RawT1Image' )
 
+  ### Brainvisa: Cleaning Isolated Vertices
+  eNode.addChild( 'GyriTextureCleaning',
+                  ProcessExecutionNode( 'gyriTextureCleaningIsolatedVertices',
+                  optional = 1 ) )
+
+  eNode.addDoubleLink( 'FreeSurferPipeline.FreeSurferPipeline.freesurferConcatTex.Gyri',
+                       'GyriTextureCleaning.gyri_texture' )
+
   ### Brainvisa Constellation Intra Pipeline
   eNode.addChild( 'ConstellationIntra',
                   ProcessExecutionNode( 'pipelineIntraBrainvisa',
@@ -61,7 +68,7 @@ def initialization( self ):
   eNode.addDoubleLink( 'ConstellationIntra.subset_of_tract',
                        'subset_of_tract' )
   eNode.addDoubleLink( 'ConstellationIntra.gyri_texture',
-                       'gyri_texture' )                     
+                       'GyriTextureCleaning.gyri_texture_clean' )
   eNode.addDoubleLink( 'ConstellationIntra.white_mesh',
                        'FreeSurferPipeline.FreeSurferPipeline.freesurferConcatenate.BothWhite' )
   eNode.addDoubleLink( 'ConstellationIntra.dw_to_t1',
