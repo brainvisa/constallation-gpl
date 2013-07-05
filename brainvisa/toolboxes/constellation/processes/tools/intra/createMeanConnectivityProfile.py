@@ -13,7 +13,7 @@ userLevel = 2
 
 signature = Signature(
   'connectivity_matrix_full', ReadDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ),
-              'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+              'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
                      'gyrus', Integer(),
                
                 'vertex_index', WriteDiskItem( 'Vertex Index', 'Text file' ),

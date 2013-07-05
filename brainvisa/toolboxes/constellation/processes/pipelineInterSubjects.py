@@ -19,7 +19,7 @@ signature = Signature(
                 'gyrus', Integer(),
     'init_texture_name', String(),
    'group_texture_name', String(),
-         'gyri_texture', ListOf( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ) ),  
+         'gyri_texture', ListOf( ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ) ),
 )
 
 def initialization( self ):

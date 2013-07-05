@@ -13,7 +13,7 @@ userLevel = 2
 signature = Signature(
          'oversampled_tracts_distantFibers', ReadDiskItem( 'Oversampled Fibers', 'Aims bundles' ),
   'length_filtered_tracts_fibersNearCortex', ReadDiskItem( 'Fibers Near Cortex', 'Aims bundles' ),
-                             'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+                             'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
                                'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
                                  'dw_to_t1', ReadDiskItem( 'Transformation matrix', 'Transformation matrix' ),
                                     'gyrus', Integer(),

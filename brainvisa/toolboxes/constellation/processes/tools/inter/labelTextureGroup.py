@@ -5,14 +5,15 @@ from soma.path import find_in_path
 def validation():
   try:
     import roca
+    import constel
   except:
-    raise ValidationError( 'module roca is not here.' )
+    raise ValidationError( 'module roca or constellation is not here.' )
 
-#import gyri_texture_cleaning
+
 from brainvisa.group_utils import Subject
 from soma.minf.api import registerClass, readMinf
 
-name = '00 - Average Gyri Segmentation'
+name = '00 - Average Gyri Texture'
 userLevel = 2
 
 signature = Signature(

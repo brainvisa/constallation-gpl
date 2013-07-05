@@ -11,7 +11,7 @@ userLevel = 2
 
 signature = Signature(
   'connectivity_matrix_reduced', ReadDiskItem( 'Reduced Connectivity Matrix', 'GIS image' ),
-                 'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+                 'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
                    'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
             'areaMin_threshold', Integer(),
                  'vertex_index', ReadDiskItem( 'Vertex Index', 'Text file' ),

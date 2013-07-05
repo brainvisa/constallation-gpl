@@ -17,7 +17,7 @@ userLevel = 2
 
 signature = Signature(
   'gyrus_connectivity_profile', ReadDiskItem( 'Gyrus Connectivity Profile', 'Aims texture formats' ),
-                'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+                'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
                   'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
                        'gyrus', Integer(),
   

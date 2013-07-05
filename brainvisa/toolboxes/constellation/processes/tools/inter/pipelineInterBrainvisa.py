@@ -16,7 +16,7 @@ signature = Signature(
    'patch_label', Integer(),
          'group', ReadDiskItem('Group definition', 'XML' ),
   'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 'BrainVISA mesh formats' ),
-  'gyri_texture', ListOf( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ) ),
+  'gyri_texture', ListOf( ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ) ),
 )
 
 def linkGroup( self, param1 ):

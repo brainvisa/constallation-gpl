@@ -2,6 +2,12 @@
 from brainvisa.processes import *
 from soma.path import find_in_path
 
+def validation():
+  if not find_in_path( 'AimsMergeLabelsFromTexture.py' ):
+    raise ValidationError( 'aims module is not here.' )
+  if not find_in_path( 'AimsExtractLabelsFromTexture.py'):
+    raise ValidationError( 'aims module is not here.' )
+
 name = 'Merge Labels From texture'
 userLevel = 2
 

@@ -18,7 +18,7 @@ signature = Signature(
          'database', Choice(),
           'subject', ReadDiskItem( 'subject', 'directory' ),
   'subset_of_tract', ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ),
-     'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+     'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
        'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
          'dw_to_t1', ReadDiskItem( 'Transformation matrix', 'Transformation matrix' ),
         'smoothing', Float(),

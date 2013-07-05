@@ -12,7 +12,7 @@ userLevel = 2
 signature = Signature(
   'connectivity_matrix_full', ReadDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ),
         'filtered_watershed', ReadDiskItem( 'Filtered Watershed', 'Aims texture formats' ),
-              'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+              'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
                 'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
               'vertex_index', ReadDiskItem( 'Vertex Index', 'Text file' ),
                      'gyrus', Integer(),

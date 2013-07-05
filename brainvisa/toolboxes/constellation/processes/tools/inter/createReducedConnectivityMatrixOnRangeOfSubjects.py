@@ -21,7 +21,7 @@ signature = Signature(
         'filtered_watershed', ReadDiskItem( 'Avg Filtered Watershed', 'Aims texture formats' ),
   'individual_matrix_sparse', ListOf( ReadDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ) ),
               'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 'BrainVISA mesh formats' ),
-         'gyri_segmentation', ListOf( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ) ),
+         'gyri_segmentation', ListOf( ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ) ),
               'vertex_index', ListOf( ReadDiskItem( 'Vertex Index', 'Text file' ) ),
   'connectivity_matrix_reduced', ListOf( WriteDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' ) ),
 )

@@ -19,7 +19,7 @@ signature = Signature(
                       'group', ReadDiskItem('Group definition', 'XML' ),
                       'study', Choice( 'Average', 'Concatenate' ),
   'individual_reduced_matrix', ListOf( ReadDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' ) ),
-          'gyri_segmentation', ListOf( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ) ),
+          'gyri_segmentation', ListOf( ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ) ),
                'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 'BrainVISA mesh formats' ),
           'areaMin_threshold', Integer(),
                'vertex_index', ListOf( ReadDiskItem( 'Vertex Index', 'Text file' ) ),
