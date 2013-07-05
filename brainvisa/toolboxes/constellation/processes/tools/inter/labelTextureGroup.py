@@ -13,7 +13,7 @@ def validation():
 from brainvisa.group_utils import Subject
 from soma.minf.api import registerClass, readMinf
 
-name = '00 - Average Gyri Texture'
+name = 'Average Gyri Texture'
 userLevel = 2
 
 signature = Signature(
@@ -38,13 +38,17 @@ def execution ( self, context ):
     subjects.append( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ).findValue( subject.attributes() ) )
   context.write(str([i for i in subjects]))
   
-  gyri_textures = []
-  for gyri_segmentation in self.gyri_textures:
-    gyri_textures.append(gyri_segmentation)
+  #gyri_textures = []
+  #for gyri_segmentation in self.gyri_textures:
+    #gyri_textures.append(gyri_segmentation)
 
-  context.write(str([i for i in gyri_textures]))
+  #context.write(str([i for i in gyri_textures]))
 
-  context.system('python', '-m', 'constel.cmd.average_texture_labels', self.avg_gyri_texture.fullPath(), *gyri_textures)
+  cmd_args = []
+  for tex in self.gyri_textures:
+    cmd_args += [ '-i', tex ]
+  cmd_args += [ '-o', self.avg_gyri_texture ]
+  context.system('python', find_in_path( 'constelAvgGyriTexture.py' ), *cmd_args )
 
   # Computing connected component:
   context.system('python', find_in_path( 'constelGyriTextureCleaningIsolatedVertices.py' ),
