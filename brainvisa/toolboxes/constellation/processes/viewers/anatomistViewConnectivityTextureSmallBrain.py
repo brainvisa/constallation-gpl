@@ -42,14 +42,14 @@ userLevel = 2
 roles = ( 'viewer', )
 
 signature = Signature(
-  'mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
   'connectivity_matrix', ReadDiskItem( 'Reduced connectivity matrix', 'aims readable volume formats' ),
+  'mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
   'basins_texture', ReadDiskItem( 'Filtered Watershed', 'anatomist texture formats' ),
   'clustering_texture', ReadDiskItem( 'Clustering Texture', 'anatomist texture formats' )
 )
 
-def initialization( self):
-  self.linkParameters( 'connectivity_matrix', 'mesh' )
+def initialization( self ):
+  self.linkParameters( 'mesh', 'connectivity_matrix' )
   self.linkParameters( 'basins_texture', 'connectivity_matrix' )
   self.linkParameters( 'clustering_texture', 'connectivity_matrix' )
 
