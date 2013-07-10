@@ -9,16 +9,16 @@ insert( '{protocol}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_sessi
           '{gyrus}', SetContent(
             'VertexIndex', SetType( 'Vertex Index' ),
               'filteredTracts', SetContent(
-                '<subject>_<texture>_<gyrus>_distantFibers_{minlengthoffibersOut}to500mm_oversampled', SetType( 'Oversampled Fibers' ),
+                '<subject>_<texture>_<gyrus>_outsideFibersOfCortex_{minlengthoffibersOut}to500mm_oversampled', SetType( 'Oversampled Fibers' ),
                 '<subject>_<texture>_<gyrus>_fibersNearCortex_{minlengthoffibersIn}to500mm', SetType( 'Fibers Near Cortex' ),
-                '<subject>_<texture>_<gyrus>_distantFibers_{minlengthoffibersOut}to500mm', SetType( 'Very OutSide Fibers Of Cortex' ),
+                '<subject>_<texture>_<gyrus>_outsideFibersOfCortex_{minlengthoffibersOut}to500mm', SetType( 'Very OutSide Fibers Of Cortex' ),
               ),
     
               'matrix', SetContent(
                 '<subject>_<texture>_<gyrus>_connectivityMatrix_fibersNearCortex', SetType( 'Connectivity Matrix Fibers Near Cortex' ),
-                '<subject>_<texture>_<gyrus>_connectivityMatrix_distantFibers', SetType( 'Connectivity Matrix Outside Fibers Of Cortex' ),
+                '<subject>_<texture>_<gyrus>_connectivityMatrix_outsideFibersOfCortex', SetType( 'Connectivity Matrix Outside Fibers Of Cortex' ),
                 '<subject>_<texture>_<gyrus>_meanConnectivityProfile_fibersNearCortex', SetType( 'Connectivity Profile Fibers Near Cortex' ),
-                '<subject>_<texture>_<gyrus>_meanConnectivityProfile_distantFibers', SetType( 'Connectivity Profile Outside Fibers Of Cortex' ),
+                '<subject>_<texture>_<gyrus>_meanConnectivityProfile_outsideFibersOfCortex', SetType( 'Connectivity Profile Outside Fibers Of Cortex' ),
                 '<subject>_<texture>_<gyrus>_connectivityMatrix', SetType( 'Gyrus Connectivity Matrix' ),
               ),
   
