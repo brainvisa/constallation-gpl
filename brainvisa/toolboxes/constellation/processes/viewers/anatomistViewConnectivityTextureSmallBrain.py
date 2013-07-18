@@ -34,8 +34,18 @@ from brainvisa.processes import *
 from brainvisa import anatomist as ana
 from soma import aims
 import numpy
-import roca.lib.textureTools as TT
-import roca.lib.connectivity.matrix.tools as Mat
+try:
+  import roca.lib.textureTools as TT
+  import roca.lib.connectivity.matrix.tools as Mat
+except:
+  pass
+
+def validation():
+  try:
+    import roca.lib.textureTools as TT
+    import roca.lib.connectivity.matrix.tools as Mat
+  except:
+    raise ValidationError( 'roca module is not available' )
 
 name = 'Anatomist view connectivity texture on small brains'
 userLevel = 2

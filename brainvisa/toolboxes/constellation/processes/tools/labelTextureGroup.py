@@ -4,10 +4,9 @@ from soma.path import find_in_path
 
 def validation():
   try:
-    import roca
     import constel
   except:
-    raise ValidationError( 'module roca or constellation is not here.' )
+    raise ValidationError( 'module constellation is not here.' )
 
 
 from brainvisa.group_utils import Subject

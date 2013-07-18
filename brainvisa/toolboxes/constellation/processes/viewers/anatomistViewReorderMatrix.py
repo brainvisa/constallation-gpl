@@ -34,8 +34,17 @@ from brainvisa.processes import *
 from brainvisa import anatomist as ana
 from soma import aims
 import numpy
-import roca.lib.textureTools_stats as TTS
+try:
+  import roca.lib.textureTools_stats as TTS
+except:
+  pass
 import constel.lib.connmatrix.connmatrixtools as CM
+
+def validation():
+  try:
+    import roca.lib.textureTools_stats as TTS
+  except:
+    raise ValidationError( 'roca module is not available' )
 
 name = 'Anatomist view reorder matrix from labeled texture'
 userLevel = 2
