@@ -11,16 +11,13 @@ name = 'Brainvisa Constellation Intra pipeline'
 userLevel = 2
 
 signature = Signature(
-  #'reorganized_subset_of_tract', ReadDiskItem( 'Gyri Regrouped Subset of Tracts', 'Aims bundles' ),
             'study', String(),
           'texture', String(),
             'gyrus', String(),
          'database', Choice(),
           'subject', ReadDiskItem( 'subject', 'directory' ),
-  'subset_of_tract', ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ),
      'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
        'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
-         'dw_to_t1', ReadDiskItem( 'Transformation matrix', 'Transformation matrix' ),
         'smoothing', Float(),
 )
 
@@ -49,8 +46,6 @@ def initialization( self ):
                        'database' )
   eNode.addDoubleLink( 'Filter.subject',
                        'subject' )
-  eNode.addDoubleLink( 'Filter.subset_of_tract',
-                       'subset_of_tract' )
   eNode.addDoubleLink( 'Filter.gyri_texture',
                        'gyri_texture' )
 
@@ -83,7 +78,7 @@ def initialization( self ):
                        'white_mesh' )
                        
   eNode.addDoubleLink( 'Smoothing.dw_to_t1',
-                       'dw_to_t1' )
+                       'Filter.dw_to_t1' )
 
   ### Sum Sparse Matrix
   eNode.addChild( 'Sum',
