@@ -22,7 +22,6 @@ signature = Signature(
   'individual_matrix_sparse', ListOf( ReadDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ) ),
               'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 'BrainVISA mesh formats' ),
          'gyri_segmentation', ListOf( ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ) ),
-              'vertex_index', ListOf( ReadDiskItem( 'Vertex Index', 'Text file' ) ),
   'connectivity_matrix_reduced', ListOf( WriteDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' ) ),
 )
 
@@ -40,7 +39,6 @@ def afterChildAddedCallback( self, parent, key, child ):
   # Set default values
   child.removeLink( 'filtered_watershed', 'connectivity_matrix_full' )
   child.removeLink( 'connectivity_matrix_reduced', 'filtered_watershed' )
-  child.removeLink( 'vertex_index', 'connectivity_matrix_full' )
 
   child.signature[ 'filtered_watershed' ] \
     = parent.signature[ 'filtered_watershed' ]
@@ -113,7 +111,6 @@ def initialization ( self ):
   self.linkParameters( 'individual_matrix_sparse', ( 'group', 'study_name', 'texture_in', 'patch_label' ), linkIndividualMatrices )
   self.linkParameters( 'filtered_watershed', ( 'group', 'patch_label', 'texture_out', 'study_name' ), linkWatershed )
   self.linkParameters( 'connectivity_matrix_reduced', ( 'group', 'individual_matrix_sparse', 'texture_out') , linkProfiles )
-  self.linkParameters( 'vertex_index', 'individual_matrix_sparse')
   self.signature['individual_matrix_sparse'].userLevel = 2
   self.linkParameters( 'average_mesh', 'group', linkMesh )
 
@@ -149,16 +146,6 @@ def initialization ( self ):
                           eNode,
                           'connectivity_matrix_reduced',
                           'connectivity_matrix_reduced',
-                          defaultProcess = 'createReducedConnectivityMatrix',
-                          name='createReducedConnectivityMatrix' ) )
-
-  eNode.addLink( None,
-                 'vertex_index',
-                 partial( brainvisa.processes.mapValuesToChildrenParameters,
-                          eNode,
-                          eNode,
-                          'vertex_index',
-                          'vertex_index',
                           defaultProcess = 'createReducedConnectivityMatrix',
                           name='createReducedConnectivityMatrix' ) )
 
