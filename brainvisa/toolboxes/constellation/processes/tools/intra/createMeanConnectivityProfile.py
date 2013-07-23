@@ -15,14 +15,12 @@ signature = Signature(
   'connectivity_matrix_full', ReadDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ),
               'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
                      'gyrus', Integer(),
-               
-                'vertex_index', WriteDiskItem( 'Vertex Index', 'Text file' ),
+
   'gyrus_connectivity_profile', WriteDiskItem( 'Gyrus Connectivity Profile', 'Aims texture formats' ),
 )
 
 def initialization ( self ):
   self.setOptional( 'gyrus' )
-  self.linkParameters( 'vertex_index','connectivity_matrix_full' )
   self.linkParameters( 'gyrus_connectivity_profile', 'connectivity_matrix_full' )
 
 def execution ( self, context ):
@@ -39,13 +37,7 @@ def execution ( self, context ):
     '-outconntex', self.gyrus_connectivity_profile,
     '-seedregionstex', self.gyri_texture,
     '-seedlabel', gyrus,
-    '-outseedvertex', self.vertex_index,
     '-verbose', 1,
     '-type', 'seed_mean_connectivity_profile',
     '-normalize', 0
   )
-  #dest = os.path.dirname( self.vertex_index.fullPath() )
-  #dest = dest + '/VertexIndex.txt.txt'
-  #context.write( dest )
-  #os.rename( str(dest), self.vertex_index.fullPath() )
-  
