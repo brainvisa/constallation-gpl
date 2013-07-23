@@ -23,7 +23,6 @@ signature = Signature(
                  'watershed', ReadDiskItem( 'Watershed Texture', 'Aims texture formats' ),
               'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
                 'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
-              'vertex_index', ReadDiskItem( 'Vertex Index', 'Text file' ),
                      'gyrus', Integer(),
   
   'watershed_fiber_nb_mesh', WriteDiskItem( 'Sum Values From Region', 'Aims texture formats' ),
@@ -33,7 +32,6 @@ signature = Signature(
 
 def initialization ( self ):
   self.setOptional( 'gyrus' )
-  self.linkParameters( 'vertex_index','connectivity_matrix_full' )
   self.linkParameters( 'watershed', 'connectivity_matrix_full' )
   self.linkParameters( 'watershed_fiber_nb_mesh', 'connectivity_matrix_full' )
   self.linkParameters( 'watershed_fiber_nb', 'connectivity_matrix_full' )
@@ -58,7 +56,6 @@ def execution ( self, context ):
     '-type', 'oneSeedRegion_to_targets',
     '-outconntex', self.watershed_fiber_nb_mesh,
     '-outconntargets', self.watershed_fiber_nb,
-    '-seedvertexindex', self.vertex_index, 
     '-normalize', 1 
   )
   fibersNbByWatershedBasinsTarget_tex = aims.read( self.watershed_fiber_nb.fullPath() )

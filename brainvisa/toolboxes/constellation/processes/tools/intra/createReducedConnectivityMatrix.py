@@ -14,7 +14,6 @@ signature = Signature(
         'filtered_watershed', ReadDiskItem( 'Filtered Watershed', 'Aims texture formats' ),
               'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
                 'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
-              'vertex_index', ReadDiskItem( 'Vertex Index', 'Text file' ),
                      'gyrus', Integer(),
   
   'connectivity_matrix_reduced', WriteDiskItem( 'Reduced Connectivity Matrix', 'GIS image' ),
@@ -22,7 +21,6 @@ signature = Signature(
 
 def initialization ( self ):
   self.setOptional( 'gyrus' )
-  self.linkParameters( 'vertex_index','connectivity_matrix_full')
   self.linkParameters( 'filtered_watershed', 'connectivity_matrix_full' )
   self.linkParameters( 'connectivity_matrix_reduced', 'filtered_watershed' )
 
@@ -43,7 +41,6 @@ def execution ( self, context ):
     '-seedlabel', gyrus,
     '-type', 'seedVertex_to_targets',
     '-connmatrix', self.connectivity_matrix_reduced,
-    '-seedvertexindex', self.vertex_index,
     '-normalize', 1,
     '-verbose', 1
   )
