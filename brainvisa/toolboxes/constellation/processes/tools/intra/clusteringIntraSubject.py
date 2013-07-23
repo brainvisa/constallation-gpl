@@ -14,7 +14,6 @@ signature = Signature(
                  'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
                    'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
             'areaMin_threshold', Integer(),
-                 'vertex_index', ReadDiskItem( 'Vertex Index', 'Text file' ),
                         'gyrus', Integer(),
                   
                'clustering_kopt', WriteDiskItem( 'Clustering kOpt', 'Aims texture formats' ),
@@ -34,7 +33,6 @@ def initialization ( self ):
   self.linkParameters( 'clustering_k_medoids', 'clustering_time' )
   self.linkParameters( 'clustering_silhouette', 'clustering_k_medoids' )
   self.linkParameters( 'clustering_vertex_silhouette', 'clustering_silhouette' )
-  self.linkParameters( 'vertex_index','connectivity_matrix_reduced' )
   self.linkParameters( 'clustering_result_gyrus','connectivity_matrix_reduced' )
   self.linkParameters( 'clustering_result_full','connectivity_matrix_reduced' )
   self.linkParameters( 'gyri_texture', 'white_mesh' )
@@ -52,7 +50,6 @@ def execution ( self, context ):
     '-g', self.gyri_texture,
     '-w', self.white_mesh,
     '-a', self.areaMin_threshold,
-    '-v', self.vertex_index,
     '-k', self.clustering_kopt,
     '-t', self.clustering_time,
     '-d', self.clustering_k_medoids,
