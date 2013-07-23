@@ -22,7 +22,6 @@ signature = Signature(
           'gyri_segmentation', ListOf( ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ) ),
                'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 'BrainVISA mesh formats' ),
           'areaMin_threshold', Integer(),
-               'vertex_index', ListOf( ReadDiskItem( 'Vertex Index', 'Text file' ) ),
 
            'group_matrix', WriteDiskItem( 'Group Matrix', 'GIS image'),
   'clustering_silhouette', ListOf( WriteDiskItem( 'Group Clustering Silhouette', 'BrainVISA texture formats' ) ),
@@ -46,25 +45,6 @@ def initialization ( self ):
         atts[ 'gyrus' ] = 'G' + str(self.patch_label)
         profiles.append( ReadDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' ).findValue( subject.attributes(), atts ) )
       return profiles
-  def linkTxt( self, dummy ):
-    if self.group is not None:
-      registerClass('minf_2.0', Subject, 'Subject')
-      groupOfSubjects = readMinf(self.group.fullPath())
-      vertexf = []
-      if self.study == 'Average':
-        study = self.study_name
-        texture = self.texture_in
-        gyrus = 'G' + str(self.patch_label)
-        print self.group[0]
-        subject = self.group[0]
-        vertexf = ReadDiskItem( 'Vertex Index', 'Text file' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus, 'subject': subject } )
-      else:
-        for subject in groupOfSubjects:
-          study = self.study_name
-          texture = self.texture_in
-          gyrus = 'G' + str(self.patch_label)
-          vertexf.append( ReadDiskItem( 'Vertex Index', 'Text file' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus }, subject.attributes() ) )
-      return vertexf
   def linkMatrix( self, dummy ):
     if self.group is not None:
       atts = dict( self.group.hierarchyAttributes() )
@@ -76,7 +56,6 @@ def initialization ( self ):
       return filename
   #self.signature['individual_reduced_matrix'].userLevel = 2
   self.linkParameters( 'individual_reduced_matrix', 'group', linkIndividual )
-  self.linkParameters( 'vertex_index', ('group', 'study_name', 'texture_in', 'patch_label' ), linkTxt )
   self.linkParameters( 'group_matrix', ('group', 'study_name', 'texture_out', 'patch_label' ), linkMatrix )
   self.linkParameters( 'clustering_silhouette', 'individual_reduced_matrix' )
   self.linkParameters( 'clustering_time', 'clustering_silhouette' )
@@ -113,8 +92,6 @@ def execution ( self, context ):
     cmd_args += [ '-o', s ]
   for y in self.gyri_segmentation:
     cmd_args += [ '-t', y ]
-  for v in self.vertex_index:
-    cmd_args += [ '-v', v ]
   cmd_args += [ '-m', self.average_mesh, '-l', patch_label, '-a', self.areaMin_threshold, '-s', self.study, '-g', self.group_matrix, '-x', self.clustering_results, '-r', Rclustering_filename ]
   context.system( 'python', find_in_path('constelInterSubjectClustering.py'),
     *cmd_args
