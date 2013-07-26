@@ -33,8 +33,7 @@ def execution ( self, context ):
     gyrus = gyrus.strip('G')
   context.write('gyrus = ', gyrus, '    Is it correct?')
   context.system( 'constelConnectionDensityTexture',
-    '-mesh', self.white_mesh, 
-    '-connfmt', 'binar_sparse',
+    '-mesh', self.white_mesh,
     '-connmatrixfile', self.connectivity_matrix_full,
     '-targetregionstex', self.filtered_watershed,
     '-seedregionstex', self.gyri_texture,
