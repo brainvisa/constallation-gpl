@@ -38,6 +38,16 @@ def initialization( self ):
     self.database=databases[0]
   else:
     self.signature[ 'database' ] = OpenChoice()
+  def linkSubjects( self, dummy ):
+    if self.database is not None and self.subject is not None:
+      subject = os.path.basename( self.subject.fullPath() )
+      db = os.path.dirname( self.subject.fullPath() )
+      attrs = dict( self.subject.hierarchyAttributes() )
+      attrs['_database'] = db
+      attrs['subject'] = subject
+      attrs['trackfileum'] = '1'
+      filename = self.signature[ 'subset_of_tract' ].findValue( attrs )
+      return filename
   def lef( self, dummy ):
     if self.subset_of_tract is not None:
       d = os.path.dirname( self.subset_of_tract.fullPath() )
@@ -56,7 +66,6 @@ def initialization( self ):
       attrs['gyrus'] = 'G' + str( self.gyrus )
       attrs['minlengthoffibersIn'] = str( int(self.min_cortex_length) )
       filename = self.signature[ 'subsets_of_tracts_FibersNearCortex' ].findValue( attrs )
-      print attrs
       return filename
   def linkProfileDistantFibers( self, dummy ):
     if self.subsets_of_tracts_FibersNearCortex is not None:
@@ -64,6 +73,7 @@ def initialization( self ):
       attrs['minlengthoffibersOut'] = str( int( self.min_distant_fibers_length ) )
       filename = self.signature[ 'subsets_of_tracts_distantFibers' ].findValue( attrs )
       return filename
+  self.linkParameters( 'subset_of_tract', 'subject', linkSubjects )
   self.linkParameters( 'listOf_subsets_of_tract', 'subset_of_tract', lef )
   self.linkParameters( 'subsets_of_tracts_FibersNearCortex', ( 'database', 'subset_of_tract', 'subject', 'study', 'texture', 'gyrus', 'min_cortex_length' ), linkProfile )
   self.linkParameters( 'subsets_of_tracts_distantFibers', ( 'subsets_of_tracts_FibersNearCortex', 'min_distant_fibers_length' ), linkProfileDistantFibers )
