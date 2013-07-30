@@ -3,11 +3,14 @@ include( 'diffusion' )
 
 insert( '{protocol}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}',
   'connectivity_parcellation', SetContent(
+  
     '{study}', SetContent(
+    
       '{texture}', SetContent(
         'IntraClusteringResultsFull', SetType( 'Full Clustering Result' ),
+        
           '{gyrus}', SetContent(
-            'VertexIndex', SetType( 'Vertex Index' ),
+
               'filteredTracts', SetContent(
                 '<subject>_<texture>_<gyrus>_outsideFibersOfCortex_{minlengthoffibersOut}to500mm_oversampled', SetType( 'Oversampled Fibers' ),
                 '<subject>_<texture>_<gyrus>_fibersNearCortex_{minlengthoffibersIn}to500mm', SetType( 'Fibers Near Cortex' ),

@@ -10,7 +10,6 @@ insert( '{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session
         'IntraClusteringResultsFull', SetType( 'Full Clustering Result' ),
 
           '{gyrus}', SetContent(
-            'VertexIndex', SetType( 'Vertex Index' ),
             
               'filteredTracts', SetContent(
                 '<subject>_<texture>_<gyrus>_outsideFibersOfCortex_{minlengthoffibersOut}to500mm_oversampled', SetType( 'Oversampled Fibers' ),

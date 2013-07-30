@@ -11,7 +11,6 @@ FileType( 'Very OutSide Fibers Of Cortex', 'Bundles selection' )
 FileType( 'Oversampled Fibers', 'Bundles selection' )
 
 # File
-FileType( 'Vertex Index', 'Text file' )
 FileType( 'Full Clustering Result', 'Text file' )
 FileType( 'Gyrus Clustering Result', 'Text file' )
 FileType( 'Group Clustering Results', 'Text file' )
