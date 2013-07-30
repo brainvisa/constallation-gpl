@@ -12,10 +12,10 @@ name = 'Merge Labels From texture'
 userLevel = 2
 
 signature = Signature(
-  'gyri_texture', ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+  'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
   'old_label', ListOf( Integer() ),
   'new_label', Integer(),
-  'gyri_output_texture', WriteDiskItem( 'BothResampledGyri', 'Aims texture formats' ),
+  'gyri_output_texture', WriteDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
   'keep_only_merged_regions', Boolean(),
 )
 
