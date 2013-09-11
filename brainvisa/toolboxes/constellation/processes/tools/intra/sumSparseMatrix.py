@@ -31,7 +31,7 @@ def execution ( self, context ):
   if self.gyrus is not None:
     gyrus = self.gyrus
   else:
-    gyrus = os.path.basename( os.path.dirname( os.path.dirname( self.gyrus_connectivity_profile.fullPath() ) ) )
+    gyrus = os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_fibersNearCortex.fullPath() ) ) )
     gyrus = gyrus.strip('G')
   context.write('gyrus = ', gyrus, '    Is it correct?')
   context.system( 'AimsSumSparseMatrix',
