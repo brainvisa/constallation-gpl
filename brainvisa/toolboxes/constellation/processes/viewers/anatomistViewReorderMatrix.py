@@ -51,8 +51,8 @@ userLevel = 2
 roles = ( 'viewer', )
 
 signature = Signature(
-  'clustering_texture', ReadDiskItem( 'Clustering Texture', 'anatomist texture formats' ),
-  'connectivity_matrix', ReadDiskItem( 'Reduced connectivity matrix', 'aims readable volume formats' ),
+  'clustering_texture', ReadDiskItem( 'Group Clustering Texture', 'anatomist texture formats' ),
+  'connectivity_matrix', ReadDiskItem( 'Group Reduced connectivity matrix', 'aims readable volume formats' ),
   'time_step', Integer(),
   'transpose', Boolean(),
 )
@@ -63,16 +63,18 @@ def initialization( self ):
 def execution( self, context ):
   a = ana.Anatomist()
 
-  matrix = aims.read( self.connectivity_matrix.fullPath() )
+  matrix = aims.read( self.connectivity_matrix.fullPath() ) 
   matrix = numpy.asarray( matrix )
   matrix = matrix.reshape( matrix.shape[:2] )
 
   clusters = aims.read( self.clustering_texture.fullPath() )
+  context.write( "clusters:", clusters )
   
   if self.transpose is None:
     matrix = matrix.T
 
   labels = clusters[ self.time_step ].arraydata()[ clusters[ self.time_step ].arraydata() != 0 ]
+  context.write( "labels:", labels, "clusters[]", clusters[ self.time_step ].arraydata() )
 
   order_mat, sortLabels = TTS.orderDataMatrix( matrix, labels )
   dissmatrix = TTS.euclidianDistanceMatrix( order_mat )
@@ -116,14 +118,16 @@ def execution( self, context ):
   labels_ima.setPalette( palette = 'Blue - Pastel - Red' )
   dissmat_ima.setPalette( palette = 'Blue - Pastel - Red' )
   
-  wgroup = a.createWindowsBlock( nbCols = 3 )
+  wgroup = a.createWindowsBlock( nbCols = 2 )
   win1 = a.createWindow( 'Axial', block = wgroup )
   win2 = a.createWindow( 'Axial', block = wgroup )
   win3 = a.createWindow( 'Axial', block = wgroup )
+  #win4 = a.createWindow( 'Axial', block = wgroup )
   br = a.createWindow( 'Browser', block = wgroup )
   win1.addObjects( mat_ima )
   win2.addObjects( dissmat_ima )
   win3.addObjects( labels_ima )
+  #win4.addObjects( [ mat_ima, labels_ima ] )
   br.addObjects( [ mat_ima, dissmat_ima, labels_ima] )
 
   return [ win1, win2, win3, br, labels_ima, mat_ima, dissmat_ima ]

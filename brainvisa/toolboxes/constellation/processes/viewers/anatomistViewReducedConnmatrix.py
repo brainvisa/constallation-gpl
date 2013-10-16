@@ -19,7 +19,7 @@ signature = Signature(
     'connectivity_matrix',
         ReadDiskItem( 'Reduced connectivity matrix',
           'aims readable volume formats' ),
-    'white_mesh', ReadDiskItem( 'AimsBothWhite', 'anatomist mesh formats' ),
+    'white_mesh', ReadDiskItem( 'FreesurferMesh', 'anatomist mesh formats' ),
     'gyrus_texture',
         ReadDiskItem( 'Label texture', 'anatomist texture formats' ),
     'basins_texture',

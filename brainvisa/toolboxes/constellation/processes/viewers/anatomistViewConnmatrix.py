@@ -18,7 +18,7 @@ userLevel = 0
 signature = Signature(
     'connectivity_matrix',
         ReadDiskItem( 'Gyrus connectivity matrix', 'Matrix sparse' ),
-    'white_mesh', ReadDiskItem( 'AimsBothWhite', 'anatomist mesh formats' ),
+    'white_mesh', ReadDiskItem( 'FreesurferMesh', 'anatomist mesh formats' ),
     'gyrus_texture',
         ReadDiskItem( 'Label texture', 'anatomist texture formats' ),
 )
