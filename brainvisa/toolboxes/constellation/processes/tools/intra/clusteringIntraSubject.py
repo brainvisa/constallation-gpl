@@ -22,7 +22,7 @@ signature = Signature(
           #'clustering_k_medoids', WriteDiskItem( 'Patch Clustering Time', 'Aims texture formats' ),
          #'clustering_silhouette', WriteDiskItem( 'Clustering Silhouette Time', 'Aims texture formats' ),
   #'clustering_vertex_silhouette', WriteDiskItem( 'Clustering Vertex Silhouette Time', 'Aims texture formats' ),
-       'clustering_result_gyrus', WriteDiskItem( 'Gyrus Clustering Result', 'Text file' ),
+       #'clustering_result_gyrus', WriteDiskItem( 'Gyrus Clustering Result', 'Text file' ),
         #'clustering_result_full', WriteDiskItem( 'Full Clustering Result', 'Text file' ),      
 )
 
@@ -53,11 +53,11 @@ def execution ( self, context ):
     '-w', self.white_mesh,
     '-a', self.kmax,
     #'-k', self.clustering_kopt,
-    '-t', self.clustering_time,
+    '-t', self.clustering_time
     #'-d', self.clustering_k_medoids,
     #'-s', self.clustering_silhouette,
     #'-l', self.clustering_vertex_silhouette,
-    '-r', self.clustering_result_gyrus
+    #'-r', self.clustering_result_gyrus
     #'-f', self.clustering_result_full
   )
   context.write( 'OK' ) 

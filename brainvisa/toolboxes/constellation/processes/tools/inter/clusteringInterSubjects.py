@@ -21,17 +21,19 @@ signature = Signature(
   'individual_reduced_matrix', ListOf( ReadDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' ) ),
           'gyri_segmentation', ListOf( ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ) ),
                'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 'BrainVISA mesh formats' ),
-          'areaMin_threshold', Integer(),
+          #'areaMin_threshold', Integer(),
+                       'kmax', Integer(),
 
            'group_matrix', WriteDiskItem( 'Group Matrix', 'GIS image'),
-  'clustering_silhouette', ListOf( WriteDiskItem( 'Group Clustering Silhouette', 'BrainVISA texture formats' ) ),
+  #'clustering_silhouette', ListOf( WriteDiskItem( 'Group Clustering Silhouette', 'BrainVISA texture formats' ) ),
         'clustering_time', ListOf( WriteDiskItem( 'Group Clustering Time', 'BrainVISA texture formats' ) ),
-        'clustering_Kopt', ListOf( WriteDiskItem( 'Group Clustering Kopt', 'BrainVISA texture formats' ) ),
-     'clustering_results', WriteDiskItem( 'Group Clustering Results', 'Text file' ),
+        #'clustering_Kopt', ListOf( WriteDiskItem( 'Group Clustering Kopt', 'BrainVISA texture formats' ) ),
+     #'clustering_results', WriteDiskItem( 'Group Clustering Results', 'Text file' ),
 )
 
 def initialization ( self ):
-  self.areaMin_threshold = 400
+  #self.areaMin_threshold = 400
+  self.kmax = 10
   self.study = 'Average'
   def linkIndividual( self, dummy ):
     if self.group is not None:
@@ -54,13 +56,35 @@ def initialization ( self ):
       print atts
       filename = self.signature['group_matrix'].findValue( atts )
       return filename
+  def linkClustering(self, dummy):
+    if self.individual_reduced_matrix and self.group is not None:
+      if self.study == 'Average':
+        atts = dict( self.group.hierarchyAttributes() )
+        atts['subject'] = 'avgSubject'
+        atts[ 'study' ] = self.study_name
+        atts[ 'texture' ] = self.texture_out
+        atts[ 'gyrus' ] = 'G' + str(self.patch_label)
+        return self.signature[ 'clustering_time' ].findValue( atts )
+      elif self.study == 'Concatenate':
+        registerClass('minf_2.0', Subject, 'Subject')
+        groupOfSubjects = readMinf(self.group.fullPath())
+        profiles = []
+        for subject in groupOfSubjects:
+          atts = dict( self.group.hierarchyAttributes() )
+          atts['subject'] = self.individual_reduced_matrix
+          atts[ 'study' ] = self.study_name
+          atts[ 'texture' ] = self.texture_out
+          atts[ 'gyrus' ] = 'G' + str(self.patch_label)
+          print "aats", atts
+          profiles.append( ReadDiskItem('Group Clustering Time', 'BrainVISA texture formats').findValue( atts ) )
+        return profiles
   #self.signature['individual_reduced_matrix'].userLevel = 2
-  self.linkParameters( 'individual_reduced_matrix', 'group', linkIndividual )
+  self.linkParameters( 'individual_reduced_matrix', ('group', 'study_name', 'texture_out', 'patch_label'), linkIndividual )
   self.linkParameters( 'group_matrix', ('group', 'study_name', 'texture_out', 'patch_label' ), linkMatrix )
-  self.linkParameters( 'clustering_silhouette', 'individual_reduced_matrix' )
-  self.linkParameters( 'clustering_time', 'clustering_silhouette' )
-  self.linkParameters( 'clustering_Kopt', 'clustering_time' )
-  self.linkParameters( 'clustering_results', 'group_matrix' )
+  self.linkParameters( 'clustering_time', ('group', 'study_name', 'individual_reduced_matrix', 'texture_out', 'patch_label'), linkClustering )
+  #self.linkParameters( 'clustering_time', 'clustering_silhouette' )
+  #self.linkParameters( 'clustering_Kopt', 'clustering_time' )
+  #self.linkParameters( 'clustering_results', 'group_matrix' )
 
 def execution ( self, context ):
   context.write( '--> Clustering inter subjects...' )
@@ -81,18 +105,20 @@ def execution ( self, context ):
    *args
   )
   
-  Rclustering_filename = os.path.join( os.path.dirname( mainPath ), 'R', 'clustering', 'kmedoids.R' )
+  #Rclustering_filename = os.path.join( os.path.dirname( mainPath ), 'R', 'clustering', 'kmedoids.R' )
 
   cmd_args = []
   for t in self.clustering_time:
     cmd_args += [ '-p', t ]
-  for k in self.clustering_Kopt:
-    cmd_args += [ '-q', k ]
-  for s in self.clustering_silhouette:
-    cmd_args += [ '-o', s ]
+  #for k in self.clustering_Kopt:
+    #cmd_args += [ '-q', k ]
+  #for s in self.clustering_silhouette:
+    #cmd_args += [ '-o', s ]
   for y in self.gyri_segmentation:
     cmd_args += [ '-t', y ]
-  cmd_args += [ '-m', self.average_mesh, '-l', patch_label, '-a', self.areaMin_threshold, '-s', self.study, '-g', self.group_matrix, '-x', self.clustering_results, '-r', Rclustering_filename ]
+  #cmd_args += [ '-m', self.average_mesh, '-l', patch_label, '-a', self.areaMin_threshold, '-s',
+#self.study, '-g', self.group_matrix, '-x', self.clustering_results, '-r', Rclustering_filename ]
+  cmd_args += ['-m', self.average_mesh, '-l', patch_label, '-s', self.study, '-g',self.group_matrix, '-a', self.kmax]
   context.system( 'python', find_in_path('constelInterSubjectClustering.py'),
     *cmd_args
   )
