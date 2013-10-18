@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #  This software and supporting documentation are distributed by
-#      Institut Federatif de Recherche 49
 #      CEA/NeuroSpin, Batiment 145,
 #      91191 Gif-sur-Yvette cedex
 #      France
@@ -33,7 +32,9 @@
 
 from brainvisa.processes import *
 import constel.lib.clustervalidity as cv
+import constel.lib.plot as p
 import numpy as np
+import pylab
 
 name = 'Average Silhouette Width'
 userLevel = 2
@@ -43,11 +44,26 @@ signature = Signature(
   'kmax', Integer(),
 )
 
+class MatplotlibFig( object ):
+  def __init__( self, fig ):
+    self._fig = fig
+  def __del__( self ):
+    mainThreadActions().call( pylab.close, self._fig )
+
 def initialization ( self ):
   self.kmax = 10
 
 def execution ( self, context ):
   reduced_matrix = aims.read(self.connectivity_matrix_reduced.fullPath())
   reduced_matrix = np.transpose(np.asarray(reduced_matrix)[:,:,0,0])
-  print "Reduced matrix of size (Nsample, Ndim): M", reduced_matrix.shape
-  s = cv.silhouette_sample(reduced_matrix, self.kmax)
+  asw = []
+  for k in range(2, self.kmax+1):
+    s = cv.silhouette_score(reduced_matrix, k)
+    context.write('ASW is ', s, 'for K =', k ) 
+    asw.append(s)
+  aswOpt = max(asw)
+  context.write('The larger ASW is', aswOpt)
+  list_k = range(self.kmax+1)
+  list_k = [x for x in list_k if x!=0 and x!=1]
+  fig = mainThreadActions().call( p.silhouette_score_plot, asw, list_k )
+  return MatplotlibFig( fig )
