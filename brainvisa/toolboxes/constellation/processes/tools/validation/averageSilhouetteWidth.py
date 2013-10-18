@@ -32,14 +32,22 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from brainvisa.processes import *
+import constel.lib.clustervalidity as cv
+import numpy as np
 
 name = 'Average Silhouette Width'
 userLevel = 2
 
-signature = Signature()
+signature = Signature(
+  'connectivity_matrix_reduced', ReadDiskItem( 'Reduced Connectivity Matrix', 'GIS image' ),
+  'kmax', Integer(),
+)
 
 def initialization ( self ):
-  pass
+  self.kmax = 10
 
 def execution ( self, context ):
-  pass
+  reduced_matrix = aims.read(self.connectivity_matrix_reduced.fullPath())
+  reduced_matrix = np.transpose(np.asarray(reduced_matrix)[:,:,0,0])
+  print "Reduced matrix of size (Nsample, Ndim): M", reduced_matrix.shape
+  s = cv.silhouette_sample(reduced_matrix, self.kmax)
