@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Optimal ration: maximize inter-clusters distance/minimize intra-clusters distance. The larger Average Silhouette Width the better the split. Interpretation:  0.71 to 1.00 excellent split, 0.51 to 0.70 reasonable structure has been found,  0.26 to 0.50 weak structure, could be artificial, moins de 0.25  horrible split.</xhtml>
+    <d name="parameters">
+      <xhtml name="kmax"/>
+      <xhtml name="connectivity_matrix_reduced"/>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>
