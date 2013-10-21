@@ -22,9 +22,19 @@ signature = Signature(
 )
 
 def initialization( self ):
+  def linkSmooth(self, dummy):
+    if self.connectivity_matrix_distantFibers is not None:
+      attrs = dict( self.connectivity_matrix_distantFibers.hierarchyAttributes() )
+      attrs['subject'] =  self.connectivity_matrix_distantFibers.get('subject')
+      attrs['study'] = self.connectivity_matrix_distantFibers.get('study')
+      attrs['texture'] = self.connectivity_matrix_distantFibers.get('texture')
+      attrs['gyrus'] = self.connectivity_matrix_distantFibers.get('gyrus')
+      attrs['smooth'] = str( self.smoothing )
+      filename = self.signature['connectivity_matrix_full'].findValue( attrs )
+      return filename
   self.setOptional( 'gyrus' )
   self.linkParameters( 'connectivity_matrix_distantFibers', 'connectivity_matrix_fibersNearCortex' )
-  self.linkParameters( 'connectivity_matrix_full', 'connectivity_matrix_distantFibers' )
+  self.linkParameters( 'connectivity_matrix_full', ( 'connectivity_matrix_distantFibers', 'smoothing'), linkSmooth )
 
 def execution ( self, context ):
   context.write( 'Sum sparse matrix (categories : between two connected regions or one place in the brain).' )

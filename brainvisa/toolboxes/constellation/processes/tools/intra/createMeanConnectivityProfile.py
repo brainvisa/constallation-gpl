@@ -20,8 +20,20 @@ signature = Signature(
 )
 
 def initialization ( self ):
+  #def linkSmooth(self, dummy):
+    #if self.connectivity_matrix_full is not None:
+      #attrs = dict( self.connectivity_matrix_full.hierarchyAttributes() )
+      #attrs['subject'] =  self.connectivity_matrix_full.get('subject')
+      #attrs['study'] = self.connectivity_matrix_full.get('study')
+      #attrs['texture'] = self.connectivity_matrix_full.get('texture')
+      #attrs['gyrus'] = self.connectivity_matrix_full.get('gyrus')
+      #attrs['smooth'] = 'smooth' + str( self.connectivity_matrix_full.get('smooth') )
+      #print 'atts', attrs
+      #filename = self.signature['gyrus_connectivity_profile'].findValue( attrs )
+      #print filename
+      #return filename
   self.setOptional( 'gyrus' )
-  self.linkParameters( 'gyrus_connectivity_profile', 'connectivity_matrix_full' )
+  self.linkParameters( 'gyrus_connectivity_profile', 'connectivity_matrix_full' )#, linkSmooth )
 
 def execution ( self, context ):
   context.write( 'The mean connectivity profile over this region is represented as a texture on the cortex.' )
