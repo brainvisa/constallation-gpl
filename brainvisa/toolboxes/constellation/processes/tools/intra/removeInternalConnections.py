@@ -35,7 +35,7 @@ def execution ( self, context ):
   if self.gyrus is not None:
     gyrus = self.gyrus # keep internal connections, put 0
   else:
-    gyrus = os.path.basename( os.path.dirname( os.path.dirname( self.gyrus_connectivity_profile.fullPath() ) ) )
+    gyrus = os.path.basename( os.path.dirname( os.path.dirname( os.path.dirname( self.gyrus_connectivity_profile.fullPath() ) ) ) )
     gyrus = gyrus.strip('G')
   context.write('gyrus = ', gyrus, '    Is it correct?')
   mask = aims.read( self.gyri_texture.fullPath() )

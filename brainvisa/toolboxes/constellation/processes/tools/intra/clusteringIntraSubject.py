@@ -44,7 +44,7 @@ def execution ( self, context ):
   if self.gyrus is not None:
     gyrus = self.gyrus # keep internal connections, put 0
   else:
-    gyrus = os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_reduced.fullPath() ) ) )
+    gyrus = os.path.basename( os.path.dirname( os.path.dirname( os.path.dirname( self.connectivity_matrix_reduced.fullPath() ) ) ) )
     gyrus = gyrus.strip('G')
   context.system( sys.executable, find_in_path( 'constelIntraSubjectClustering.py' ),
     '-m', self.connectivity_matrix_reduced,

@@ -29,7 +29,7 @@ def execution ( self, context ):
   if self.gyrus is not None:
     gyrus = self.gyrus
   else:
-    gyrus = os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_full.fullPath() ) ) )
+    gyrus = os.path.dirname( os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_full.fullPath() ) ) ) )
     gyrus = gyrus.strip('G')
   context.write('gyrus = ', gyrus, '    Is it correct?')
   context.system( 'constelConnectionDensityTexture',
