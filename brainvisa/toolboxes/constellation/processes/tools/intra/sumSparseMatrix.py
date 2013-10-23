@@ -56,7 +56,7 @@ def execution ( self, context ):
     '-o', self.connectivity_matrix_full,
     '-s', self.smoothing,
     '-l', self.gyri_texture,
-    '-p', self.gyrus,
+    '-p', gyrus,
   )
   
   context.write( 'OK' )
