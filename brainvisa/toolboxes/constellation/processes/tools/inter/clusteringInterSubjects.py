@@ -16,6 +16,7 @@ signature = Signature(
                  'texture_in', String(),
                 'texture_out', String(),
                 'patch_label', Integer(),
+                     'smooth', Float(),
                       'group', ReadDiskItem('Group definition', 'XML' ),
                       'study', Choice( 'Average', 'Concatenate' ),
   'individual_reduced_matrix', ListOf( ReadDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' ) ),
@@ -45,6 +46,7 @@ def initialization ( self ):
         atts[ 'study' ] = self.study_name
         atts[ 'texture' ] = self.texture_out
         atts[ 'gyrus' ] = 'G' + str(self.patch_label)
+        atts['smooth'] = 'smooth' + str(self.smooth)
         profiles.append( ReadDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' ).findValue( subject.attributes(), atts ) )
       return profiles
   def linkMatrix( self, dummy ):
@@ -53,7 +55,7 @@ def initialization ( self ):
       atts[ 'study' ] = self.study_name
       atts[ 'texture' ] = self.texture_out
       atts[ 'gyrus' ] = 'G' + str(self.patch_label)
-      print atts
+      atts['smooth'] = 'smooth' + str(self.smooth)
       filename = self.signature['group_matrix'].findValue( atts )
       return filename
   def linkClustering(self, dummy):
@@ -64,6 +66,7 @@ def initialization ( self ):
         atts[ 'study' ] = self.study_name
         atts[ 'texture' ] = self.texture_out
         atts[ 'gyrus' ] = 'G' + str(self.patch_label)
+        atts['smooth'] = 'smooth' + str(self.smooth)
         return self.signature[ 'clustering_time' ].findValue( atts )
       elif self.study == 'Concatenate':
         registerClass('minf_2.0', Subject, 'Subject')
@@ -75,13 +78,13 @@ def initialization ( self ):
           atts[ 'study' ] = self.study_name
           atts[ 'texture' ] = self.texture_out
           atts[ 'gyrus' ] = 'G' + str(self.patch_label)
-          print "aats", atts
+          atts['smooth'] = 'smooth' + str(self.smooth)
           profiles.append( ReadDiskItem('Group Clustering Time', 'BrainVISA texture formats').findValue( atts ) )
         return profiles
   #self.signature['individual_reduced_matrix'].userLevel = 2
-  self.linkParameters( 'individual_reduced_matrix', ('group', 'study_name', 'texture_out', 'patch_label'), linkIndividual )
-  self.linkParameters( 'group_matrix', ('group', 'study_name', 'texture_out', 'patch_label' ), linkMatrix )
-  self.linkParameters( 'clustering_time', ('group', 'study_name', 'individual_reduced_matrix', 'texture_out', 'patch_label'), linkClustering )
+  self.linkParameters( 'individual_reduced_matrix', ('group', 'study_name', 'texture_out', 'patch_label', 'smooth'), linkIndividual )
+  self.linkParameters( 'group_matrix', ('group', 'study_name', 'texture_out', 'patch_label', 'smooth' ), linkMatrix )
+  self.linkParameters( 'clustering_time', ('group', 'study_name', 'individual_reduced_matrix', 'texture_out', 'patch_label', 'smooth'), linkClustering )
   #self.linkParameters( 'clustering_time', 'clustering_silhouette' )
   #self.linkParameters( 'clustering_Kopt', 'clustering_time' )
   #self.linkParameters( 'clustering_results', 'group_matrix' )
@@ -94,8 +97,9 @@ def execution ( self, context ):
   registerClass('minf_2.0', Subject, 'Subject')
   groupOfSubjects = readMinf(self.group.fullPath())
 
-  patch_label = os.path.basename( os.path.dirname( os.path.dirname( self.individual_reduced_matrix[0].fullPath() ) ) )
+  patch_label = os.path.basename( os.path.basename( os.path.basename( os.path.dirname( os.path.dirname( self.individual_reduced_matrix[0].fullPath() ) ) ) ) )
   patch_label = patch_label.strip('G')
+  patch_label = self.patch_label
   context.write(patch_label)
   args = []
   for x in self.individual_reduced_matrix:

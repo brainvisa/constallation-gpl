@@ -17,6 +17,7 @@ signature = Signature(
                                  'texture_in', String(),
                                 'texture_out', String(),
                                 'patch_label', Integer(),
+                                     'smooth', Float(),
                                       'group', ReadDiskItem( 'Group definition', 'XML' ),
   'individual_norm_mean_connectivity_profile', ListOf( ReadDiskItem( 'Normed Connectivity Profile', 'Aims texture formats' ) ),
       'thresholded_mean_connectivity_profile', ListOf( ReadDiskItem( 'Thresholded Connectivity Profile', 'Aims texture formats' ) ),
@@ -34,7 +35,8 @@ def initialization ( self ):
         study = self.study_name
         texture = self.texture_in
         gyrus = 'G' + str(self.patch_label)
-        profile = ReadDiskItem( 'Normed Connectivity Profile', 'Aims texture formats' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus }, subject.attributes() )
+        smooth = 'smooth' + str(self.smooth)
+        profile = ReadDiskItem( 'Normed Connectivity Profile', 'Aims texture formats' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus, 'smooth': smooth }, subject.attributes() )
         if profile is None:
           return []
         profiles.append( profile )
@@ -63,7 +65,7 @@ def initialization ( self ):
       atts[ 'gyrus' ] = self.norm_mean_connectivity_profile_nb_normed[0].get( 'gyrus' )
       return self.signature[ 'connectivity_profile_group' ].findValue( atts )
   self.signature['individual_norm_mean_connectivity_profile'].userLevel = 2
-  self.linkParameters( 'individual_norm_mean_connectivity_profile', ( 'group', 'study_name', 'texture_in', 'patch_label' ), linkIndividualProfiles )
+  self.linkParameters( 'individual_norm_mean_connectivity_profile', ( 'group', 'study_name', 'texture_in', 'patch_label', 'smooth' ), linkIndividualProfiles )
   self.linkParameters( 'thresholded_mean_connectivity_profile', 'individual_norm_mean_connectivity_profile' )
   self.linkParameters( 'norm_mean_connectivity_profile_nb_normed', ( 'thresholded_mean_connectivity_profile', 'texture_out' ), linkProfiles )
   self.linkParameters( 'connectivity_profile_group', 'norm_mean_connectivity_profile_nb_normed', linkGroupProfiles )

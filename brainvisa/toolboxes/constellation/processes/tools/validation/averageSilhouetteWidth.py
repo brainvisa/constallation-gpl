@@ -40,7 +40,7 @@ name = 'Average Silhouette Width'
 userLevel = 2
 
 signature = Signature(
-  'connectivity_matrix_reduced', ReadDiskItem( 'Reduced Connectivity Matrix', 'GIS image' ),
+  'connectivity_matrix_reduced', ReadDiskItem( 'Group Matrix', 'GIS image' ),
   'kmax', Integer(),
 )
 

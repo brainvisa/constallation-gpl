@@ -14,6 +14,7 @@ signature = Signature(
     'texture_in', String(),
    'texture_out', String(),
    'patch_label', Integer(),
+        'smooth', Float(),
          'group', ReadDiskItem('Group definition', 'XML' ),
   'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 'BrainVISA mesh formats' ),
   'gyri_texture', ListOf( ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ) ),
@@ -33,7 +34,8 @@ def linkGroup( self, param1 ):
 def initialization( self ):
 
   self.addLink( None, 'group', self.linkGroup )
-
+  self.texture_out = 'fsgroup'
+  self.smooth = 3.0
   eNode = SerialExecutionNode( self.name, parameterized=self )
 
   ## 01 Surface With Enough Connections Creation InterSubjects
@@ -52,6 +54,9 @@ def initialization( self ):
 
   eNode.addDoubleLink( 'meanProfileInter.patch_label',
                        'patch_label' )
+                       
+  eNode.addDoubleLink( 'meanProfileInter.smooth',
+                       'smooth' )
 
   eNode.addDoubleLink( 'meanProfileInter.group',
                        'group' )

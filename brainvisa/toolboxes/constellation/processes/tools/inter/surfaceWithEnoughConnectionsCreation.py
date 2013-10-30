@@ -18,6 +18,7 @@ signature = Signature(
                        'texture_in', String(),
                       'texture_out', String(),
                       'patch_label', Integer(),
+                           'smooth', Float(),
                             'group', ReadDiskItem( 'Group definition', 'XML' ),
   'individual_connectivity_profile', ListOf( ReadDiskItem( 'Gyrus Connectivity Profile', 'Aims texture formats' ) ),
                              'mask', WriteDiskItem( 'Avg Connectivity Mask', 'Aims texture formats' ),
@@ -30,10 +31,12 @@ def initialization ( self ):
       groupOfSubjects = readMinf(self.group.fullPath())
       profiles = []
       for subject in groupOfSubjects:
+        
         study = self.study_name
         texture = self.texture_in
+        smooth = 'smooth' + str(self.smooth)
         gyrus = 'G' + str(self.patch_label)
-        profile = ReadDiskItem( 'Gyrus Connectivity Profile', 'Aims texture formats' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus }, subject.attributes() )
+        profile = ReadDiskItem( 'Gyrus Connectivity Profile', 'Aims texture formats' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus, 'smooth': smooth }, subject.attributes() )
         if profile is not None:
           profiles.append( profile )
       return profiles
@@ -43,8 +46,9 @@ def initialization ( self ):
       atts[ 'study' ] = self.individual_connectivity_profile[0].get( 'study' )
       atts[ 'texture' ] = self.texture_out
       atts[ 'gyrus' ] = self.individual_connectivity_profile[0].get( 'gyrus' )
+      atts[ 'smooth' ] = self.individual_connectivity_profile[0].get( 'smooth' )
       return self.signature[ 'mask' ].findValue( atts )
-  self.linkParameters( 'individual_connectivity_profile', ( 'group', 'study_name', 'texture_in', 'patch_label' ), linkIndividualProfiles )
+  self.linkParameters( 'individual_connectivity_profile', ( 'group', 'study_name', 'texture_in', 'patch_label', 'smooth' ), linkIndividualProfiles )
   self.linkParameters( 'mask', ( 'individual_connectivity_profile', 'texture_out' ) , linkGroupProfiles )
   self.signature['individual_connectivity_profile'].userLevel = 2
 
