@@ -21,7 +21,19 @@ signature = Signature(
 
 def initialization ( self ):
   self.setOptional( 'gyrus' )
-  self.linkParameters( 'filtered_watershed', 'connectivity_matrix_full' )
+  def linkMatrix(self, dummy):
+    if self.connectivity_matrix_full is not None:
+      attrs = dict( self.connectivity_matrix_full.hierarchyAttributes() )
+      attrs['subject'] =  self.connectivity_matrix_full.get('subject')
+      attrs['study'] = self.connectivity_matrix_full.get('study')
+      attrs['texture'] = self.connectivity_matrix_full.get('texture')
+      attrs['gyrus'] = self.connectivity_matrix_full.get('gyrus')
+      attrs['smooth'] = 'smooth' + str( self.connectivity_matrix_full.get('smooth') )
+      print 'atts', attrs
+      filename = self.signature['filtered_watershed'].findValue( attrs )
+      print filename
+      return filename
+  self.linkParameters( 'filtered_watershed', 'connectivity_matrix_full', linkMatrix )
   self.linkParameters( 'connectivity_matrix_reduced', 'filtered_watershed' )
 
 def execution ( self, context ):

@@ -67,6 +67,7 @@ def initialization ( self ):
         atts[ 'texture' ] = self.texture_out
         atts[ 'gyrus' ] = 'G' + str(self.patch_label)
         atts['smooth'] = 'smooth' + str(self.smooth)
+        print atts
         return self.signature[ 'clustering_time' ].findValue( atts )
       elif self.study == 'Concatenate':
         registerClass('minf_2.0', Subject, 'Subject')

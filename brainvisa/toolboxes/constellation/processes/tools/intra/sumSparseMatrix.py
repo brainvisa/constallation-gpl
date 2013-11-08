@@ -22,6 +22,7 @@ signature = Signature(
 )
 
 def initialization( self ):
+  self.smoothing = 3.0
   def linkSmooth(self, dummy):
     if self.connectivity_matrix_distantFibers is not None:
       attrs = dict( self.connectivity_matrix_distantFibers.hierarchyAttributes() )
