@@ -35,16 +35,18 @@ from brainvisa import anatomist as ana
 from soma import aims
 import numpy
 try:
-  import roca.lib.textureTools_stats as TTS
+  #import roca.lib.textureTools_stats as TTS
+  import constel.lib.connmatrix.connmatrixtools as CM
 except:
   pass
-import constel.lib.connmatrix.connmatrixtools as CM
+#import constel.lib.connmatrix.connmatrixtools as CM
 
 def validation():
   try:
-    import roca.lib.textureTools_stats as TTS
+    #import roca.lib.textureTools_stats as TTS
+    import constel.lib.connmatrix.connmatrixtools as CM
   except:
-    raise ValidationError( 'roca module is not available' )
+    raise ValidationError( 'constel module is not available' )
 
 name = 'Anatomist view reorder matrix from labeled texture'
 userLevel = 2
@@ -52,7 +54,7 @@ roles = ( 'viewer', )
 
 signature = Signature(
   'clustering_texture', ReadDiskItem( 'Group Clustering Texture', 'anatomist texture formats' ),
-  'connectivity_matrix', ReadDiskItem( 'Group Reduced connectivity matrix', 'aims readable volume formats' ),
+  'connectivity_matrix', ReadDiskItem( 'Group matrix', 'aims readable volume formats' ),
   'time_step', Integer(),
   'transpose', Boolean(),
 )
@@ -70,14 +72,14 @@ def execution( self, context ):
   clusters = aims.read( self.clustering_texture.fullPath() )
   context.write( "clusters:", clusters )
   
-  if self.transpose is None:
-    matrix = matrix.T
+  #if self.transpose is None:
+  matrix = matrix.T
 
   labels = clusters[ self.time_step ].arraydata()[ clusters[ self.time_step ].arraydata() != 0 ]
   context.write( "labels:", labels, "clusters[]", clusters[ self.time_step ].arraydata() )
 
-  order_mat, sortLabels = TTS.orderDataMatrix( matrix, labels )
-  dissmatrix = TTS.euclidianDistanceMatrix( order_mat )
+  order_mat, sortLabels = CM.orderDataMatrix( matrix, labels )
+  dissmatrix = CM.euclidianDistanceMatrix( order_mat )
 
   ( n, p ) = order_mat.shape
   ( i, j ) = dissmatrix.shape
