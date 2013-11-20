@@ -35,15 +35,15 @@ from brainvisa import anatomist as ana
 from soma import aims
 import numpy
 try:
-  import roca.lib.textureTools as TT
-  import roca.lib.connectivity.matrix.tools as Mat
+  import constel.lib.texturetools as TT
+  import constel.lib.connmatrix.connmatrixtools as Mat
 except:
   pass
 
 def validation():
   try:
-    import roca.lib.textureTools as TT
-    import roca.lib.connectivity.matrix.tools as Mat
+    import constel.lib.texturetools as TT
+    import constel.lib.connmatrix.connmatrixtools as Mat
   except:
     raise ValidationError( 'roca module is not available' )
 
@@ -52,10 +52,10 @@ userLevel = 2
 roles = ( 'viewer', )
 
 signature = Signature(
-  'connectivity_matrix', ReadDiskItem( 'Reduced connectivity matrix', 'aims readable volume formats' ),
-  'mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
-  'basins_texture', ReadDiskItem( 'Filtered Watershed', 'anatomist texture formats' ),
-  'clustering_texture', ReadDiskItem( 'Clustering Texture', 'anatomist texture formats' )
+  'connectivity_matrix', ReadDiskItem( 'Group Matrix', 'aims readable volume formats' ),
+  'mesh', ReadDiskItem( 'BothAverageBrainWhite', 'Aims mesh formats' ),
+  'basins_texture', ReadDiskItem( 'Avg Filtered Watershed', 'anatomist texture formats' ),
+  'clustering_texture', ReadDiskItem( 'Group Clustering Texture', 'anatomist texture formats' )
 )
 
 def initialization( self ):
@@ -109,7 +109,7 @@ def execution_mainthread( self, context ):
     a.unmapObject( texsurf )
     oldmesh = [ x for x in anavertex ][0]
     anavertex.setReferentialInheritance( mesh2 )
-    anavertex.erase( oldmesh )
+    anavertex.eraseObject( oldmesh )
     anavertex.insert( texsurf )
     clustindices = numpy.where( aclusters == regions[i] )[0]
     vertices = avertex[ clustindices ]
