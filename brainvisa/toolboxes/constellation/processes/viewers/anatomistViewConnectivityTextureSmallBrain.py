@@ -55,7 +55,8 @@ signature = Signature(
   'connectivity_matrix', ReadDiskItem( 'Group Matrix', 'aims readable volume formats' ),
   'mesh', ReadDiskItem( 'BothAverageBrainWhite', 'Aims mesh formats' ),
   'basins_texture', ReadDiskItem( 'Avg Filtered Watershed', 'anatomist texture formats' ),
-  'clustering_texture', ReadDiskItem( 'Group Clustering Texture', 'anatomist texture formats' )
+  'clustering_texture', ReadDiskItem( 'Group Clustering Texture', 'anatomist texture formats' ),
+  'time_step', Integer(),
 )
 
 def initialization( self ):
@@ -77,10 +78,10 @@ def execution_mainthread( self, context ):
   basins = aims.read( self.basins_texture.fullPath() )
   # abasins = basins[0].arraydata()
   clusters = a.toAimsObject( anaclusters )
-  aclusters = clusters[0].arraydata()
+  aclusters = clusters[self.time_step].arraydata()
   aimsmesh = a.toAimsObject( mesh )
   avertex = numpy.asarray( aimsmesh.vertex() )
-  reducedMatrix = Mat.connMatrixParcelsToTargets( matrix, clusters, 0 )
+  reducedMatrix = Mat.connMatrixParcelsToTargets( matrix, clusters, self.time_step )
   mat = numpy.asarray( reducedMatrix )
   mat = mat.reshape( mat.shape[:2] )
   
