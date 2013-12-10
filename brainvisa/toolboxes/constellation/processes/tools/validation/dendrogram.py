@@ -35,8 +35,8 @@ import numpy as np
 import pylab
 import scipy
 import scipy.cluster.hierarchy as sch
+import constel.lib.connmatrix.connmatrixtools as cm
 from soma import aims
-import Pycluster as pc
 
 name = 'Dendrogram'
 userLevel = 2
@@ -73,20 +73,9 @@ def execution ( self, context ):
   Ndim = matrix.shape[1]
 
   # Calculate distance matrix
-  distmat = pc.distancematrix( matrix, dist = self.distance )
   
-  fact = 2
-  distMat1 = [ np.array( [] ) ]
-  print 'Euclidean distance at power ', fact
-  for i in range( 1, matrix.shape[0] ):
-    distMat1.append( ( distmat[i] ** fact ).copy() )
-  distMat = np.zeros( ( Nsample, Nsample ) )
-  for i in range( 1, Nsample ):
-    for j in range ( 0, i ):
-      distMat[i, j] = distMat1[i][j]
-      distMat[j, i] = distMat1[i][j]
-  Nsample = distMat.shape[0]
-  
+  distMat = cm.euclidianDistanceMatrix( matrix )
+   
   # Compute and plot first dendrogram 
   fig = pylab.figure()
   axdendro1 = fig.add_axes( [ 0.09, 0.1, 0.2, 0.6] )
