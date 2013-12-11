@@ -102,7 +102,7 @@ def execution ( self, context ):
   axmatrix.set_yticks( [] )
 
   # Plot colorbar.
-  axcolor = fig.add_axes( [ 0.91, 0.1, 0.02, 0.6 ] )
+  axcolor = fig.add_axes( [ 0.91, 0.1, 0.02, 0.8 ] )
   pylab.colorbar( im, cax = axcolor )
 
   # Save figure.
