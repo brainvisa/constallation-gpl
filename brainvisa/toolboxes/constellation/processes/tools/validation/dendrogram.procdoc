@@ -12,8 +12,8 @@
     <xhtml name="long">It is necessary to calculate the pairwise distances between all elements.<br/>
 <br/>
 <span style="text-decoration:underline"><b>Graph methods:</b></span><br/>
-<i>(1) average linkage:</i> it will be the mean of the distances of the joining clusters weighted by the number of elements each cluster holds.<br/>
-<i>(2) centroid linkage:</i> each cluster is defined by its centroid: a data point that represents all the points included in the cluster.</xhtml>
+<i>(1) average linkage:</i> it will be the mean of the distances of the joining clusters weighted by the number of elements each cluster holds. Disadvantages: Average-link clustering may cause elongated clusters to split and for portions of neighboring elongated clusters to merge.<br/>
+<i>(2) centroid linkage:</i> each cluster is defined by its centroid: a data point that represents all the points included in the cluster. </xhtml>
   </d>
 </d>
 </minf>

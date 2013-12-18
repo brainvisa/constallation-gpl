@@ -13,7 +13,7 @@
 <br/>
 Rand Index: the index produces a result in the range [0,1], where a value of 1.0 indicates that the labels and the calculated clusters are identical. A high value for this measure generally indicates a high level of agreement between two clustering.<br/>
 <br/>
-Mutual information: <br/>
+Mutual information: Criterion can be used as an external measure for clustering (Strehl et al., 2000). When no assumption is made on the cluster structure, the index can be used to compare clustering algorithms such as k-medoids.<br/>
 <br/>
 Homogeneity: <br/>
 <br/>
