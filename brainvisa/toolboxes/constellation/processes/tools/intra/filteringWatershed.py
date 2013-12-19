@@ -8,68 +8,73 @@ def validation():
     import constel
   except:
     raise ValidationError( 'constellation module is not here.' )
-
 try :
   import constel.lib.texturetools as TT
 except :
   pass
 
-
 name = 'Filtering Watershed'
 userLevel = 2
 
 signature = Signature(
-  'connectivity_matrix_full', ReadDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ),
-                 'watershed', ReadDiskItem( 'Watershed Texture', 'Aims texture formats' ),
-              'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
-                'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
-                     'gyrus', Integer(),
-  
-  'watershed_fiber_nb_mesh', WriteDiskItem( 'Sum Values From Region', 'Aims texture formats' ),
-       'watershed_fiber_nb', WriteDiskItem( 'Spread Value On Region', 'Aims texture formats' ),
-       'filtered_watershed', WriteDiskItem( 'Filtered Watershed', 'Aims texture formats' ),
+  'complete_connectivity_matrix', ReadDiskItem( 'Gyrus Connectivity Matrix', 
+                                                'Matrix sparse' ),
+  'watershed', ReadDiskItem( 'Watershed Texture', 'Aims texture formats' ),
+  'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 
+                                'Aims texture formats' ),
+  'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
+  'gyrus', Integer(),
+  'sum_vertices_patch', WriteDiskItem( 'Sum Values From Region', 
+                                       'Aims texture formats' ),
+  'duplication_value_patch', WriteDiskItem( 'Spread Value On Region', 
+                                            'Aims texture formats' ),
+  'filtered_watershed', WriteDiskItem( 'Filtered Watershed', 
+                                       'Aims texture formats' ),
 )
 
 def initialization ( self ):
   self.setOptional( 'gyrus' )
   def linkWat(self, dummy):
-    if self.connectivity_matrix_full is not None:
-      attrs = dict( self.connectivity_matrix_full.hierarchyAttributes() )
-      attrs['subject'] =  self.connectivity_matrix_full.get('subject')
-      attrs['study'] = self.connectivity_matrix_full.get('study')
-      attrs['texture'] = self.connectivity_matrix_full.get('texture')
-      attrs['gyrus'] = self.connectivity_matrix_full.get('gyrus')
-      attrs['smooth'] = 'smooth' + str( self.connectivity_matrix_full.get('smooth') )
+    if self.complete_connectivity_matrix is not None:
+      attrs = dict( self.complete_connectivity_matrix.hierarchyAttributes() )
+      attrs['subject'] =  self.complete_connectivity_matrix.get('subject')
+      attrs['study'] = self.complete_connectivity_matrix.get('study')
+      attrs['texture'] = self.complete_connectivity_matrix.get('texture')
+      attrs['gyrus'] = self.complete_connectivity_matrix.get('gyrus')
+      attrs['smoothing'] = 'smoothing' + \
+        str( self.complete_connectivity_matrix.get('smoothing') )
       print 'atts', attrs
       filename = self.signature['watershed'].findValue( attrs )
       print filename
       return filename
-  self.linkParameters( 'watershed', 'connectivity_matrix_full' , linkWat )
-  self.linkParameters( 'watershed_fiber_nb_mesh', 'connectivity_matrix_full' )
-  self.linkParameters( 'watershed_fiber_nb', 'connectivity_matrix_full' )
-  self.linkParameters( 'filtered_watershed', 'connectivity_matrix_full' )
+  self.linkParameters( 'watershed', 'complete_connectivity_matrix' , linkWat )
+  self.linkParameters( 'sum_vertices_patch', 'complete_connectivity_matrix' )
+  self.linkParameters( 'duplication_value_patch', 
+                       'complete_connectivity_matrix' )
+  self.linkParameters( 'filtered_watershed', 'complete_connectivity_matrix' )
 
 
 def execution ( self, context ):
-  context.write( 'The connectivity profiles are reduced according to the patches.' )
   if self.gyrus is not None:
     gyrus = self.gyrus
   else:
-    gyrus = os.path.dirname( os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_full.fullPath() ) ) ) )
+    gyrus = os.path.dirname( os.path.basename( os.path.dirname( 
+            os.path.dirname( self.complete_connectivity_matrix.fullPath() ))))
     gyrus = gyrus.strip('G')
-  context.write('gyrus = ', gyrus, '    Is it correct?')
+  context.write('gyrus ', gyrus )
   context.system( 'constelConnectionDensityTexture',
     '-mesh', self.white_mesh,
-    '-connmatrixfile', self.connectivity_matrix_full,
+    '-connmatrixfile', self.complete_connectivity_matrix,
     '-targetregionstex', self.watershed, 
     '-seedregionstex', self.gyri_texture,
     '-seedlabel', gyrus,
     '-type', 'oneSeedRegion_to_targets',
-    '-outconntex', self.watershed_fiber_nb_mesh,
-    '-outconntargets', self.watershed_fiber_nb,
+    '-outconntex', self.sum_vertices_patch,
+    '-outconntargets', self.duplication_value_patch,
     '-normalize', 1 
   )
-  fibersNbByWatershedBasinsTarget_tex = aims.read( self.watershed_fiber_nb.fullPath() )
+  fibersNbByWatershedBasinsTarget_tex = aims.read( 
+                                        self.duplication_value_patch.fullPath() )
   subjectWatershedBasins_tex = aims.read( self.watershed.fullPath() )
   
   labelsToRemove_ar = fibersNbByWatershedBasinsTarget_tex[0].arraydata()
@@ -102,4 +107,3 @@ def execution ( self, context ):
   filteredWatershedBasins_tex = TT.removeLabelsFromTexture(
     subjectWatershedBasins_tex,labelsToRemove_list )
   aims.write( filteredWatershedBasins_tex, self.filtered_watershed.fullPath() )
-  context.write( 'OK' )

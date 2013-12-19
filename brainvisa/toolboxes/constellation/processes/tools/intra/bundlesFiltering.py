@@ -11,23 +11,26 @@ name = 'Bundles Filtering'
 userLevel = 2
 
 signature = Signature(
-                    'study', String(),
-                  'texture', String(),
-                    'gyrus', String(),
-                 'database', Choice(),
-                  'subject', ReadDiskItem( 'subject', 'directory' ),
-          'subset_of_tract', ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ),
-  'listOf_subsets_of_tract', ListOf( ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ) ),
-             'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
-               'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
-                 'dw_to_t1', ReadDiskItem( 'Transformation matrix', 'Transformation matrix' ),
-        'min_cortex_length', Float(),
-        'max_cortex_length', Float(),
-'min_distant_fibers_length', Float(),
-'max_distant_fibers_length', Float(),
-
-  'subsets_of_tracts_FibersNearCortex', WriteDiskItem( 'Fibers Near Cortex', 'Aims bundles' ),
-     'subsets_of_tracts_distantFibers', WriteDiskItem( 'Very OutSide Fibers Of Cortex', 'Aims bundles' ),
+  'study', String(),
+  'texture', String(),
+  'gyrus', String(),
+  'database', Choice(),
+  'subject', ReadDiskItem( 'subject', 'directory' ),
+  'subset_of_tract', ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ),
+  'listOf_subsets_of_tract', ListOf( ReadDiskItem( 'Fascicles bundles', 
+                                                   'Aims bundles' ) ),
+  'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 
+                                'Aims texture formats' ),
+  'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
+  'dw_to_t1', ReadDiskItem( 'Transformation matrix', 'Transformation matrix' ),
+  'min_cortex_length', Float(),
+  'max_cortex_length', Float(),
+  'min_distant_fibers_length', Float(),
+  'max_distant_fibers_length', Float(),
+  'subsets_of_tracts_FibersNearCortex', WriteDiskItem( 'Fibers Near Cortex', 
+                                                       'Aims bundles' ),
+  'subsets_of_tracts_distantFibers', WriteDiskItem( 'Very OutSide Fibers Of Cortex', 
+                                                    'Aims bundles' ),
 )
 
 

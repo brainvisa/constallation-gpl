@@ -10,52 +10,55 @@ name = 'Reduced Connectivity Matrix'
 userLevel = 2
 
 signature = Signature(
-  'connectivity_matrix_full', ReadDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ),
-        'filtered_watershed', ReadDiskItem( 'Filtered Watershed', 'Aims texture formats' ),
-              'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
-                'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
-                     'gyrus', Integer(),
-  
-  'connectivity_matrix_reduced', WriteDiskItem( 'Reduced Connectivity Matrix', 'GIS image' ),
+  'complete_connectivity_matrix', ReadDiskItem( 'Gyrus Connectivity Matrix', 
+                                            'Matrix sparse' ),
+  'filtered_watershed', ReadDiskItem( 'Filtered Watershed', 
+                                      'Aims texture formats' ),
+  'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 
+                                'Aims texture formats' ),
+  'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
+  'gyrus', Integer(),
+  'reduced_connectivity_matrix', WriteDiskItem( 'Reduced Connectivity Matrix', 
+                                                'GIS image' ),
 )
 
 def initialization ( self ):
   self.setOptional( 'gyrus' )
   def linkMatrix(self, dummy):
-    if self.connectivity_matrix_full is not None:
-      attrs = dict( self.connectivity_matrix_full.hierarchyAttributes() )
-      attrs['subject'] =  self.connectivity_matrix_full.get('subject')
-      attrs['study'] = self.connectivity_matrix_full.get('study')
-      attrs['texture'] = self.connectivity_matrix_full.get('texture')
-      attrs['gyrus'] = self.connectivity_matrix_full.get('gyrus')
-      attrs['smooth'] = 'smooth' + str( self.connectivity_matrix_full.get('smooth') )
+    if self.complete_connectivity_matrix is not None:
+      attrs = dict( self.complete_connectivity_matrix.hierarchyAttributes() )
+      attrs['subject'] =  self.complete_connectivity_matrix.get('subject')
+      attrs['study'] = self.complete_connectivity_matrix.get('study')
+      attrs['texture'] = self.complete_connectivity_matrix.get('texture')
+      attrs['gyrus'] = self.complete_connectivity_matrix.get('gyrus')
+      attrs['smoothing'] = 'smoothing' + str( self.complete_connectivity_matrix.get('smoothing') )
       print 'atts', attrs
       filename = self.signature['filtered_watershed'].findValue( attrs )
       print filename
       return filename
-  self.linkParameters( 'filtered_watershed', 'connectivity_matrix_full', linkMatrix )
-  self.linkParameters( 'connectivity_matrix_reduced', 'filtered_watershed' )
+  self.linkParameters( 'filtered_watershed', 
+                       'complete_connectivity_matrix', linkMatrix )
+  self.linkParameters( 'reduced_connectivity_matrix', 'filtered_watershed' )
 
 def execution ( self, context ):
-  context.write( 'For a given cortex region, a dimension reduction of the connectivity matrix is computed, of size (patches number, gyrus vertices number)' )
   if self.gyrus is not None:
     gyrus = self.gyrus
   else:
-    gyrus = os.path.dirname( os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_full.fullPath() ) ) ) )
+    gyrus = os.path.dirname( os.path.basename( os.path.dirname( 
+            os.path.dirname( self.complete_connectivity_matrix.fullPath()))))
     gyrus = gyrus.strip('G')
-  context.write('gyrus = ', gyrus, '    Is it correct?')
+  context.write('gyrus ', gyrus )
   context.system( 'constelConnectionDensityTexture',
     '-mesh', self.white_mesh,
-    '-connmatrixfile', self.connectivity_matrix_full,
+    '-connmatrixfile', self.complete_connectivity_matrix,
     '-targetregionstex', self.filtered_watershed,
     '-seedregionstex', self.gyri_texture,
     '-seedlabel', gyrus,
     '-type', 'seedVertex_to_targets',
-    '-connmatrix', self.connectivity_matrix_reduced,
+    '-connmatrix', self.reduced_connectivity_matrix,
     '-normalize', 1,
     '-verbose', 1
   )
-  context.write( 'OK' )
 
 
 

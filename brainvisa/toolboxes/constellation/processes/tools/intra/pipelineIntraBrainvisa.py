@@ -85,8 +85,8 @@ def initialization( self ):
                   ProcessExecutionNode( 'sumSparseMatrix',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'Sum.connectivity_matrix_fibersNearCortex',
-                       'Smoothing.connectivity_matrix_fibersNearCortex' )
+  eNode.addDoubleLink( 'Sum.matrix_fibersNearCortex',
+                       'Smoothing.matrix_fibersNearCortex' )
 
   eNode.addDoubleLink( 'Sum.white_mesh',
                        'white_mesh' )
@@ -105,8 +105,8 @@ def initialization( self ):
                   ProcessExecutionNode( 'createMeanConnectivityProfile',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'ProfileComputing.connectivity_matrix_full',
-                       'Sum.connectivity_matrix_full' )
+  eNode.addDoubleLink( 'ProfileComputing.complete_connectivity_matrix',
+                       'Sum.complete_connectivity_matrix' )
 
   eNode.addDoubleLink( 'ProfileComputing.gyri_texture',
                        'gyri_texture' )
@@ -116,8 +116,8 @@ def initialization( self ):
                   ProcessExecutionNode( 'removeInternalConnections',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'ProfileNormalization.gyrus_connectivity_profile',
-                       'ProfileComputing.gyrus_connectivity_profile' )
+  eNode.addDoubleLink( 'ProfileNormalization.patch_connectivity_profile',
+                       'ProfileComputing.patch_connectivity_profile' )
 
   eNode.addDoubleLink( 'ProfileNormalization.gyri_texture',
                        'gyri_texture' )
@@ -130,8 +130,8 @@ def initialization( self ):
                   ProcessExecutionNode( 'watershedReflectingConnectionsToGyrus',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'Watershed.norm_connectivity_profile',
-                       'ProfileNormalization.norm_connectivity_profile' )
+  eNode.addDoubleLink( 'Watershed.normed_connectivity_profile',
+                       'ProfileNormalization.normed_connectivity_profile' )
 
   eNode.addDoubleLink( 'Watershed.white_mesh',
                        'white_mesh' )
@@ -141,8 +141,8 @@ def initialization( self ):
                   ProcessExecutionNode( 'filteringWatershed',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'ConnectivityMatrixToBassins.connectivity_matrix_full',
-                       'ProfileComputing.connectivity_matrix_full' )
+  eNode.addDoubleLink( 'ConnectivityMatrixToBassins.complete_connectivity_matrix',
+                       'ProfileComputing.complete_connectivity_matrix' )
 
   eNode.addDoubleLink( 'ConnectivityMatrixToBassins.gyri_texture',
                        'gyri_texture')
@@ -156,8 +156,8 @@ def initialization( self ):
                   ProcessExecutionNode( 'createReducedConnectivityMatrix',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'ConnectivityMatrixWatershedToBassins.connectivity_matrix_full',
-                       'ConnectivityMatrixToBassins.connectivity_matrix_full' )
+  eNode.addDoubleLink( 'ConnectivityMatrixWatershedToBassins.complete_connectivity_matrix',
+                       'ConnectivityMatrixToBassins.complete_connectivity_matrix' )
 
   eNode.addDoubleLink( 'ConnectivityMatrixWatershedToBassins.gyri_texture',
                        'gyri_texture' )
@@ -170,8 +170,8 @@ def initialization( self ):
                   ProcessExecutionNode( 'ClusteringIntrasubject',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'ClusteringIntraSubjects.connectivity_matrix_reduced',
-                       'ConnectivityMatrixWatershedToBassins.connectivity_matrix_reduced' )
+  eNode.addDoubleLink( 'ClusteringIntraSubjects.reduced_connectivity_matrix',
+                       'ConnectivityMatrixWatershedToBassins.reduced_connectivity_matrix' )
 
   eNode.addDoubleLink( 'ClusteringIntraSubjects.gyri_texture',
                        'gyri_texture' )

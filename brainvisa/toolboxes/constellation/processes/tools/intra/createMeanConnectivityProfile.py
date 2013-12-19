@@ -12,41 +12,45 @@ name = 'Mean Connectivity Profile'
 userLevel = 2
 
 signature = Signature(
-  'connectivity_matrix_full', ReadDiskItem( 'Gyrus Connectivity Matrix', 'Matrix sparse' ),
-              'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ),
-                     'gyrus', Integer(),
-
-  'gyrus_connectivity_profile', WriteDiskItem( 'Gyrus Connectivity Profile', 'Aims texture formats' ),
+  'complete_connectivity_matrix', ReadDiskItem( 'Gyrus Connectivity Matrix',  
+                                                'Matrix sparse' ),
+  'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 
+                                'Aims texture formats' ),
+  'gyrus', Integer(),
+  'patch_connectivity_profile', WriteDiskItem( 'Gyrus Connectivity Profile', 
+                                               'Aims texture formats' ),
 )
 
 def initialization ( self ):
-  def linkSmooth(self, dummy):
-    if self.connectivity_matrix_full is not None:
-      attrs = dict( self.connectivity_matrix_full.hierarchyAttributes() )
-      attrs['subject'] =  self.connectivity_matrix_full.get('subject')
-      attrs['study'] = self.connectivity_matrix_full.get('study')
-      attrs['texture'] = self.connectivity_matrix_full.get('texture')
-      attrs['gyrus'] = self.connectivity_matrix_full.get('gyrus')
-      attrs['smooth'] = 'smooth' + str( self.connectivity_matrix_full.get('smooth') )
+  def linkSmoothing(self, dummy):
+    if self.complete_connectivity_matrix is not None:
+      attrs = dict( self.complete_connectivity_matrix.hierarchyAttributes() )
+      attrs['subject'] =  self.complete_connectivity_matrix.get('subject')
+      attrs['study'] = self.complete_connectivity_matrix.get('study')
+      attrs['texture'] = self.complete_connectivity_matrix.get('texture')
+      attrs['gyrus'] = self.complete_connectivity_matrix.get('gyrus')
+      attrs['smoothing'] = 'smoothing' \
+        + str( self.complete_connectivity_matrix.get('smoothing') )
       print 'atts', attrs
-      filename = self.signature['gyrus_connectivity_profile'].findValue( attrs )
+      filename = self.signature['patch_connectivity_profile'].findValue( attrs )
       print filename
       return filename
   self.setOptional( 'gyrus' )
-  self.linkParameters( 'gyrus_connectivity_profile', 'connectivity_matrix_full' , linkSmooth )
+  self.linkParameters( 'patch_connectivity_profile', 
+                       'complete_connectivity_matrix' , linkSmoothing )
 
 def execution ( self, context ):
-  context.write( 'The mean connectivity profile over this region is represented as a texture on the cortex.' )
   if self.gyrus is not None:
     gyrus = self.gyrus
   else:
-    gyrus = os.path.basename( os.path.dirname( os.path.dirname( self.connectivity_matrix_full.fullPath() ) ) )
+    gyrus = os.path.basename( os.path.dirname( os.path.dirname( 
+      self.complete_connectivity_matrix.fullPath() ) ) )
     gyrus = gyrus.strip('G')
   context.write('gyrus = ', gyrus, '    Is it correct?')
   context.system( 'constelMeanConnectivityProfileFromMatrix',
     '-connfmt', 'binar_sparse',
-    '-connmatrixfile', self.connectivity_matrix_full,
-    '-outconntex', self.gyrus_connectivity_profile,
+    '-connmatrixfile', self.complete_connectivity_matrix,
+    '-outconntex', self.patch_connectivity_profile,
     '-seedregionstex', self.gyri_texture,
     '-seedlabel', gyrus,
     '-verbose', 1,

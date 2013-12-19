@@ -10,19 +10,21 @@ name = 'Fiber Oversampler'
 userLevel = 2
 
 signature = Signature(
-  'length_filtered_tracts_distantFibers', ReadDiskItem( 'Very OutSide Fibers Of Cortex', 'Aims bundles' ),
-      'oversampled_tracts_distantFibers', WriteDiskItem( 'Oversampled Fibers', 'Aims bundles' ),
+  'filtered_length_remote_Fibers', ReadDiskItem( 
+                                     'Very OutSide Fibers Of Cortex', 
+                                     'Aims bundles' 
+                                   ),
+  'oversampled_remote_Fibers', WriteDiskItem( 'Oversampled Fibers', 
+                                              'Aims bundles' ),
 )
 
 def initialization( self ):
-  self.linkParameters( 'oversampled_tracts_distantFibers', 'length_filtered_tracts_distantFibers' )
+  self.linkParameters( 'oversampled_remote_Fibers', 'filtered_length_remote_Fibers' )
 
 def execution ( self, context ):
-  context.write( 'Gyrus tracts Oversampling.' )
   context.system( 'comistFiberOversampler',
-    '-i', self.length_filtered_tracts_distantFibers,
-    '-o', self.oversampled_tracts_distantFibers,
+    '-i', self.filtered_length_remote_Fibers,
+    '-o', self.oversampled_remote_Fibers,
     '-points', 3,
     '-verbose', 1
   )
-  context.write( 'OK' )

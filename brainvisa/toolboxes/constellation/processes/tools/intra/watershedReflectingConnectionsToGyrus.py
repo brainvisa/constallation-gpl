@@ -7,23 +7,21 @@ def validation():
   if not find_in_path( 'AimsMeshWatershed.py' ):
     raise ValidationError( 'aims module is not here.' )
 
-
 name = 'Watershed'
 userLevel = 2
 
 signature = Signature(
-  'norm_connectivity_profile', ReadDiskItem( 'Normed Connectivity Profile', 'Aims texture formats' ),
-                 'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
-  
+  'normed_connectivity_profile', ReadDiskItem( 'Normed Connectivity Profile', 
+                                               'Aims texture formats' ),
+  'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
   'watershed', WriteDiskItem( 'Watershed Texture', 'Aims texture formats' ),
 )
 
 def initialization ( self ):
-  self.linkParameters( 'white_mesh', 'norm_connectivity_profile' )
-  self.linkParameters( 'watershed', 'norm_connectivity_profile' )
+  self.linkParameters( 'white_mesh', 'normed_connectivity_profile' )
+  self.linkParameters( 'watershed', 'normed_connectivity_profile' )
 
 def execution ( self, context ):
-  context.write( 'A watershed is performed to obtain different patches of interest. These patches correspond to cortex sites with a strong connection to the gyrus.' )
   commandMeshWatershedProcessing = [ sys.executable,
     find_in_path( 'AimsMeshWatershed.py' ),
     '-i', self.norm_connectivity_profile,
@@ -35,5 +33,3 @@ def execution ( self, context ):
     '-o', self.watershed
   ]
   context.system( *commandMeshWatershedProcessing )
-  context.write( 'OK' )
-
