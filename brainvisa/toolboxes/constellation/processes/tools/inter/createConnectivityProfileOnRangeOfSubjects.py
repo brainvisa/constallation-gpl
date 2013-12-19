@@ -9,20 +9,30 @@ def validation():
   except:
     raise ValidationError( 'aims module is not here.' )
 
-name = '02 - Connectivity Profile of Group'
+name = 'Connectivity Profile of Group'
 userLevel = 2
 
 signature = Signature(
-                                 'study_name', String(),
-                                 'texture_in', String(),
-                                'texture_out', String(),
-                                'patch_label', Integer(),
-                                     'smooth', Float(),
-                                      'group', ReadDiskItem( 'Group definition', 'XML' ),
-  'individual_norm_mean_connectivity_profile', ListOf( ReadDiskItem( 'Normed Connectivity Profile', 'Aims texture formats' ) ),
-      'thresholded_mean_connectivity_profile', ListOf( ReadDiskItem( 'Thresholded Connectivity Profile', 'Aims texture formats' ) ),
-   'norm_mean_connectivity_profile_nb_normed', ListOf( WriteDiskItem( 'Group Normed Connectivity Profile', 'Aims texture formats' ) ),
-                 'connectivity_profile_group', WriteDiskItem( 'Avg Connectivity Profile', 'Aims texture formats' ),
+  'study_name', String(),
+  'texture_ind', String(),
+  'texture_group', String(),
+  'patch_label', Integer(),
+  'smoothing', Float(),
+  'group', ReadDiskItem( 'Group definition', 'XML' ),
+  'normed_connectivity_profiles', ListOf( 
+                                  ReadDiskItem( 'Normed Connectivity Profile', 
+                                                'Aims texture formats' ) 
+                                  ),
+  'thresholded_connectivity_profile', ListOf( 
+                                      ReadDiskItem( 'Thresholded Connectivity Profile', 
+                                                    'Aims texture formats' ) 
+                                      ),
+  'normed_connectivity_profile_nb', ListOf( 
+                                    WriteDiskItem( 'Group Normed Connectivity Profile', 
+                                                   'Aims texture formats' ) 
+                                    ),
+  'group_connectivity_profile', WriteDiskItem( 'Avg Connectivity Profile', 
+                                               'Aims texture formats' ),
 )
 
 def initialization ( self ):
@@ -33,42 +43,53 @@ def initialization ( self ):
       profiles = []
       for subject in groupOfSubjects:
         study = self.study_name
-        texture = self.texture_in
+        texture = self.texture_ind
         gyrus = 'G' + str(self.patch_label)
-        smooth = 'smooth' + str(self.smooth)
-        profile = ReadDiskItem( 'Normed Connectivity Profile', 'Aims texture formats' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus, 'smooth': smooth }, subject.attributes() )
+        smoothing = 'smoothing' + str(self.smoothing)
+        profile = ReadDiskItem( 'Normed Connectivity Profile', 
+                                'Aims texture formats' ).findValue( 
+                                { 'study': study, 'texture': texture, 
+                                'gyrus': gyrus, 'smoothing': smoothing }, 
+                                subject.attributes() )
         if profile is None:
           return []
         profiles.append( profile )
       return profiles
   def linkProfiles( self, dummy ):
-    if self.thresholded_mean_connectivity_profile and self.group is not None:
+    if self.thresholded_connectivity_profile and self.group is not None:
       profiles = []
-      for p in self.thresholded_mean_connectivity_profile:
+      for p in self.thresholded_connectivity_profile:
         if p is None:
           continue
         atts = dict( self.group.hierarchyAttributes() )
         atts[ 'study' ] = p.get( 'study' )
-        atts[ 'texture' ] = self.texture_out
+        atts[ 'texture' ] = self.texture_group
         atts[ 'gyrus' ] = p.get( 'gyrus' )
         atts[ 'subject' ] = p.get( 'subject' )
-        profile = WriteDiskItem( 'Group Normed Connectivity Profile', 'Aims texture formats' ).findValue( atts )
+        profile = WriteDiskItem( 'Group Normed Connectivity Profile', 
+                                 'Aims texture formats' ).findValue( atts )
         if profile is None:
           return []
         profiles.append( profile )
       return profiles
   def linkGroupProfiles( self, dummy ):
-    if self.norm_mean_connectivity_profile_nb_normed and self.group is not None:
+    if self.normed_connectivity_profile_nb and self.group is not None:
       atts = dict( self.group.hierarchyAttributes() )
-      atts[ 'study' ] = self.norm_mean_connectivity_profile_nb_normed[0].get( 'study' )
-      atts[ 'texture' ] = self.texture_out
-      atts[ 'gyrus' ] = self.norm_mean_connectivity_profile_nb_normed[0].get( 'gyrus' )
-      return self.signature[ 'connectivity_profile_group' ].findValue( atts )
-  self.signature['individual_norm_mean_connectivity_profile'].userLevel = 2
-  self.linkParameters( 'individual_norm_mean_connectivity_profile', ( 'group', 'study_name', 'texture_in', 'patch_label', 'smooth' ), linkIndividualProfiles )
-  self.linkParameters( 'thresholded_mean_connectivity_profile', 'individual_norm_mean_connectivity_profile' )
-  self.linkParameters( 'norm_mean_connectivity_profile_nb_normed', ( 'thresholded_mean_connectivity_profile', 'texture_out' ), linkProfiles )
-  self.linkParameters( 'connectivity_profile_group', 'norm_mean_connectivity_profile_nb_normed', linkGroupProfiles )
+      atts[ 'study' ] = self.normed_connectivity_profile_nb[0].get( 'study' )
+      atts[ 'texture' ] = self.texture_group
+      atts[ 'gyrus' ] = self.normed_connectivity_profile_nb[0].get( 'gyrus' )
+      return self.signature[ 'group_connectivity_profile' ].findValue( atts )
+  self.signature['normed_connectivity_profiles'].userLevel = 2
+  self.linkParameters( 'normed_connectivity_profiles', ( 'group', 
+                       'study_name', 'texture_ind', 'patch_label', 
+                       'smoothing' ), linkIndividualProfiles )
+  self.linkParameters( 'thresholded_connectivity_profile', 
+                       'normed_connectivity_profiles' )
+  self.linkParameters( 'normed_connectivity_profile_nb', 
+                       ( 'thresholded_connectivity_profile', 'texture_group' ), 
+                       linkProfiles )
+  self.linkParameters( 'group_connectivity_profile', 
+                       'normed_connectivity_profile_nb', linkGroupProfiles )
 
 def execution ( self, context ):
   context.write( 'Process Combine All Subjects Mean Connectivity Profile...' )
@@ -82,7 +103,7 @@ def execution ( self, context ):
 
   n = 0
   listOfTex = []
-  for texture, outtexname in zip( self.thresholded_mean_connectivity_profile, self.norm_mean_connectivity_profile_nb_normed ):
+  for texture, outtexname in zip( self.thresholded_connectivity_profile, self.normed_connectivity_profile_nb ):
     tex = aims.read( texture.fullPath() )
     tex_ar = tex[0].arraydata()
     dividende_coef = 0
@@ -105,21 +126,21 @@ def execution ( self, context ):
   for tex_filename in listOfTex:
     if count == 0:
       context.write( tex_filename )
-      context.write( self.connectivity_profile_group )
-      shutil.copyfile( str(tex_filename), str(self.connectivity_profile_group) )
+      context.write( self.group_connectivity_profile )
+      shutil.copyfile( str(tex_filename), str(self.group_connectivity_profile) )
     else:
       context.system('AimsLinearComb',
         '-i', tex_filename,
-        '-j', self.connectivity_profile_group,
-        '-o', self.connectivity_profile_group
+        '-j', self.group_connectivity_profile,
+        '-o', self.group_connectivity_profile
       )
     count += 1
   
-  averageTexture = aims.read( self.connectivity_profile_group.fullPath() )
+  averageTexture = aims.read( self.group_connectivity_profile.fullPath() )
   subjects_nb = len( groupOfSubjects )
   if subjects_nb == 0:
     raise exceptions.ValueError( "subjects_list is empty" )
   for i in xrange( averageTexture.nItem() ):
     val = averageTexture[0][i]
     averageTexture[0][i] = val/subjects_nb
-  aims.write( averageTexture, self.connectivity_profile_group.fullPath() )
+  aims.write( averageTexture, self.group_connectivity_profile.fullPath() )

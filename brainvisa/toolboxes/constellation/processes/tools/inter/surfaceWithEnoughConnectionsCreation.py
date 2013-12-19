@@ -10,66 +10,66 @@ def validation():
   if not find_in_path( 'constelConnectivityProfileOverlapMask.py' ):
     raise ValidationError( 'constellation module is not here.' )
 
-name = '01 - Creation of a mask'
+name = 'Creation of a mask'
 userLevel = 2
 
 signature = Signature(
-                       'study_name', String(),
-                       'texture_in', String(),
-                      'texture_out', String(),
-                      'patch_label', Integer(),
-                           'smooth', Float(),
-                            'group', ReadDiskItem( 'Group definition', 'XML' ),
-  'individual_connectivity_profile', ListOf( ReadDiskItem( 'Gyrus Connectivity Profile', 'Aims texture formats' ) ),
-                             'mask', WriteDiskItem( 'Avg Connectivity Mask', 'Aims texture formats' ),
+  'study_name', String(),
+  'texture_ind', String(),
+  'texture_group', String(),
+  'patch_label', Integer(),
+  'smoothing', Float(),
+  'group', ReadDiskItem( 'Group definition', 'XML' ),
+  'connectivity_profiles', ListOf( ReadDiskItem( 'Gyrus Connectivity Profile', 
+                                                 'Aims texture formats' ) ),
+  'mask', WriteDiskItem( 'Avg Connectivity Mask', 'Aims texture formats' ),
 )
 
 def initialization ( self ):
-  def linkIndividualProfiles( self, dummy ):
+  self.smoothing = 3.0
+  self.texture_group = 'fsgroup'
+  
+  def linkIndProfiles( self, dummy ):
     if self.group is not None:
       registerClass('minf_2.0', Subject, 'Subject')
       groupOfSubjects = readMinf(self.group.fullPath())
       profiles = []
-      for subject in groupOfSubjects:
-        
+      for subject in groupOfSubjects:      
         study = self.study_name
-        texture = self.texture_in
-        smooth = 'smooth' + str(self.smooth)
+        texture = self.texture_ind
+        smoothing = 'smoothing' + str(self.smoothing)
         gyrus = 'G' + str(self.patch_label)
-        profile = ReadDiskItem( 'Gyrus Connectivity Profile', 'Aims texture formats' ).findValue( { 'study': study, 'texture': texture, 'gyrus': gyrus, 'smooth': smooth }, subject.attributes() )
+        profile = ReadDiskItem( 'Gyrus Connectivity Profile', 
+                                'Aims texture formats' ).findValue( 
+                                { 'study': study, 'texture': texture, 
+                                  'gyrus': gyrus, 'smoothing': smoothing }, 
+                                 subject.attributes() )
         if profile is not None:
           profiles.append( profile )
       return profiles
-  def linkGroupProfiles( self, dummy ):
-    if self.individual_connectivity_profile and self.group is not None:
+  
+  def linkMask( self, dummy ):
+    if self.connectivity_profiles and self.group and self.smoothing is not None:
       atts = dict( self.group.hierarchyAttributes() )
-      atts[ 'study' ] = self.individual_connectivity_profile[0].get( 'study' )
-      atts[ 'texture' ] = self.texture_out
-      atts[ 'gyrus' ] = self.individual_connectivity_profile[0].get( 'gyrus' )
-      atts[ 'smooth' ] = self.individual_connectivity_profile[0].get( 'smooth' )
+      atts[ 'study' ] = self.connectivity_profiles[0].get( 'study' )
+      atts[ 'texture' ] = self.texture_group
+      atts[ 'gyrus' ] = self.connectivity_profiles[0].get( 'gyrus' )
+      atts[ 'smoothing' ] = 'smoothing' + str(self.smoothing)
       return self.signature[ 'mask' ].findValue( atts )
-  self.linkParameters( 'individual_connectivity_profile', ( 'group', 'study_name', 'texture_in', 'patch_label', 'smooth' ), linkIndividualProfiles )
-  self.linkParameters( 'mask', ( 'individual_connectivity_profile', 'texture_out' ) , linkGroupProfiles )
-  self.signature['individual_connectivity_profile'].userLevel = 2
+      
+  self.linkParameters( 'connectivity_profiles', ( 'group', 'study_name', 
+                       'texture_ind', 'patch_label', 'smoothing' ), 
+                       linkIndProfiles )
+  self.linkParameters( 'mask', ( 'connectivity_profiles', 'texture_group', 
+                                 'smoothing' ) , linkMask )
+  self.signature['connectivity_profiles'].userLevel = 3
 
 def execution ( self, context ):
-  if mainThread() is not threading.currentThread():
-    mainThreadActions().call( aims.carto.PluginLoader.load )
-  else:
-    aims.carto.PluginLoader.load()
-
-  registerClass('minf_2.0', Subject, 'Subject')
-  groupOfSubjects = readMinf(self.group.fullPath())
-
-  context.write( 'Creation of a mask... ' )
   args = []
-  for x in self.individual_connectivity_profile:
+  for x in self.connectivity_profiles:
     args += [ '-p', x ]
   args += [ '-o', self.mask ]
-  context.system('python', 
+  context.system( sys.executable, 
     find_in_path( 'constelConnectivityProfileOverlapMask.py' ),
     *args
   )
-  context.write( 'OK' )
-
-  

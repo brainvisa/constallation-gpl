@@ -10,14 +10,16 @@ name = 'Brainvisa Constellation Inter Pipeline'
 userLevel = 2
 
 signature = Signature(
-    'study_name', String(),
-    'texture_in', String(),
-   'texture_out', String(),
-   'patch_label', Integer(),
-        'smooth', Float(),
-         'group', ReadDiskItem('Group definition', 'XML' ),
-  'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 'BrainVISA mesh formats' ),
-  'gyri_texture', ListOf( ReadDiskItem( 'FreesurferResampledBothParcellationType', 'Aims texture formats' ) ),
+  'study_name', String(),
+  'texture_ind', String(),
+  'texture_group', String(),
+  'patch_label', Integer(),
+  'smoothing', Float(),
+  'group', ReadDiskItem('Group definition', 'XML' ),
+  'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 
+                                'BrainVISA mesh formats' ),
+  'gyri_texture', ListOf( ReadDiskItem( 'FreesurferResampledBothParcellationType', 
+                                        'Aims texture formats' ) ),
 )
 
 def linkGroup( self, param1 ):
@@ -34,8 +36,8 @@ def linkGroup( self, param1 ):
 def initialization( self ):
 
   self.addLink( None, 'group', self.linkGroup )
-  self.texture_out = 'fsgroup'
-  self.smooth = 3.0
+  self.texture_group = 'fsgroup'
+  self.smoothing = 3.0
   eNode = SerialExecutionNode( self.name, parameterized=self )
 
   ## 01 Surface With Enough Connections Creation InterSubjects
@@ -46,17 +48,17 @@ def initialization( self ):
   eNode.addDoubleLink( 'meanProfileInter.study_name',
                        'study_name' )
 
-  eNode.addDoubleLink( 'meanProfileInter.texture_in',
-                       'texture_in' )
+  eNode.addDoubleLink( 'meanProfileInter.texture_ind',
+                       'texture_ind' )
 
-  eNode.addDoubleLink( 'meanProfileInter.texture_out',
-                       'texture_out' )                     
+  eNode.addDoubleLink( 'meanProfileInter.texture_group',
+                       'texture_group' )                     
 
   eNode.addDoubleLink( 'meanProfileInter.patch_label',
                        'patch_label' )
                        
-  eNode.addDoubleLink( 'meanProfileInter.smooth',
-                       'smooth' )
+  eNode.addDoubleLink( 'meanProfileInter.smoothing',
+                       'smoothing' )
 
   eNode.addDoubleLink( 'meanProfileInter.group',
                        'group' )
@@ -69,11 +71,11 @@ def initialization( self ):
   eNode.addDoubleLink( 'combineMeanInter.study_name',
                        'study_name' )
 
-  eNode.addDoubleLink( 'combineMeanInter.texture_in',
-                       'texture_in' )
+  eNode.addDoubleLink( 'combineMeanInter.texture_ind',
+                       'texture_ind' )
 
-  eNode.addDoubleLink( 'combineMeanInter.texture_out',
-                       'texture_out' )
+  eNode.addDoubleLink( 'combineMeanInter.texture_group',
+                       'texture_group' )
 
   eNode.addDoubleLink( 'combineMeanInter.patch_label',
                        'patch_label' )
@@ -89,8 +91,8 @@ def initialization( self ):
   eNode.addDoubleLink( 'meanInter.mask',
                        'meanProfileInter.mask' )
 
-  eNode.addDoubleLink( 'meanInter.connectivity_profile_group',
-                       'combineMeanInter.connectivity_profile_group' )
+  eNode.addDoubleLink( 'meanInter.connectivity_profiles',
+                       'combineMeanInter.group_connectivity_profile' )
 
   ## 04 Watershed On Normed Smoothed InterSubjects
   eNode.addChild( 'watershedInter',
@@ -100,8 +102,8 @@ def initialization( self ):
   eNode.addDoubleLink( 'watershedInter.average_mesh',
                        'average_mesh' )
 
-  eNode.addDoubleLink( 'watershedInter.normed_thresholded_mean_connectivity_profile',
-                       'meanInter.norm_thresholded_mean_connectivity_profile' )
+  eNode.addDoubleLink( 'watershedInter.normed_connectivity_profile',
+                       'meanInter.normed_connectivity_profile' )
 
   ## 05 Connectivity Matrix to Watershed Bassins InterSubjects
   eNode.addChild( 'connMatrixBasinInter',
@@ -111,11 +113,11 @@ def initialization( self ):
   eNode.addDoubleLink( 'connMatrixBasinInter.study_name',
                        'study_name' )
 
-  eNode.addDoubleLink( 'connMatrixBasinInter.texture_in',
-                       'texture_in' )
+  eNode.addDoubleLink( 'connMatrixBasinInter.texture_ind',
+                       'texture_ind' )
 
-  eNode.addDoubleLink( 'connMatrixBasinInter.texture_out',
-                       'texture_out' )
+  eNode.addDoubleLink( 'connMatrixBasinInter.texture_group',
+                       'texture_group' )
 
   eNode.addDoubleLink( 'connMatrixBasinInter.patch_label',
                        'patch_label' )
@@ -126,7 +128,7 @@ def initialization( self ):
   eNode.addDoubleLink( 'connMatrixBasinInter.average_mesh',
                        'average_mesh' )
 
-  eNode.addDoubleLink( 'connMatrixBasinInter.gyri_segmentation',
+  eNode.addDoubleLink( 'connMatrixBasinInter.gyri_texture',
                        'gyri_texture' )
 
   eNode.addDoubleLink( 'connMatrixBasinInter.filtered_watershed',
@@ -140,11 +142,11 @@ def initialization( self ):
   eNode.addDoubleLink( 'clusteringInter.study_name',
                        'study_name' )
 
-  eNode.addDoubleLink( 'clusteringInter.texture_in',
-                       'texture_in' )
+  eNode.addDoubleLink( 'clusteringInter.texture_ind',
+                       'texture_ind' )
 
-  eNode.addDoubleLink( 'clusteringInter.texture_out',
-                       'texture_out' )
+  eNode.addDoubleLink( 'clusteringInter.texture_group',
+                       'texture_group' )
 
   eNode.addDoubleLink( 'clusteringInter.patch_label',
                        'patch_label' )
@@ -157,9 +159,9 @@ def initialization( self ):
 
   eNode.addDoubleLink( 'clusteringInter.average_mesh',
                        'average_mesh' )
-  eNode.addDoubleLink( 'clusteringInter.gyri_segmentation',
-                       'connMatrixBasinInter.gyri_segmentation' )
-  eNode.addDoubleLink( 'clusteringInter.individual_reduced_matrix',
-                       'connMatrixBasinInter.connectivity_matrix_reduced' )
+  eNode.addDoubleLink( 'clusteringInter.gyri_texture',
+                       'connMatrixBasinInter.gyri_texture' )
+  eNode.addDoubleLink( 'clusteringInter.reduced_connectivity_matrix',
+                       'connMatrixBasinInter.reduced_connectivity_matrix' )
 
   self.setExecutionNode( eNode )
