@@ -23,13 +23,13 @@ signature = Signature(
                                 'Aims texture formats' ),
   'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
   'dw_to_t1', ReadDiskItem( 'Transformation matrix', 'Transformation matrix' ),
-  'min_cortex_length', Float(),
-  'max_cortex_length', Float(),
+  'min_length_of_fibers_near_cortex', Float(),
+  'max_length_of_fibers_near_cortex', Float(),
   'min_distant_fibers_length', Float(),
   'max_distant_fibers_length', Float(),
-  'subsets_of_tracts_FibersNearCortex', WriteDiskItem( 'Fibers Near Cortex', 
+  'subsets_of_fibers_near_cortex', WriteDiskItem( 'Fibers Near Cortex', 
                                                        'Aims bundles' ),
-  'subsets_of_tracts_distantFibers', WriteDiskItem( 'Very OutSide Fibers Of Cortex', 
+  'subsets_of_distant_fibers', WriteDiskItem( 'Very OutSide Fibers Of Cortex', 
                                                     'Aims bundles' ),
 )
 
@@ -59,7 +59,7 @@ def initialization( self ):
   def linkProfile( self, dummy ):
     if self.subject is None:
       return None
-    if self.subset_of_tract is not None and self.gyrus is not None and self.study is not None and self.texture is not None and self.min_cortex_length is not None and self.database is not None and self.subject is not None:
+    if self.subset_of_tract is not None and self.gyrus is not None and self.study is not None and self.texture is not None and self.min_length_of_fibers_near_cortex is not None and self.database is not None and self.subject is not None:
       attrs = dict( self.subset_of_tract.hierarchyAttributes() )
       attrs.update( self.subject.hierarchyAttributes() )
       attrs['study'] = self.study
@@ -67,25 +67,25 @@ def initialization( self ):
       attrs['_database'] = self.database
       attrs['subject'] = os.path.basename( self.subject.fullPath() )
       attrs['gyrus'] = 'G' + str( self.gyrus )
-      attrs['minlengthoffibersIn'] = str( int(self.min_cortex_length) )
-      filename = self.signature[ 'subsets_of_tracts_FibersNearCortex' ].findValue( attrs )
+      attrs['minlengthoffibersIn'] = str( int(self.min_length_of_fibers_near_cortex) )
+      filename = self.signature[ 'subsets_of_fibers_near_cortex' ].findValue( attrs )
       return filename
   def linkProfileDistantFibers( self, dummy ):
-    if self.subsets_of_tracts_FibersNearCortex is not None:
-      attrs = dict( self.subsets_of_tracts_FibersNearCortex.hierarchyAttributes() )
+    if self.subsets_of_fibers_near_cortex is not None:
+      attrs = dict( self.subsets_of_fibers_near_cortex.hierarchyAttributes() )
       attrs['minlengthoffibersOut'] = str( int( self.min_distant_fibers_length ) )
-      filename = self.signature[ 'subsets_of_tracts_distantFibers' ].findValue( attrs )
+      filename = self.signature[ 'subsets_of_distant_fibers' ].findValue( attrs )
       return filename
   self.linkParameters( 'subset_of_tract', 'subject', linkSubjects )
   self.linkParameters( 'listOf_subsets_of_tract', 'subset_of_tract', lef )
-  self.linkParameters( 'subsets_of_tracts_FibersNearCortex', ( 'database', 'subset_of_tract', 'subject', 'study', 'texture', 'gyrus', 'min_cortex_length' ), linkProfile )
-  self.linkParameters( 'subsets_of_tracts_distantFibers', ( 'subsets_of_tracts_FibersNearCortex', 'min_distant_fibers_length' ), linkProfileDistantFibers )
+  self.linkParameters( 'subsets_of_fibers_near_cortex', ( 'database', 'subset_of_tract', 'subject', 'study', 'texture', 'gyrus', 'min_length_of_fibers_near_cortex' ), linkProfile )
+  self.linkParameters( 'subsets_of_distant_fibers', ( 'subsets_of_fibers_near_cortex', 'min_distant_fibers_length' ), linkProfileDistantFibers )
   self.linkParameters( 'white_mesh', 'subject' )
   self.linkParameters( 'dw_to_t1', 'subset_of_tract' )
   
   self.signature['listOf_subsets_of_tract'].userLevel = 2
-  self.min_cortex_length = 30.
-  self.max_cortex_length = 500.
+  self.min_length_of_fibers_near_cortex = 30.
+  self.max_length_of_fibers_near_cortex = 500.
   self.min_distant_fibers_length = 20.
   self.max_distant_fibers_length = 500.
 
@@ -95,8 +95,8 @@ def execution( self, context ):
   for subset_of_tract in self.listOf_subsets_of_tract:
     cmd += [ '-i', subset_of_tract ]
   cmd += [
-    '-o', self.subsets_of_tracts_FibersNearCortex,
-    '-n', self.subsets_of_tracts_distantFibers,
+    '-o', self.subsets_of_fibers_near_cortex,
+    '-n', self.subsets_of_distant_fibers,
     '--mesh', self.white_mesh,
     '--tex', self.gyri_texture,
     '--trs', self.dw_to_t1,
@@ -106,8 +106,8 @@ def execution( self, context ):
     '-g', self.gyrus,
     #'--verbose',
     '-r',
-    '-l', self.min_cortex_length,
-    '-L', self.max_cortex_length,
+    '-l', self.min_length_of_fibers_near_cortex,
+    '-L', self.max_length_of_fibers_near_cortex,
     '--nimlmin', self.min_distant_fibers_length,
     '--nimlmax', self.max_distant_fibers_length,
   ]

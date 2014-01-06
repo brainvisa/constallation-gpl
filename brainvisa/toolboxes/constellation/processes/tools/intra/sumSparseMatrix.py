@@ -11,11 +11,11 @@ name = 'Sum Sparse Matrix Smoothing'
 userLevel = 2
 
 signature = Signature(
-  'matrix_fibersNearCortex', ReadDiskItem( 
+  'matrix_of_fibers_near_cortex', ReadDiskItem( 
                                'Connectivity Matrix Fibers Near Cortex', 
                                'Matrix sparse' 
                              ),
-  'matrix_distantFibers', ReadDiskItem( 
+  'matrix_of_distant_fibers', ReadDiskItem( 
                             'Connectivity Matrix Outside Fibers Of Cortex', 
                             'Matrix sparse' 
                           ),
@@ -33,32 +33,33 @@ def initialization( self ):
   self.setOptional( 'gyrus' )
   
   def linkSmooth(self, dummy):
-    if self.matrix_distantFibers is not None:
-      attrs = dict( self.matrix_distantFibers.hierarchyAttributes() )
-      attrs['subject'] =  self.matrix_distantFibers.get('subject')
-      attrs['study'] = self.matrix_distantFibers.get('study')
-      attrs['texture'] = self.matrix_distantFibers.get('texture')
-      attrs['gyrus'] = self.matrix_distantFibers.get('gyrus')
+    if self.matrix_of_distant_fibers is not None:
+      attrs = dict( self.matrix_of_distant_fibers.hierarchyAttributes() )
+      print 'attrs de matrix_of_distant_fibers --> ', attrs
+      attrs['subject'] =  self.matrix_of_distant_fibers.get('subject')
+      attrs['study'] = self.matrix_of_distant_fibers.get('study')
+      attrs['texture'] = self.matrix_of_distant_fibers.get('texture')
+      attrs['gyrus'] = self.matrix_of_distant_fibers.get('gyrus')
       attrs['smoothing'] = str( self.smoothing )
       filename = self.signature['complete_connectivity_matrix'].findValue( 
                                                                 attrs )
       return filename
   
-  self.linkParameters( 'matrix_distantFibers', 'matrix_fibersNearCortex' )
+  self.linkParameters( 'matrix_of_distant_fibers', 'matrix_of_fibers_near_cortex' )
   self.linkParameters( 'complete_connectivity_matrix', 
-                       ( 'matrix_distantFibers', 'smoothing'), linkSmooth )
+                       ( 'matrix_of_distant_fibers', 'smoothing'), linkSmooth )
 
 def execution ( self, context ):
   if self.gyrus is not None:
     gyrus = self.gyrus
   else:
     gyrus = os.path.basename( os.path.dirname( 
-            os.path.dirname( self.matrix_fibersNearCortex.fullPath() ) ) )
+            os.path.dirname( self.matrix_of_fibers_near_cortex.fullPath() ) ) )
     gyrus = gyrus.strip('G')
   context.write('gyrus ', gyrus)
   context.system( 'AimsSumSparseMatrix',
-    '-i', self.matrix_distantFibers,
-    '-i', self.matrix_fibersNearCortex,
+    '-i', self.matrix_of_distant_fibers,
+    '-i', self.matrix_of_fibers_near_cortex,
     '-o', self.complete_connectivity_matrix
   )
 

@@ -25,12 +25,12 @@ def initialization ( self ):
   def linkSmoothing(self, dummy):
     if self.complete_connectivity_matrix is not None:
       attrs = dict( self.complete_connectivity_matrix.hierarchyAttributes() )
+      print 'attrs de complete matrix --> ', attrs
       attrs['subject'] =  self.complete_connectivity_matrix.get('subject')
       attrs['study'] = self.complete_connectivity_matrix.get('study')
       attrs['texture'] = self.complete_connectivity_matrix.get('texture')
       attrs['gyrus'] = self.complete_connectivity_matrix.get('gyrus')
-      attrs['smoothing'] = 'smoothing' \
-        + str( self.complete_connectivity_matrix.get('smoothing') )
+      attrs['smoothing'] = 'smooth' + str( attrs['smoothing'] )
       print 'atts', attrs
       filename = self.signature['patch_connectivity_profile'].findValue( attrs )
       print filename

@@ -47,13 +47,13 @@ def linkGyri( self, key, value ):
 
 def afterChildAddedCallback( self, parent, key, child ):
   # Set default values
-  child.removeLink( 'filtered_watershed', 'connectivity_matrix_full' )
-  child.removeLink( 'connectivity_matrix_reduced', 'filtered_watershed' )
+  child.removeLink( 'filtered_watershed', 'complete_connectivity_matrix' )
+  child.removeLink( 'reduced_connectivity_matrix', 'filtered_watershed' )
 
   child.signature[ 'filtered_watershed' ] \
     = parent.signature[ 'filtered_watershed' ]
   child.signature[ 'white_mesh' ] = parent.signature[ 'average_mesh' ]
-  child.signature[ 'connectivity_matrix_reduced' ] \
+  child.signature[ 'reduced_connectivity_matrix' ] \
     = WriteDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' )
 
   child.gyrus = parent.patch_label
@@ -68,7 +68,7 @@ def afterChildAddedCallback( self, parent, key, child ):
   ## Add link between eNode.ListOf_Input_3dImage and pNode.Input_3dImage
   parent.addLink( key + '.filtered_watershed', 'filtered_watershed' )
   parent.addLink( key + '.gyrus', 'patch_label' )
-  parent.addLink( key + '.smoothing', 'smoothing' )
+  #parent.addLink( key + '.smoothing', 'smoothing' )
   parent.addLink( key + '.white_mesh', 'average_mesh' )
   parent.addLink( key + '.gyri_texture', 'gyri_texture',
     partial( self.linkGyri, key ) )
@@ -77,7 +77,7 @@ def afterChildAddedCallback( self, parent, key, child ):
 def beforeChildRemovedCallback( self, parent, key, child ):
   parent.removeLink( key + '.filtered_watershed', 'filtered_watershed' )
   parent.removeLink( key + '.gyrus', 'patch_label' )
-  parent.removeLink( key + '.smoothing', 'smoothing' )
+  #parent.removeLink( key + '.smoothing', 'smoothing' )
   parent.removeLink( key + '.white_mesh', 'average_mesh' )
   parent.remove( key + '.gyri_texture', 'gyri_texture' )
 

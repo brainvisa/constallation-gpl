@@ -37,7 +37,7 @@ def initialization ( self ):
       for subject in groupOfSubjects:      
         study = self.study_name
         texture = self.texture_ind
-        smoothing = 'smoothing' + str(self.smoothing)
+        smoothing = 'smooth' + str(self.smoothing)
         gyrus = 'G' + str(self.patch_label)
         profile = ReadDiskItem( 'Gyrus Connectivity Profile', 
                                 'Aims texture formats' ).findValue( 
@@ -54,7 +54,7 @@ def initialization ( self ):
       atts[ 'study' ] = self.connectivity_profiles[0].get( 'study' )
       atts[ 'texture' ] = self.texture_group
       atts[ 'gyrus' ] = self.connectivity_profiles[0].get( 'gyrus' )
-      atts[ 'smoothing' ] = 'smoothing' + str(self.smoothing)
+      atts[ 'smoothing' ] = 'smooth' + str(self.smoothing)
       return self.signature[ 'mask' ].findValue( atts )
       
   self.linkParameters( 'connectivity_profiles', ( 'group', 'study_name', 

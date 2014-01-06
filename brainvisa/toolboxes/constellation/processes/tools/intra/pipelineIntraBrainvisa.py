@@ -50,79 +50,79 @@ def initialization( self ):
                        'gyri_texture' )
 
   ### Bundles Oversampled
-  eNode.addChild( 'ConnectivityCortexMatrix',
+  eNode.addChild( 'Oversampler',
                   ProcessExecutionNode( 'fiberOversampler',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'ConnectivityCortexMatrix.length_filtered_tracts_distantFibers',
-                       'Filter.subsets_of_tracts_distantFibers' )
+  eNode.addDoubleLink( 'Oversampler.filtered_length_distant_fibers',
+                       'Filter.subsets_of_distant_fibers' )
 
   ### Connectivity Matrix
-  eNode.addChild( 'Smoothing',
+  eNode.addChild( 'ConnectivityMatrix',
                   ProcessExecutionNode( 'createConnectivityMatrix',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'Smoothing.oversampled_tracts_distantFibers',
-                       'ConnectivityCortexMatrix.oversampled_tracts_distantFibers' )
+  eNode.addDoubleLink( 'ConnectivityMatrix.oversampled_distant_fibers',
+                       'Oversampler.oversampled_distant_fibers' )
 
-  eNode.addDoubleLink( 'Smoothing.length_filtered_tracts_fibersNearCortex',
-                       'Filter.subsets_of_tracts_FibersNearCortex' )
+  eNode.addDoubleLink( 'ConnectivityMatrix.filtered_length_fibers_near_cortex',
+                       'Filter.subsets_of_fibers_near_cortex' )
 
-  #eNode.Smoothing.removeLink( 'gyri_texture',
+  #eNode.ConnectivityMatrix.removeLink( 'gyri_texture',
                               #'oversampled_tracts_distantFibers' )
+
+  eNode.addDoubleLink( 'ConnectivityMatrix.gyri_texture',
+                       'gyri_texture' )
+                       
+  eNode.addDoubleLink( 'ConnectivityMatrix.white_mesh',
+                       'white_mesh' )
+                       
+  eNode.addDoubleLink( 'ConnectivityMatrix.dw_to_t1',
+                       'Filter.dw_to_t1' )
+
+  ### Sum Sparse Matrix
+  eNode.addChild( 'Smoothing',
+                  ProcessExecutionNode( 'sumSparseMatrix',
+                  optional = 1 ) )
+
+  eNode.addDoubleLink( 'Smoothing.matrix_of_fibers_near_cortex',
+                       'ConnectivityMatrix.matrix_of_fibers_near_cortex' )
+
+  eNode.addDoubleLink( 'Smoothing.white_mesh',
+                       'white_mesh' )
 
   eNode.addDoubleLink( 'Smoothing.gyri_texture',
                        'gyri_texture' )
                        
-  eNode.addDoubleLink( 'Smoothing.white_mesh',
-                       'white_mesh' )
-                       
-  eNode.addDoubleLink( 'Smoothing.dw_to_t1',
-                       'Filter.dw_to_t1' )
-
-  ### Sum Sparse Matrix
-  eNode.addChild( 'Sum',
-                  ProcessExecutionNode( 'sumSparseMatrix',
-                  optional = 1 ) )
-
-  eNode.addDoubleLink( 'Sum.matrix_fibersNearCortex',
-                       'Smoothing.matrix_fibersNearCortex' )
-
-  eNode.addDoubleLink( 'Sum.white_mesh',
-                       'white_mesh' )
-
-  eNode.addDoubleLink( 'Sum.gyri_texture',
-                       'gyri_texture' )
-                       
-  eNode.addDoubleLink( 'Sum.gyrus',
+  eNode.addDoubleLink( 'Smoothing.gyrus',
                        'gyrus' )
 
-  eNode.addDoubleLink( 'Sum.smoothing',
+  eNode.addDoubleLink( 'Smoothing.smoothing',
                        'smoothing' )
 
   ### Mean Connectivity Profile
-  eNode.addChild( 'ProfileComputing',
+  eNode.addChild( 'MeanProfile',
                   ProcessExecutionNode( 'createMeanConnectivityProfile',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'ProfileComputing.complete_connectivity_matrix',
-                       'Sum.complete_connectivity_matrix' )
+  eNode.addDoubleLink( 'MeanProfile.complete_connectivity_matrix',
+                       'Smoothing.complete_connectivity_matrix' )
 
-  eNode.addDoubleLink( 'ProfileComputing.gyri_texture',
+  eNode.addDoubleLink( 'MeanProfile.gyri_texture',
                        'gyri_texture' )
 
   ### Normed Smoothed Mean Connectivity Profile
-  eNode.addChild( 'ProfileNormalization',
+  eNode.addChild( 'InternalConnections',
                   ProcessExecutionNode( 'removeInternalConnections',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'ProfileNormalization.patch_connectivity_profile',
-                       'ProfileComputing.patch_connectivity_profile' )
+  eNode.addDoubleLink( 'InternalConnections.patch_connectivity_profile',
+                       'MeanProfile.patch_connectivity_profile' )
 
-  eNode.addDoubleLink( 'ProfileNormalization.gyri_texture',
+  eNode.addDoubleLink( 'InternalConnections.gyri_texture',
                        'gyri_texture' )
                        
-  eNode.addDoubleLink( 'ProfileNormalization.white_mesh',
+  eNode.addDoubleLink( 'InternalConnections.white_mesh',
                        'white_mesh' )
 
   ### Watershed
@@ -131,38 +131,38 @@ def initialization( self ):
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'Watershed.normed_connectivity_profile',
-                       'ProfileNormalization.normed_connectivity_profile' )
+                       'InternalConnections.normed_connectivity_profile' )
 
   eNode.addDoubleLink( 'Watershed.white_mesh',
                        'white_mesh' )
 
   ### Filtered Watershed
-  eNode.addChild( 'ConnectivityMatrixToBassins',
+  eNode.addChild( 'FilteringWatershed',
                   ProcessExecutionNode( 'filteringWatershed',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'ConnectivityMatrixToBassins.complete_connectivity_matrix',
-                       'ProfileComputing.complete_connectivity_matrix' )
+  eNode.addDoubleLink( 'FilteringWatershed.complete_connectivity_matrix',
+                       'MeanProfile.complete_connectivity_matrix' )
 
-  eNode.addDoubleLink( 'ConnectivityMatrixToBassins.gyri_texture',
+  eNode.addDoubleLink( 'FilteringWatershed.gyri_texture',
                        'gyri_texture')
 
-  eNode.addDoubleLink( 'ConnectivityMatrixToBassins.white_mesh',
+  eNode.addDoubleLink( 'FilteringWatershed.white_mesh',
                        'white_mesh' )
 
   # Reduced Connectivity Matrix
 
-  eNode.addChild( 'ConnectivityMatrixWatershedToBassins',
+  eNode.addChild( 'ReducedMatrix',
                   ProcessExecutionNode( 'createReducedConnectivityMatrix',
                   optional = 1 ) )
 
-  eNode.addDoubleLink( 'ConnectivityMatrixWatershedToBassins.complete_connectivity_matrix',
-                       'ConnectivityMatrixToBassins.complete_connectivity_matrix' )
+  eNode.addDoubleLink( 'ReducedMatrix.complete_connectivity_matrix',
+                       'FilteringWatershed.complete_connectivity_matrix' )
 
-  eNode.addDoubleLink( 'ConnectivityMatrixWatershedToBassins.gyri_texture',
+  eNode.addDoubleLink( 'ReducedMatrix.gyri_texture',
                        'gyri_texture' )
                        
-  eNode.addDoubleLink( 'ConnectivityMatrixWatershedToBassins.white_mesh',
+  eNode.addDoubleLink( 'ReducedMatrix.white_mesh',
                        'white_mesh' )
 
   ### Clustering
@@ -171,7 +171,7 @@ def initialization( self ):
                   optional = 1 ) )
 
   eNode.addDoubleLink( 'ClusteringIntraSubjects.reduced_connectivity_matrix',
-                       'ConnectivityMatrixWatershedToBassins.reduced_connectivity_matrix' )
+                       'ReducedMatrix.reduced_connectivity_matrix' )
 
   eNode.addDoubleLink( 'ClusteringIntraSubjects.gyri_texture',
                        'gyri_texture' )

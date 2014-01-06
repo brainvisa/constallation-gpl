@@ -22,10 +22,10 @@ insert( '{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session
                 '<subject>_<texture>_<gyrus>_connectivityMatrix_outsideFibersOfCortex', SetType( 'Connectivity Matrix Outside Fibers Of Cortex' ),
                 '<subject>_<texture>_<gyrus>_meanConnectivityProfile_fibersNearCortex', SetType( 'Connectivity Profile Fibers Near Cortex' ),
                 '<subject>_<texture>_<gyrus>_meanConnectivityProfile_outsideFibersOfCortex', SetType( 'Connectivity Profile Outside Fibers Of Cortex' ),
-                '<subject>_<texture>_<gyrus>_connectivityMatrixSmooth{smooth}', SetType( 'Gyrus Connectivity Matrix' ),
+                '<subject>_<texture>_<gyrus>_connectivityMatrixSmooth{smoothing}', SetType( 'Gyrus Connectivity Matrix' ),
               ),
     
-              '{smooth}', SetContent(
+              '{smoothing}', SetContent(
     
                 'clustering', SetContent(
                   '<subject>_<texture>_<gyrus>_meanConnectivityProfile', SetType( 'Gyrus Connectivity Profile' ),
@@ -66,8 +66,8 @@ insert( '{center}/group_analysis/{group_of_subjects}',
               '<group_of_subjects>_<study>_<texture>_<gyrus>_meanConnectivityProfile', SetType( 'Avg Connectivity Profile' ),
               '<group_of_subjects>_<study>_<texture>_<gyrus>_thresholdedMeanConnectivityProfile', SetType( 'Avg Thresholded Connectivity Profile' ),
               '<group_of_subjects>_<study>_<texture>_<gyrus>_normedMeanConnectivityProfile', SetType( 'Avg Normed Connectivity Profile' ),
-              '<group_of_subjects>_<study>_<texture>_<gyrus>_watershed', SetType( 'Avg Watershed Texture'),
               '<group_of_subjects>_<study>_<texture>_<gyrus>_filteredWatershed', SetType( 'Avg Filtered Watershed' ),
+              '<group_of_subjects>_<study>_<texture>_<gyrus>_watershed', SetType( 'Avg Watershed Texture'),
               '<group_of_subjects>_<study>_<texture>_<gyrus>_matrix', SetType( 'Group Matrix' ),
               
               '{subject}', SetContent(

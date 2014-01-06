@@ -41,8 +41,7 @@ def initialization ( self ):
       attrs['study'] = self.complete_connectivity_matrix.get('study')
       attrs['texture'] = self.complete_connectivity_matrix.get('texture')
       attrs['gyrus'] = self.complete_connectivity_matrix.get('gyrus')
-      attrs['smoothing'] = 'smoothing' + \
-        str( self.complete_connectivity_matrix.get('smoothing') )
+      attrs['smoothing'] = 'smoothing' + str( attrs['smoothing'] )
       print 'atts', attrs
       filename = self.signature['watershed'].findValue( attrs )
       print filename

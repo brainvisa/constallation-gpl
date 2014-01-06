@@ -52,14 +52,17 @@ FileType( 'Avg Normed Connectivity Profile', 'Avg Connectivity Profile Texture' 
 FileType( 'ROI Texture', 'Label Texture' )
 FileType( 'Watershed Texture', 'ROI Texture' )
 FileType( 'Watershed Measures', 'ROI Texture' )
-FileType( 'Avg Watershed Texture', 'ROI Texture' )
+FileType( 'Average Texture', 'ROI Texture' )
+
+FileType( 'Avg Watershed Texture', 'Average Texture' )
+FileType( 'Avg Filtered Watershed', 'Average Texture' )
 
 FileType( 'Filtered Watershed', 'ROI Texture' )
 FileType( 'Sum Values From Region', 'Watershed Measures' )
 FileType( 'Spread Value On Region', 'Watershed Measures' )
 
-FileType( 'Avg Watershed Texture', 'ROI Texture' )
-FileType( 'Avg Filtered Watershed', 'Avg Watershed Texture' )
+#FileType( 'Avg Watershed Texture', 'ROI Texture' )
+#FileType( 'Avg Filtered Watershed', 'Avg Watershed Texture' )
 
 # Clustering (texture)
 FileType( 'Clustering Texture', 'Label Texture' )

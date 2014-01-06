@@ -25,7 +25,7 @@ signature = Signature(
                                         'Thresholded Connectivity Profile', 
                                         'Aims texture formats' 
                                       ),
-  'norm_connectivity_profile', WriteDiskItem( 'Normed Connectivity Profile', 
+  'normed_connectivity_profile', WriteDiskItem( 'Normed Connectivity Profile', 
                                               'Aims texture formats' ),
 )
 
@@ -33,7 +33,7 @@ def initialization ( self ):
   self.setOptional( 'gyrus' )
   self.linkParameters( 'thresholded_connectivity_profile', 
                        'patch_connectivity_profile' )
-  self.linkParameters( 'norm_connectivity_profile', 
+  self.linkParameters( 'normed_connectivity_profile', 
                        'thresholded_connectivity_profile' )
 
 def execution ( self, context ):
@@ -58,7 +58,7 @@ def execution ( self, context ):
   if dividende_coef > 0:
     z = 1./dividende_coef
     pcparr *= z
-  aims.write( pcp, self.norm_connectivity_profile.fullPath() )
+  aims.write( pcp, self.normed_connectivity_profile.fullPath() )
   context.write( 'OK' )
 
 
