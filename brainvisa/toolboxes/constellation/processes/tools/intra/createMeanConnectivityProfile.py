@@ -25,15 +25,12 @@ def initialization ( self ):
   def linkSmoothing(self, dummy):
     if self.complete_connectivity_matrix is not None:
       attrs = dict( self.complete_connectivity_matrix.hierarchyAttributes() )
-      print 'attrs de complete matrix --> ', attrs
       attrs['subject'] =  self.complete_connectivity_matrix.get('subject')
       attrs['study'] = self.complete_connectivity_matrix.get('study')
       attrs['texture'] = self.complete_connectivity_matrix.get('texture')
       attrs['gyrus'] = self.complete_connectivity_matrix.get('gyrus')
       attrs['smoothing'] = 'smooth' + str( attrs['smoothing'] )
-      print 'atts', attrs
       filename = self.signature['patch_connectivity_profile'].findValue( attrs )
-      print filename
       return filename
   self.setOptional( 'gyrus' )
   self.linkParameters( 'patch_connectivity_profile', 
@@ -46,7 +43,7 @@ def execution ( self, context ):
     gyrus = os.path.basename( os.path.dirname( os.path.dirname( 
       self.complete_connectivity_matrix.fullPath() ) ) )
     gyrus = gyrus.strip('G')
-  context.write('gyrus = ', gyrus, '    Is it correct?')
+  context.write( 'gyrus ', gyrus )
   context.system( 'constelMeanConnectivityProfileFromMatrix',
     '-connfmt', 'binar_sparse',
     '-connmatrixfile', self.complete_connectivity_matrix,

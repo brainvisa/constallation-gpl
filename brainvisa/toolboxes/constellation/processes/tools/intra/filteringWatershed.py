@@ -42,9 +42,7 @@ def initialization ( self ):
       attrs['texture'] = self.complete_connectivity_matrix.get('texture')
       attrs['gyrus'] = self.complete_connectivity_matrix.get('gyrus')
       attrs['smoothing'] = 'smooth' + str( self.complete_connectivity_matrix.get('smoothing') )
-      print 'atts', attrs
       filename = self.signature['watershed'].findValue( attrs )
-      print filename
       return filename
   self.linkParameters( 'watershed', 'complete_connectivity_matrix', linkWat )
   self.linkParameters( 'sum_vertices_patch', 'complete_connectivity_matrix' )

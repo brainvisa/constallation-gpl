@@ -35,7 +35,6 @@ def initialization( self ):
   def linkSmooth(self, dummy):
     if self.matrix_of_distant_fibers is not None:
       attrs = dict( self.matrix_of_distant_fibers.hierarchyAttributes() )
-      print 'attrs de matrix_of_distant_fibers --> ', attrs
       attrs['subject'] =  self.matrix_of_distant_fibers.get('subject')
       attrs['study'] = self.matrix_of_distant_fibers.get('study')
       attrs['texture'] = self.matrix_of_distant_fibers.get('texture')

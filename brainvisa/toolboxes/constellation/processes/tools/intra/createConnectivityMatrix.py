@@ -34,13 +34,12 @@ def initialization( self ):
   self.linkParameters( 'gyri_texture', 'white_mesh' )
 
 def execution ( self, context ):
-  context.write( 'Connections between a given vertice and all the vertices of the cortex. Connectivity matrix is smoothed over the surface to account for a reasonable uncertainty on the tractography.' )
   if self.gyrus is not None:
     gyrus = self.gyrus
   else:
     gyrus = os.path.basename( os.path.dirname( os.path.dirname( self.oversampled_distant_fibers.fullPath() ) ) )
     gyrus = gyrus.strip('G')
-  context.write('gyrus = ', gyrus )
+  context.write('gyrus ', gyrus )
   context.system( 'constelConnectivityMatrix',
     '-bundles', self.oversampled_distant_fibers,
     '-connmatrix', self.matrix_of_distant_fibers,

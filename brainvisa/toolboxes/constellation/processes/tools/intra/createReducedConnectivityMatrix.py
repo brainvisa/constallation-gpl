@@ -57,7 +57,3 @@ def execution ( self, context ):
     '-normalize', 1,
     '-verbose', 1
   )
-
-
-
-  
