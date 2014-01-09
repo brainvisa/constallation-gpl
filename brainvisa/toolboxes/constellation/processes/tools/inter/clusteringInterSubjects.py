@@ -61,7 +61,7 @@ def initialization ( self ):
       atts[ 'study' ] = self.study_name
       atts[ 'texture' ] = self.texture_group
       atts[ 'gyrus' ] = 'G' + str(self.patch_label)
-      atts['smoothing'] = 'smoothing' + str(self.smoothing)
+      atts['smoothing'] = 'smooth' + str(self.smoothing)
       filename = self.signature['group_matrix'].findValue( atts )
       return filename
   def linkClustering(self, dummy):
@@ -72,8 +72,7 @@ def initialization ( self ):
         atts[ 'study' ] = self.study_name
         atts[ 'texture' ] = self.texture_group
         atts[ 'gyrus' ] = 'G' + str(self.patch_label)
-        atts['smoothing'] = 'smoothing' + str(self.smoothing)
-        print atts
+        atts['smoothing'] = 'smooth' + str(self.smoothing)
         return self.signature[ 'clustering_time' ].findValue( atts )
       elif self.study == 'Concatenate':
         registerClass('minf_2.0', Subject, 'Subject')
@@ -85,7 +84,7 @@ def initialization ( self ):
           atts[ 'study' ] = self.study_name
           atts[ 'texture' ] = self.texture_group
           atts[ 'gyrus' ] = 'G' + str(self.patch_label)
-          atts['smoothing'] = 'smoothing' + str(self.smoothing)
+          atts['smoothing'] = 'smooth' + str(self.smoothing)
           profiles.append( ReadDiskItem('Group Clustering Time', 
                            'BrainVISA texture formats').findValue( atts ) )
         return profiles

@@ -41,12 +41,12 @@ def initialization ( self ):
       attrs['study'] = self.complete_connectivity_matrix.get('study')
       attrs['texture'] = self.complete_connectivity_matrix.get('texture')
       attrs['gyrus'] = self.complete_connectivity_matrix.get('gyrus')
-      attrs['smoothing'] = 'smoothing' + str( attrs['smoothing'] )
+      attrs['smoothing'] = 'smooth' + str( self.complete_connectivity_matrix.get('smoothing') )
       print 'atts', attrs
       filename = self.signature['watershed'].findValue( attrs )
       print filename
       return filename
-  self.linkParameters( 'watershed', 'complete_connectivity_matrix' , linkWat )
+  self.linkParameters( 'watershed', 'complete_connectivity_matrix', linkWat )
   self.linkParameters( 'sum_vertices_patch', 'complete_connectivity_matrix' )
   self.linkParameters( 'duplication_value_patch', 
                        'complete_connectivity_matrix' )

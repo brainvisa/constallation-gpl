@@ -79,6 +79,9 @@ def initialization( self ):
 
   eNode.addDoubleLink( 'combineMeanInter.patch_label',
                        'patch_label' )
+                       
+  eNode.addDoubleLink( 'combineMeanInter.smoothing',
+                       'smoothing' )
 
   eNode.addDoubleLink( 'combineMeanInter.group',
                        'group' )
@@ -121,6 +124,9 @@ def initialization( self ):
 
   eNode.addDoubleLink( 'connMatrixBasinInter.patch_label',
                        'patch_label' )
+                       
+  eNode.addDoubleLink( 'connMatrixBasinInter.smoothing',
+                       'smoothing' )                     
 
   eNode.addDoubleLink( 'connMatrixBasinInter.group',
                        'group' )
@@ -150,7 +156,10 @@ def initialization( self ):
 
   eNode.addDoubleLink( 'clusteringInter.patch_label',
                        'patch_label' )
-
+                       
+  eNode.addDoubleLink( 'clusteringInter.smoothing',
+                       'smoothing' )
+  
   eNode.addDoubleLink( 'clusteringInter.group',
                        'group' )
 

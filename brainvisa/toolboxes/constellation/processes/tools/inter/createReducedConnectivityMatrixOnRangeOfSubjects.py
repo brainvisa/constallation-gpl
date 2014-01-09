@@ -57,7 +57,7 @@ def afterChildAddedCallback( self, parent, key, child ):
     = WriteDiskItem( 'Group Reduced Connectivity Matrix', 'GIS image' )
 
   child.gyrus = parent.patch_label
-  child.smoothing = parent.smoothing
+  #child.smoothing = parent.smoothing
   child.filtered_watershed = parent.filtered_watershed
   child.white_mesh = parent.average_mesh
 
@@ -92,7 +92,7 @@ def initialization ( self ):
         study = self.study_name
         texture = self.texture_ind
         gyrus = 'G' + str(self.patch_label)
-        smoothing = 'smoothing' + str(self.smoothing)
+        smoothing = str(self.smoothing)
         profile = ReadDiskItem( 'Gyrus Connectivity Matrix', 
                                 'Matrix sparse' ).findValue( { 'study': study, 
                                 'texture': texture, 'gyrus': gyrus, 
@@ -113,6 +113,7 @@ def initialization ( self ):
         atts[ 'texture' ] = self.texture_group
         atts[ 'gyrus' ] = p.get( 'gyrus' )
         atts[ 'subject' ] = p.get( 'subject' )
+        atts[ 'smoothing' ] = 'smooth' + str(self.smoothing)
         profiles.append( WriteDiskItem( 'Group Reduced Connectivity Matrix', 
                                         'GIS image' ).findValue( atts ) )
       return profiles
@@ -123,8 +124,8 @@ def initialization ( self ):
       atts[ 'texture' ] = self.texture_group
       atts[ 'gyrus' ] = 'G' + str(self.patch_label)
       atts[ 'study' ] = self.study_name
-      atts[ 'smoothing' ] = 'smoothing' + str(self.smoothing)
-      return ReadDiskItem( 'Averaged Filtered Watershed', 
+      atts[ 'smoothing' ] = 'smooth' + str(self.smoothing)
+      return ReadDiskItem( 'Avg Filtered Watershed', 
                            'Aims texture formats' ).findValue( atts )
   def linkMesh( self, dummy ):
     if self.group is not None:
@@ -140,9 +141,10 @@ def initialization ( self ):
                        'texture_group', 'study_name', 'smoothing' ), 
                        linkWatershed 
                      )
-  self.linkParameters( 'reduced_connectivity_matrix', ( 'group', 
-                       'complete_connectivity_matrix', 'texture_group'), 
-                       linkProfiles 
+  self.linkParameters( 'reduced_connectivity_matrix', 
+                     ( 'complete_connectivity_matrix', 'texture_group', 
+                       'group', 'smoothing' ), 
+                     linkProfiles 
                      )
   self.linkParameters( 'average_mesh', 'group', linkMesh )
   self.signature['complete_connectivity_matrix'].userLevel = 2

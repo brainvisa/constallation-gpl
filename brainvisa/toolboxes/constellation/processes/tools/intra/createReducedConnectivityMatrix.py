@@ -32,9 +32,7 @@ def initialization ( self ):
       attrs['texture'] = self.complete_connectivity_matrix.get('texture')
       attrs['gyrus'] = self.complete_connectivity_matrix.get('gyrus')
       attrs['smoothing'] = 'smooth' + str( self.complete_connectivity_matrix.get('smoothing') )
-      print 'atts : ', attrs
       filename = self.signature['filtered_watershed'].findValue( attrs )
-      print filename
       return filename
   self.linkParameters( 'filtered_watershed', 
                        'complete_connectivity_matrix', linkMatrix )

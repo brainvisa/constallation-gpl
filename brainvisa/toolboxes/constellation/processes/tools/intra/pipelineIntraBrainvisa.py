@@ -141,6 +141,9 @@ def initialization( self ):
                   ProcessExecutionNode( 'filteringWatershed',
                   optional = 1 ) )
 
+  eNode.addDoubleLink( 'FilteringWatershed.watershed',
+                       'Watershed.watershed' )
+  
   eNode.addDoubleLink( 'FilteringWatershed.complete_connectivity_matrix',
                        'MeanProfile.complete_connectivity_matrix' )
 

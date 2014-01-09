@@ -23,10 +23,10 @@ insert( '{protocol}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_sessi
                 '<subject>_<texture>_<gyrus>_connectivityMatrix_outsideFibersOfCortex', SetType( 'Connectivity Matrix Outside Fibers Of Cortex' ),
                 '<subject>_<texture>_<gyrus>_meanConnectivityProfile_fibersNearCortex', SetType( 'Connectivity Profile Fibers Near Cortex' ),
                 '<subject>_<texture>_<gyrus>_meanConnectivityProfile_outsideFibersOfCortex', SetType( 'Connectivity Profile Outside Fibers Of Cortex' ),
-                '<subject>_<texture>_<gyrus>_connectivityMatrixSmooth{smooth}', SetType( 'Gyrus Connectivity Matrix' ),
+                '<subject>_<texture>_<gyrus>_connectivityMatrixSmooth{smoothing}', SetType( 'Gyrus Connectivity Matrix' ),
               ),
     
-              '{smooth}', SetContent(
+              '{smoothing}', SetContent(
     
                 'clustering', SetContent(
                   '<subject>_<texture>_<gyrus>_meanConnectivityProfile', SetType( 'Gyrus Connectivity Profile' ),

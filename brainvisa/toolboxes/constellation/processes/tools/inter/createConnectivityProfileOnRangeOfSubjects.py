@@ -45,7 +45,7 @@ def initialization ( self ):
         study = self.study_name
         texture = self.texture_ind
         gyrus = 'G' + str(self.patch_label)
-        smoothing = 'smoothing' + str(self.smoothing)
+        smoothing = 'smooth' + str(self.smoothing)
         profile = ReadDiskItem( 'Normed Connectivity Profile', 
                                 'Aims texture formats' ).findValue( 
                                 { 'study': study, 'texture': texture, 
