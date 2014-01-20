@@ -17,34 +17,25 @@ userLevel = 2
 
 signature = Signature(
   'group_freesurfer', ReadDiskItem('Freesurfer Group definition', 'XML' ),
-  'gyri_textures', ListOf( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ) ),
   'mesh', ReadDiskItem('BothAverageBrainWhite', 'MESH mesh'),
   'avg_gyri_texture', WriteDiskItem( 'BothAverageResampledGyri', 'BrainVISA texture formats' ),
 )
 
 def initialization ( self ):
-  self.linkParameters( 'gyri_textures', 'group_freesurfer' )
   self.linkParameters( 'mesh', 'group_freesurfer' )
   self.linkParameters( 'avg_gyri_texture', 'group_freesurfer' )
   
 def execution ( self, context ):
-  
   registerClass('minf_2.0', Subject, 'Subject')
   groupOfSubjects = readMinf(self.group_freesurfer.fullPath())
 
-  subjects = []
+  textures = []
   for subject in groupOfSubjects:
-    subjects.append( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ).findValue( subject.attributes() ) )
-  context.write(str([i for i in subjects]))
+    textures.append( ReadDiskItem( 'BothResampledGyri', 'Aims texture formats' ).findValue( subject.attributes() ) )
+  context.write(str([i for i in textures]))
   
-  #gyri_textures = []
-  #for gyri_segmentation in self.gyri_textures:
-    #gyri_textures.append(gyri_segmentation)
-
-  #context.write(str([i for i in gyri_textures]))
-
   cmd_args = []
-  for tex in self.gyri_textures:
+  for tex in textures:
     cmd_args += [ '-i', tex ]
   cmd_args += [ '-o', self.avg_gyri_texture ]
   context.system('python', find_in_path( 'constelAvgGyriTexture.py' ), *cmd_args )
