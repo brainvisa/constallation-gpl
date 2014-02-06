@@ -1,5 +1,4 @@
 #  This software and supporting documentation are distributed by
-#      Institut Federatif de Recherche 49
 #      CEA/NeuroSpin, Batiment 145,
 #      91191 Gif-sur-Yvette cedex
 #      France
@@ -34,15 +33,14 @@ from brainvisa.processes import *
 from brainvisa import anatomist as ana
 from soma import aims
 import numpy
+import constel
 try:
-  import constel.lib.texturetools as TT
   import constel.lib.connmatrix.connmatrixtools as Mat
 except:
   pass
 
 def validation():
   try:
-    import constel.lib.texturetools as TT
     import constel.lib.connmatrix.connmatrixtools as Mat
   except:
     raise ValidationError( 'roca module is not available' )
@@ -100,7 +98,7 @@ def execution_mainthread( self, context ):
   a.unmapObject( anagraph )
   for i, vertex in enumerate( graph.vertices() ):
     anavertex = vertex[ 'ana_object' ]
-    current_tex = TT.oneTargetDensityTargetsRegroupTexture( mat[i], basins )
+    current_tex = constel.oneTargetDensityTargetsRegroupTexture( mat[i], basins, self.time_step )
     anatex = a.toAObject( current_tex )
     anatex.releaseAppRef()
     a.unmapObject( anatex )
