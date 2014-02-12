@@ -3,6 +3,7 @@ from soma import aims
 import scipy
 import scipy.cluster.hierarchy
 import scipy.spatial.distance
+from soma.path import find_in_path
 import os
 import numpy as np
 
