@@ -11,21 +11,25 @@ def validation():
     if not find_in_path( 'constelConnectionDensityTexture' ):
         raise ValidationError( 'constellation module is not here.' )
 
-name = 'Ward'
+name = 'Clustering Ward'
 userLevel = 2
 
-signature = Signature(
-    'reduced_connectivity_matrix', WriteDiskItem('Reduced Connectivity Matrix', 
-                                               'GIS image'),
+signature = Signature( 
+    'group_matrix', ReadDiskItem('Group Matrix', 'GIS image'),
+    'output_directory', ReadDiskItem( 'Directory', 'Directory' ),
 )
 
 def initialization (self):
     pass
 
 def execution(self, context):
-    matrix = aims.read(self.reduced_connectivity_matrix)
+    '''Use hieararchical clustering to identify patterns.
+    '''
+    # Load the matrix
+    matrix = aims.read(self.group_matrix.fullPath())
     mat = np.asarray(matrix)[:, :, 0, 0]
     n, p = s = mat.shape
+    # Compute linkage
     Z = scipy.cluster.hierarchy.linkage(mat, method='ward', metric='euclidean')
     OUTPUT_DIR_FMT = '/home/sl236442'
     TS = []
