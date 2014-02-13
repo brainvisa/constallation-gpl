@@ -4,6 +4,7 @@ import scipy
 import scipy.cluster.hierarchy
 import scipy.spatial.distance
 from soma.path import find_in_path
+import matplotlib.pyplot as plt
 import os
 import numpy as np
 
@@ -31,6 +32,20 @@ def execution(self, context):
     n, p = s = mat.shape
     # Compute linkage
     Z = scipy.cluster.hierarchy.linkage(mat, method='ward', metric='euclidean')
+    np.save('/home/sl236442/dendrogram.npy', Z)
+
+    # Save dendrogram
+    dendrogram_full_fig = plt.figure()
+    R = scipy.cluster.hierarchy.dendrogram(Z,
+                                        color_threshold=1,
+                                        distance_sort='ascending')
+    dendrogram_full_fig.savefig('/home/sl236442/dendrogram.full.svg')
+    dendrogram_lastp_fig = plt.figure()
+    R = scipy.cluster.hierarchy.dendrogram(Z,
+                                        color_threshold=1,
+                                        truncate_mode='lastp',
+                                        distance_sort='ascending')
+    dendrogram_lastp_fig.savefig('/home/sl236442/dendrogram.lastp.svg')
     OUTPUT_DIR_FMT = '/home/sl236442'
     TS = []
     for nb in n_clusters:
