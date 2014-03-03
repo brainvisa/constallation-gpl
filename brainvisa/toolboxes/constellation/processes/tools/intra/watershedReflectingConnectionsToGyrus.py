@@ -24,7 +24,7 @@ def initialization ( self ):
 def execution ( self, context ):
   commandMeshWatershedProcessing = [ sys.executable,
     find_in_path( 'AimsMeshWatershed.py' ),
-    '-i', self.norm_connectivity_profile,
+    '-i', self.normed_connectivity_profile,
     '-m', self.white_mesh,
     '-k', 10,
     '-q', 0.05,

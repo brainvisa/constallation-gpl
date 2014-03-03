@@ -52,7 +52,7 @@ def initialization ( self ):
         atts[ 'texture' ] = self.texture_group
         atts[ 'gyrus' ] = 'G' + str(self.patch_label)
         atts['smoothing'] = 'smoothing' + str(self.smoothing)
-        profiles.append( ReadDiskItem( 'Group Reduced Connectivity Matrix', 
+        profiles.append( ReadDiskItem( 'Reduced Connectivity Matrix', 
                          'GIS image' ).findValue( subject.attributes(), atts ) )
       return profiles
   def linkMatrix( self, dummy ):

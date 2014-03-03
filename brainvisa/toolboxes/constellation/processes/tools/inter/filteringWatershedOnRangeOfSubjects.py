@@ -59,6 +59,6 @@ def execution ( self, context ):
   for basin_label in basins_labels:
     if np.where( basinTex_ar == basin_label )[0].size < minVertex_nb:
       labelsToRemove_list.append( basin_label )
-  filteredBasins = TT.removeLabelsFromTexture( basins_tex, 
-                                               labelsToRemove_list )
+  filteredBasins = TT.remove_labels(basins_tex, 
+                                             labelsToRemove_list )
   aims.write( filteredBasins, self.filtered_watershed.fullPath() )

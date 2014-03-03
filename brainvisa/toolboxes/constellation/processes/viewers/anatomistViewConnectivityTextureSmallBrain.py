@@ -65,8 +65,6 @@ def initialization( self ):
 def execution_mainthread( self, context ):
   a = ana.Anatomist()
   mesh = a.loadObject( self.mesh )
-  #matrix = a.loadObject( self.connectivity_matrix )
-  #basins = a.loadObject( self.basins_texture )
   anaclusters = a.loadObject( self.clustering_texture )
   anaclusters.setPalette( palette='Blue-Red-fusion' )
   a.execute( "TexturingParams", objects=[anaclusters], interpolation = 'rgb' )
@@ -74,9 +72,10 @@ def execution_mainthread( self, context ):
   matrix = numpy.asarray( matrix )
   matrix = matrix.reshape( matrix.shape[:2] )
   basins = aims.read( self.basins_texture.fullPath() )
-  # abasins = basins[0].arraydata()
+  # Create TimeTexture_S16
   clusters = a.toAimsObject( anaclusters )
   aclusters = clusters[self.time_step].arraydata()
+  # Create AimsTimeSurface_3
   aimsmesh = a.toAimsObject( mesh )
   avertex = numpy.asarray( aimsmesh.vertex() )
   reducedMatrix = Mat.connMatrixParcelsToTargets( matrix, clusters, self.time_step )
@@ -87,6 +86,7 @@ def execution_mainthread( self, context ):
   bbmin, bbmax = mesh.boundingbox()
   graph[ 'boundingbox_min' ] = list( bbmin )
   graph[ 'boundingbox_max' ] = list( bbmax )
+  # Complete list of clusters
   regions = [ x for x in numpy.unique( aclusters ) if x != 0 ]
   for rnum in regions:
     vertex = graph.addVertex( 'roi' )

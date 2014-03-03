@@ -64,8 +64,8 @@ def execution_mainthread(self, context):
     connectivity = a.fusionObjects([ mesh, clusters, bundles, t1 ],
         method = 'FusionTexMeshImaAndBundlesToROIsAndBundlesGraphMethod')
         
-    a.execute('FusionTexMeshImaAndBundlesToROIsAndBundlesGraphMethod', 
-               object=connectivity)
+    #a.execute('FusionTexMeshImaAndBundlesToROIsAndBundlesGraphMethod', 
+               #object=connectivity)
     if connectivity is None:
         raise ValueError('could not fusion objects')
     
@@ -77,9 +77,10 @@ def execution_mainthread(self, context):
     #mesh = a.toAimsObject(mesh)
     
     patches = ['1', ]
-    basins = {'27' : [1., 1., 0., 0.5], '19' : [1., 0., 0., 0.5], 
-              '17' : [0.5, 1., 1., 0.5], '16' : [0.5, 1., 0.5, 0.5], 
-              '13' : [1., 0., 0.5, 0.5]}
+    basins = {'27' : [1., 1., 0., 0.5] }
+    #, '19' : [1., 0., 0., 0.5], 
+              #'17' : [0.5, 1., 1., 0.5], '16' : [0.5, 1., 0.5, 0.5], 
+              #'13' : [1., 0., 0.5, 0.5]}
     all_regions = patches + basins.keys()
     for v in graph.vertices():
         if v['name'] in all_regions:

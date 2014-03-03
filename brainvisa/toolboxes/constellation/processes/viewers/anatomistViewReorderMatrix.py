@@ -33,104 +33,103 @@
 from brainvisa.processes import *
 from brainvisa import anatomist as ana
 from soma import aims
-import numpy
+import numpy as np
 try:
-  #import roca.lib.textureTools_stats as TTS
-  import constel.lib.connmatrix.connmatrixtools as CM
+    import constel.lib.connmatrix.connmatrixtools as CM
 except:
-  pass
-#import constel.lib.connmatrix.connmatrixtools as CM
+    pass
 
 def validation():
   try:
-    #import roca.lib.textureTools_stats as TTS
-    import constel.lib.connmatrix.connmatrixtools as CM
+      import constel.lib.connmatrix.connmatrixtools as CM
   except:
-    raise ValidationError( 'constel module is not available' )
+      raise ValidationError( 'constel module is not available' )
 
 name = 'Anatomist view reorder matrix from labeled texture'
 userLevel = 2
 roles = ( 'viewer', )
 
 signature = Signature(
-  'clustering_texture', ReadDiskItem( 'Group Clustering Texture', 'anatomist texture formats' ),
-  'connectivity_matrix', ReadDiskItem( 'Group matrix', 'aims readable volume formats' ),
-  'time_step', Integer(),
-  'transpose', Boolean(),
+    'clustering_texture', ReadDiskItem('Group Clustering Texture', 
+                                       'anatomist texture formats'),
+    'connectivity_matrix', ReadDiskItem('Group matrix', 
+                                        'aims readable volume formats'),
+    'time_step', Integer(),
+    'transpose', Boolean(),
 )
 
 def initialization( self ):
-  self.linkParameters( 'connectivity_matrix', 'clustering_texture' ) 
+    self.linkParameters('connectivity_matrix', 'clustering_texture') 
 
-def execution( self, context ):
-  a = ana.Anatomist()
-
-  matrix = aims.read( self.connectivity_matrix.fullPath() ) 
-  matrix = numpy.asarray( matrix )
-  matrix = matrix.reshape( matrix.shape[:2] )
-
-  clusters = aims.read( self.clustering_texture.fullPath() )
-  context.write( "clusters:", clusters )
-  
-  #if self.transpose is None:
-  matrix = matrix.T
-
-  labels = clusters[ self.time_step ].arraydata()[ clusters[ self.time_step ].arraydata() != 0 ]
-  context.write( "labels:", labels, "clusters[]", clusters[ self.time_step ].arraydata() )
-
-  order_mat, sortLabels = CM.orderDataMatrix( matrix, labels )
-  dissmatrix = CM.euclidianDistanceMatrix( order_mat )
-
-  ( n, p ) = order_mat.shape
-  ( i, j ) = dissmatrix.shape
-  lines_length = 100.0
-  cols_length = 80.0
-  row_thickness = 50
+def execution(self, context):
     
-  mat_ima = aims.Volume_FLOAT( n, p, 1, 1 )
-  mat_ima_array = mat_ima.arraydata()
-  mat_ima_array[0,0,:,:] = order_mat.transpose()
+    a = ana.Anatomist()
 
-  dissmat_ima = aims.Volume_FLOAT( i, j, 1, 1 )
-  dissmat_ima_array = dissmat_ima.arraydata()
-  dissmat_ima_array[ 0, 0, :, : ] = dissmatrix.transpose()
+    matrix = aims.read(self.connectivity_matrix.fullPath()) 
+    matrix = np.asarray(matrix)
+    matrix = matrix.reshape(matrix.shape[:2])
 
-  if n == p:
-    mat_ima.header()['voxel_size'] = aims.vector_FLOAT( [ lines_length/n, lines_length/p, 1, 1 ] )
-    dissmat_ima.header()['voxel_size'] = aims.vector_FLOAT( [ lines_length/i, lines_length/j, 1, 1 ] )
-  else:
-    mat_ima.header()['voxel_size'] = aims.vector_FLOAT( [ lines_length/n, cols_length/p, 1, 1 ] )
-    dissmat_ima.header()['voxel_size'] = aims.vector_FLOAT([lines_length/i, cols_length/j, 1, 1 ] )
+    clusters = aims.read(self.clustering_texture.fullPath())
+    context.write('clusters: ', clusters)
+    
+    matrix = matrix.T
 
-  labels_ima = aims.Volume_FLOAT( sortLabels.size, row_thickness, 1, 1 )
-  labels_ima_array = labels_ima.arraydata()
-  labels_ima.header()['voxel_size'] = aims.vector_FLOAT( [ lines_length/sortLabels.size, 1, 1, 1 ] )
-  for i in xrange( row_thickness ):
-    labels_ima_array[ 0, 0, i, : ] = sortLabels
+    labels = clusters[self.time_step].arraydata()[clusters[self.time_step ].arraydata() != 0]
+    context.write("labels:", labels, "clusters[]", clusters[self.time_step ].arraydata())
 
-  mat_ima = a.toAObject( mat_ima )
-  labels_ima = a.toAObject( labels_ima )
-  dissmat_ima = a.toAObject( dissmat_ima )
+    order_mat, sortLabels = CM.orderDataMatrix(matrix, labels)
+    dissmatrix = CM.euclidianDistanceMatrix(order_mat)
 
-  mat_ima.releaseAppRef()
-  labels_ima.releaseAppRef()
-  dissmat_ima.releaseAppRef()
-  
-  mat_ima.setPalette( palette = 'Blue - Pastel - Red' )
-  labels_ima.setPalette( palette = 'Blue - Pastel - Red' )
-  dissmat_ima.setPalette( palette = 'Blue - Pastel - Red' )
-  
-  wgroup = a.createWindowsBlock( nbCols = 2 )
-  win1 = a.createWindow( 'Axial', block = wgroup )
-  win2 = a.createWindow( 'Axial', block = wgroup )
-  win3 = a.createWindow( 'Axial', block = wgroup )
-  #win4 = a.createWindow( 'Axial', block = wgroup )
-  br = a.createWindow( 'Browser', block = wgroup )
-  win1.addObjects( mat_ima )
-  win2.addObjects( dissmat_ima )
-  win3.addObjects( labels_ima )
-  #win4.addObjects( [ mat_ima, labels_ima ] )
-  br.addObjects( [ mat_ima, dissmat_ima, labels_ima] )
+    (n, p) = order_mat.shape
+    (i, j) = dissmatrix.shape
+    lines_length = 100.0
+    cols_length = 80.0
+    row_thickness = 50
+        
+    mat_ima = aims.Volume_FLOAT(n, p, 1, 1)
+    mat_ima_array = mat_ima.arraydata()
+    mat_ima_array[0,0,:,:] = order_mat.transpose()
 
-  return [ win1, win2, win3, br, labels_ima, mat_ima, dissmat_ima ]
+    dissmat_ima = aims.Volume_FLOAT(i, j, 1, 1)
+    dissmat_ima_array = dissmat_ima.arraydata()
+    dissmat_ima_array[ 0, 0, :, : ] = dissmatrix.transpose()
+
+    if n == p:
+        mat_ima.header()['voxel_size'] = aims.vector_FLOAT([lines_length / n, lines_length / p, 1, 1])
+        dissmat_ima.header()['voxel_size'] = aims.vector_FLOAT([lines_length / i, lines_length / j, 1, 1])
+    else:
+        mat_ima.header()['voxel_size'] = aims.vector_FLOAT([lines_length / n, cols_length / p, 1, 1])
+        dissmat_ima.header()['voxel_size'] = aims.vector_FLOAT([lines_length / i, cols_length / j, 1, 1])
+
+    labels_ima = aims.Volume_FLOAT(sortLabels.size, row_thickness, 1, 1)
+    labels_ima_array = labels_ima.arraydata()
+    labels_ima.header()['voxel_size'] = aims.vector_FLOAT([lines_length / sortLabels.size, 1, 1, 1])
+    for i in xrange(row_thickness):
+        labels_ima_array[0, 0, i, :] = sortLabels
+
+    mat_ima = a.toAObject(mat_ima)
+    labels_ima = a.toAObject(labels_ima)
+    dissmat_ima = a.toAObject(dissmat_ima)
+
+    mat_ima.releaseAppRef()
+    labels_ima.releaseAppRef()
+    dissmat_ima.releaseAppRef()
+    
+    mat_ima.setPalette(palette = 'random')
+    labels_ima.setPalette(palette = 'random')
+    dissmat_ima.setPalette(palette = 'random')
+    
+    wgroup = a.createWindowsBlock(nbCols = 2)
+    win1 = a.createWindow('Axial', block = wgroup)
+    win2 = a.createWindow('Axial', block = wgroup)
+    win3 = a.createWindow('Axial', block = wgroup)
+    #win4 = a.createWindow('Axial', block = wgroup)
+    br = a.createWindow('Browser', block = wgroup)
+    win1.addObjects(mat_ima)
+    win2.addObjects(dissmat_ima)
+    win3.addObjects(labels_ima)
+    #win4.addObjects( [ mat_ima, labels_ima ] )
+    br.addObjects([mat_ima, dissmat_ima, labels_ima])
+
+    return [win1, win2, win3, br, labels_ima, mat_ima, dissmat_ima]
 

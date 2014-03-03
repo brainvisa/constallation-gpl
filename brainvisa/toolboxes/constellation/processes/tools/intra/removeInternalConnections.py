@@ -8,8 +8,9 @@ except:
 def validation():
   try:
     import soma.aims
+    import constel.lib.texturetools as cltt
   except:
-    raise ValidationError( 'module soma.aims is not here.' )
+    raise ValidationError( 'module is not here.' )
 
 name = 'Remove Internal Connections'
 userLevel = 2
@@ -53,7 +54,7 @@ def execution ( self, context ):
     pcparr[maskarr == int(gyrus)] = 0
   aims.write( pcp, self.thresholded_connectivity_profile.fullPath() )
 
-  dividende_coef = 0
+  #otex = cltt.normalized_texture(self.thresholded_connectivity_profile.fullPath())
   dividende_coef = pcparr.max()
   if dividende_coef > 0:
     z = 1./dividende_coef

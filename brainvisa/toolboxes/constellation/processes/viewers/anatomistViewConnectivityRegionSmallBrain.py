@@ -1,5 +1,4 @@
-#  This software and supporting documentation are distributed by
-#      Institut Federatif de Recherche 49
+# This software and supporting documentation are distributed by
 #      CEA/NeuroSpin, Batiment 145,
 #      91191 Gif-sur-Yvette cedex
 #      France
@@ -35,48 +34,49 @@ from brainvisa import anatomist as ana
 
 name = 'Anatomist view connectivity regions on small brain'
 userLevel = 0
-roles = ( 'viewer', )
+roles = ('viewer', )
 
 signature = Signature(
-  'bundles', ReadDiskItem( 'Fascicles bundles', 'Aims bundles' ),
-  'RawT1Image', ReadDiskItem('Raw T1 MRI', 'NIFTI-1 image'),
-  'dw_to_t1', ReadDiskItem( 'Transformation matrix', 'Transformation matrix' ),
-  'white_mesh', ReadDiskItem( 'BothAverageBrainWhite', 'anatomist mesh formats' ),
-  'clustering_texture', ReadDiskItem( 'Group Clustering Texture', 'anatomist texture formats' ),
+    'bundles', ReadDiskItem('Fascicles bundles', 'Aims bundles'),
+    'RawT1Image', ReadDiskItem('Raw T1 MRI', 'NIFTI-1 image'),
+    'dw_to_t1', ReadDiskItem('Transformation matrix', 'Transformation matrix'),
+    'white_mesh', ReadDiskItem('AimsBothWhite', 'anatomist mesh formats'),
+    'clustering_texture', ReadDiskItem('Group Clustering Texture', 'anatomist texture formats'),
 )
 
 def initialization( self ):
-  self.linkParameters( 'bundles', 'clustering_texture' )
-  self.linkParameters( 'dw_to_t1', 'RawT1Image' )
+    self.linkParameters('bundles', 'clustering_texture')
+    self.linkParameters('dw_to_t1', 'RawT1Image')
 
 
-def execution_mainthread( self, context ):
-  a = ana.Anatomist()
-  mesh = a.loadObject( self.white_mesh )
-  clusters = a.loadObject( self.clustering_texture )
-  bundles = a.loadObject( self.bundles )
-  t1 = a.loadObject( self.RawT1Image )
-  r = a.createReferential()
-  cr = a.centralRef
-  bundles.assignReferential(r)
-  a.loadTransformation(self.dw_to_t1.fullPath(), r, cr)
-  
-  connectivity = a.fusionObjects( [ mesh, clusters, bundles, t1 ],
-      method = 'FusionTexMeshImaAndBundlesToROIsAndBundlesGraphMethod' )
-  if connectivity is None:
-    raise ValueError( 'could not fusion objects - T1, mesh, texture and bundles' )
+def execution_mainthread(self, context):
+    a = ana.Anatomist()
+    mesh = a.loadObject(self.white_mesh)
+    clusters = a.loadObject(self.clustering_texture)
+    bundles = a.loadObject(self.bundles)
+    t1 = a.loadObject(self.RawT1Image)
+    r = a.createReferential()
+    mr = t1.referential
+    bundles.assignReferential(r)
+    mesh.assignReferential(mr)
+    a.loadTransformation(self.dw_to_t1.fullPath(), r, mr)
+    
+    connectivity = a.fusionObjects([ mesh, clusters, bundles, t1 ],
+        method = 'FusionTexMeshImaAndBundlesToROIsAndBundlesGraphMethod')
+    if connectivity is None:
+        raise ValueError('could not fusion objects - T1, mesh, texture and bundles')
 
-  wgroup = a.createWindowsBlock(nbCols=2)
-  win = a.createWindow('3D', block=wgroup)
-  win2 = a.createWindow('3D', block=wgroup)
-  br = a.createWindow('Browser', block=wgroup)
-  win.addObjects( connectivity )
-  br.addObjects( connectivity )
-  a.execute( 'SetControl', windows = [win], control = 'BundlesSelectionControl' )
-  action = win.view().controlSwitch().getAction( 'BundlesSelectionAction' )
-  action.secondaryView = win2
+    wgroup = a.createWindowsBlock(nbCols=2)
+    win = a.createWindow('3D', block=wgroup)
+    win2 = a.createWindow('3D', block=wgroup)
+    br = a.createWindow('Browser', block=wgroup)
+    win.addObjects(connectivity)
+    br.addObjects(connectivity)
+    a.execute('SetControl', windows = [win], control = 'BundlesSelectionControl')
+    action = win.view().controlSwitch().getAction('BundlesSelectionAction')
+    action.secondaryView = win2
 
-  return[win, win2, br, connectivity]
+    return[win, win2, br, connectivity, t1, bundles, clusters]
 
 def execution(self, context):
-  return mainThreadActions().call(self.execution_mainthread, context)
+    return mainThreadActions().call(self.execution_mainthread, context)

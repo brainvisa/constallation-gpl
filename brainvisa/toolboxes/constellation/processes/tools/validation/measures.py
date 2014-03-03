@@ -69,7 +69,7 @@ def execution ( self, context ):
   entropy2 = clcc.entropy( list2 )
 
   mi = cls.mutual_information( list1, list2 )
-  ri = cls.randIndex( list1, list2 )
+  ri = cls.rand_index( list1, list2 )
   
   homogeneity = mi / ( entropy1 )
   completeness = mi / ( entropy2 )
@@ -83,7 +83,7 @@ def execution ( self, context ):
   group1 = os.path.basename( os.path.dirname( os.path.dirname( os.path.dirname( os.path.dirname( os.path.dirname( os.path.dirname( os.path.dirname( self.clustering_1.fullPath() ) ) ) ) ) ) ) )
   group2 = os.path.basename( os.path.dirname( os.path.dirname( os.path.dirname( os.path.dirname( os.path.dirname( os.path.dirname( os.path.dirname( self.clustering_2.fullPath() ) ) ) ) ) ) ) )
   gyrus = os.path.basename( os.path.dirname( os.path.dirname( os.path.dirname( self.clustering_1.fullPath() ) ) ) )
-  scoreFile = str(self.directory.fullPath() ) + '/' + str(group1) + '_' + str(group2) + '_' + str(gyrus) + '_' + 'scoreFile.txt'
+  scoreFile = str(self.directory.fullPath() ) + '/' + str(group1) + '_' + str(group2) + '_step' + str(self.time_step) + '_'+ str(gyrus) + '_' + 'scoreFile.txt'
   
   fileR = open( scoreFile, 'w')
   fileR.write( 'Clustering 1 -----> ' + clus1 + '\n')

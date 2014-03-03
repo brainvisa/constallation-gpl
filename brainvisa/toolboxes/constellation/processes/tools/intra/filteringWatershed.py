@@ -101,6 +101,6 @@ def execution ( self, context ):
     if labelsToRemove_list.count( label ) == 0:
       labelsToRemove_list.append( label )
   
-  filteredWatershedBasins_tex = TT.removeLabelsFromTexture(
+  filteredWatershedBasins_tex = TT.remove_labels(
     subjectWatershedBasins_tex,labelsToRemove_list )
   aims.write( filteredWatershedBasins_tex, self.filtered_watershed.fullPath() )
