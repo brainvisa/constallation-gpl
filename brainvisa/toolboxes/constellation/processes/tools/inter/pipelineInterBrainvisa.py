@@ -1,37 +1,63 @@
+# -*- coding: utf-8 -*-
+############################################################################
+#  This software and supporting documentation are distributed by
+#      CEA/NeuroSpin, Batiment 145,
+#      91191 Gif-sur-Yvette cedex
+#      France
+# This software is governed by the CeCILL license version 2 under
+# French law and abiding by the rules of distribution of free software.
+# You can  use, modify and/or redistribute the software under the 
+# terms of the CeCILL license version 2 as circulated by CEA, CNRS
+# and INRIA at the following URL "http://www.cecill.info". 
+# As a counterpart to the access to the source code and  rights to copy,
+# modify and redistribute granted by the license, users are provided only
+# with a limited warranty  and the software's author,  the holder of the
+# economic rights,  and the successive licensors  have only  limited
+# liability.
+# In this respect, the user's attention is drawn to the risks associated
+# with loading,  using,  modifying and/or developing or reproducing the
+# software by the user in light of its specific status of free software,
+# that may mean  that it is complicated to manipulate,  and  that  also
+# therefore means  that it is reserved for developers  and  experienced
+# professionals having in-depth computer knowledge. Users are therefore
+# encouraged to load and test the software's suitability as regards their
+# requirements in conditions enabling the security of their systems and/or 
+# data to be ensured and,  more generally, to use and operate it in the 
+# same conditions as regards security.
+# The fact that you are presently reading this means that you have had
+# knowledge of the CeCILL license version 2 and that you accept its terms.
+############################################################################
+
 from brainvisa.processes import *
 
-def validation():
-  try:
+try:
     import constel
-  except:
-    raise ValidationError( 'constellation module is not here.' )
+except:
+    raise ValidationError('Please make sure that constel module is installed.')
 
-name = 'Brainvisa Constellation Inter Pipeline'
+name = 'Constellation inter-subject pipeline'
 userLevel = 2
 
 signature = Signature(
-  'study_name', String(),
-  'texture_ind', String(),
-  'texture_group', String(),
-  'patch_label', Integer(),
-  'smoothing', Float(),
-  'group', ReadDiskItem('Group definition', 'XML' ),
-  'average_mesh', ReadDiskItem( 'BothAverageBrainWhite', 
-                                'BrainVISA mesh formats' ),
-  'gyri_texture', ListOf( ReadDiskItem( 'FreesurferResampledBothParcellationType', 
-                                        'Aims texture formats' ) ),
+    'study_name', Choice('avg','concat'),
+    'texture_ind', String(),
+    'texture_group', String(),
+    'patch_label', Integer(),
+    'smoothing', Float(),
+    'group', ReadDiskItem('Group definition', 'XML'),
+    'average_mesh', ReadDiskItem('BothAverageBrainWhite', 
+                                 'BrainVISA mesh formats'),
+    'gyri_texture', ListOf(ReadDiskItem('FreesurferResampledBothParcellationType', 
+                                        'Aims texture formats')),
 )
 
-def linkGroup( self, param1 ):
-  print 'linkGroup', param1
-  print 'self:', self
+def linkGroup(self, param1):
+  self.smoothing = 3.0
   eNode = self.executionNode()
   for node in eNode.children():
-    print node.name()
     if node.name() == 'Parallel Node':
-      node.addChild( 'N%d' % len(list(node.children())), ProcessExecutionNode( 'createReducedConnectivityMatrixOnRangeOfSubjects',
-                  optional = 1) )
-      print 'added. Nb nodes:', len(list(node.children()))
+      node.addChild('N%d' % len(list(node.children())), ProcessExecutionNode( 'createReducedConnectivityMatrixOnRangeOfSubjects',
+                  optional = 1))
 
 def initialization( self ):
 
@@ -40,137 +66,108 @@ def initialization( self ):
   self.smoothing = 3.0
   eNode = SerialExecutionNode( self.name, parameterized=self )
 
-  ## 01 Surface With Enough Connections Creation InterSubjects
-  eNode.addChild( 'meanProfileInter',
-                  ProcessExecutionNode( 'surfaceWithEnoughConnectionsCreation',
-                  optional = 1 ) )
+  # link of parameters with teh "Creation of a mask" process
+  eNode.addChild('CreateMask',
+                 ProcessExecutionNode('surfaceWithEnoughConnectionsCreation',
+                 optional = 1))
 
-  eNode.addDoubleLink( 'meanProfileInter.study_name',
-                       'study_name' )
+  eNode.addDoubleLink('CreateMask.study_name',
+                      'study_name')
+  eNode.addDoubleLink('CreateMask.texture_ind',
+                      'texture_ind')
+  eNode.addDoubleLink('CreateMask.texture_group',
+                      'texture_group')                     
+  eNode.addDoubleLink('CreateMask.patch_label',
+                      'patch_label')
+  eNode.addDoubleLink('CreateMask.smoothing',
+                      'smoothing')
+  eNode.addDoubleLink('CreateMask.group',
+                      'group')
 
-  eNode.addDoubleLink( 'meanProfileInter.texture_ind',
-                       'texture_ind' )
+  # link of parameters with the "Connectivity Profile of Group" process
+  eNode.addChild('ConnectivityProfileGroup',
+                 ProcessExecutionNode('createConnectivityProfileOnRangeOfSubjects',
+                 optional = 1))
 
-  eNode.addDoubleLink( 'meanProfileInter.texture_group',
-                       'texture_group' )                     
+  eNode.addDoubleLink('ConnectivityProfileGroup.study_name',
+                      'study_name')
+  eNode.addDoubleLink('ConnectivityProfileGroup.texture_ind',
+                      'texture_ind')
+  eNode.addDoubleLink('ConnectivityProfileGroup.texture_group',
+                      'texture_group')
+  eNode.addDoubleLink('ConnectivityProfileGroup.patch_label',
+                      'patch_label') 
+  eNode.addDoubleLink('ConnectivityProfileGroup.smoothing',
+                      'smoothing')
+  eNode.addDoubleLink('ConnectivityProfileGroup.group',
+                      'group')
 
-  eNode.addDoubleLink( 'meanProfileInter.patch_label',
-                       'patch_label' )
-                       
-  eNode.addDoubleLink( 'meanProfileInter.smoothing',
-                       'smoothing' )
+  # link of parameters with the "Normed Connectivity Profile of Group" process
+  eNode.addChild('NormedProfileGroup',
+                 ProcessExecutionNode('removeInternalConnectionsOnRangeOfSubjects',
+                 optional = 1))
 
-  eNode.addDoubleLink( 'meanProfileInter.group',
-                       'group' )
+  eNode.addDoubleLink('NormedProfileGroup.mask',
+                      'CreateMask.mask')
+  eNode.addDoubleLink('NormedProfileGroup.connectivity_profiles',
+                      'ConnectivityProfileGroup.group_connectivity_profile')
 
-  ## 02 Combine All Subjects Mean Conectivity Profile
-  eNode.addChild( 'combineMeanInter',
-                  ProcessExecutionNode( 'createConnectivityProfileOnRangeOfSubjects',
-                  optional = 1 ) )
+  # link of parameters with the "Watershed of Group" process
+  eNode.addChild('WatershedGroup',
+                 ProcessExecutionNode('filteringWatershedOnRangeOfSubjects',
+                 optional = 1))
 
-  eNode.addDoubleLink( 'combineMeanInter.study_name',
-                       'study_name' )
+  eNode.addDoubleLink('WatershedGroup.average_mesh',
+                      'average_mesh')
+  eNode.addDoubleLink('WatershedGroup.normed_connectivity_profile',
+                      'NormedProfileGroup.normed_connectivity_profile')
 
-  eNode.addDoubleLink( 'combineMeanInter.texture_ind',
-                       'texture_ind' )
+  # link of parameters with the "Reduced Connectivity Matrix" process
+  eNode.addChild('ReducedMatrixGroup',
+                 ProcessExecutionNode('createReducedConnectivityMatrixOnRangeOfSubjects',
+                 optional = 1))
 
-  eNode.addDoubleLink( 'combineMeanInter.texture_group',
-                       'texture_group' )
+  eNode.addDoubleLink('ReducedMatrixGroup.study_name',
+                      'study_name')
+  eNode.addDoubleLink('ReducedMatrixGroup.texture_ind',
+                      'texture_ind')
+  eNode.addDoubleLink('ReducedMatrixGroup.texture_group',
+                      'texture_group')
+  eNode.addDoubleLink('ReducedMatrixGroup.patch_label',
+                      'patch_label')
+  eNode.addDoubleLink('ReducedMatrixGroup.smoothing',
+                      'smoothing')                     
+  eNode.addDoubleLink('ReducedMatrixGroup.group',
+                      'group')
+  eNode.addDoubleLink('ReducedMatrixGroup.average_mesh',
+                      'average_mesh')
+  eNode.addDoubleLink('ReducedMatrixGroup.gyri_texture',
+                      'gyri_texture')
+  eNode.addDoubleLink('ReducedMatrixGroup.filtered_watershed',
+                      'WatershedGroup.filtered_watershed')
 
-  eNode.addDoubleLink( 'combineMeanInter.patch_label',
-                       'patch_label' )
-                       
-  eNode.addDoubleLink( 'combineMeanInter.smoothing',
-                       'smoothing' )
+  # link of parameters with the "Clustering of Group" process
+  eNode.addChild('ClusteringGroup',
+                 ProcessExecutionNode('clusteringInterSubjects',
+                 optional = 1))
 
-  eNode.addDoubleLink( 'combineMeanInter.group',
-                       'group' )
+  eNode.addDoubleLink('ClusteringGroup.study_name',
+                      'study_name')
+  eNode.addDoubleLink('ClusteringGroup.texture_ind',
+                      'texture_ind')
+  eNode.addDoubleLink('ClusteringGroup.texture_group',
+                      'texture_group')
+  eNode.addDoubleLink('ClusteringGroup.patch_label',
+                      'patch_label')
+  eNode.addDoubleLink('ClusteringGroup.smoothing',
+                      'smoothing')
+  eNode.addDoubleLink('ClusteringGroup.group',
+                      'group')
+  eNode.addDoubleLink('ClusteringGroup.average_mesh',
+                      'average_mesh')
+  eNode.addDoubleLink('ClusteringGroup.gyri_texture',
+                      'ReducedMatrixGroup.gyri_texture')
+  eNode.addDoubleLink('ClusteringGroup.reduced_connectivity_matrix',
+                      'ReducedMatrixGroup.reduced_connectivity_matrix')
 
-  ## 03 Thresholding Average Mean Connectivity Profile
-  eNode.addChild( 'meanInter',
-                  ProcessExecutionNode( 'removeInternalConnectionsOnRangeOfSubjects',
-                  optional = 1 ) )
-
-  eNode.addDoubleLink( 'meanInter.mask',
-                       'meanProfileInter.mask' )
-
-  eNode.addDoubleLink( 'meanInter.connectivity_profiles',
-                       'combineMeanInter.group_connectivity_profile' )
-
-  ## 04 Watershed On Normed Smoothed InterSubjects
-  eNode.addChild( 'watershedInter',
-                  ProcessExecutionNode( 'filteringWatershedOnRangeOfSubjects',
-                  optional = 1 ) )
-
-  eNode.addDoubleLink( 'watershedInter.average_mesh',
-                       'average_mesh' )
-
-  eNode.addDoubleLink( 'watershedInter.normed_connectivity_profile',
-                       'meanInter.normed_connectivity_profile' )
-
-  ## 05 Connectivity Matrix to Watershed Bassins InterSubjects
-  eNode.addChild( 'connMatrixBasinInter',
-                  ProcessExecutionNode( 'createReducedConnectivityMatrixOnRangeOfSubjects',
-                  optional = 1 ) )
-
-  eNode.addDoubleLink( 'connMatrixBasinInter.study_name',
-                       'study_name' )
-
-  eNode.addDoubleLink( 'connMatrixBasinInter.texture_ind',
-                       'texture_ind' )
-
-  eNode.addDoubleLink( 'connMatrixBasinInter.texture_group',
-                       'texture_group' )
-
-  eNode.addDoubleLink( 'connMatrixBasinInter.patch_label',
-                       'patch_label' )
-                       
-  eNode.addDoubleLink( 'connMatrixBasinInter.smoothing',
-                       'smoothing' )                     
-
-  eNode.addDoubleLink( 'connMatrixBasinInter.group',
-                       'group' )
-
-  eNode.addDoubleLink( 'connMatrixBasinInter.average_mesh',
-                       'average_mesh' )
-
-  eNode.addDoubleLink( 'connMatrixBasinInter.gyri_texture',
-                       'gyri_texture' )
-
-  eNode.addDoubleLink( 'connMatrixBasinInter.filtered_watershed',
-                       'watershedInter.filtered_watershed' )
-
-  ## 06 Clustering InterSubjects
-  eNode.addChild( 'clusteringInter',
-                  ProcessExecutionNode( 'clusteringInterSubjects',
-                  optional = 1 ) )
-
-  eNode.addDoubleLink( 'clusteringInter.study_name',
-                       'study_name' )
-
-  eNode.addDoubleLink( 'clusteringInter.texture_ind',
-                       'texture_ind' )
-
-  eNode.addDoubleLink( 'clusteringInter.texture_group',
-                       'texture_group' )
-
-  eNode.addDoubleLink( 'clusteringInter.patch_label',
-                       'patch_label' )
-                       
-  eNode.addDoubleLink( 'clusteringInter.smoothing',
-                       'smoothing' )
-  
-  eNode.addDoubleLink( 'clusteringInter.group',
-                       'group' )
-
-  #eNode.addDoubleLink( 'clusteringInter.patch_label',
-                       #'patch_label' )
-
-  eNode.addDoubleLink( 'clusteringInter.average_mesh',
-                       'average_mesh' )
-  eNode.addDoubleLink( 'clusteringInter.gyri_texture',
-                       'connMatrixBasinInter.gyri_texture' )
-  eNode.addDoubleLink( 'clusteringInter.reduced_connectivity_matrix',
-                       'connMatrixBasinInter.reduced_connectivity_matrix' )
-
-  self.setExecutionNode( eNode )
+  self.setExecutionNode(eNode)
