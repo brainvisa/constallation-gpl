@@ -33,45 +33,32 @@
 ############################################################################
 
 from brainvisa.processes import *
-import matplotlib.pyplot as plt
-import numpy as np
-import glob
+import constel.lib.visutools as clv
 
 signature = Signature(
-    'rand_index_files', ListOf(ReadDiskItem('Directory', 'Directory')),
+    'measures_files', ListOf(ReadDiskItem('Directory', 'Directory')),
     'k_max', Integer(),
+    'rand_index', Boolean(),
+    'cramer_V', Boolean(),
+    'V_measure', Boolean(),
+    'mutual_information', Boolean(),  
 )
 
 def initialization(self):
-    pass
+    self.rand_index = True
+    self.cramer_V = True
+    self.V_measure = True
+    self.mutual_information = True
 
 def execution(self, context):
-    # finds all the pathnames matching a specified pattern
-    for i in range(len(self.rand_index_files)):
-        inputs = glob.glob(self.rand_index_files[i].fullPath() + '/*.npy')
-    
-        couleurs = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
-        partition = ['A', 'B', 'C']
-    
-        rand_index_fig = plt.figure()
-        axarr = plt.subplots(2, 2)
-        j = 0
-        for infile in inputs:
-            plt.plot(range(2, self.k_max + 1), np.loadtxt(infile), couleurs[j], label=("partition_" + partition[j]))
-            plt.plot(range(2, self.k_max + 1), np.loadtxt(infile), couleurs[j] + 'o')
-            plt.ylabel('Rand Index')
-            plt.xlabel('Clusters (K)')
-            gyrus = os.path.basename(self.rand_index_files[i].fullPath())
-            rand_index_fig.suptitle(gyrus)
-            plt.legend()
-            j += 1
-        output_fig = os.path.join(self.rand_index_files[i].fullPath(), "rand_index.svg")
-        rand_index_fig.savefig(output_fig)
-        
-        
-    #f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex='col', sharey='row')
-    #ax1.plot(listof_fig[0])
-    #ax2.plot(listof_fig[1])
-    #ax3.plot(listof_fig[2])
-    #ax4.plot(listof_fig[3])
-    
+    if self.rand_index:
+        clv.plot_measures(self.measures_files, self.k_max, 'rand_index')
+    if self.cramer_V:
+        clv.plot_measures(self.measures_files, self.k_max, 'cramer_V')
+    if self.V_measure:
+        clv.plot_measures(self.measures_files, self.k_max, 'v_measure')
+    if self.mutual_information:
+        clv.plot_measures(self.measures_files, self.k_max, 'mutual_information')
+    #input_dir = os.path.dirname(self.measures_files[0].fullPath())
+    #print input_dir
+    #clv.thumbnails(input_dir)
