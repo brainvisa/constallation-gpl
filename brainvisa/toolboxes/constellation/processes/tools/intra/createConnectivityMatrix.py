@@ -34,6 +34,9 @@
 # BrainVisa module
 from brainvisa.processes import *
 
+# System module
+import warnings
+
 # Plot constel module
 try:
     import constel

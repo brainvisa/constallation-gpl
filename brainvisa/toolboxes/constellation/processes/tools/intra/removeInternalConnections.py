@@ -34,6 +34,9 @@
 # BrainVisa module
 from brainvisa.processes import *
 
+# System module
+import warnings
+
 # Plot aims module
 try:
   from soma import aims

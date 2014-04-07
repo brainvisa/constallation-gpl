@@ -1,62 +1,83 @@
 # -*- coding: utf-8 -*-
+############################################################################
+#  This software and supporting documentation are distributed by
+#      CEA/NeuroSpin, Batiment 145,
+#      91191 Gif-sur-Yvette cedex
+#      France
+# This software is governed by the CeCILL license version 2 under
+# French law and abiding by the rules of distribution of free software.
+# You can  use, modify and/or redistribute the software under the 
+# terms of the CeCILL license version 2 as circulated by CEA, CNRS
+# and INRIA at the following URL "http://www.cecill.info". 
+
+# As a counterpart to the access to the source code and  rights to copy,
+# modify and redistribute granted by the license, users are provided only
+# with a limited warranty  and the software's author,  the holder of the
+# economic rights,  and the successive licensors  have only  limited
+# liability.
+
+# In this respect, the user's attention is drawn to the risks associated
+# with loading,  using,  modifying and/or developing or reproducing the
+# software by the user in light of its specific status of free software,
+# that may mean  that it is complicated to manipulate,  and  that  also
+# therefore means  that it is reserved for developers  and  experienced
+# professionals having in-depth computer knowledge. Users are therefore
+# encouraged to load and test the software's suitability as regards their
+# requirements in conditions enabling the security of their systems and/or 
+# data to be ensured and,  more generally, to use and operate it in the 
+# same conditions as regards security.
+
+# The fact that you are presently reading this means that you have had
+# knowledge of the CeCILL license version 2 and that you accept its terms.
+############################################################################
+
+# BrainVisa modules
 from brainvisa.processes import *
 from soma.path import find_in_path
 
+# Plot constel module
 def validation():
-  if not find_in_path( 'constelIntraSubjectClustering.py' ):
-    raise ValidationError( 'constellation module is not here.' )
+    if not find_in_path('constelIntraSubjectClustering.py'):
+        raise ValidationError('Please make sure that constel module is installed.')
 
 name = 'Clustering'
 userLevel = 2
 
+# Argument declaration
 signature = Signature(
-  'reduced_connectivity_matrix', ReadDiskItem( 'Reduced Connectivity Matrix', 
-                                               'GIS image' ),
-  'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 
-                                'Aims texture formats' ),
-  'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
-  #'areaMin_threshold', Integer(),
-  'gyrus', Integer(),
-  'kmax', Integer(),                
-  #'clustering_kopt', WriteDiskItem( 'Clustering kOpt', 'Aims texture formats' ),
-  'clustering_time', WriteDiskItem( 'Clustering Time', 'Aims texture formats' ),
-  #'clustering_k_medoids', WriteDiskItem( 'Patch Clustering Time', 'Aims texture formats' ),
-  #'clustering_silhouette', WriteDiskItem( 'Clustering Silhouette Time', 'Aims texture formats' ),
-  #'clustering_vertex_silhouette', WriteDiskItem( 'Clustering Vertex Silhouette Time', 'Aims texture formats' ),
-  #'clustering_result_gyrus', WriteDiskItem( 'Gyrus Clustering Result', 'Text file' ),
-  #'clustering_result_full', WriteDiskItem( 'Full Clustering Result', 'Text file' ),      
+    'reduced_connectivity_matrix', ReadDiskItem('Reduced Connectivity Matrix', 
+                                                'GIS image'),
+    'gyri_texture', ReadDiskItem('FreesurferResampledBothParcellationType', 
+                                'Aims texture formats'),
+    'white_mesh', ReadDiskItem('AimsBothWhite', 'Aims mesh formats'),
+    'patch', Integer(),
+    'kmax', Integer(),                
+    'clustering_time', WriteDiskItem('Clustering Time', 'Aims texture formats'),  
 )
 
-def initialization ( self ):
-  #self.areaMin_threshold = 400.0
-  self.kmax = 10
-  self.setOptional( 'gyrus' )
-  self.linkParameters( 'clustering_time', 'reduced_connectivity_matrix' )
-  #self.linkParameters( 'clustering_time', 'clustering_kopt' )
-  #self.linkParameters( 'clustering_k_medoids', 'clustering_time' )
-  #self.linkParameters( 'clustering_silhouette', 'clustering_k_medoids' )
-  #self.linkParameters( 'clustering_vertex_silhouette', 'clustering_silhouette' )
-  #self.linkParameters( 'clustering_result_gyrus','reduced_connectivity_matrix' )
-  #self.linkParameters( 'clustering_result_full','reduced_connectivity_matrix' )
-  self.linkParameters( 'gyri_texture', 'white_mesh' )
+# Default values
+def initialization(self):
+    self.kmax = 12
+    self.setOptional('patch')
+    self.linkParameters('clustering_time', 'reduced_connectivity_matrix')
+    self.linkParameters('gyri_texture', 'white_mesh')
 
-def execution ( self, context ):
-  if self.gyrus is not None:
-    gyrus = self.gyrus # keep internal connections, put 0
-  else:
-    gyrus = os.path.basename( os.path.dirname( os.path.dirname( os.path.dirname( self.reduced_connectivity_matrix.fullPath() ) ) ) )
-    gyrus = gyrus.strip('G')
-  context.system( sys.executable, find_in_path( 'constelIntraSubjectClustering.py' ),
-    '-m', self.reduced_connectivity_matrix,
-    '-p', gyrus,
-    '-g', self.gyri_texture,
-    '-w', self.white_mesh,
-    '-a', self.kmax,
-    #'-k', self.clustering_kopt,
-    '-t', self.clustering_time
-    #'-d', self.clustering_k_medoids,
-    #'-s', self.clustering_silhouette,
-    #'-l', self.clustering_vertex_silhouette,
-    #'-r', self.clustering_result_gyrus
-    #'-f', self.clustering_result_full
+def execution(self, context):
+    # provides the patch name
+    if self.patch is not None:
+        patch = self.patch # keep internal connections, put 0
+    else:
+        patch = os.path.basename(os.path.dirname(os.path.dirname(
+            os.path.dirname( self.reduced_connectivity_matrix.fullPath()))))
+        patch = patch.strip('G')
+    
+    # the reduced connectivity matrix is clustered using the kmedoids algorithm
+    context.system( sys.executable, find_in_path( 'constelIntraSubjectClustering.py' ),
+        '-m', self.reduced_connectivity_matrix,
+        '-p', patch,
+        '-g', self.gyri_texture,
+        '-w', self.white_mesh,
+        '-a', self.kmax,
+        '-t', self.clustering_time
+
   )

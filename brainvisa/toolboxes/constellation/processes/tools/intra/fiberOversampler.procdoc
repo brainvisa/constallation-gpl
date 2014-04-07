@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Fibers tracts are oversampled to attach its end with the cortical surface.</xhtml>
+    <d name="parameters">
+      <xhtml name="oversampled_distant_fibers"/>
+      <xhtml name="filtered_length_distant_fibers"/>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>
