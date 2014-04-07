@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Cortical connectivity profile computation.</xhtml>
+    <d name="parameters">
+      <xhtml name="patch_connectivity_profile"/>
+      <xhtml name="patch"/>
+      <xhtml name="gyri_texture"/>
+      <xhtml name="complete_connectivity_matrix"/>
+    </d>
+    <xhtml name="long">In each matrix, the ith line corresponds to the cortical connectivity profile of the ith point of the patch, representing its connexions towards each point of the cortical surface. Then, several profiles is averaged across all patch points. So, the connectivity profile of the patch is computed.</xhtml>
+  </d>
+</d>
+</minf>

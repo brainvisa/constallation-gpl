@@ -53,12 +53,12 @@ signature = Signature(
         'Connectivity Matrix Outside Fibers Of Cortex', 
         'Matrix sparse'),
     'gyri_texture', ReadDiskItem('FreesurferResampledBothParcellationType', 
-                                 'Aims texture formats' ),
-    'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
+                                 'Aims texture formats'),
+    'white_mesh', ReadDiskItem('AimsBothWhite', 'Aims mesh formats'),
     'smoothing', Float(),
     'patch', Integer(),
     'complete_connectivity_matrix', WriteDiskItem('Gyrus Connectivity Matrix', 
-                                                  'Matrix sparse' ),
+                                                  'Matrix sparse'),
 )
 
 # Default values

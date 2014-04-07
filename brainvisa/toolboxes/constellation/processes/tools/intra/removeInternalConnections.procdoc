@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Remove internals connection of patch and normalization of profile.</xhtml>
+    <d name="parameters">
+      <xhtml name="gyri_texture"/>
+      <xhtml name="normed_connectivity_profile"/>
+      <xhtml name="patch_connectivity_profile"/>
+      <xhtml name="patch"/>
+      <xhtml name="thresholded_connectivity_profile"/>
+      <xhtml name="white_mesh"/>
+    </d>
+    <xhtml name="long">The connectivity profile is normalized by the number of tracts reaching the patch.</xhtml>
+  </d>
+</d>
+</minf>
