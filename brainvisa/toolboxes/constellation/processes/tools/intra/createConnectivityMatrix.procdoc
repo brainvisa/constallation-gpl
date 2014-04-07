@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Connectivity matrices computation</xhtml>
+    <d name="parameters">
+      <xhtml name="gyri_texture"/>
+      <xhtml name="dw_to_t1"/>
+      <xhtml name="profile_of_distant_fibers"/>
+      <xhtml name="matrix_of_distant_fibers"/>
+      <xhtml name="oversampled_distant_fibers">One end only of fibers is known because this file is mostly concerned with fibers leaving the brain stem.</xhtml>
+      <xhtml name="patch"/>
+      <xhtml name="matrix_of_fibers_near_cortex"/>
+      <xhtml name="filtered_length_fibers_near_cortex">Both ends of fibers are well known.</xhtml>
+      <xhtml name="profile_of_fibers_near_cortex"/>
+      <xhtml name="white_mesh"/>
+    </d>
+    <xhtml name="long">The cortical connectivity matrix of given patch is computed using tractography results and its individual cortical surface. This connectivity matrix is computed by counting fibers connecting cells of the patch to all others cells.</xhtml>
+  </d>
+</d>
+</minf>
