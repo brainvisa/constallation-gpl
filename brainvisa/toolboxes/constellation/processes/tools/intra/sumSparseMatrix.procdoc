@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Smoothing on the connectivity matrix resulting from the addition of two matrices. </xhtml>
+    <d name="parameters">
+      <xhtml name="gyri_texture"/>
+      <xhtml name="matrix_of_distant_fibers"/>
+      <xhtml name="smoothing">in millimetres</xhtml>
+      <xhtml name="matrix_of_fibers_near_cortex"/>
+      <xhtml name="complete_connectivity_matrix">complete connectivity matrix of size (patch vertices, cortex vertices)</xhtml>
+      <xhtml name="patch"/>
+      <xhtml name="white_mesh"/>
+    </d>
+    <xhtml name="long">There are two matrices, ones for each type of fibers (near or distant of cortex),  and subsequently summed to give complete connectivity matrix (patch vertices, cortex vertices) .
+This connectivity matrix is then smoothed over the surface by solving the heat equation.</xhtml>
+  </d>
+</d>
+</minf>
