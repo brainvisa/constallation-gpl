@@ -1,6 +1,5 @@
 from brainvisa.processes import *
 from soma.path import find_in_path
-import constel.lib.clustervalidity as cv
 import constel.lib.plot as p
 import numpy as np
 import pylab
@@ -20,7 +19,7 @@ class MatplotlibFig( object ):
     self._fig = fig
   def __del__( self ):
     mainThreadActions().call( pylab.close, self._fig )
-
+    
 def initialization ( self ):
   self.kmax = 12
   self.nbIter = 100

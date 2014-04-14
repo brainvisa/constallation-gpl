@@ -41,7 +41,10 @@ import numpy as np
 
 # Constellation
 from constel.lib.misctools import sameNbElements
-from constel.lib.clustering.clusterstools import entropy
+try:
+  from constel.lib.clustering.clusterstools import entropy
+except:
+  pass
 import constel.lib.measuringtools as measure
 
 name = 'Scores'
@@ -59,6 +62,9 @@ signature = Signature(
 def mkdir_path(path):
     if not os.access(path, os.F_OK):
         os.makedirs(path)
+        
+def validate(self):
+  from constel.lib.clustering.clusterstools import entropy
            
 def initialization (self):
     pass

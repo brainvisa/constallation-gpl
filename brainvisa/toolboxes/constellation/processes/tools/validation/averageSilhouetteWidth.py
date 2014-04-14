@@ -31,7 +31,11 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from brainvisa.processes import *
-import constel.lib.clustervalidity as cv
+try :
+  import constel.lib.clustervalidity as cv
+except :
+  pass
+
 import constel.lib.plot as p
 import numpy as np
 import pylab
@@ -50,6 +54,9 @@ class MatplotlibFig( object ):
   def __del__( self ):
     mainThreadActions().call( pylab.close, self._fig )
 
+def validate( self ):
+  import constel.lib.clustervalidity as cv
+  
 def initialization ( self ):
   self.kmax = 10
 
