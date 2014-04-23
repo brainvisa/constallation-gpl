@@ -39,7 +39,8 @@ from soma.path import find_in_path
 def validation():
     if not find_in_path('AimsSumSparseMatrix') \
         or not find_in_path('AimsSparseMatrixSmoothing'):
-            raise ValidationError('Please make sure that constel module is installed.')
+            raise ValidationError('Please make sure that constel module'
+                                  'is installed.')
 
 name = 'Smoothing Matrix'
 userLevel = 2

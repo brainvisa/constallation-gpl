@@ -81,7 +81,6 @@ signature = Signature(
         ('right temporal pole', 70), ('right transverse temporal', 71), 
         ('right insula', 72)
                   ),
-    'texture_ind', String(),
     'texture_group', String(),
     'gyri_texture', ListOf(
                     ReadDiskItem('FreesurferResampledBothParcellationType', 
@@ -137,12 +136,10 @@ def initialization(self):
                    ProcessExecutionNode('pipelineInterBrainvisa',
                    optional = 1))
 
-    eNode.addDoubleLink('ConstellationInter.study_name',
+    eNode.addDoubleLink('ConstellationInter.study',
                         'study')
     eNode.addDoubleLink('ConstellationInter.patch_label',
                         'patch')
-    eNode.addDoubleLink('ConstellationInter.texture_ind',
-                        'texture_ind')
     eNode.addDoubleLink('ConstellationInter.texture_group',
                         'texture_group')
     eNode.addDoubleLink('ConstellationInter.group',

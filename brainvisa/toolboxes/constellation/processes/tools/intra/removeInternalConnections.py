@@ -42,7 +42,7 @@ try:
   from soma import aims
   import soma.aims
 except:
-  warnings.warn('Please make sure that aims module is installed.' )
+  warnings.warn('Please make sure that aims module is installed.')
 
 name = 'Remove Internal Connections'
 userLevel = 2
@@ -57,7 +57,7 @@ signature = Signature(
     'patch', Integer(),
     'normed_connectivity_profile', WriteDiskItem(
          'Normed Connectivity Profile', 
-         'Aims texture formats' ),
+         'Aims texture formats'),
 )
 
 # Default values

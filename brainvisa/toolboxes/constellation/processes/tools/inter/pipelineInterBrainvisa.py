@@ -28,8 +28,10 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 ############################################################################
 
+# BrainVisa module
 from brainvisa.processes import *
 
+# Plot constel module
 try:
     import constel
 except:
@@ -39,8 +41,7 @@ name = 'Constellation inter-subject pipeline'
 userLevel = 2
 
 signature = Signature(
-    'study_name', Choice('avg','concat'),
-    'texture_ind', String(),
+    'study', Choice('avg','concat'),
     'texture_group', String(),
     'patch_label', Choice(
         ('left bankssts', 1), ('left caudal anterior cingulate', 2),
@@ -108,10 +109,8 @@ def initialization( self ):
                  ProcessExecutionNode('surfaceWithEnoughConnectionsCreation',
                  optional = 1))
 
-  eNode.addDoubleLink('CreateMask.study_name',
-                      'study_name')
-  eNode.addDoubleLink('CreateMask.texture_ind',
-                      'texture_ind')
+  eNode.addDoubleLink('CreateMask.study',
+                      'study')
   eNode.addDoubleLink('CreateMask.texture_group',
                       'texture_group')                     
   eNode.addDoubleLink('CreateMask.patch_label',
@@ -126,10 +125,8 @@ def initialization( self ):
                  ProcessExecutionNode('createConnectivityProfileOnRangeOfSubjects',
                  optional = 1))
 
-  eNode.addDoubleLink('ConnectivityProfileGroup.study_name',
-                      'study_name')
-  eNode.addDoubleLink('ConnectivityProfileGroup.texture_ind',
-                      'texture_ind')
+  eNode.addDoubleLink('ConnectivityProfileGroup.study',
+                      'study')
   eNode.addDoubleLink('ConnectivityProfileGroup.texture_group',
                       'texture_group')
   eNode.addDoubleLink('ConnectivityProfileGroup.patch_label',
@@ -164,10 +161,8 @@ def initialization( self ):
                  ProcessExecutionNode('createReducedConnectivityMatrixOnRangeOfSubjects',
                  optional = 1))
 
-  eNode.addDoubleLink('ReducedMatrixGroup.study_name',
-                      'study_name')
-  eNode.addDoubleLink('ReducedMatrixGroup.texture_ind',
-                      'texture_ind')
+  eNode.addDoubleLink('ReducedMatrixGroup.study',
+                      'study')
   eNode.addDoubleLink('ReducedMatrixGroup.texture_group',
                       'texture_group')
   eNode.addDoubleLink('ReducedMatrixGroup.patch_label',
@@ -188,10 +183,8 @@ def initialization( self ):
                  ProcessExecutionNode('clusteringInterSubjects',
                  optional = 1))
 
-  eNode.addDoubleLink('ClusteringGroup.study_name',
-                      'study_name')
-  eNode.addDoubleLink('ClusteringGroup.texture_ind',
-                      'texture_ind')
+  eNode.addDoubleLink('ClusteringGroup.study',
+                      'study')
   eNode.addDoubleLink('ClusteringGroup.texture_group',
                       'texture_group')
   eNode.addDoubleLink('ClusteringGroup.patch_label',

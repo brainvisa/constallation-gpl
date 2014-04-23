@@ -51,19 +51,19 @@ userLevel = 2
 
 # Argument declaration
 signature = Signature(
-    'complete_connectivity_matrix', ReadDiskItem( 'Gyrus Connectivity Matrix', 
-                                                    'Matrix sparse' ),
-    'watershed', ReadDiskItem( 'Watershed Texture', 'Aims texture formats' ),
-    'gyri_texture', ReadDiskItem( 'FreesurferResampledBothParcellationType', 
-                                    'Aims texture formats' ),
-    'white_mesh', ReadDiskItem( 'AimsBothWhite', 'Aims mesh formats' ),
+    'complete_connectivity_matrix', ReadDiskItem('Gyrus Connectivity Matrix', 
+                                                 'Matrix sparse'),
+    'watershed', ReadDiskItem('Watershed Texture', 'Aims texture formats'),
+    'gyri_texture', ReadDiskItem('FreesurferResampledBothParcellationType', 
+                                 'Aims texture formats'),
+    'white_mesh', ReadDiskItem('AimsBothWhite', 'Aims mesh formats'),
     'patch', Integer(),
-    'sum_vertices_patch', WriteDiskItem( 'Sum Values From Region', 
-                                        'Aims texture formats' ),
-    'duplication_value_patch', WriteDiskItem( 'Spread Value On Region', 
-                                                'Aims texture formats' ),
-    'filtered_watershed', WriteDiskItem( 'Filtered Watershed', 
-                                        'Aims texture formats' ),
+    'sum_vertices_patch', WriteDiskItem('Sum Values From Region', 
+                                        'Aims texture formats'),
+    'duplication_value_patch', WriteDiskItem('Spread Value On Region', 
+                                             'Aims texture formats'),
+    'filtered_watershed', WriteDiskItem('Filtered Watershed', 
+                                        'Aims texture formats'),
 )
 
 # Default values
