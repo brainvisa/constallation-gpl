@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Selection of tracking fibers according to a white matter mesh with label texture.</xhtml>
+    <d name="parameters">
+      <xhtml name="max_length_of_fibers_near_cortex"/>
+      <xhtml name="min_distant_fibers_length"/>
+      <xhtml name="gyri_texture"/>
+      <xhtml name="max_distant_fibers_length"/>
+      <xhtml name="dw_to_t1"/>
+      <xhtml name="min_length_of_fibers_near_cortex"/>
+      <xhtml name="database">Ontology: brainvisa-3.2.0</xhtml>
+      <xhtml name="study">There are two possibilities at the moment: Averaged or Concatenated study.
+</xhtml>
+      <xhtml name="texture">Name the texture (total freedom of choice). For instance, "fs01to40"  corresponds exactly to the freesurfer texture for the group of subjects: 001 to 040.</xhtml>
+      <xhtml name="patch">Labels used to select a region was on subdivision into gyri of FreeSurfer.
+For instance, postcentral gyrus corresponds to 23.</xhtml>
+      <xhtml name="listOf_subsets_of_tract"/>
+      <xhtml name="subsets_of_fibers_near_cortex"/>
+      <xhtml name="subsets_of_distant_fibers"/>
+      <xhtml name="white_mesh"/>
+      <xhtml name="subset_of_tract">The connectivity data are only in bundles format (Connectomist software) at the moment.</xhtml>
+      <xhtml name="subject"/>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>
