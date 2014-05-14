@@ -37,11 +37,13 @@ userLevel = 0
 roles = ('viewer', )
 
 signature = Signature(
-    'bundles', ReadDiskItem('Fascicles bundles', 'Aims bundles'),
+    'bundles', ListOf(ReadDiskItem('Fascicles bundles', 'Aims bundles')),
     'RawT1Image', ReadDiskItem('Raw T1 MRI', 'NIFTI-1 image'),
     'dw_to_t1', ReadDiskItem('Transformation matrix', 'Transformation matrix'),
     'white_mesh', ReadDiskItem('AimsBothWhite', 'anatomist mesh formats'),
-    'clustering_texture', ReadDiskItem('Group Clustering Texture', 'anatomist texture formats'),
+    'clustering_texture', ListOf(ReadDiskItem('Group Clustering Texture', 
+                                              'anatomist texture formats')),
+    'texture_hbm', String(),
 )
 
 def initialization( self ):
@@ -52,31 +54,43 @@ def initialization( self ):
 def execution_mainthread(self, context):
     a = ana.Anatomist()
     mesh = a.loadObject(self.white_mesh)
-    clusters = a.loadObject(self.clustering_texture)
-    bundles = a.loadObject(self.bundles)
     t1 = a.loadObject(self.RawT1Image)
     r = a.createReferential()
     mr = t1.referential
-    bundles.assignReferential(r)
     mesh.assignReferential(mr)
-    a.loadTransformation(self.dw_to_t1.fullPath(), r, mr)
+    toto = []
+    tutu = []
+    for ct, bundles_name in enumerate(self.bundles):
+        clusters = a.loadObject(self.clustering_texture[ct])
+        context.write(ct)
+        bundles = a.loadObject(bundles_name)
+        bundles.assignReferential(r)
     
-    connectivity = a.fusionObjects([ mesh, clusters, bundles, t1 ],
-        method = 'FusionTexMeshImaAndBundlesToROIsAndBundlesGraphMethod')
-    if connectivity is None:
-        raise ValueError('could not fusion objects - T1, mesh, texture and bundles')
-
+        a.loadTransformation(self.dw_to_t1.fullPath(), r, mr)
+    
+        connectivity = a.fusionObjects([ mesh, clusters, bundles, t1 ],
+            method = 'FusionTexMeshImaAndBundlesToROIsAndBundlesGraphMethod')
+        if connectivity is None:
+            raise ValueError('could not fusion objects - T1, mesh, texture and bundles')
+        toto.append(connectivity)
+        tutu.append(bundles)
+    
+    anacl = a.loadObject( self.texture_hbm )
+    anacl.setPalette( palette='gradient2' )
+    tex = a.fusionObjects( [ mesh, anacl  ], method='FusionTexSurfMethod' )
+    a.execute('TexturingParams', objects=[tex], interpolation='rgb')
     wgroup = a.createWindowsBlock(nbCols=2)
     win = a.createWindow('3D', block=wgroup)
     win2 = a.createWindow('3D', block=wgroup)
     br = a.createWindow('Browser', block=wgroup)
-    win.addObjects(connectivity)
-    br.addObjects(connectivity)
+    win.addObjects(toto)
+    win.addObjects(tex)
+    br.addObjects(toto)
     a.execute('SetControl', windows = [win], control = 'BundlesSelectionControl')
     action = win.view().controlSwitch().getAction('BundlesSelectionAction')
     action.secondaryView = win2
 
-    return[win, win2, br, connectivity, t1, bundles, clusters]
+    return[win, win2, br, toto, t1, tex, tutu, clusters]
 
 def execution(self, context):
     return mainThreadActions().call(self.execution_mainthread, context)
