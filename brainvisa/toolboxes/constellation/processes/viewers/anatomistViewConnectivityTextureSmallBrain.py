@@ -55,7 +55,7 @@ signature = Signature(
   'basins_texture', ListOf(ReadDiskItem( 'Avg Filtered Watershed', 'anatomist texture formats')),
   'clustering_texture', ListOf(ReadDiskItem('Group Clustering Texture', 'anatomist texture formats')),
   'time_step', ListOf(Integer()),
-  'texture_hbm', String(),
+  'texture_hbm', ReadDiskItem('Label Texture', 'anatomist texture formats'),
 )
 
 def initialization( self ):
@@ -135,7 +135,8 @@ def execution_mainthread( self, context ):
       
       toto.append(anagraph)
   anacl = a.loadObject( self.texture_hbm )
-  anacl.setPalette( palette='gradient2' )
+  anacl.setPalette( palette='parcellation720', minVal=11, maxVal=730,
+    absoluteMode=True )
   tex = a.fusionObjects( [ mesh, anacl  ], method='FusionTexSurfMethod' )
   a.execute('TexturingParams', objects=[tex], interpolation='rgb')
   wgroup = a.createWindowsBlock( nbCols=2 )
