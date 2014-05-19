@@ -43,7 +43,7 @@ def validation():
   try:
     import constel.lib.connmatrix.connmatrixtools as Mat
   except:
-    raise ValidationError( 'roca module is not available' )
+    raise ValidationError( 'constel module is not available' )
 
 name = 'Anatomist view connectivity texture on small brains'
 userLevel = 2
