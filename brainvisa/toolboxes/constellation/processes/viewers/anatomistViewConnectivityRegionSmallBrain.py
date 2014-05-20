@@ -43,12 +43,44 @@ signature = Signature(
     'white_mesh', ReadDiskItem('AimsBothWhite', 'anatomist mesh formats'),
     'clustering_texture', ListOf(ReadDiskItem('Group Clustering Texture', 
                                               'anatomist texture formats')),
-    'texture_hbm', String(),
+    'texture_hbm', ReadDiskItem('Label Texture', 'anatomist texture formats'),
+    'max_number_of_fibers', Integer(),
 )
 
 def initialization( self ):
     self.linkParameters('bundles', 'clustering_texture')
     self.linkParameters('dw_to_t1', 'RawT1Image')
+    self.max_number_of_fibers = 100000
+
+
+def loadFilteredBundles(self, bundles_name):
+    import connectomist.api as conn
+    from soma import aims
+    from soma.minf import api as minf
+
+    maxFibers = self.max_number_of_fibers
+    binfo = minf.readMinf(bundles_name)[0]
+    if 'curves_count' in binfo:
+        nfibers = binfo['curves_count']
+    elif 'fibers_count' in binfo:
+        nfibers = binfo['fibers_count']
+    else:
+        nfibers = 500000 # arbitrary...
+    percent = float(maxFibers) / nfibers * 100.
+    br = conn.BundleReader(bundles_name)
+    graph = aims.Graph('RoiArg')
+    bg = conn.BundleToGraph(graph)
+    if maxFibers != 0:
+        bs = conn.BundleSampler(percent, 'toto', 'tutu', 0)
+        br.addBundleListener(bs)
+        bs.addBundleListener(bg)
+    else:
+        br.addBundleListener(bg)
+    br.read()
+    a = ana.Anatomist()
+    ag = a.toAObject(graph)
+    ag.setFileName(bundles_name)
+    return ag
 
 
 def execution_mainthread(self, context):
@@ -63,7 +95,8 @@ def execution_mainthread(self, context):
     for ct, bundles_name in enumerate(self.bundles):
         clusters = a.loadObject(self.clustering_texture[ct])
         context.write(ct)
-        bundles = a.loadObject(bundles_name)
+        bundles = self.loadFilteredBundles(bundles_name.fullPath())
+        #bundles = a.loadObject(bundles_name)
         bundles.assignReferential(r)
     
         a.loadTransformation(self.dw_to_t1.fullPath(), r, mr)
