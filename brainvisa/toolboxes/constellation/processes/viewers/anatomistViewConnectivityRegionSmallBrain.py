@@ -59,24 +59,28 @@ def loadFilteredBundles(self, bundles_name):
     from soma.minf import api as minf
 
     maxFibers = self.max_number_of_fibers
-    binfo = minf.readMinf(bundles_name)[0]
-    if 'curves_count' in binfo:
-        nfibers = binfo['curves_count']
-    elif 'fibers_count' in binfo:
-        nfibers = binfo['fibers_count']
-    else:
-        nfibers = 500000 # arbitrary...
-    percent = float(maxFibers) / nfibers * 100.
-    br = conn.BundleReader(bundles_name)
-    graph = aims.Graph('RoiArg')
-    bg = conn.BundleToGraph(graph)
     if maxFibers != 0:
-        bs = conn.BundleSampler(percent, 'toto', 'tutu', 0)
-        br.addBundleListener(bs)
-        bs.addBundleListener(bg)
+        binfo = minf.readMinf(bundles_name)[0]
+        if 'curves_count' in binfo:
+            nfibers = binfo['curves_count']
+        elif 'fibers_count' in binfo:
+            nfibers = binfo['fibers_count']
+        else:
+            nfibers = 500000 # arbitrary...
+        percent = float(maxFibers) / nfibers
     else:
-        br.addBundleListener(bg)
-    br.read()
+        percent = 0.
+    #br = conn.BundleReader(bundles_name)
+    graph = aims.Graph('RoiArg')
+    #bg = conn.BundleToGraph(graph)
+    if maxFibers != 0:
+        graph.fibers_proportion_filter = percent
+        #bs = conn.BundleSampler(percent, 'toto', 'tutu', 0)
+        #br.addBundleListener(bs)
+        #bs.addBundleListener(bg)
+    #else:
+        #br.addBundleListener(bg)
+    #br.read()
     a = ana.Anatomist()
     ag = a.toAObject(graph)
     ag.setFileName(bundles_name)
