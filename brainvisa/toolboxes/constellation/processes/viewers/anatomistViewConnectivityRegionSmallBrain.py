@@ -50,10 +50,14 @@ signature = Signature(
 def initialization( self ):
     self.linkParameters('bundles', 'clustering_texture')
     self.linkParameters('dw_to_t1', 'RawT1Image')
-    self.max_number_of_fibers = 100000
+    self.max_number_of_fibers = 10000
 
 
 def loadFilteredBundles(self, bundles_name):
+    '''Fake bundles reading: just creates an empty graph with the file name
+    in it, which will be used (and actually read) by the fusion.
+    Also counts fibers.
+    '''
     import connectomist.api as conn
     from soma import aims
     from soma.minf import api as minf
@@ -67,20 +71,8 @@ def loadFilteredBundles(self, bundles_name):
             nfibers = binfo['fibers_count']
         else:
             nfibers = 500000 # arbitrary...
-        percent = float(maxFibers) / nfibers
-    else:
-        percent = 0.
-    #br = conn.BundleReader(bundles_name)
     graph = aims.Graph('RoiArg')
-    #bg = conn.BundleToGraph(graph)
-    if maxFibers != 0:
-        graph.fibers_proportion_filter = percent
-        #bs = conn.BundleSampler(percent, 'toto', 'tutu', 0)
-        #br.addBundleListener(bs)
-        #bs.addBundleListener(bg)
-    #else:
-        #br.addBundleListener(bg)
-    #br.read()
+    graph['fibers_count'] = nfibers
     a = ana.Anatomist()
     ag = a.toAObject(graph)
     ag.setFileName(bundles_name)
@@ -94,40 +86,51 @@ def execution_mainthread(self, context):
     r = a.createReferential()
     mr = t1.referential
     mesh.assignReferential(mr)
-    toto = []
-    tutu = []
+    viewing_objects = []
+    living_objects = []
+    bundleslist = []
+    totalfibers = 0
     for ct, bundles_name in enumerate(self.bundles):
-        clusters = a.loadObject(self.clustering_texture[ct])
-        context.write(ct)
+        context.write('scanning budles:', ct+1, '/', len(self.bundles))
         bundles = self.loadFilteredBundles(bundles_name.fullPath())
-        #bundles = a.loadObject(bundles_name)
         bundles.assignReferential(r)
-    
+        bundleslist.append(bundles)
+        totalfibers += bundles.graph()['fibers_count']
         a.loadTransformation(self.dw_to_t1.fullPath(), r, mr)
-    
-        connectivity = a.fusionObjects([ mesh, clusters, bundles, t1 ],
-            method = 'FusionTexMeshImaAndBundlesToROIsAndBundlesGraphMethod')
+        living_objects.append(bundles)
+
+    context.write('total number of fibers:', totalfibers)
+    fibers_proportion_filter = float(self.max_number_of_fibers) / totalfibers
+    context.write('keeping proportion:', fibers_proportion_filter)
+    for ct, bundles in enumerate(bundleslist):
+        clusters = a.loadObject(self.clustering_texture[ct])
+        living_objects.append(clusters)
+        context.write('processing bundles:', ct+1, '/', len(self.bundles))
+        bundles.graph()['fibers_proportion_filter'] = fibers_proportion_filter
+        connectivity = a.fusionObjects([mesh, clusters, bundles, t1],
+            method='FusionTexMeshImaAndBundlesToROIsAndBundlesGraphMethod')
         if connectivity is None:
             raise ValueError('could not fusion objects - T1, mesh, texture and bundles')
-        toto.append(connectivity)
-        tutu.append(bundles)
-    
-    anacl = a.loadObject( self.texture_hbm )
-    anacl.setPalette( palette='gradient2' )
-    tex = a.fusionObjects( [ mesh, anacl  ], method='FusionTexSurfMethod' )
+        viewing_objects.append(connectivity)
+
+    anacl = a.loadObject(self.texture_hbm)
+    anacl.setPalette(palette='parcellation720')
+    tex = a.fusionObjects([mesh, anacl], method='FusionTexSurfMethod')
     a.execute('TexturingParams', objects=[tex], interpolation='rgb')
     wgroup = a.createWindowsBlock(nbCols=2)
     win = a.createWindow('3D', block=wgroup)
     win2 = a.createWindow('3D', block=wgroup)
     br = a.createWindow('Browser', block=wgroup)
-    win.addObjects(toto)
+    win.addObjects(viewing_objects)
     win.addObjects(tex)
-    br.addObjects(toto)
-    a.execute('SetControl', windows = [win], control = 'BundlesSelectionControl')
+    br.addObjects(viewing_objects)
+    a.execute('SetControl', windows = [win], control='BundlesSelectionControl')
     action = win.view().controlSwitch().getAction('BundlesSelectionAction')
     action.secondaryView = win2
+    living_objects += [t1, tex]
+    living_objects += viewing_objects
 
-    return[win, win2, br, toto, t1, tex, tutu, clusters]
+    return [win, win2, br, living_objects]
 
 def execution(self, context):
     return mainThreadActions().call(self.execution_mainthread, context)
