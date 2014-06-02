@@ -114,7 +114,8 @@ def execution_mainthread(self, context):
         viewing_objects.append(connectivity)
 
     anacl = a.loadObject(self.texture_hbm)
-    anacl.setPalette(palette='parcellation720')
+    anacl.setPalette(palette='parcellation720', minVal=11, maxVal=730,
+        absoluteMode=True)
     tex = a.fusionObjects([mesh, anacl], method='FusionTexSurfMethod')
     a.execute('TexturingParams', objects=[tex], interpolation='rgb')
     wgroup = a.createWindowsBlock(nbCols=2)
