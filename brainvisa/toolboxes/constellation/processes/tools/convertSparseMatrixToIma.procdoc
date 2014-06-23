@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Read a sparse matrix and write it a dense matrix (any volume format).</xhtml>
+    <d name="parameters">
+      <xhtml name="sparse_connectivity_matrix"/>
+      <xhtml name="dense_connectivity_matrix"/>
+    </d>
+    <xhtml name="long">The dense matrix must fit in memory since it is trnasformed in memory first. (may eat memory)</xhtml>
+  </d>
+</d>
+</minf>
