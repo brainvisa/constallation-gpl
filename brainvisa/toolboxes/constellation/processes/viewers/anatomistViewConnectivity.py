@@ -30,6 +30,7 @@ signature = Signature(
                                'anatomist mesh formats'),
     'clustering_texture', ReadDiskItem('Group Clustering Texture', 
                                        'anatomist texture formats'),
+    'cluster_number', String(),
 )
 
 def initialization( self ):
@@ -75,17 +76,20 @@ def execution_mainthread(self, context):
     # get the Aims graph
     graph = a.toAimsObject(connectivity)
     #mesh = a.toAimsObject(mesh)
+    a.execute('SetMaterial', objects=[connectivity], diffuse=[0.5, 0., 1., 0.2])
+
     
-    patches = ['1', ]
-    basins = {'27' : [1., 1., 0., 0.5] }
-    #, '19' : [1., 0., 0., 0.5], 
-              #'17' : [0.5, 1., 1., 0.5], '16' : [0.5, 1., 0.5, 0.5], 
-              #'13' : [1., 0., 0.5, 0.5]}
-    all_regions = patches + basins.keys()
+    patches = {self.cluster_number: [0.4, 0.6, 1., 1.]}
+    basins = {'11': [0., 0., 1., 0.35], '24': [1., 0., 0., 0.35], 
+              '16': [0., 1., 0., 0.35],}
+              #'17': [0.5, 1., 1., 0.3], 
+              #'13': [1., 0., 0.5, 0.3]}
+    basincolor = [0.9, 0.9, 0.9, 1.]
+    all_regions = patches.keys() + basins.keys()
     for v in graph.vertices():
         if v['name'] in all_regions:
-            win.addObjects(v['ana_object'])
             if v['name'] in patches:
+                a.execute('SetMaterial', objects=[v['ana_object']], diffuse=patches[v['name']])
                 for edge in v.edges():
                     if edge.vertices()[0]['name'] in basins or edge.vertices()[1]['name'] in basins:
                         if edge.vertices()[0]['name'] in basins:
@@ -95,8 +99,10 @@ def execution_mainthread(self, context):
                         edgeobj = edge['ana_object']
                         a.execute('SetMaterial', objects=[edgeobj], diffuse=color)
                         win.addObjects(edgeobj)
+            else:
+                a.execute('SetMaterial', objects=[v['ana_object']], diffuse=basincolor)
                            
-    return[win, connectivity, mesh, t1, bundles, clusters, edgeobj, v['ana_object']]
+    return[win, connectivity, mesh, t1, bundles, clusters]
 
 def execution(self, context):
     return mainThreadActions().call(self.execution_mainthread, context)

@@ -129,11 +129,8 @@ def execution_mainthread( self, context ):
       anagraph.notifyObservers()
       a.mapObject( anagraph )
       anagraph.setMaterial( diffuse=[ 0.8, 0.8, 0.8, 1. ] )
-  
-      #tex = a.fusionObjects( [ mesh, anaclusters  ], method='FusionTexSurfMethod' )
-      #tutu.append(tex)
-      
       toto.append(anagraph)
+      
   anacl = a.loadObject( self.texture_hbm )
   anacl.setPalette( palette='parcellation720', minVal=11, maxVal=730,
     absoluteMode=True )
@@ -142,16 +139,16 @@ def execution_mainthread( self, context ):
   wgroup = a.createWindowsBlock( nbCols=2 )
   win = a.createWindow( '3D', block=wgroup )
   win2 = a.createWindow( '3D', block=wgroup )
-  br = a.createWindow( 'Browser', block=wgroup )
+  #br = a.createWindow( 'Browser', block=wgroup )
   win.addObjects(tex)
   win.addObjects(toto)
-  br.addObjects(toto)
+  #br.addObjects(toto)
   #a.execute( 'Select', objects=[ x[ 'ana_object' ] for x in graph.vertices() ] )
   a.execute( 'SetControl', windows=[win], control='BundlesSelectionControl' )
   action = win.view().controlSwitch().getAction( 'BundlesSelectionAction' )
   action.secondaryView = win2
 
-  return [mesh, toto, anaclusters, tex, win, br, win2]
+  return [mesh, toto, anaclusters, tex, win, win2]
 
 def execution( self, context ):
     return mainThreadActions().call( self.execution_mainthread, context )

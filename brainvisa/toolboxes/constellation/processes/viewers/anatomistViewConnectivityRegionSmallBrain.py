@@ -121,7 +121,6 @@ def execution_mainthread(self, context):
     wgroup = a.createWindowsBlock(nbCols=2)
     win = a.createWindow('3D', block=wgroup)
     win2 = a.createWindow('3D', block=wgroup)
-    br = a.createWindow('Browser', block=wgroup)
     win.addObjects(viewing_objects)
     win.addObjects(tex)
     br.addObjects(viewing_objects)
