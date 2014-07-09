@@ -58,6 +58,7 @@ signature = Signature(
     'texture_hbm', ReadDiskItem('Label Texture', 'anatomist texture formats'),
     'small_brains_distance', Float(),
     'small_brains_scaling', Float(),
+    'mode', Choice('normal', 'brain_center', 'hemispheres_centers'),
 )
 
 def initialization( self ):
@@ -66,11 +67,46 @@ def initialization( self ):
     self.linkParameters( 'clustering_texture', 'connectivity_matrix' )
     self.small_brains_distance = 10.
     self.small_brains_scaling = 0.1
+    self.mode = 'normal'
+
+
+def geodesicGravitycenter(mesh, voronoiTex, meshNeighbourhood_vector, label, 
+      time_step=0):
+  """
+  "Approximated":   for circular geodesic region it works, otherwise the max of dist_tex is not single
+  """
+  meshVertex_nb = mesh.vertex().size()
+  tex = aims.TimeTexture_S16()
+  tex[0].reserve(meshVertex_nb)
+  
+  for i in xrange(meshVertex_nb):
+    tex[0].push_back(-1)
+  
+  vertexLabel_index = numpy.where(voronoiTex[time_step].arraydata()==label)[0]
+  vertexLabel_nb = vertexLabel_index.size
+  
+  for i in xrange(vertexLabel_nb):
+    index_i = vertexLabel_index[i]
+    tex[0][index_i] = 0
+    neigh_list = meshNeighbourhood_vector[index_i].list()
+    for n in neigh_list:
+      if voronoiTex[time_step][n]!=label:
+        tex[0][index_i] = 1
+        break
+
+  dist_tex = aims.meshdistance.MeshDistance(mesh, tex, False)
+  gravityCenter_index = dist_tex[0].arraydata().argmax()
+  return gravityCenter_index
 
 def execution_mainthread( self, context ):
   a = ana.Anatomist()
   mesh = a.loadObject( self.mesh )
   graph_list = []
+
+  # mesh neighbours are needed for centroids of clusters
+  aims_mesh = a.toAimsObject(mesh)
+  meshNeighbourhood_vector = aims.SurfaceManip.surfaceNeighbours(aims_mesh)
+
   for ct, matrix_name in enumerate(self.connectivity_matrix):
       gyrus_name = os.path.basename(matrix_name.fullName())
       context.write(matrix_name)
@@ -102,6 +138,8 @@ def execution_mainthread( self, context ):
       graph['boundingbox_max'] = list( bbmax )
       graph['small_brains_distance'] = self.small_brains_distance
       graph['small_brains_scaling'] = self.small_brains_scaling
+      if self.mode == 'hemispheres_centers':
+          graph['lateralized_view'] = self.lateralized_view
       # Complete list of clusters
       regions = [ x for x in numpy.unique( aclusters ) if x != 0 ]
       for rnum in regions:
@@ -138,9 +176,16 @@ def execution_mainthread( self, context ):
           vertices = avertex[ clustindices ]
           # TODO: could replace the barycenter by 
           # roca.lib.meshTools.geodesicGravitycenter
-          cent = numpy.average( vertices, axis=0 )
-          vertex[ 'center' ] = cent
-          vertex[ 'cluster_index' ] = i
+          #cent = numpy.average( vertices, axis=0 )
+          cent_index = geodesicGravitycenter(aims_mesh, clusters,
+              meshNeighbourhood_vector, regions[i], 
+              time_step=self.time_step[ct])
+          cent = aims_mesh.vertex()[cent_index]
+          normal = aims_mesh.normal()[cent_index]
+          vertex['center'] = cent
+          vertex['cluster_index'] = i
+          if self.mode == 'normal':
+              vertex['normal'] = normal
       anagraph.setChanged()
       anagraph.notifyObservers()
       a.mapObject( anagraph )
