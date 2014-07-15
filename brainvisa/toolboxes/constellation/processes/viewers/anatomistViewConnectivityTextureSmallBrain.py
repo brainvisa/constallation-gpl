@@ -205,8 +205,8 @@ def execution_mainthread( self, context ):
   win.addObjects(graph_list)
   #br.addObjects(toto)
   #a.execute( 'Select', objects=[ x[ 'ana_object' ] for x in graph.vertices() ] )
-  a.execute( 'SetControl', windows=[win], control='BundlesSelectionControl' )
-  action = win.view().controlSwitch().getAction( 'BundlesSelectionAction' )
+  a.execute( 'SetControl', windows=[win], control='SmallBrainsControl' )
+  action = win.view().controlSwitch().getAction( 'SmallBrainSelectionAction' )
   action.secondaryView = win2
 
   return [mesh, graph_list, anaclusters, big_textured_mesh, win, win2]
