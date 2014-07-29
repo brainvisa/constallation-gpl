@@ -145,7 +145,7 @@ def execution_mainthread( self, context ):
       for rnum in regions:
           vertex = graph.addVertex( 'roi' )
           aims.GraphManip.storeAims( graph, vertex, 'aims_Tmtktri', aimsmesh )
-          #vertex['label'] = '%s - clust. %d' % (gyrus_name, rnum)
+          vertex['name'] = str('%s - clust. %d node' % (gyrus_name, rnum))
 
       anagraph = a.toAObject( graph )
       anagraph.releaseAppRef()
@@ -167,6 +167,7 @@ def execution_mainthread( self, context ):
           mesh2.setReferential( mesh.referential )
           texsurf = a.fusionObjects( [ mesh2, anatex ], 
               method='FusionTexSurfMethod' )
+          texsurf.setName('%s - clust. %d' % (gyrus_name, rnum))
           a.unmapObject( texsurf )
           oldmesh = [ x for x in anavertex ][0]
           anavertex.setReferentialInheritance( mesh2 )
