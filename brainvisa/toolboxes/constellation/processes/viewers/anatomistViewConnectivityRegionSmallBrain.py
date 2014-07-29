@@ -123,14 +123,14 @@ def execution_mainthread(self, context):
     win2 = a.createWindow('3D', block=wgroup)
     win.addObjects(viewing_objects)
     win.addObjects(tex)
-    br.addObjects(viewing_objects)
-    a.execute('SetControl', windows = [win], control='BundlesSelectionControl')
-    action = win.view().controlSwitch().getAction('BundlesSelectionAction')
+    a.execute('SetControl', windows = [win], control='SmallBrainsControl')
+    action = win.view().controlSwitch().getAction('SmallBrainSelectionAction')
+    context.write('action:', action)
     action.secondaryView = win2
     living_objects += [t1, tex]
     living_objects += viewing_objects
 
-    return [win, win2, br, living_objects]
+    return [win, win2, living_objects]
 
 def execution(self, context):
     return mainThreadActions().call(self.execution_mainthread, context)
