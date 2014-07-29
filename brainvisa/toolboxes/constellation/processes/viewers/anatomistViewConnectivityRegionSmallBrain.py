@@ -45,12 +45,14 @@ signature = Signature(
                                               'anatomist texture formats')),
     'texture_hbm', ReadDiskItem('Label Texture', 'anatomist texture formats'),
     'max_number_of_fibers', Integer(),
+    'clustering_texture_timestep', ListOf(Integer()),
 )
 
 def initialization( self ):
     self.linkParameters('bundles', 'clustering_texture')
     self.linkParameters('dw_to_t1', 'RawT1Image')
     self.max_number_of_fibers = 10000
+    self.clustering_texture_timestep = []
 
 
 def loadFilteredBundles(self, bundles_name):
@@ -63,6 +65,7 @@ def loadFilteredBundles(self, bundles_name):
     from soma.minf import api as minf
 
     maxFibers = self.max_number_of_fibers
+    nfibers = 0
     if maxFibers != 0:
         binfo = minf.readMinf(bundles_name)[0]
         if 'curves_count' in binfo:
@@ -100,10 +103,17 @@ def execution_mainthread(self, context):
         living_objects.append(bundles)
 
     context.write('total number of fibers:', totalfibers)
-    fibers_proportion_filter = float(self.max_number_of_fibers) / totalfibers
+    if totalfibers != 0:
+        fibers_proportion_filter \
+            = float(self.max_number_of_fibers) / totalfibers
+    else:
+        fibers_proportion_filter = 1.
     context.write('keeping proportion:', fibers_proportion_filter)
     for ct, bundles in enumerate(bundleslist):
         clusters = a.loadObject(self.clustering_texture[ct])
+        if len(self.clustering_texture_timestep) > ct:
+            clusters.attributed()['time_step'] \
+                = self.clustering_texture_timestep[ct]
         living_objects.append(clusters)
         context.write('processing bundles:', ct+1, '/', len(self.bundles))
         bundles.graph()['fibers_proportion_filter'] = fibers_proportion_filter
@@ -125,7 +135,6 @@ def execution_mainthread(self, context):
     win.addObjects(tex)
     a.execute('SetControl', windows = [win], control='SmallBrainsControl')
     action = win.view().controlSwitch().getAction('SmallBrainSelectionAction')
-    context.write('action:', action)
     action.secondaryView = win2
     living_objects += [t1, tex]
     living_objects += viewing_objects
