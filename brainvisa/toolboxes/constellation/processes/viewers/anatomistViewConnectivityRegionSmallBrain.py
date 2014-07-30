@@ -120,8 +120,20 @@ def execution_mainthread(self, context):
         connectivity = a.fusionObjects([mesh, clusters, bundles, t1],
             method='FusionTexMeshImaAndBundlesToROIsAndBundlesGraphMethod')
         if connectivity is None:
-            raise ValueError('could not fusion objects - T1, mesh, texture and bundles')
+            raise ValueError('could not fusion objects - '
+                'T1, mesh, texture and bundles')
         viewing_objects.append(connectivity)
+        # remove brain mesh in node "other"
+        other_nodes = [node for node in connectivity.graph().vertices() \
+            if node.has_key('name') and node['name'] == 'others']
+        context.write('other nodes:', len(other_nodes))
+        if len(other_nodes) != 0:
+            aobj = other_nodes[0]['ana_object']
+            aobj.eraseObject(other_nodes[0]['roi_mesh_ana'])
+            del other_nodes[0]['roi_mesh_ana']
+            del other_nodes[0]['roi_mesh']
+            del other_nodes[0]['ana_object']
+            connectivity.eraseObject(aobj)
 
     anacl = a.loadObject(self.texture_hbm)
     anacl.setPalette(palette='parcellation720', minVal=11, maxVal=730,
