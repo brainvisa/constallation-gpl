@@ -38,7 +38,6 @@ roles = ('viewer', )
 
 signature = Signature(
     'bundles', ListOf(ReadDiskItem('Fascicles bundles', 'Aims bundles')),
-    'RawT1Image', ReadDiskItem('Raw T1 MRI', 'NIFTI-1 image'),
     'dw_to_t1', ReadDiskItem('Transformation matrix', 'Transformation matrix'),
     'white_mesh', ReadDiskItem('AimsBothWhite', 'anatomist mesh formats'),
     'clustering_texture', ListOf(ReadDiskItem('Group Clustering Texture', 
@@ -50,7 +49,6 @@ signature = Signature(
 
 def initialization( self ):
     self.linkParameters('bundles', 'clustering_texture')
-    self.linkParameters('dw_to_t1', 'RawT1Image')
     self.max_number_of_fibers = 10000
     self.clustering_texture_timestep = []
 
@@ -85,10 +83,8 @@ def loadFilteredBundles(self, bundles_name):
 def execution_mainthread(self, context):
     a = ana.Anatomist()
     mesh = a.loadObject(self.white_mesh)
-    t1 = a.loadObject(self.RawT1Image)
     r = a.createReferential()
-    mr = t1.referential
-    mesh.assignReferential(mr)
+    mr = mesh.referential
     viewing_objects = []
     living_objects = []
     bundleslist = []
@@ -117,16 +113,15 @@ def execution_mainthread(self, context):
         living_objects.append(clusters)
         context.write('processing bundles:', ct+1, '/', len(self.bundles))
         bundles.graph()['fibers_proportion_filter'] = fibers_proportion_filter
-        connectivity = a.fusionObjects([mesh, clusters, bundles, t1],
-            method='FusionTexMeshImaAndBundlesToROIsAndBundlesGraphMethod')
+        connectivity = a.fusionObjects([mesh, clusters, bundles],
+            method='FusionBundlesSplitByCorticalROIsMethod')
         if connectivity is None:
             raise ValueError('could not fusion objects - '
-                'T1, mesh, texture and bundles')
+                'mesh, texture and bundles')
         viewing_objects.append(connectivity)
         # remove brain mesh in node "other"
         other_nodes = [node for node in connectivity.graph().vertices() \
             if node.has_key('name') and node['name'] == 'others']
-        context.write('other nodes:', len(other_nodes))
         if len(other_nodes) != 0:
             aobj = other_nodes[0]['ana_object']
             aobj.eraseObject(other_nodes[0]['roi_mesh_ana'])
@@ -148,7 +143,7 @@ def execution_mainthread(self, context):
     a.execute('SetControl', windows = [win], control='SmallBrainsControl')
     action = win.view().controlSwitch().getAction('SmallBrainSelectionAction')
     action.secondaryView = win2
-    living_objects += [t1, tex]
+    living_objects.append(tex)
     living_objects += viewing_objects
 
     return [win, win2, living_objects]
