@@ -23,16 +23,15 @@ roles = ('viewer', )
 
 signature = Signature(
     'bundles', ReadDiskItem('Fascicles bundles', 'Aims bundles'),
-    'dw_to_t1', ReadDiskItem('Transformation matrix',
-                             'Transformation matrix'),
-    'white_mesh', ReadDiskItem('AimsBothWhite',
-                               'anatomist mesh formats'),
-    'clustering_texture', ReadDiskItem('Group Clustering Texture',
-                                       'anatomist texture formats'),
-    'cluster_number', String(),
+    'dw_to_t1', ReadDiskItem(
+        'Transformation matrix', 'Transformation matrix'),
+    'white_mesh', ReadDiskItem(
+        'AimsBothWhite', 'anatomist mesh formats'),
+    'clustering_texture', ReadDiskItem(
+        'Group Clustering Texture', 'anatomist texture formats'),
+    'cluster_number', String(), 
     'max_number_of_fibers', Integer(),
-    'clustering_texture_timestep', Integer(),
-)
+    'clustering_texture_timestep', Integer(), )
 
 def initialization( self ):
     self.linkParameters('bundles', 'clustering_texture')

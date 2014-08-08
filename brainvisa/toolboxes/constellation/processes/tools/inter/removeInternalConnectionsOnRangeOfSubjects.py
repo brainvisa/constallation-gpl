@@ -66,7 +66,7 @@ def initialization(self):
 
 def execution(self, context):
 
-    mask = aims.read( elf.mask.fullPath())
+    mask = aims.read( self.mask.fullPath())
     meanConnectivityProfileTex = aims.read(self.connectivity_profiles.fullPath())
     for i in xrange(meanConnectivityProfileTex[0].nItem()):
         if mask[0][i] == 0:

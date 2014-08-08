@@ -40,7 +40,8 @@ from soma.path import find_in_path
 # Plot constel module
 def validation():
     if not find_in_path('constelConnectivityProfileOverlapMask.py'):
-        raise ValidationError('Please make sure that constel module is installed.')
+        raise ValidationError(
+            'Please make sure that constel module is installed.')
 
 name = 'Creation of a mask'
 userLevel = 2
@@ -89,10 +90,10 @@ signature = Signature(
                         ),
     'smoothing', Float(),
     'group', ReadDiskItem('Group definition', 'XML'),
-    'connectivity_profiles', ListOf(ReadDiskItem('Gyrus Connectivity Profile', 
-                                                  'Aims texture formats')),
-    'mask', WriteDiskItem('Avg Connectivity Mask', 'Aims texture formats'),
-)
+    'connectivity_profiles', ListOf(
+        ReadDiskItem('Gyrus Connectivity Profile', 'Aims texture formats')),
+    'mask', WriteDiskItem('Avg Connectivity Mask', 'Aims texture formats'), )
+
 
 # Default values
 def initialization(self):
@@ -112,9 +113,11 @@ def initialization(self):
                 atts['texture'] = 'fs' + os.path.basename(
                                          os.path.dirname(self.group.fullPath()))
                 atts['smoothing'] = 'smooth' + str(self.smoothing)
-                profile = ReadDiskItem('Gyrus Connectivity Profile', 
-                                       'Aims texture formats' ).findValue(atts, 
-                                       subject.attributes())
+                profile = ReadDiskItem(
+                    'Gyrus Connectivity Profile', 
+                    'Aims texture formats').findValue(
+                        atts, 
+                        subject.attributes())
                 if profile is not None:
                     profiles.append(profile)
             return profiles
@@ -130,14 +133,23 @@ def initialization(self):
             return self.signature['mask'].findValue(atts)
         
     # link of parameters
-    self.linkParameters('connectivity_profiles', ('group', 'study', 'patch_label', 
-                        'smoothing'), linkIndProfiles)
-    self.linkParameters('mask', ('connectivity_profiles', 'texture_group', 
-                                 'smoothing'), linkMask)
+    self.linkParameters(
+        'connectivity_profiles',
+        ('group', 
+         'study', 
+         'patch_label',
+         'smoothing'),
+        linkIndProfiles)
+    self.linkParameters(
+        'mask',
+        ('connectivity_profiles',
+         'texture_group',
+         'smoothing'),
+        linkMask)
     
     # visibility level                      
-    self.signature['texture_group'].userLevel = 3
-    self.signature['connectivity_profiles'].userLevel = 3
+    self.signature['texture_group'].userLevel = 2
+    self.signature['connectivity_profiles'].userLevel = 2
 
 def execution (self, context):
     # show the connectivity profiles

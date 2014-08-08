@@ -93,8 +93,8 @@ signature = Signature(
     'group', ReadDiskItem('Group definition', 'XML'),
     'normed_connectivity_profiles', ListOf(
         ReadDiskItem('Normed Connectivity Profile', 'Aims texture formats')),
-    'thresholded_connectivity_profile', ListOf(
-        ReadDiskItem('Thresholded Connectivity Profile', 'Aims texture formats')),
+#    'thresholded_connectivity_profile', ListOf(
+#        ReadDiskItem('Thresholded Connectivity Profile', 'Aims texture formats')),
     'normed_connectivity_profile_nb', ListOf(
         WriteDiskItem('Group Normed Connectivity Profile', 'Aims texture formats') 
                                              ),
@@ -129,7 +129,7 @@ def initialization(self):
     
     # function of link
     def linkProfiles(self, dummy):
-        if self.thresholded_connectivity_profile and self.group is not None:
+        if self.normed_connectivity_profiles and self.group is not None:
             registerClass('minf_2.0', Subject, 'Subject')
             groupOfSubjects = readMinf(self.group.fullPath())
             profiles = []
@@ -162,8 +162,8 @@ def initialization(self):
                                                          'patch_label', 
                                                          'smoothing'), 
                                                          linkIndividualProfiles)
-    self.linkParameters('thresholded_connectivity_profile', 
-                        'normed_connectivity_profiles')
+#    self.linkParameters('thresholded_connectivity_profile', 
+#                        'normed_connectivity_profiles')
     self.linkParameters('normed_connectivity_profile_nb', ('group', 'study', 
                                                            'patch_label', 
                                                            'smoothing'), 
@@ -173,9 +173,9 @@ def initialization(self):
 
     # visibility level
     self.signature['texture_group'].userLevel = 3
-    self.signature['thresholded_connectivity_profile'].userLevel = 3
-    self.signature['normed_connectivity_profiles'].userLevel = 3
-    self.signature['normed_connectivity_profile_nb'].userLevel = 3
+#    self.signature['thresholded_connectivity_profile'].userLevel = 2
+    self.signature['normed_connectivity_profiles'].userLevel = 2
+    self.signature['normed_connectivity_profile_nb'].userLevel = 2
 
 def execution ( self, context ):
 
@@ -185,8 +185,8 @@ def execution ( self, context ):
     registerClass('minf_2.0', Subject, 'Subject')
     groupOfSubjects = readMinf(self.group.fullPath())
     
-    # show the thresholded connectivity profiles
-    print(str([i.fullPath() for i in self.thresholded_connectivity_profile]))
+#    # show the thresholded connectivity profiles
+#    print(str([i.fullPath() for i in self.thresholded_connectivity_profile]))
     # show the normed connectivity profiles
     print(str([i.fullPath() for i in self.normed_connectivity_profiles]))
     # show the new version of normed connectivity profiles
@@ -194,7 +194,7 @@ def execution ( self, context ):
     
     n = 0
     listOfTex = []
-    for texture, outtexname in zip(self.thresholded_connectivity_profile, self.normed_connectivity_profile_nb):
+    for texture, outtexname in zip(self.normed_connectivity_profiles, self.normed_connectivity_profile_nb):
         tex = aims.read(texture.fullPath())
         tex_ar = tex[0].arraydata()
         dividende_coef = 0

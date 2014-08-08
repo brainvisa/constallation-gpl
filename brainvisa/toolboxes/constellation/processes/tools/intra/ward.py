@@ -14,6 +14,7 @@ signature = Signature(
     'kmax', Integer(),
     'patch', Integer(),
     'group_matrix', ReadDiskItem('Group Matrix', 'GIS image'),
+    'distance_matrix_file', String(),
     'average_mesh', ReadDiskItem('BothAverageBrainWhite', 
                                  'BrainVISA mesh formats'),
     'gyri_texture', ListOf(
@@ -30,12 +31,11 @@ def initialization (self):
 def execution(self, context):
     '''Use hieararchical clustering to identify patterns.
     '''
-        
+    args = [sys.executable, find_in_path( 'constelClusteringWard.py' )]   
     for x in self.gyri_texture:
         args += [ '-g', x ]
     for t in self.tex_time:
         args += [ '-t', t ]
-    args += ['-k', self.kmax, '-l', self.patch, '-c', self.group_matrix, 
-        '-m', self.avg_mesh, '-o', self.output_directory]
-    context.system('python', find_in_path( 'constelClusteringWard.py' ),
-        *args)
+    args += ['-k', self.kmax, '-l', self.patch, '-x', self.group_matrix, '-c',
+    self.distance_matrix_file, '-m', self.average_mesh, '-o', self.output_directory]
+    context.system(*args)

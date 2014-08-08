@@ -1,3 +1,4 @@
+#############################################################################
 # This software and supporting documentation are distributed by
 #      CEA/NeuroSpin, Batiment 145,
 #      91191 Gif-sur-Yvette cedex
@@ -8,44 +9,29 @@
 # You can  use, modify and/or redistribute the software under the
 # terms of the CeCILL license version 2 as circulated by CEA, CNRS
 # and INRIA at the following URL "http://www.cecill.info".
-#
-# As a counterpart to the access to the source code and  rights to copy,
-# modify and redistribute granted by the license, users are provided only
-# with a limited warranty  and the software's author,  the holder of the
-# economic rights,  and the successive licensors  have only  limited
-# liability.
-#
-# In this respect, the user's attention is drawn to the risks associated
-# with loading,  using,  modifying and/or developing or reproducing the
-# software by the user in light of its specific status of free software,
-# that may mean  that it is complicated to manipulate,  and  that  also
-# therefore means  that it is reserved for developers  and  experienced
-# professionals having in-depth computer knowledge. Users are therefore
-# encouraged to load and test the software's suitability as regards their
-# requirements in conditions enabling the security of their systems and/or
-# data to be ensured and,  more generally, to use and operate it in the
-# same conditions as regards security.
-#
-# The fact that you are presently reading this means that you have had
-# knowledge of the CeCILL license version 2 and that you accept its terms.
+#############################################################################
 
+# brainvisa
 from brainvisa.processes import *
 from brainvisa import anatomist as ana
 
-name = 'Anatomist view connectivity regions on small brain'
+name = 'Anatomist view mozaic visualization of fibers'
 userLevel = 0
 roles = ('viewer', )
 
+
 signature = Signature(
     'bundles', ListOf(ReadDiskItem('Fascicles bundles', 'Aims bundles')),
-    'dw_to_t1', ReadDiskItem('Transformation matrix', 'Transformation matrix'),
-    'white_mesh', ReadDiskItem('AimsBothWhite', 'anatomist mesh formats'),
+    'dw_to_t1', ReadDiskItem('Transformation matrix', 
+                             'Transformation matrix'),
+    'white_mesh', ReadDiskItem('FreesurferMesh', 'anatomist mesh formats'),
     'clustering_texture', ListOf(ReadDiskItem('Group Clustering Texture', 
                                               'anatomist texture formats')),
-    'texture_hbm', ReadDiskItem('Label Texture', 'anatomist texture formats'),
+    'major_texture', ReadDiskItem('Label Texture', 'anatomist texture formats'),
     'max_number_of_fibers', Integer(),
     'clustering_texture_timestep', ListOf(Integer()),
 )
+
 
 def initialization( self ):
     self.linkParameters('bundles', 'clustering_texture')
@@ -81,15 +67,25 @@ def loadFilteredBundles(self, bundles_name):
 
 
 def execution_mainthread(self, context):
+    """Visualization of small brains on the parcellated cortical surface.
+    
+    For each cluster or region, a small brain represents the connections
+    usinf fiber tracts.
+    """
+    # instance of anatomist
     a = ana.Anatomist()
+    
+    # load object
     mesh = a.loadObject(self.white_mesh)
+    
     r = a.createReferential()
     mr = mesh.referential
+    
     viewing_objects = []
     living_objects = []
     bundleslist = []
     totalfibers = 0
-    for ct, bundles_name in enumerate(self.bundles):
+    for (ct, bundles_name) in enumerate(self.bundles):
         context.write('scanning budles:', ct+1, '/', len(self.bundles))
         bundles = self.loadFilteredBundles(bundles_name.fullPath())
         bundles.assignReferential(r)
@@ -105,7 +101,7 @@ def execution_mainthread(self, context):
     else:
         fibers_proportion_filter = 1.
     context.write('keeping proportion:', fibers_proportion_filter)
-    for ct, bundles in enumerate(bundleslist):
+    for (ct, bundles) in enumerate(bundleslist):
         clusters = a.loadObject(self.clustering_texture[ct])
         if len(self.clustering_texture_timestep) > ct:
             clusters.attributed()['time_step'] \
@@ -130,23 +126,41 @@ def execution_mainthread(self, context):
             del other_nodes[0]['ana_object']
             connectivity.eraseObject(aobj)
 
-    anacl = a.loadObject(self.texture_hbm)
-    anacl.setPalette(palette='parcellation720', minVal=11, maxVal=730,
-        absoluteMode=True)
-    tex = a.fusionObjects([mesh, anacl], method='FusionTexSurfMethod')
-    a.execute('TexturingParams', objects=[tex], interpolation='rgb')
+    # load object
+    ana_major_texture = a.loadObject(self.major_texture)
+    
+    # define a palette
+    ana_major_texture.setPalette(palette='parcellation720',
+                                 minVal=11,
+                                 maxVal=730,
+                                 absoluteMode=True)
+    
+    # fusion between mesh and texure
+    major_textured_mesh = a.fusionObjects([mesh, ana_major_texture],
+                          method='FusionTexSurfMethod')
+    
+    # change major_textured_mesh settings
+    a.execute("TexturingParams",
+              objects=[major_textured_mesh],
+              interpolation="rgb")
+    
+    # view object
     wgroup = a.createWindowsBlock(nbCols=2)
-    win = a.createWindow('3D', block=wgroup)
-    win2 = a.createWindow('3D', block=wgroup)
-    win.addObjects(viewing_objects)
-    win.addObjects(tex)
-    a.execute('SetControl', windows = [win], control='SmallBrainsControl')
-    action = win.view().controlSwitch().getAction('SmallBrainSelectionAction')
+    win1 = a.createWindow("3D", block=wgroup)
+    win2 = a.createWindow("3D", block=wgroup)
+    win1.addObjects(viewing_objects)
+    win1.addObjects(major_textured_mesh)
+    
+    # control on objects
+    a.execute("SetControl", windows = [win1], control="SmallBrainsControl")
+    action = win1.view().controlSwitch().getAction(
+                 "SmallBrainSelectionAction")
     action.secondaryView = win2
-    living_objects.append(tex)
+    
+    living_objects.append(major_textured_mesh)
     living_objects += viewing_objects
 
-    return [win, win2, living_objects]
+    return [win1, win2, living_objects]
 
 def execution(self, context):
     return mainThreadActions().call(self.execution_mainthread, context)

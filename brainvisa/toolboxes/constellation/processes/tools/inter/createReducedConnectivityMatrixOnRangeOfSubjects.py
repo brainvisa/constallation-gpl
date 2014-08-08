@@ -104,7 +104,7 @@ signature = Signature(
         WriteDiskItem('Group Reduced Connectivity Matrix','GIS image')),
 )
 
-#TO DO: remove this function? 
+#TODO: remove this function? 
 #def linkGyri(self, key, value):
 #    if self.gyri_texture:
 #        eNode = self.executionNode()
@@ -121,7 +121,7 @@ def afterChildAddedCallback(self, parent, key, child):
 
     child.signature['filtered_watershed'] = parent.signature[ 'filtered_watershed']
     child.signature['white_mesh'] = parent.signature['average_mesh']
-    child.signature['gyri_texture'] = parent.signature['gyri_texture']
+    #child.signature['gyri_texture'] = parent.signature['gyri_texture']
     child.signature['reduced_connectivity_matrix'] \
         = WriteDiskItem('Group Reduced Connectivity Matrix', 'GIS image')
 
@@ -133,7 +133,7 @@ def afterChildAddedCallback(self, parent, key, child):
     parent.addLink(key + '.filtered_watershed', 'filtered_watershed')
     parent.addLink(key + '.patch', 'patch_label')
     parent.addLink(key + '.white_mesh', 'average_mesh')
-    parent.addLink(key + '.gyri_texture', 'gyri_texture')
+    #parent.addLink(key + '.gyri_texture', 'gyri_texture')
 #        partial(self.linkGyri, key))
 
 
@@ -235,10 +235,10 @@ def initialization (self):
     self.linkParameters('gyri_texture', ('group', 'study'), linkGyri)
     
     # visibility level
-    self.signature['complete_connectivity_matrix'].userLevel = 3
-    self.signature['reduced_connectivity_matrix'].userLevel = 3
-    self.signature['texture_group'].userLevel = 3
-    self.signature['gyri_texture'].userLevel = 3
+    self.signature['complete_connectivity_matrix'].userLevel = 2
+    self.signature['reduced_connectivity_matrix'].userLevel = 2
+    self.signature['texture_group'].userLevel = 2
+    self.signature['gyri_texture'].userLevel = 2
 
     eNode = ParallelExecutionNode(\
         'Reduced_connectivity_matrix',

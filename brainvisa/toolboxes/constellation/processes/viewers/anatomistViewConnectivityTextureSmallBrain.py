@@ -236,7 +236,7 @@ def execution_mainthread(self, context):
         graph_list.append(ana_graph)
 
     #########################################################################
-    #                           Major brain                                 #
+    #                             Major brain                                 #
     #########################################################################
 
     # load object

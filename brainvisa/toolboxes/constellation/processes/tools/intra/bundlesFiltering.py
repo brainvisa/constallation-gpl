@@ -102,8 +102,11 @@ def initialization( self ):
             attrs['study'] = self.study
             attrs['texture'] = self.texture
             attrs['_database'] = self.database
+            attrs['_ontology'] = 'brainvisa-3.2.0'
             attrs['subject'] = os.path.basename(self.subject.fullPath())
-            attrs['patch'] = 'G' + str(self.patch)
+            attrs['gyrus'] = 'G' + str(self.patch)
+            attrs['trackfileum'] = None
+            attrs['numberoftrackfiles'] = None
             attrs['minlengthoffibersIn'] = str(int(self.min_length_of_fibers_near_cortex))
             filename = self.signature['subsets_of_fibers_near_cortex'].findValue(attrs)
             return filename
@@ -115,7 +118,7 @@ def initialization( self ):
             return filename
     self.linkParameters('subset_of_tract', 'subject', linkSubjects)
     self.linkParameters('listOf_subsets_of_tract', 'subset_of_tract', lef)
-    self.linkParameters('subsets_of_fibers_near_cortex', ('database', 'subset_of_tract', 'subject', 'study', 'texture', 'patch', 'min_length_of_fibers_near_cortex'), linkProfile)
+    self.linkParameters('subsets_of_fibers_near_cortex', ('database', 'subject', 'study', 'texture', 'patch', 'min_length_of_fibers_near_cortex'), linkProfile)
     self.linkParameters('subsets_of_distant_fibers', ('subsets_of_fibers_near_cortex', 'min_distant_fibers_length'), linkProfileDistantFibers)
     self.linkParameters('white_mesh', 'subject')
     self.linkParameters('dw_to_t1', 'subset_of_tract')

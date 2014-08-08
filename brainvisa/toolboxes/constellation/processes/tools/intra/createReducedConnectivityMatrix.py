@@ -38,24 +38,24 @@ from soma.path import find_in_path
 
 # Plot constel module
 def validation():
-  if not find_in_path('constelConnectionDensityTexture'):
-    raise ValidationError('Please make sure that constel module is installed.')
+    if not find_in_path('constelConnectionDensityTexture'):
+        raise ValidationError('Please make sure that constel module is installed.')
 
 name = 'Reduced Connectivity Matrix'
 userLevel = 2
 
 # Argument declaration
 signature = Signature(
-    'complete_connectivity_matrix', ReadDiskItem('Gyrus Connectivity Matrix', 
-                                                 'Matrix sparse'),
-    'filtered_watershed', ReadDiskItem('Filtered Watershed', 
-                                       'Aims texture formats'),
-    'gyri_texture', ReadDiskItem('FreesurferResampledBothParcellationType', 
-                                 'Aims texture formats'),
+    'complete_connectivity_matrix', ReadDiskItem(
+        'Gyrus Connectivity Matrix', 'Matrix sparse'),
+    'filtered_watershed', ReadDiskItem(
+        'Filtered Watershed', 'Aims texture formats'),
+    'gyri_texture', ReadDiskItem(
+        'FreesurferResampledBothParcellationType', 'Aims texture formats'),
     'white_mesh', ReadDiskItem('AimsBothWhite', 'Aims mesh formats'),
     'patch', Integer(),
-    'reduced_connectivity_matrix', WriteDiskItem('Reduced Connectivity Matrix', 
-                                                 'GIS image'),
+    'reduced_connectivity_matrix', WriteDiskItem(
+        'Reduced Connectivity Matrix', 'GIS image'),
 )
 
 # Default value
@@ -85,12 +85,12 @@ def execution(self, context):
         patch = patch.strip('G')
 
     # compute reduced connectivity matrix 
-    # of size (target regions, cortex vertices)
+    # of size (target regions, patch vertices)
     context.system('constelConnectionDensityTexture',
         '-mesh', self.white_mesh,
         '-connmatrixfile', self.complete_connectivity_matrix,
         '-targetregionstex', self.filtered_watershed,
-        '-seedregionstex', self.gyri_texture,
+        '-seedregionstex', str(self.gyri_texture),
         '-seedlabel', patch,
         '-type', 'seedVertex_to_targets',
         '-connmatrix', self.reduced_connectivity_matrix,

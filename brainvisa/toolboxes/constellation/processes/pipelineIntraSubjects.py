@@ -140,7 +140,7 @@ def initialization(self):
                         'study')
     eNode.addDoubleLink('ConstellationIntra.texture',
                         'texture')
-    eNode.addDoubleLink('ConstellationIntra.gyrus',
+    eNode.addDoubleLink('ConstellationIntra.patch',
                         'patch')
     eNode.addDoubleLink('ConstellationIntra.database',
                         'database')                     

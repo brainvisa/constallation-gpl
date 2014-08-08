@@ -99,8 +99,8 @@ signature = Signature(
                                  'BrainVISA mesh formats'),
     'group_matrix', WriteDiskItem('Group Matrix', 'GIS image'),
     'kmax', Integer(),
-    'clustering_time', ListOf(WriteDiskItem('Group Clustering Time', 
-                                            'BrainVISA texture formats')),
+    #'clustering_time', ListOf(WriteDiskItem('Group Clustering Time', 
+                                            #'BrainVISA texture formats')),
 )
 
 # Default values
@@ -208,17 +208,17 @@ def initialization(self):
                         ('group', 'study', 'texture_group', 
                          'patch_label', 'smoothing'), 
                         linkMatrix)
-    self.linkParameters('clustering_time', 
-                        ('group', 'study', 'reduced_connectivity_matrix', 
-                         'texture_group', 'patch_label', 'smoothing'), 
-                        linkClustering)
+    #self.linkParameters('clustering_time', 
+                        #('group', 'study', 'reduced_connectivity_matrix', 
+                         #'texture_group', 'patch_label', 'smoothing'), 
+                        #linkClustering)
     self.linkParameters('gyri_texture', ('group', 'study'), linkGyri)
     self.linkParameters('average_mesh', 'group', linkMesh)
     
     # visibility level
-    self.signature['texture_group'].userLevel = 3
-    self.signature['gyri_texture'].userLevel = 3
-    self.signature['reduced_connectivity_matrix'].userLevel = 3
+    self.signature['texture_group'].userLevel = 2
+    self.signature['gyri_texture'].userLevel = 2
+    self.signature['reduced_connectivity_matrix'].userLevel = 2
     
 def execution(self, context):
     '''
@@ -252,13 +252,13 @@ def execution(self, context):
         *args
     )
 
-    cmd_args = []
-    for t in self.clustering_time:
-        cmd_args += ['-p', t]
-    for y in self.gyri_texture:
-        cmd_args += ['-t', y]
-    cmd_args += ['-m', self.average_mesh, '-l', patch_label, 
-                 '-s', self.study, '-g',self.group_matrix, '-a', self.kmax]
-    context.system('python', find_in_path('constelInterSubjectClustering.py'),
-        *cmd_args
-    )
+#    cmd_args = []
+#    for t in self.clustering_time:
+#        cmd_args += ['-p', t]
+#    for y in self.gyri_texture:
+#        cmd_args += ['-t', y]
+#    cmd_args += ['-m', self.average_mesh, '-l', patch_label, 
+#                 '-s', self.study, '-g',self.group_matrix, '-a', self.kmax]
+#    context.system('python', find_in_path('constelInterSubjectClustering.py'),
+#        *cmd_args
+#    )
