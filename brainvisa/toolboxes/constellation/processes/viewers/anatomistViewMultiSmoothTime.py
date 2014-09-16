@@ -11,7 +11,8 @@ def validation():
         raise ValidationError(_t_('Anatomist not available'))
     
 from soma.path import find_in_path
-import gtk
+from PyQt4 import QtGui
+#import gtk
 from numpy import arange
 
 name = 'Anatomist view Smooth Time'
