@@ -5,8 +5,10 @@
     <xhtml name="short">Cortical connectivity profile computation.</xhtml>
     <d name="parameters">
       <xhtml name="patch_connectivity_profile"/>
-      <xhtml name="patch"/>
-      <xhtml name="gyri_texture"/>
+      <xhtml name="patch">Labels used to select a region was on subdivision into gyri of FreeSurfer. For instance, postcentral gyrus corresponds to 23. By default, pacth is not defined ("use_new_patch").</xhtml>
+      <xhtml name="gyri_texture">Several possibilities depending on the study:<br/>
+<i>(1) Averaged approach:</i> average gyri segmentation corresponding to a group of subject<br/>
+<i>(2) Concatenated approach:</i> individual gyri segmentation</xhtml>
       <xhtml name="complete_connectivity_matrix"/>
     </d>
     <xhtml name="long">In each matrix, the ith line corresponds to the cortical connectivity profile of the ith point of the patch, representing its connexions towards each point of the cortical surface. Then, several profiles is averaged across all patch points. So, the connectivity profile of the patch is computed.</xhtml>

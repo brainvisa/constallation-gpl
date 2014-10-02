@@ -4,8 +4,8 @@
   <d name="en">
     <xhtml name="short">Fibers tracts are oversampled to attach its end with the cortical surface.</xhtml>
     <d name="parameters">
-      <xhtml name="oversampled_distant_fibers"/>
-      <xhtml name="filtered_length_distant_fibers"/>
+      <xhtml name="oversampled_distant_fibers">Fibers are oversampled to attach its end leaving by the brain stem with the cortical surface.</xhtml>
+      <xhtml name="filtered_length_distant_fibers"><i>Feature:</i> One end only is identified because fibers coming from gyrus leave the brain stem</xhtml>
     </d>
     <xhtml name="long"/>
   </d>
