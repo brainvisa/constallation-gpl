@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Ward method minimizes the total within-cluster variance.  At each step the pair of clusters with minimum cluster distance are merged. To implement this method, at each step find the pair of clusters that leads to minimum increase in total within-cluster variance after merging.</xhtml>
+    <d name="parameters">
+      <xhtml name="average_mesh">Both average brain mesh (from a group of subject)</xhtml>
+      <xhtml name="distance_matrix_file"/>
+      <xhtml name="patch">The number corresponding to the gyrus</xhtml>
+      <xhtml name="gyri_texture">List of all individual gyri segmentation (for example, bh.r.aparc.annot.gii of the FreeSurfer pipeline)</xhtml>
+      <xhtml name="tex_time">List of the clustering results, i.e. all individual parcellations of patch with a point-to-point correspodence across subject</xhtml>
+      <xhtml name="kmax">The maximum number of clusters to consider</xhtml>
+      <xhtml name="group_matrix"/>
+    </d>
+    <xhtml name="long">In the ward linkage for each cluster a error function is defined. This error function is the average distance of each datapoint in a cluster to the center of gravity in the cluster. <br/>
+<br/>
+D = Error function of unified cluster - Error function for each cluster</xhtml>
+  </d>
+</d>
+</minf>
