@@ -4,26 +4,48 @@
   <d name="en">
     <xhtml name="short">Selection of tracking fibers according to a white matter mesh with label texture.</xhtml>
     <d name="parameters">
-      <xhtml name="max_length_of_fibers_near_cortex"/>
-      <xhtml name="min_distant_fibers_length"/>
-      <xhtml name="gyri_texture"/>
-      <xhtml name="max_distant_fibers_length"/>
-      <xhtml name="dw_to_t1"/>
-      <xhtml name="min_length_of_fibers_near_cortex"/>
-      <xhtml name="database">Ontology: brainvisa-3.2.0</xhtml>
-      <xhtml name="study">There are two possibilities at the moment: Averaged or Concatenated study.
+      <xhtml name="max_length_of_fibers_near_cortex">Maximum length for a near cortex fiber (i.e., both ends of fibers are well identified as attached in such or such gyri), necessary for the filter from length.</xhtml>
+      <xhtml name="min_distant_fibers_length">Minimum length for a distant fiber (i.e., one end only is identified because fibers leave the brain stem), necessary for the filter from length.</xhtml>
+      <xhtml name="gyri_texture">Several possibilities depending on the study:<br/>
+<i>(1) Averaged approach:</i> average gyri segmentation corresponding to a group of subject<br/>
+<i>(2) Concatenated approach:</i> individual gyri segmentation
 </xhtml>
-      <xhtml name="texture">Name the texture (total freedom of choice). For instance, "fs01to40"  corresponds exactly to the freesurfer texture for the group of subjects: 001 to 040.</xhtml>
+      <xhtml name="max_distant_fibers_length">Maximum length for a distant fiber (i.e., one end only is identified because fibers leave the brain stem), necessary for the filter from length.</xhtml>
+      <xhtml name="dw_to_t1">Transformation from t2 to anat</xhtml>
+      <xhtml name="min_length_of_fibers_near_cortex">Minimum length for a near cortex fiber (i.e., both ends of fibers are well identified as attached in such or such gyri), necessary for the filter from length.</xhtml>
+      <xhtml name="database">Ontology: brainvisa-3.x<br/>
+All output files will be in a database. Please make sure that this database exist, otherwise, it will not appear on the process. </xhtml>
+      <xhtml name="study">There are two possibilities:<br/>
+<i>(1) Averaged approach:</i> the goal is to obtain a parcellation of patch for a group of subject<br/>
+<i>(2) Concatenated approach:</i> the goal is to obtain a parcellation for each subject 
+</xhtml>
+      <xhtml name="texture">The desired name of the used texture (total freedom of choice). For instance, "fs01to40"  corresponds exactly to the FreeSurfer texture for the group of subjects: 001 to 040 in the case of averaged study.</xhtml>
       <xhtml name="patch">Labels used to select a region was on subdivision into gyri of FreeSurfer.
-For instance, postcentral gyrus corresponds to 23.</xhtml>
-      <xhtml name="listOf_subsets_of_tract"/>
-      <xhtml name="subsets_of_fibers_near_cortex"/>
-      <xhtml name="subsets_of_distant_fibers"/>
-      <xhtml name="white_mesh"/>
-      <xhtml name="subset_of_tract">The connectivity data are only in bundles format (Connectomist software) at the moment.</xhtml>
-      <xhtml name="subject"/>
+For instance, postcentral gyrus corresponds to 23. By default, pacth is not defined ("use_new_patch").</xhtml>
+      <xhtml name="listOf_subsets_of_tract">All of the diffusion data for the selected subject (.bundles)</xhtml>
+      <xhtml name="new_patch">Users have the opportunity to force the number of gyrus. For this, pacth should be "use_new_patch" (i.e. not defined), necessary to use a new numbering with new_patch.</xhtml>
+      <xhtml name="subsets_of_fibers_near_cortex">Fibers are filtered according to selected patch.<br/>
+<i>Feature:</i> Both ends of fibers are well identified as attached in such or such gyri</xhtml>
+      <xhtml name="subsets_of_distant_fibers">Fibers are filtered according to selected patch.<br/>
+<i>Feature:</i> One end only is identified because fibers coming from gyrus leave the brain stem</xhtml>
+      <xhtml name="white_mesh">Indivdual both brain mesh</xhtml>
+      <xhtml name="subject">Subject directory where all files will be create</xhtml>
     </d>
-    <xhtml name="long"/>
+    <xhtml name="long">This filtering is organized as follow:<br/>
+<br/>
+
+<ul>
+<li><b><i>reads fibers:</i> </b>The tractography of Connectomist is subdivided into x files "listOf_subsets_of_tract" but it is entirely possible to enter a single file. <br/></li>
+<br/>
+<li><b><i>set gyrus pair name on each fiber:</i></b> while distinguishing two types of fibers "fibers near cortex" and "distant fibers"<br/></li>
+<br/>
+<li><b><i>select bundles from names:</i></b> keeping only the fibers attached to the selected patch with one of its extremities (not necessarily both ends)<br/></li>
+<br/>
+<li><b><i>filter by length:</i></b> the fiber tracts were filtered in order to remove tracts shorter than a minimum length<br/></li>
+<br/>
+<li><b><i>merge the files:</i></b> sorts fibers into consistent bundles, two final files "subsets_of_fibers_near_cortex" and "subsets_of_distant_fibers"<br/></li>
+</ul>
+</xhtml>
   </d>
 </d>
 </minf>
