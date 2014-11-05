@@ -37,45 +37,46 @@ signature = Signature(
     "database", Choice(),
     "study", Choice(("averaged approach", "avg"),
                     ("concatenated approach", "concat")),
-    "patch", Choice(
-        ("use_new_patch", None),
-        ("left corpus callosum", 1), ("left bankssts", 2),
-        ("left caudal anterior cingulate", 3),
-        ("left caudal middle frontal", 4), ("left cuneus", 6),
-        ("left entorhinal", 7), ("left fusiform", 8),
-        ("left inferior parietal", 9), ("left inferior temporal", 10),
-        ("left isthmus cingulate", 11), ("left lateral occipital", 12),
-        ("left lateral orbitofrontal", 13), ("left lingual", 14),
-        ("left medial orbitofrontal", 15), ("left middle temporal", 16),
-        ("left parahippocampal", 17), ("left paracentral", 18),
-        ("left pars opercularis", 19), ("left pars orbitalis", 20),
-        ("left pars triangularis", 21), ("left pericalcarine", 22),
-        ("left postcentral", 23), ("left posterior cingulate", 24),
-        ("left precentral", 25), ("left precuneus", 26),
-        ("left rostral anterior cingulate", 27),
-        ("left rostral middle frontal", 28), ("left superior frontal", 29),
-        ("left superior parietal", 30), ("left superior temporal", 31),
-        ("left supramarginal", 32), ("left frontal pole", 33),
-        ("left temporal pole", 34), ("left transverse temporal", 35),
-        ("left insula", 36), ("right corpus callosum", 37),
-        ("right bankssts", 38), ("right caudal anterior cingulate", 39),
-        ("right caudal middle frontal", 40), ("right cuneus", 42),
-        ("right entorhinal", 43), ("right fusiform", 44),
-        ("right inferior parietal", 45), ("right inferior temporal", 46),
-        ("right isthmus cingulate", 47), ("right lateral occipital", 48),
-        ("right lateral orbitofrontal", 49), ("right lingual", 50),
-        ("right medial orbitofrontal", 51), ("right middle temporal", 52),
-        ("right parahippocampal", 53), ("right paracentral", 54),
-        ("right pars opercularis", 55), ("right pars orbitalis", 56),
-        ("right pars triangularis", 57), ("right pericalcarine", 58),
-        ("right postcentral", 59), ("right posterior cingulate", 60),
-        ("right precentral", 61), ("right precuneus", 62),
-        ("right rostral anterior cingulate", 63),
-        ("right rostral middle frontal", 64), ("right superior frontal", 65),
-        ("right superior parietal", 66), ("right superior temporal", 67),
-        ("right supramarginal", 68), ("right frontal pole", 69),
-        ("right temporal pole", 70), ("right transverse temporal", 71),
-        ("right insula", 72)),
+    "patch", Integer(),
+#    "patch", Choice(
+#        ("use_new_patch", 250),
+#        ("left corpus callosum", 1), ("left bankssts", 2),
+#        ("left caudal anterior cingulate", 3),
+#        ("left caudal middle frontal", 4), ("left cuneus", 6),
+#        ("left entorhinal", 7), ("left fusiform", 8),
+#        ("left inferior parietal", 9), ("left inferior temporal", 10),
+#        ("left isthmus cingulate", 11), ("left lateral occipital", 12),
+#        ("left lateral orbitofrontal", 13), ("left lingual", 14),
+#        ("left medial orbitofrontal", 15), ("left middle temporal", 16),
+#        ("left parahippocampal", 17), ("left paracentral", 18),
+#        ("left pars opercularis", 19), ("left pars orbitalis", 20),
+#        ("left pars triangularis", 21), ("left pericalcarine", 22),
+#        ("left postcentral", 23), ("left posterior cingulate", 24),
+#        ("left precentral", 25), ("left precuneus", 26),
+#        ("left rostral anterior cingulate", 27),
+#        ("left rostral middle frontal", 28), ("left superior frontal", 29),
+#        ("left superior parietal", 30), ("left superior temporal", 31),
+#        ("left supramarginal", 32), ("left frontal pole", 33),
+#        ("left temporal pole", 34), ("left transverse temporal", 35),
+#        ("left insula", 36), ("right corpus callosum", 37),
+#        ("right bankssts", 38), ("right caudal anterior cingulate", 39),
+#        ("right caudal middle frontal", 40), ("right cuneus", 42),
+#        ("right entorhinal", 43), ("right fusiform", 44),
+#        ("right inferior parietal", 45), ("right inferior temporal", 46),
+#        ("right isthmus cingulate", 47), ("right lateral occipital", 48),
+#        ("right lateral orbitofrontal", 49), ("right lingual", 50),
+#        ("right medial orbitofrontal", 51), ("right middle temporal", 52),
+#        ("right parahippocampal", 53), ("right paracentral", 54),
+#        ("right pars opercularis", 55), ("right pars orbitalis", 56),
+#        ("right pars triangularis", 57), ("right pericalcarine", 58),
+#        ("right postcentral", 59), ("right posterior cingulate", 60),
+#        ("right precentral", 61), ("right precuneus", 62),
+#        ("right rostral anterior cingulate", 63),
+#        ("right rostral middle frontal", 64), ("right superior frontal", 65),
+#        ("right superior parietal", 66), ("right superior temporal", 67),
+#        ("right supramarginal", 68), ("right frontal pole", 69),
+#        ("right temporal pole", 70), ("right transverse temporal", 71),
+#        ("right insula", 72)),
     "new_patch", Integer(),
     "texture", String(),
     "subject", ReadDiskItem("subject", "directory"),
@@ -128,7 +129,7 @@ def initialization(self):
             attrs["study"] = self.study
             attrs["texture"] = self.texture
             attrs["subject"] = os.path.basename(self.subject.fullPath())
-            if self.patch is None:
+            if self.new_patch is not None:
                 attrs["gyrus"] = "G" + str(self.new_patch)
             else:
                 attrs["gyrus"] = "G" + str(self.patch)
@@ -176,10 +177,9 @@ def execution(self, context):
         patch = self.new_patch
     else:
         patch = self.patch
-
     # name of the command
     cmd = ["constelBundlesFiltering"]
-
+    
     # options of the command
     for subset_of_tract in self.listOf_subsets_of_tract:
         cmd += ["-i", subset_of_tract]
