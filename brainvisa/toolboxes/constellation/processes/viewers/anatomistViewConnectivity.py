@@ -22,7 +22,8 @@ userLevel = 0
 roles = ('viewer', )
 
 signature = Signature(
-    'bundles', ReadDiskItem('Fascicles bundles', 'Aims bundles'),
+    'bundles', ReadDiskItem('Fascicles bundles',
+                            'Aims readable bundles formats'),
     'dw_to_t1', ReadDiskItem(
         'Transformation matrix', 'Transformation matrix'),
     'white_mesh', ReadDiskItem(
