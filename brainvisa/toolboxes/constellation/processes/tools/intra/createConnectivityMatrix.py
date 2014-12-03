@@ -31,9 +31,9 @@ userLevel = 2
 # Argument declaration
 signature = Signature(
     "oversampled_distant_fibers", ReadDiskItem(
-        "Oversampled Fibers", "Aims bundles"),
+        "Oversampled Fibers", "Aims readable bundles formats"),
     "filtered_length_fibers_near_cortex", ReadDiskItem(
-        "Fibers Near Cortex", "Aims bundles"),
+        "Fibers Near Cortex", "Aims readable bundles formats"),
     "white_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
     "gyri_texture", ReadDiskItem("Label Texture", "Aims texture formats"),
     "dw_to_t1", ReadDiskItem(

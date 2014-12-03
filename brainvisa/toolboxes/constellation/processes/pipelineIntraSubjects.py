@@ -84,7 +84,8 @@ signature = Signature(
                   ),
     'database', Choice(),
     'subject', ReadDiskItem('subject', 'directory'),
-    'subset_of_tract', ReadDiskItem('Fascicles bundles', 'Aims bundles'),
+    'subset_of_tract', ReadDiskItem('Fascicles bundles',
+                                    'Aims readable bundles formats'),
     'dw_to_t1', ReadDiskItem('Transformation matrix', 
                              'Transformation matrix'),
     'smoothing', Float(),
@@ -143,7 +144,7 @@ def initialization(self):
     eNode.addDoubleLink('ConstellationIntra.patch',
                         'patch')
     eNode.addDoubleLink('ConstellationIntra.database',
-                        'database')                     
+                        'database')
     eNode.addDoubleLink('ConstellationIntra.subject',
                         'subject')
     eNode.addDoubleLink('ConstellationIntra.Filter.subset_of_tract',

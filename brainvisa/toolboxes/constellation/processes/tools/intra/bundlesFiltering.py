@@ -91,10 +91,10 @@ signature = Signature(
     "max_length_of_fibers_near_cortex", Float(),
     "min_distant_fibers_length", Float(),
     "max_distant_fibers_length", Float(),
-    "subsets_of_fibers_near_cortex", WriteDiskItem("Fibers Near Cortex",
-                                                   "Aims bundles"),
+    "subsets_of_fibers_near_cortex",
+    WriteDiskItem("Fibers Near Cortex", "Aims writable bundles formats"),
     "subsets_of_distant_fibers", WriteDiskItem(
-        "Very OutSide Fibers Of Cortex", "Aims bundles"),
+        "Very OutSide Fibers Of Cortex", "Aims writable bundles formats"),
 )
 
 

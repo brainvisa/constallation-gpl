@@ -32,9 +32,9 @@ userLevel = 2
 # Argument declaration
 signature = Signature(
     "filtered_length_distant_fibers", ReadDiskItem(
-        "Very OutSide Fibers Of Cortex", "Aims bundles"),
+        "Very OutSide Fibers Of Cortex", "Aims readable bundles formats"),
     "oversampled_distant_fibers", WriteDiskItem(
-        "Oversampled Fibers", "Aims bundles"),
+        "Oversampled Fibers", "Aims writable bundles formats"),
 )
 
 
