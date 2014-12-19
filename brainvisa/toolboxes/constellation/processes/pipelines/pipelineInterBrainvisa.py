@@ -159,7 +159,7 @@ def initialization(self):
     eNode.addDoubleLink("ClusteringGroup.patch_label", "patch_label")
     eNode.addDoubleLink("ClusteringGroup.smoothing", "smoothing")
     eNode.addDoubleLink("ClusteringGroup.group", "group")
-    eNode.addDoubleLink("ClusteringGroup.average_mesh", "average_mesh")
+#    eNode.addDoubleLink("ClusteringGroup.average_mesh", "average_mesh")
     eNode.addDoubleLink(
         "ClusteringGroup.gyri_texture", "ReducedMatrixGroup.gyri_texture")
     eNode.addDoubleLink("ClusteringGroup.reduced_connectivity_matrix",

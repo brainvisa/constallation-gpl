@@ -33,7 +33,8 @@
 from brainvisa.processes import *
 from brainvisa import anatomist as ana
 from soma import aims
-import numpy as np
+import numpy
+import exceptions
 try:
     import constel.lib.connmatrix.connmatrixtools as CM
 except:
@@ -65,19 +66,20 @@ def execution(self, context):
     
     a = ana.Anatomist()
 
+    # load a matrix of size (nb_basins, vertices_patch)
     matrix = aims.read(self.connectivity_matrix.fullPath()) 
-    matrix = np.asarray(matrix)
-    matrix = matrix.reshape(matrix.shape[:2])
+    matrix = numpy.asarray(matrix)[:,:,0,0]
 
     clusters = aims.read(self.clustering_texture.fullPath())
-    context.write('clusters: ', clusters)
     
-    matrix = matrix.T
+    matrix = numpy.transpose(matrix)
 
-    labels = clusters[self.time_step].arraydata()[clusters[self.time_step ].arraydata() != 0]
-    context.write("labels:", labels, "clusters[]", clusters[self.time_step ].arraydata())
-
+    # retrieves the vertices corresponding to patch
+    labels = clusters[self.time_step].arraydata()[
+        clusters[self.time_step].arraydata() != 0]
+    
     order_mat, sortLabels = CM.orderDataMatrix(matrix, labels)
+    
     dissmatrix = CM.euclidianDistanceMatrix(order_mat)
 
     (n, p) = order_mat.shape

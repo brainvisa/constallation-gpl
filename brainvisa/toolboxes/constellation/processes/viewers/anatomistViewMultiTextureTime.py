@@ -31,7 +31,7 @@ def initialization(self):
 def get_screen_config():
     desktop = QtGui.qApp.desktop()
     print "desktop size: %d x %d" % (desktop.width(), desktop.height())
-    monitors = []
+#    monitors = []
     nmons = desktop.screenCount()
     print "there are %d monitors" % nmons
     for m in range(nmons):
@@ -39,10 +39,10 @@ def get_screen_config():
         mg = desktop.availableGeometry(m)
         print "monitor %d: %d, %d, %d x %d" % (m, mg.x(), mg.y(), mg.width(), mg.height())
         monitors.append((mg.x(), mg.y(), mg.width(), mg.height()))
-
-    # current monitor
+#    # current monitor
+#    curmon = screen.get_monitor_at_window(screen.get_active_window())
     curmon = desktop.screenNumber(QtGui.QCursor.pos())
-    x, y, width, height = monitors[curmon]
+#    print "monitor %d: %d x %d (current)" % (curmon,width,height)  
     print "monitor %d: %d x %d (current)" % (curmon,width,height)
     return (curmon, monitors[curmon])
 
@@ -70,7 +70,6 @@ def execution(self, context):
 
     curmon, monitor = mainThreadActions().call(get_screen_config)
 
-    block = a.createWindowsBlock(nbCols=5, nbRows=4)
 
     w = []
     t = []
