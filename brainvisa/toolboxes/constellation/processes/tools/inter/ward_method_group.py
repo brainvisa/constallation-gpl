@@ -35,7 +35,7 @@ signature = Signature(
     "group_matrix", String(), # TODO: to define a type
     "distance_matrix_file", String(), # TODO: to define a type
     "average_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
-    "gyri_texture", ListOf(ReadDiskItem("Mesh", "Aims texture formats")),
+    "gyri_texture", ListOf(ReadDiskItem("Label Texture", "Aims texture formats")),
     "tex_time", ListOf(
         WriteDiskItem("Group Clustering Time", "Aims texture formats")),
 )

@@ -26,6 +26,7 @@ userLevel = 2
 
 # Argument declaration
 signature = Signature(
+    "name_group_of_subjects", String(),
     "white_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
     "clustering_texture", ReadDiskItem(
         "Group Clustering Time", "Aims texture formats"),
@@ -82,7 +83,8 @@ def execution(self, context):
         if not os.path.exists(path):
             os.makedirs(path)
 
-        name = subject + "_" + gyrus + "_cluster" + str(label) + ".gii"
+        name = (subject + self.name_group_of_subjects + "_" + gyrus +
+                "_cluster" + str(label) + ".gii")
         ofile = path + name
         context.write("--> SUBMESH " + str(label) + ": ", ofile)
         aims.write(cluster_submesh,  ofile)
@@ -95,8 +97,8 @@ def execution(self, context):
 
         path_t = (self.output_database + "/t1-1mm-1/" + subject + "/t1mri/" +
                   "default_acquisition/default_analysis/segmentation/mesh/")
-        name_t = (subject + "_" + gyrus + "_cluster" + str(label) +
-                  "_transfo_to_target_subject.gii")
+        name_t = (subject + self.name_group_of_subjects + "_" + gyrus +
+                  "_cluster" + str(label) + "_transfo_to_target_subject.gii")
         ofile_t = path_t + name_t
         context.write("--> SUBMESH " + str(label) + ": ", ofile_t)
         aims.write(cluster_submesh,  ofile_t)

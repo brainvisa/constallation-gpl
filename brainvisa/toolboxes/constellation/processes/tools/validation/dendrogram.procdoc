@@ -5,7 +5,8 @@
     <xhtml name="short">Plot distance matrix,  two dendrograms and color bar: save the figure (.png)</xhtml>
     <d name="parameters">
       <xhtml name="connectivity_matrix"/>
-      <xhtml name="distance"/>
+      <xhtml name="method_2"/>
+      <xhtml name="method_1"/>
       <xhtml name="transpose"/>
       <xhtml name="directory"/>
     </d>
