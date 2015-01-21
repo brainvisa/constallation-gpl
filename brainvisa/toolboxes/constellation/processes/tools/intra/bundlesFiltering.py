@@ -17,7 +17,6 @@ from soma.path import find_in_path
 # System module
 import glob
 
-
 # Plot constel module
 def validation():
     """This function is executed at BrainVisa startup when the process is loaded.
@@ -35,54 +34,51 @@ userLevel = 2
 # Arguments declaration
 signature = Signature(
     "database", Choice(),
+    "formats_fiber_tracts", Choice("bundles", "trk"),
     "study", Choice(("averaged approach", "avg"),
                     ("concatenated approach", "concat")),
-    "patch", Integer(),
-#    "patch", Choice(
-#        ("use_new_patch", 250),
-#        ("left corpus callosum", 1), ("left bankssts", 2),
-#        ("left caudal anterior cingulate", 3),
-#        ("left caudal middle frontal", 4), ("left cuneus", 6),
-#        ("left entorhinal", 7), ("left fusiform", 8),
-#        ("left inferior parietal", 9), ("left inferior temporal", 10),
-#        ("left isthmus cingulate", 11), ("left lateral occipital", 12),
-#        ("left lateral orbitofrontal", 13), ("left lingual", 14),
-#        ("left medial orbitofrontal", 15), ("left middle temporal", 16),
-#        ("left parahippocampal", 17), ("left paracentral", 18),
-#        ("left pars opercularis", 19), ("left pars orbitalis", 20),
-#        ("left pars triangularis", 21), ("left pericalcarine", 22),
-#        ("left postcentral", 23), ("left posterior cingulate", 24),
-#        ("left precentral", 25), ("left precuneus", 26),
-#        ("left rostral anterior cingulate", 27),
-#        ("left rostral middle frontal", 28), ("left superior frontal", 29),
-#        ("left superior parietal", 30), ("left superior temporal", 31),
-#        ("left supramarginal", 32), ("left frontal pole", 33),
-#        ("left temporal pole", 34), ("left transverse temporal", 35),
-#        ("left insula", 36), ("right corpus callosum", 37),
-#        ("right bankssts", 38), ("right caudal anterior cingulate", 39),
-#        ("right caudal middle frontal", 40), ("right cuneus", 42),
-#        ("right entorhinal", 43), ("right fusiform", 44),
-#        ("right inferior parietal", 45), ("right inferior temporal", 46),
-#        ("right isthmus cingulate", 47), ("right lateral occipital", 48),
-#        ("right lateral orbitofrontal", 49), ("right lingual", 50),
-#        ("right medial orbitofrontal", 51), ("right middle temporal", 52),
-#        ("right parahippocampal", 53), ("right paracentral", 54),
-#        ("right pars opercularis", 55), ("right pars orbitalis", 56),
-#        ("right pars triangularis", 57), ("right pericalcarine", 58),
-#        ("right postcentral", 59), ("right posterior cingulate", 60),
-#        ("right precentral", 61), ("right precuneus", 62),
-#        ("right rostral anterior cingulate", 63),
-#        ("right rostral middle frontal", 64), ("right superior frontal", 65),
-#        ("right superior parietal", 66), ("right superior temporal", 67),
-#        ("right supramarginal", 68), ("right frontal pole", 69),
-#        ("right temporal pole", 70), ("right transverse temporal", 71),
-#        ("right insula", 72)),
+    "patch", Choice(
+        ("use_new_patch", 0),
+        ("left corpus callosum", 1), ("left bankssts", 2),
+        ("left caudal anterior cingulate", 3),
+        ("left caudal middle frontal", 4), ("left cuneus", 6),
+        ("left entorhinal", 7), ("left fusiform", 8),
+        ("left inferior parietal", 9), ("left inferior temporal", 10),
+        ("left isthmus cingulate", 11), ("left lateral occipital", 12),
+        ("left lateral orbitofrontal", 13), ("left lingual", 14),
+        ("left medial orbitofrontal", 15), ("left middle temporal", 16),
+        ("left parahippocampal", 17), ("left paracentral", 18),
+        ("left pars opercularis", 19), ("left pars orbitalis", 20),
+        ("left pars triangularis", 21), ("left pericalcarine", 22),
+        ("left postcentral", 23), ("left posterior cingulate", 24),
+        ("left precentral", 25), ("left precuneus", 26),
+        ("left rostral anterior cingulate", 27),
+        ("left rostral middle frontal", 28), ("left superior frontal", 29),
+        ("left superior parietal", 30), ("left superior temporal", 31),
+        ("left supramarginal", 32), ("left frontal pole", 33),
+        ("left temporal pole", 34), ("left transverse temporal", 35),
+        ("left insula", 36), ("right corpus callosum", 37),
+        ("right bankssts", 38), ("right caudal anterior cingulate", 39),
+        ("right caudal middle frontal", 40), ("right cuneus", 42),
+        ("right entorhinal", 43), ("right fusiform", 44),
+        ("right inferior parietal", 45), ("right inferior temporal", 46),
+        ("right isthmus cingulate", 47), ("right lateral occipital", 48),
+        ("right lateral orbitofrontal", 49), ("right lingual", 50),
+        ("right medial orbitofrontal", 51), ("right middle temporal", 52),
+        ("right parahippocampal", 53), ("right paracentral", 54),
+        ("right pars opercularis", 55), ("right pars orbitalis", 56),
+        ("right pars triangularis", 57), ("right pericalcarine", 58),
+        ("right postcentral", 59), ("right posterior cingulate", 60),
+        ("right precentral", 61), ("right precuneus", 62),
+        ("right rostral anterior cingulate", 63),
+        ("right rostral middle frontal", 64), ("right superior frontal", 65),
+        ("right superior parietal", 66), ("right superior temporal", 67),
+        ("right supramarginal", 68), ("right frontal pole", 69),
+        ("right temporal pole", 70), ("right transverse temporal", 71),
+        ("right insula", 72)),
     "new_patch", Integer(),
     "texture", String(),
     "subject", ReadDiskItem("subject", "directory"),
-    "listOf_subsets_of_tract",
-    ListOf(ReadDiskItem("Fascicles bundles",
-                        "Aims readable bundles formats")),
     "white_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
     "gyri_texture", ReadDiskItem("Label Texture", "Aims texture formats"),
     "dw_to_t1", ReadDiskItem("Transformation matrix",
@@ -98,15 +94,16 @@ signature = Signature(
 )
 
 
-# Default values
 def initialization(self):
     """Provides default values and link of parameters
     """
+    # default values
     self.min_length_of_fibers_near_cortex = 30.
     self.max_length_of_fibers_near_cortex = 500.
     self.min_distant_fibers_length = 20.
     self.max_distant_fibers_length = 500.
 
+    # optional parameter
     self.setOptional("new_patch")
 
     databases = [h.name for h in neuroHierarchy.hierarchies()
@@ -116,12 +113,6 @@ def initialization(self):
         self.database = databases[0]
     else:
         self.signature["database"] = OpenChoice()
-
-    def link_bundles(self, dummy):
-        if self.subject is not None:
-            list_bundles = glob.glob(
-                os.path.join(self.subject.fullPath(), "*.bundles"))
-            return list_bundles
 
     def link_filtered_bundles(self, dummy):
         if self.database is not None and self.subject is not None:
@@ -152,7 +143,6 @@ def initialization(self):
                 "subsets_of_distant_fibers"].findValue(attrs)
             return filename
 
-    self.linkParameters("listOf_subsets_of_tract", "subject", link_bundles)
     self.linkParameters(
         "subsets_of_fibers_near_cortex", (
             "database", "subject", "study", "texture", "patch", "new_patch",
@@ -161,12 +151,36 @@ def initialization(self):
         "subsets_of_distant_fibers", (
             "subsets_of_fibers_near_cortex",
             "min_distant_fibers_length"), link_between_filtered_bundles)
-    self.linkParameters("white_mesh", "subject")
+
     self.linkParameters("dw_to_t1", "subject")
 
     self.signature["dw_to_t1"].userLevel = 2
     self.signature["white_mesh"].userLevel = 2
-    self.signature["listOf_subsets_of_tract"].userLevel = 2
+
+
+def load_fiber_tracts(directory, formats):
+    """Load all fiber tracts from patterns for one subject.
+
+    Parameters
+    ----------
+    directory: str (mandatory)
+        pattern of fiber tracts files to download
+    formats: str (mandatory)
+        fiber tracts formats (.bundles or .trk)
+
+    Return
+    ------
+    fnames: list
+        list of bundles files
+    """
+    if formats == "bundles":
+        patterns = [os.path.join(directory, "*.bundles")]
+    elif formats == "trk":
+        patterns = [os.path.join(directory), "*.trk"]
+    fnames = []
+    for pattern in patterns:
+        fnames.extend(glob.glob(pattern))
+    return fnames
 
 
 def execution(self, context):
@@ -174,16 +188,20 @@ def execution(self, context):
     """
     # Users have the opportunity to force the number of gyrus
     # For this, patch should be "use_new_patch" = None
-    if self.patch is None:
+    if self.patch == 0:
         patch = self.new_patch
     else:
         patch = self.patch
+
+    list_fiber_tracts = load_fiber_tracts(
+        self.subject.fullPath(), self.formats_fiber_tracts)
+    
     # name of the command
     cmd = ["constelBundlesFiltering"]
     
     # options of the command
-    for subset_of_tract in self.listOf_subsets_of_tract:
-        cmd += ["-i", subset_of_tract]
+    for fiber_tract in list_fiber_tracts:
+        cmd += ["-i", fiber_tract]
     cmd += [
         "-o", self.subsets_of_fibers_near_cortex,
         "-n", self.subsets_of_distant_fibers,
