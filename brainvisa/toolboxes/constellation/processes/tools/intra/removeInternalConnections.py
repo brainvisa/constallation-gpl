@@ -28,7 +28,9 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters
     """
+    # default value
     self.keep_internal_connections = False
+    
     self.linkParameters(
         "normed_connectivity_profile", "patch_connectivity_profile")
 
