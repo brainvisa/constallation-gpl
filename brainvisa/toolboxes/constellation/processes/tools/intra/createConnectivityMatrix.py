@@ -1,18 +1,18 @@
-############################################################################
-#  This software and supporting documentation are distributed by
-#      CEA/NeuroSpin, Batiment 145,
-#      91191 Gif-sur-Yvette cedex
-#      France
-# This software is governed by the CeCILL license version 2 under
-# French law and abiding by the rules of distribution of free software.
-# You can  use, modify and/or redistribute the software under the
-# terms of the CeCILL license version 2 as circulated by CEA, CNRS
-# and INRIA at the following URL "http://www.cecill.info".
-############################################################################
+###############################################################################
+# This software and supporting documentation are distributed by CEA/NeuroSpin,
+# Batiment 145, 91191 Gif-sur-Yvette cedex, France. This software is governed
+# by the CeCILL license version 2 under French law and abiding by the rules of
+# distribution of free software. You can  use, modify and/or redistribute the
+# software under the terms of the CeCILL license version 2 as circulated by
+# CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+###############################################################################
 
 # Axon python API module
 from brainvisa.processes import *
 from soma.path import find_in_path
+
+# constel module
+from constel.lib.texturetools import identify_patch_number
 
 
 # Plot contel
@@ -34,11 +34,10 @@ signature = Signature(
         "Oversampled Fibers", "Aims readable bundles formats"),
     "filtered_length_fibers_near_cortex", ReadDiskItem(
         "Fibers Near Cortex", "Aims readable bundles formats"),
-    "white_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
     "gyri_texture", ReadDiskItem("Label Texture", "Aims texture formats"),
+    "white_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
     "dw_to_t1", ReadDiskItem(
         "Transformation matrix", "Transformation matrix"),
-    "patch", Integer(),
     "matrix_of_distant_fibers", WriteDiskItem(
         "Connectivity Matrix Outside Fibers Of Cortex", "Matrix sparse"),
     "matrix_of_fibers_near_cortex", WriteDiskItem(
@@ -62,11 +61,11 @@ def initialization(self):
     self.linkParameters(
         "profile_of_distant_fibers", "oversampled_distant_fibers")
     self.linkParameters(
-        "profile_of_fibers_near_cortex", "profile_of_distant_fibers")
-    self.linkParameters("white_mesh", "filtered_length_fibers_near_cortex")
+        "profile_of_fibers_near_cortex", "filtered_length_fibers_near_cortex")
 
-    self.setOptional("patch")
-    self.signature["white_mesh"].userLevel = 2
+    # these links are completely hidden for the user
+    self.signature["profile_of_fibers_near_cortex"].userLevel = 3
+    self.signature["profile_of_distant_fibers"].userLevel = 3
 
 
 def execution(self, context):
@@ -78,13 +77,7 @@ def execution(self, context):
                both ends of fibers are well identified
     """
     # provides the patch name
-    if self.patch is not None:
-        patch = self.patch
-    else:
-        patch = os.path.basename(
-            os.path.dirname(os.path.dirname(
-                self.oversampled_distant_fibers.fullPath())))
-        patch = patch.strip("G")
+    patch = identify_patch_number(self.oversampled_distant_fibers.fullPath())
 
     # case 1
     # this command is mostly concerned with fibers leaving the brain stem
