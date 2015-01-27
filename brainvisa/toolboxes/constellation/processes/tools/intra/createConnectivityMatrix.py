@@ -34,8 +34,8 @@ signature = Signature(
         "Oversampled Fibers", "Aims readable bundles formats"),
     "filtered_length_fibers_near_cortex", ReadDiskItem(
         "Fibers Near Cortex", "Aims readable bundles formats"),
-    "gyri_texture", ReadDiskItem("Label Texture", "Aims texture formats"),
     "white_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
+    "gyri_texture", ReadDiskItem("Label Texture", "Aims texture formats"),
     "dw_to_t1", ReadDiskItem(
         "Transformation matrix", "Transformation matrix"),
     "matrix_of_distant_fibers", WriteDiskItem(
@@ -61,12 +61,9 @@ def initialization(self):
     self.linkParameters(
         "profile_of_distant_fibers", "oversampled_distant_fibers")
     self.linkParameters(
-        "profile_of_fibers_near_cortex", "filtered_length_fibers_near_cortex")
-
-    # these links are completely hidden for the user
+        "profile_of_fibers_near_cortex", "profile_of_distant_fibers")
     self.signature["profile_of_fibers_near_cortex"].userLevel = 3
     self.signature["profile_of_distant_fibers"].userLevel = 3
-
 
 def execution(self, context):
     """Computes two connectivity matrices.
@@ -90,7 +87,7 @@ def execution(self, context):
                    "-distmax", 5.0,
                    "-seedregionstex", self.gyri_texture,
                    "-outconntex", self.profile_of_distant_fibers,
-                   "-mesh", self. white_mesh,
+                   "-mesh", self.white_mesh,
                    "-type", "seed_mean_connectivity_profile",
                    "-trs", self.dw_to_t1,
                    "-seedlabel", patch,
@@ -104,7 +101,7 @@ def execution(self, context):
                    "-dist", 0.0,  # no smoothing
                    "-seedregionstex", self.gyri_texture,
                    "-outconntex", self.profile_of_fibers_near_cortex,
-                   "-mesh", self. white_mesh,
+                   "-mesh", self.white_mesh,
                    "-type", "seed_mean_connectivity_profile",
                    "-trs", self.dw_to_t1,
                    "-seedlabel", patch,
