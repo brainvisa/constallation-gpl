@@ -59,11 +59,11 @@ def initialization(self):
     self.linkParameters(
         "matrix_of_fibers_near_cortex", "matrix_of_distant_fibers")
     self.linkParameters(
-        "profile_of_distant_fibers", "oversampled_distant_fibers")
+        "profile_of_distant_fibers", "matrix_of_distant_fibers")
     self.linkParameters(
-        "profile_of_fibers_near_cortex", "profile_of_distant_fibers")
-    self.signature["profile_of_fibers_near_cortex"].userLevel = 3
-    self.signature["profile_of_distant_fibers"].userLevel = 3
+        "profile_of_fibers_near_cortex", "matrix_of_fibers_near_cortex")
+    self.signature["profile_of_fibers_near_cortex"].userLevel = 2
+    self.signature["profile_of_distant_fibers"].userLevel = 2
 
 def execution(self, context):
     """Computes two connectivity matrices.
