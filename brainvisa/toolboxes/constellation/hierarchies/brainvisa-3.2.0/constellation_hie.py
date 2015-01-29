@@ -37,9 +37,9 @@ insert('{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}
                 '<subject>_<texture>_<gyrus>_patchConnectivityMatrix', SetType( 'Patch Connectivity Matrix' ),
               ),
     
-              '{smoothing}', SetContent(
+              'clustering', SetContent(
     
-                'clustering', SetContent(
+                '{smoothing}', SetContent(
                   '<subject>_<texture>_<gyrus>_meanConnectivityProfile', SetType( 'Gyrus Connectivity Profile' ),
                   '<subject>_<texture>_<gyrus>_thresholdedMeanConnectivityProfile', SetType( 'Thresholded Connectivity Profile' ),
                   '<subject>_<texture>_<gyrus>_normedMeanConnectivityProfile', SetType( 'Normed Connectivity Profile' ),
