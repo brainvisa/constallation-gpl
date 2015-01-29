@@ -35,24 +35,14 @@ signature = Signature(
         "Gyrus Connectivity Matrix", "Matrix sparse"),
     "gyri_texture", ReadDiskItem("Label Texture", "Aims texture formats"),
     "patch_connectivity_profile", WriteDiskItem(
-        "Gyrus Connectivity Profile", "Aims texture formats"),
+        "Gyrus Connectivity Profile", "GIFTI file"),
 )
 
 
-# Default values
 def initialization(self):
     """Provides default values and link of parameters"""
-    def linkSmoothing(self, dummy):
-        if self.complete_connectivity_matrix is not None:
-            attrs = dict(
-                self.complete_connectivity_matrix.hierarchyAttributes())
-            attrs["smoothing"] = "smooth" + str(attrs["smoothing"])
-            filename = self.signature[
-                "patch_connectivity_profile"].findValue(attrs)
-        return filename
-
     self.linkParameters("patch_connectivity_profile",
-                        "complete_connectivity_matrix", linkSmoothing)
+                        "complete_connectivity_matrix")
 
 
 def execution(self, context):
