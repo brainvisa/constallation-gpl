@@ -1,16 +1,13 @@
-############################################################################
-#  This software and supporting documentation are distributed by
-#      CEA/NeuroSpin, Batiment 145,
-#      91191 Gif-sur-Yvette cedex
-#      France
-# This software is governed by the CeCILL license version 2 under
-# French law and abiding by the rules of distribution of free software.
-# You can  use, modify and/or redistribute the software under the
-# terms of the CeCILL license version 2 as circulated by CEA, CNRS
-# and INRIA at the following URL "http://www.cecill.info".
-############################################################################
+###############################################################################
+# This software and supporting documentation are distributed by CEA/NeuroSpin,
+# Batiment 145, 91191 Gif-sur-Yvette cedex, France. This software is governed
+# by the CeCILL license version 2 under French law and abiding by the rules of
+# distribution of free software. You can  use, modify and/or redistribute the
+# software under the terms of the CeCILL license version 2 as circulated by
+# CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+###############################################################################
 
-# BrainVisa module
+# Axon python API module
 from brainvisa.processes import *
 from soma import aims
 
@@ -20,6 +17,10 @@ import numpy
 
 # Plot constel module
 def validation():
+    """This function is executed at BrainVisa startup when the process is loaded.
+
+    It checks some conditions for the process to be available.
+    """
     try:
         import constel
     except:
@@ -47,22 +48,9 @@ signature = Signature(
 
 
 def initialization(self):
-    # function of link between group and average_mesh
-    def linkMesh(self, dummy):
-        if self.normed_connectivity_profile is not None:
-            group = os.path.basename(os.path.dirname(os.path.dirname(
-                os.path.dirname(os.path.dirname(os.path.dirname(
-                    os.path.dirname(
-                        self.normed_connectivity_profile.fullPath())))))))
-            atts = {"freesurfer_group_of_subjects": group}
-            print atts
-            return self.signature["average_mesh"].findValue(atts)
-
-    # link of parameters
+    """Provides default values and link of parameters"""
     self.linkParameters("watershed", "normed_connectivity_profile")
     self.linkParameters("filtered_watershed", "normed_connectivity_profile")
-    self.linkParameters(
-        "average_mesh", "normed_connectivity_profile", linkMesh)
 
 
 def execution(self, context):
