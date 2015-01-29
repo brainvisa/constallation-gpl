@@ -34,6 +34,8 @@ userLevel = 2
 signature = Signature(
     "reduced_connectivity_matrix", ListOf(
         ReadDiskItem("Group Reduced Connectivity Matrix", "GIS image")),
+    "study", Choice(
+        ("averaged approach", "avg"), ("concatenated approach", "concat")),
     "group", ReadDiskItem("Group definition", "XML"),
     "gyri_texture", ListOf(ReadDiskItem("Label Texture",
                                  "Aims texture formats")),
@@ -41,6 +43,7 @@ signature = Signature(
                                  "BrainVISA mesh formats"),
     "group_matrix", WriteDiskItem("Group Matrix", "GIS image"),
     "kmax", Integer(),
+    
     "clustering_time", ListOf(WriteDiskItem("Group Clustering Time",
                                      "BrainVISA texture formats")),
 )

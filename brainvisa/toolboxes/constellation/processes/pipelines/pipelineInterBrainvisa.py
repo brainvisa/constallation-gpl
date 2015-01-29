@@ -132,8 +132,8 @@ def initialization(self):
         "normed_connectivity_profiles", "connectivity_profiles")
 
     # visibility level for the user
-    self.signature["connectivity_profiles"].userLevel = 2
-    self.signature["normed_connectivity_profiles"].userLevel = 2
+    self.signature["connectivity_profiles"].userLevel = 3
+    self.signature["normed_connectivity_profiles"].userLevel = 3
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
@@ -206,6 +206,7 @@ def initialization(self):
                                         optional=1))
 
     eNode.addDoubleLink("ClusteringGroup.group", "group")
+    eNode.addDoubleLink("ClusteringGroup.study", "study")
     eNode.addDoubleLink("ClusteringGroup.average_mesh", "average_mesh")
     eNode.addDoubleLink("ClusteringGroup.gyri_texture", "gyri_texture")
     eNode.addDoubleLink("ClusteringGroup.reduced_connectivity_matrix",
