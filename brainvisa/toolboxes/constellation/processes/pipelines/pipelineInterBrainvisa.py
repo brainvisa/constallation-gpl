@@ -65,6 +65,7 @@ signature = Signature(
         ("right insula", 72)),
     "new_patch", Integer(),
     "segmentation_name_used", String(),
+    "new_name", String(),
     "smoothing", Float(),
     "group", ReadDiskItem("Group definition", "XML"),
     "connectivity_profiles", ListOf(
@@ -98,6 +99,7 @@ def initialization(self):
 
     # optional value
     self.setOptional("new_patch")
+    self.setOptional("new_name")
 
     def link_profiles(self, dummy):
         """Function of link to determine the connectivity profiles
@@ -147,6 +149,7 @@ def initialization(self):
                        optional=1))
 
     eNode.addDoubleLink("CreateMask.group", "group")
+    eNode.addDoubleLink("CreateMask.new_name", "new_name")
     eNode.addDoubleLink(
         "CreateMask.connectivity_profiles", "connectivity_profiles")
     
@@ -159,6 +162,7 @@ def initialization(self):
                        optional=1))
 
     eNode.addDoubleLink("ConnectivityProfileGroup.group", "group")
+    eNode.addDoubleLink("ConnectivityProfileGroup.new_name", "new_name")
     eNode.addDoubleLink(
         "ConnectivityProfileGroup.normed_connectivity_profiles",
         "normed_connectivity_profiles")
@@ -193,6 +197,8 @@ def initialization(self):
                        optional=1))
 
     eNode.addDoubleLink("ReducedMatrixGroup.group", "group")
+    eNode.addDoubleLink("ReducedMatrixGroup.segmentation_name_used",
+                        "segmentation_name_used")
     eNode.addDoubleLink("ReducedMatrixGroup.average_mesh", "average_mesh")
     eNode.addDoubleLink("ReducedMatrixGroup.gyri_texture", "gyri_texture")
     eNode.addDoubleLink("ReducedMatrixGroup.filtered_watershed",
