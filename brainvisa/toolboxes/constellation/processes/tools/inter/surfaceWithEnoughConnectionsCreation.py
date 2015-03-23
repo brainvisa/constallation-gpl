@@ -34,13 +34,15 @@ signature = Signature(
     "connectivity_profiles", ListOf(
         ReadDiskItem("Gyrus Connectivity Profile", "Aims texture formats")),
     "group", ReadDiskItem("Group definition", "XML"),
+    "new_name", String(),
     "mask", WriteDiskItem("Avg Connectivity Mask", "Aims texture formats"), )
 
 
 def initialization(self):
     """Provides default values and link of parameters
     """
-
+    # optional value
+    self.setOptional("new_name")
     
     def link_mask(self, dummy):
         """Function of link between mask and group parameters.
@@ -49,9 +51,12 @@ def initialization(self):
             atts = dict(self.connectivity_profiles[0].hierarchyAttributes())
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.group.fullPath()))
+            if self.new_name is not None:
+                atts["texture"] = self.new_name
             return self.signature["mask"].findValue(atts)
 
-    self.linkParameters("mask", ("connectivity_profiles", "group"), link_mask)
+    self.linkParameters("mask", ("connectivity_profiles", "group", "new_name"),
+                        link_mask)
 
 
 def execution(self, context):

@@ -31,6 +31,7 @@ signature = Signature(
     "filtered_watershed", ReadDiskItem(
         "Avg Filtered Watershed", "Aims texture formats"),
     "group", ReadDiskItem("Group definition", "XML"),
+    "segmentation_name_used", String(),
     "complete_connectivity_matrix", ListOf(
         ReadDiskItem("Gyrus Connectivity Matrix", "Matrix sparse")),
     "average_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
@@ -48,30 +49,27 @@ def afterChildAddedCallback(self, parent, key, child):
     child.signature["filtered_watershed"] = parent.signature[
         "filtered_watershed"]
     child.signature["white_mesh"] = parent.signature["average_mesh"]
-    child.signature["gyri_texture"] = parent.signature["gyri_texture"]
     child.signature["reduced_connectivity_matrix"] = WriteDiskItem(
         "Group Reduced Connectivity Matrix", "GIS image")
 
 
     child.filtered_watershed = parent.filtered_watershed
     child.white_mesh = parent.average_mesh
-    child.gyri_texture = parent.gyri_texture
 
     # Add link between eNode.ListOf_Input_3dImage and pNode.Input_3dImage
     parent.addLink(key + ".filtered_watershed", "filtered_watershed")
     parent.addLink(key + ".white_mesh", "average_mesh")
-    parent.addLink(key + ".gyri_texture", "gyri_texture")
 
 
 def beforeChildRemovedCallback(self, parent, key, child):
     parent.removeLink(key + ".filtered_watershed", "filtered_watershed")
     parent.removeLink(key + ".white_mesh", "average_mesh")
-    parent.removeLink(key + ".gyri_texture", "gyri_texture")
 
 
 def initialization(self):
     """Provides default values and link of parameters
     """
+    
     def link_watershed(self, dummy):
         """Function of link between the filtered watershed and the
         complete matrices.
@@ -82,6 +80,7 @@ def initialization(self):
             matrices = []
             for subject in groupOfSubjects:
                 atts = dict(self.filtered_watershed.hierarchyAttributes())
+                atts["texture"] = self.segmentation_name_used
                 matrix = ReadDiskItem(
                     "Gyrus Connectivity Matrix", "Matrix sparse").findValue(
                         atts, subject.attributes())
@@ -100,6 +99,9 @@ def initialization(self):
                 atts = dict(matrix.hierarchyAttributes())
                 atts["group_of_subjects"] = os.path.basename(
                     os.path.dirname(self.group.fullPath()))
+                atts["texture"] = os.path.basename(os.path.dirname(
+                    os.path.dirname(
+                        os.path.dirname(self.filtered_watershed.fullPath()))))
                 matrix = WriteDiskItem("Group Reduced Connectivity Matrix",
                                    "GIS image").findValue(atts)
                 if matrix is not None:
@@ -108,7 +110,8 @@ def initialization(self):
 
     # link of parameters
     self.linkParameters(
-        "complete_connectivity_matrix", ("filtered_watershed", "group"),
+        "complete_connectivity_matrix",
+        ("filtered_watershed", "group", "segmentation_name_used"),
         link_watershed)
     self.linkParameters(
         "reduced_connectivity_matrix",
@@ -143,3 +146,11 @@ def initialization(self):
                 "reduced_connectivity_matrix",
                 defaultProcess="createReducedConnectivityMatrix",
                 name="createReducedConnectivityMatrix"))
+
+    #~eNode.addLink(
+        #~None, "gyri_texture",
+        #~partial(brainvisa.processes.mapValuesToChildrenParameters, eNode,
+                #~eNode, "gyri_texture",
+                #~"gyri_texture",
+                #~defaultProcess="createReducedConnectivityMatrix",
+                #~name="createReducedConnectivityMatrix"))

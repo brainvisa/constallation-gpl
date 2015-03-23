@@ -35,6 +35,7 @@ signature = Signature(
     "normed_connectivity_profiles", ListOf(
         ReadDiskItem("Normed Connectivity Profile", "Aims texture formats")),
     "group", ReadDiskItem("Group definition", "XML"),
+    "new_name", String(),
     "normed_connectivity_profile_nb", ListOf(
         WriteDiskItem("Group Normed Connectivity Profile", "Aims texture formats")),
     "group_connectivity_profile", WriteDiskItem(
@@ -46,6 +47,8 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters"""
 
+    # optional value
+    self.setOptional("new_name")
     
     def link_profiles(self, dummy):
         """Function of link between individual profiles and normed profiles.
@@ -56,6 +59,8 @@ def initialization(self):
                 atts = dict(profile.hierarchyAttributes())
                 atts["group_of_subjects"] = os.path.basename(
                     os.path.dirname(self.group.fullPath()))
+                if self.new_name is not None:
+                    atts["texture"] = self.new_name
                 profile = WriteDiskItem(
                     "Group Normed Connectivity Profile",
                     "Aims texture formats").findValue(atts)
@@ -71,14 +76,16 @@ def initialization(self):
             atts = dict(self.normed_connectivity_profiles[0].hierarchyAttributes())
             atts["group_of_subjects"] = os.path.basename(
                     os.path.dirname(self.group.fullPath()))
+            if self.new_name is not None:
+                atts["texture"] = self.new_name
             return self.signature["group_connectivity_profile"].findValue(atts)
 
     # link of parameters
     self.linkParameters("normed_connectivity_profile_nb", (
-        "normed_connectivity_profiles", "group"), link_profiles)
+        "normed_connectivity_profiles", "group", "new_name"), link_profiles)
     self.linkParameters(
         "group_connectivity_profile",
-        ("normed_connectivity_profiles", "group"), link_group_profiles)
+        ("normed_connectivity_profiles", "group", "new_name"), link_group_profiles)
 
 
 def execution(self, context):
