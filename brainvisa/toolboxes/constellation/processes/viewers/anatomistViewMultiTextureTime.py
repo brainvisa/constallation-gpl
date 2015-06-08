@@ -20,7 +20,7 @@ userLevel = 0
 
 signature = Signature(
     'clustering_texture', ListOf(ReadDiskItem('Group Clustering Texture', 'anatomist texture formats')),
-    'white_mesh', ListOf(ReadDiskItem('AimsBothWhite', 'Aims mesh formats')),
+    'white_mesh', ListOf(ReadDiskItem('Mesh', 'Aims mesh formats')),
 )
 
 
@@ -31,7 +31,7 @@ def initialization(self):
 def get_screen_config():
     desktop = QtGui.qApp.desktop()
     print "desktop size: %d x %d" % (desktop.width(), desktop.height())
-#    monitors = []
+    monitors = []
     nmons = desktop.screenCount()
     print "there are %d monitors" % nmons
     for m in range(nmons):
@@ -43,7 +43,7 @@ def get_screen_config():
 #    curmon = screen.get_monitor_at_window(screen.get_active_window())
     curmon = desktop.screenNumber(QtGui.QCursor.pos())
 #    print "monitor %d: %d x %d (current)" % (curmon,width,height)  
-    print "monitor %d: %d x %d (current)" % (curmon,width,height)
+    #~print "monitor %d: %d x %d (current)" % (curmon,width,height)
     return (curmon, monitors[curmon])
 
     #window = gtk.Window()
@@ -69,7 +69,7 @@ def execution(self, context):
     a = ana.Anatomist()
 
     curmon, monitor = mainThreadActions().call(get_screen_config)
-
+    block = a.createWindowsBlock(nbCols=3, nbRows=3)
 
     w = []
     t = []
@@ -79,7 +79,7 @@ def execution(self, context):
         texture.setPalette(palette='random', absoluteMode=True)
         textured_mesh = a.fusionObjects([mesh, texture], method='FusionTexSurfMethod')
         a.execute('TexturingParams', objects=[textured_mesh], interpolation='rgb')
-        win = a.createWindow('3D', block=block, no_decoration=True)
+        win = a.createWindow('Sagittal', block=block, no_decoration=False)
         win.addObjects(textured_mesh)
         w.append(win)
         t.append(textured_mesh)

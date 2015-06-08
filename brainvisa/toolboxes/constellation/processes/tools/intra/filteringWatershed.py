@@ -1,14 +1,11 @@
-############################################################################
-#  This software and supporting documentation are distributed by
-#      CEA/NeuroSpin, Batiment 145,
-#      91191 Gif-sur-Yvette cedex
-#      France
-# This software is governed by the CeCILL license version 2 under
-# French law and abiding by the rules of distribution of free software.
-# You can  use, modify and/or redistribute the software under the
-# terms of the CeCILL license version 2 as circulated by CEA, CNRS
-# and INRIA at the following URL "http://www.cecill.info".
-############################################################################
+###############################################################################
+# This software and supporting documentation are distributed by CEA/NeuroSpin,
+# Batiment 145, 91191 Gif-sur-Yvette cedex, France. This software is governed
+# by the CeCILL license version 2 under French law and abiding by the rules of
+# distribution of free software. You can  use, modify and/or redistribute the
+# software under the terms of the CeCILL license version 2 as circulated by
+# CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+###############################################################################
 
 # Axon python API modules
 from brainvisa.processes import *
@@ -24,6 +21,7 @@ import warnings
 # Plot constel modules
 try:
     import constel.lib.texturetools as tt
+    from constel.lib.texturetools import identify_patch_number
 except:
     warnings.warn("Please make sure that constellation module is installed.")
 
@@ -79,20 +77,13 @@ def initialization(self):
     self.linkParameters("filtered_watershed", "complete_connectivity_matrix")
 
     self.setOptional("patch")
-    self.signature["white_mesh"].userLevel = 3
 
 
 def execution(self, context):
     """ Compute reduced connectivity matrix
     """
     # provides the patch name
-    if self.patch is not None:
-        patch = self.patch
-    else:
-        patch = os.path.dirname(
-            os.path.basename(os.path.dirname(os.path.dirname(
-                self.complete_connectivity_matrix.fullPath()))))
-        patch = patch.strip("G")
+    patch = identify_patch_number(self.complete_connectivity_matrix.fullPath())
 
     context.system("constelConnectionDensityTexture",
                    "-mesh", self.white_mesh,

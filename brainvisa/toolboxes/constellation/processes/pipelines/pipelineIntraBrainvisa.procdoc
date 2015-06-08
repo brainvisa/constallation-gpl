@@ -5,6 +5,7 @@
     <xhtml name="short">A complete pipeline: an intra_subject chain which builds the individual connectivity matrices. The preprocessings are done using FreeSurfer for the anatomical data, and Connectomist for the diffusion data.</xhtml>
     <d name="parameters">
       <xhtml name="smoothing">Degree of smoothing (in millimetres)</xhtml>
+      <xhtml name="white_mesh">Indivdual both brain mesh</xhtml>
       <xhtml name="gyri_texture">Several possibilities depending on the study:<br/>
 <i>(1) Averaged approach:</i> average gyri segmentation corresponding to a group of subject<br/>
 <i>(2) Concatenated approach:</i> individual gyri segmentation
@@ -17,8 +18,9 @@ All output files will be in a database. Please make sure that this database exis
 </xhtml>
       <xhtml name="texture">The desired name of the used texture (total freedom of choice). For instance, "fs01to40" corresponds exactly to the FreeSurfer texture for the group of subjects: 001 to 040 in the case of averaged study.</xhtml>
       <xhtml name="patch">Labels used to select a region was on subdivision into gyri of FreeSurfer. For instance, postcentral gyrus corresponds to 23. By default, pacth is not defined ("use_new_patch").</xhtml>
-      <xhtml name="white_mesh">Indivdual both brain mesh</xhtml>
-      <xhtml name="subject">Subject directory where all files will be create</xhtml>
+      <xhtml name="new_patch"/>
+      <xhtml name="formats_fiber_tracts"/>
+      <xhtml name="subject">Directory where the fiber tracts files are stored.</xhtml>
     </d>
     <xhtml name="long"/>
   </d>

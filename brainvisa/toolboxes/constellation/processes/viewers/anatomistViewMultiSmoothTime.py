@@ -77,12 +77,12 @@ def execution(self, context):
     w = []
     t = []
     for i in xrange(nb_tex):
-        mesh = a.loadObject(self.white_mesh[i])
+        mesh = a.loadObject(self.white_mesh[0])
         texture = a.loadObject(self.clustering_texture[i])
         texture.setPalette(palette='random', absoluteMode=True)
         textured_mesh = a.fusionObjects([mesh, texture], method='FusionTexSurfMethod')
         a.execute('TexturingParams', objects=[textured_mesh], interpolation='rgb')
-        win = a.createWindow('3D', block=block, no_decoration=True)
+        win = a.createWindow('Sagittal', block=block, no_decoration=True)
         win.addObjects(textured_mesh)
         w.append(win)
         t.append(textured_mesh)

@@ -1,19 +1,15 @@
-############################################################################
-#  This software and supporting documentation are distributed by
-#      CEA/NeuroSpin, Batiment 145,
-#      91191 Gif-sur-Yvette cedex
-#      France
-# This software is governed by the CeCILL license version 2 under
-# French law and abiding by the rules of distribution of free software.
-# You can  use, modify and/or redistribute the software under the
-# terms of the CeCILL license version 2 as circulated by CEA, CNRS
-# and INRIA at the following URL "http://www.cecill.info".
-############################################################################
+###############################################################################
+# This software and supporting documentation are distributed by CEA/NeuroSpin,
+# Batiment 145, 91191 Gif-sur-Yvette cedex, France. This software is governed
+# by the CeCILL license version 2 under French law and abiding by the rules of
+# distribution of free software. You can  use, modify and/or redistribute the
+# software under the terms of the CeCILL license version 2 as circulated by
+# CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+###############################################################################
 
-# Axon python API modules
+# Axon python API module
 from brainvisa.processes import *
 from soma.path import find_in_path
-
 
 # Plot constel module
 def validation():
@@ -61,11 +57,18 @@ def execution(self, context):
             os.path.dirname(self.reduced_connectivity_matrix.fullPath()))))
         patch = patch.strip("G")
 
-    context.system(sys.executable,
+    print "patch: ", patch
+    print "matrix", self.reduced_connectivity_matrix
+    print "gyri_seg", self.gyri_texture
+    print "mesh", self.white_mesh
+    print "kmax", self.kmax
+    print "clustering", self.clustering_time
+
+    context.system("python",
                    find_in_path("constelIntraSubjectClustering.py"),
-                   "-m", self.reduced_connectivity_matrix,
-                   "-p", patch,
-                   "-g", self.gyri_texture,
-                   "-w", self.white_mesh,
-                   "-a", self.kmax,
-                   "-t", self.clustering_time)
+                   "matrix", self.reduced_connectivity_matrix,
+                   "patch", patch,
+                   "gyri_segmentation", self.gyri_texture,
+                   "mesh", self.white_mesh,
+                   "kmax", self.kmax,
+                   "clustering_time", self.clustering_time)

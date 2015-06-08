@@ -7,7 +7,7 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-# BrainVisa module
+# Axon python API module
 from brainvisa.processes import *
 from soma.path import find_in_path
 

@@ -43,10 +43,10 @@ signature = Signature(
     "matrix_of_fibers_near_cortex", WriteDiskItem(
         "Connectivity Matrix Fibers Near Cortex", "Matrix sparse"),
     "profile_of_fibers_near_cortex", WriteDiskItem(
-        "Connectivity Profile Fibers Near Cortex", "Aims texture formats"),
+        "Connectivity Profile Fibers Near Cortex", "Gifti file"),
     "profile_of_distant_fibers", WriteDiskItem(
         "Connectivity Profile Outside Fibers Of Cortex",
-        "Aims texture formats"),
+        "Gifti file"),
 )
 
 

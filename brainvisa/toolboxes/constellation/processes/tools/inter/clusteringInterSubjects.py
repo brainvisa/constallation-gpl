@@ -117,6 +117,7 @@ def execution(self, context):
     ma = aims.read(self.group_matrix.fullPath())
     context.write(ma.header())
 
+    
     cmd_args = []
     for t in self.clustering_time:
         cmd_args += ["-p", t]

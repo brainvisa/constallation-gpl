@@ -29,7 +29,7 @@ userLevel = 2
 # Argument declaration
 signature = Signature(
     "mask", ReadDiskItem("Avg Connectivity Mask", "Aims texture formats"),
-    "connectivity_profiles", ReadDiskItem(
+    "connectivity_profile", ReadDiskItem(
         "Avg Connectivity Profile", "Aims texture formats"),
     "thresholded_connectivity_profile", WriteDiskItem(
         "Avg Thresholded Connectivity Profile", "Aims texture formats"),
@@ -39,9 +39,9 @@ signature = Signature(
 
 def initialization(self):
     """Provides default values and link of parameters"""
-    self.linkParameters("connectivity_profiles", "mask")
+    self.linkParameters("connectivity_profile", "mask")
     self.linkParameters(
-        "thresholded_connectivity_profile", "connectivity_profiles")
+        "thresholded_connectivity_profile", "connectivity_profile")
     self.linkParameters(
         "normed_connectivity_profile", "thresholded_connectivity_profile")
 
@@ -51,7 +51,7 @@ def execution(self, context):
     """
     mask = aims.read(self.mask.fullPath())
     meanConnectivityProfileTex = aims.read(
-        self.connectivity_profiles.fullPath())
+        self.connectivity_profile.fullPath())
     for i in xrange(meanConnectivityProfileTex[0].nItem()):
         if mask[0][i] == 0:
             meanConnectivityProfileTex[0][i] = 0

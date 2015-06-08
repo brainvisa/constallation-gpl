@@ -1,16 +1,13 @@
-############################################################################
-# This software and supporting documentation are distributed by
-#      CEA/NeuroSpin, Batiment 145,
-#      91191 Gif-sur-Yvette cedex
-#      France
-# This software is governed by the CeCILL license version 2 under
-# French law and abiding by the rules of distribution of free software.
-# You can  use, modify and/or redistribute the software under the
-# terms of the CeCILL license version 2 as circulated by CEA, CNRS
-# and INRIA at the following URL "http://www.cecill.info".
-############################################################################
+###############################################################################
+# This software and supporting documentation are distributed by CEA/NeuroSpin,
+# Batiment 145, 91191 Gif-sur-Yvette cedex, France. This software is governed
+# by the CeCILL license version 2 under French law and abiding by the rules of
+# distribution of free software. You can  use, modify and/or redistribute the
+# software under the terms of the CeCILL license version 2 as circulated by
+# CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+###############################################################################
 
-# BrainVisa
+# Axon python API module
 from brainvisa.processes import *
 from soma import aims
 
@@ -22,8 +19,8 @@ userLevel = 0
 roles = ('viewer', )
 
 signature = Signature(
-    'bundles', ReadDiskItem('Fascicles bundles',
-                            'Aims readable bundles formats'),
+    'bundles', ReadDiskItem(
+        'Fascicles bundles', 'Aims readable bundles formats'),
     'dw_to_t1', ReadDiskItem(
         'Transformation matrix', 'Transformation matrix'),
     'white_mesh', ReadDiskItem(
@@ -74,6 +71,8 @@ def execution_mainthread(self, context):
     # load objects
     mesh = a.loadObject(self.white_mesh)
     clusters = a.loadObject(self.clustering_texture)
+
+    # filtering fiber tracts
     clusters.attributed()['time_step'] \
         = self.clustering_texture_timestep
     bundles = self.loadFilteredBundles(self.bundles.fullPath())
@@ -121,8 +120,8 @@ def execution_mainthread(self, context):
                '3': [0.3, 0.3, 0.8, 1.], '4': [0.8, 0.8, 0.3, 1.],
                '5': [0.8, 0.3, 0.8, 1.], '6': [0.3, 0.8, 0.8, 1.]}
     patches[self.cluster_number] = [0.4, 0.6, 1., 1.]
-    basins = {'11': [0., 0., 1., 0.35], '24': [1., 0., 0., 0.35],
-              '16': [0., 1., 0., 0.35],}
+    basins = {'2': [0., 0., 1., 0.35], '4': [1., 0., 0., 0.35],
+              '5': [0., 1., 0., 0.35],}
               #'17': [0.5, 1., 1., 0.3],
               #'13': [1., 0., 0.5, 0.3]}
     basincolor = [0.9, 0.9, 0.9, 1.]
