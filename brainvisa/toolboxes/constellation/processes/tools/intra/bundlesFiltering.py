@@ -7,89 +7,91 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-# Axon python API module
-from brainvisa.processes import *
-from soma.path import find_in_path
+"""
+This script does the following:
+* defines a Brainvisa process
+    - the parameters of a process (Signature),
+    - the parameters initialization
+    - the linked parameters
+* executes the command 'constelBundlesFiltering' to filter the fiber tracts
+  according to length.
 
-# System module
+Main dependencies: axon python API, soma-base, constel
+
+Author: Sandrine Lefranc, 2015
+"""
+
+#----------------------------Imports-------------------------------------------
+
+
+# python modules
+import os
 import glob
 
+# axon python API module
+from brainvisa.processes import Signature, String, Choice, Float, \
+    ReadDiskItem, WriteDiskItem, ValidationError, neuroHierarchy, OpenChoice
 
-# Plot constel module
+# soma-base module
+from soma.path import find_in_path
+
+# constel modules
+try:
+    from constel.lib.utils.files import read_file, select_ROI_number
+    from constel.lib.bundles.bundles_tools import load_fiber_tracts
+except:
+    pass
+
+
 def validation():
-    """This function is executed at BrainVisa startup when the process is loaded.
-
-    It checks some conditions for the process to be available.
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("constelBundlesFiltering"):
-        raise ValidationError("Please make sure that constel is installed.")
+    if not find_in_path("constelBundlesFiltering"):  # checks command (C++)
+        raise ValidationError(
+            "constelBundlesFiltering is not contained in PATH environnement "
+            "variable. Please make sure that constellation is installed.")
+
+
+#----------------------------Header--------------------------------------------
 
 
 name = "Bundles Filtering"
 userLevel = 2
 
-
-# Arguments declaration
 signature = Signature(
+    # --inputs--
+    "give_the_study_a_name", String(),
     "database", Choice(),
-    "formats_fiber_tracts", Choice("bundles", "trk"),
-    "study", Choice(("averaged approach", "avg"),
-                    ("concatenated approach", "concat")),
-    "patch", Choice(
-        ("*** use_new_patch ***", 0),
-        ("left corpus callosum", 1), ("left bankssts", 2),
-        ("left caudal anterior cingulate", 3),
-        ("left caudal middle frontal", 4), ("left cuneus", 6),
-        ("left entorhinal", 7), ("left fusiform", 8),
-        ("left inferior parietal", 9), ("left inferior temporal", 10),
-        ("left isthmus cingulate", 11), ("left lateral occipital", 12),
-        ("left lateral orbitofrontal", 13), ("left lingual", 14),
-        ("left medial orbitofrontal", 15), ("left middle temporal", 16),
-        ("left parahippocampal", 17), ("left paracentral", 18),
-        ("left pars opercularis", 19), ("left pars orbitalis", 20),
-        ("left pars triangularis", 21), ("left pericalcarine", 22),
-        ("left postcentral", 23), ("left posterior cingulate", 24),
-        ("left precentral", 25), ("left precuneus", 26),
-        ("left rostral anterior cingulate", 27),
-        ("left rostral middle frontal", 28), ("left superior frontal", 29),
-        ("left superior parietal", 30), ("left superior temporal", 31),
-        ("left supramarginal", 32), ("left frontal pole", 33),
-        ("left temporal pole", 34), ("left transverse temporal", 35),
-        ("left insula", 36), ("right corpus callosum", 37),
-        ("right bankssts", 38), ("right caudal anterior cingulate", 39),
-        ("right caudal middle frontal", 40), ("right cuneus", 42),
-        ("right entorhinal", 43), ("right fusiform", 44),
-        ("right inferior parietal", 45), ("right inferior temporal", 46),
-        ("right isthmus cingulate", 47), ("right lateral occipital", 48),
-        ("right lateral orbitofrontal", 49), ("right lingual", 50),
-        ("right medial orbitofrontal", 51), ("right middle temporal", 52),
-        ("right parahippocampal", 53), ("right paracentral", 54),
-        ("right pars opercularis", 55), ("right pars orbitalis", 56),
-        ("right pars triangularis", 57), ("right pericalcarine", 58),
-        ("right postcentral", 59), ("right posterior cingulate", 60),
-        ("right precentral", 61), ("right precuneus", 62),
-        ("right rostral anterior cingulate", 63),
-        ("right rostral middle frontal", 64), ("right superior frontal", 65),
-        ("right superior parietal", 66), ("right superior temporal", 67),
-        ("right supramarginal", 68), ("right frontal pole", 69),
-        ("right temporal pole", 70), ("right transverse temporal", 71),
-        ("right insula", 72)),
-    "new_patch", Integer(),
-    "segmentation_name_used", String(),
+    "format_fiber_tracts", Choice("bundles", "trk"),
+    "method", Choice(("averaged approach", "avg"),
+                     ("concatenated approach", "concat")),
+    "ROIs_nomenclature", ReadDiskItem("Text file", "Text File"),
+    "ROI", Choice(),
     "subject", ReadDiskItem("subject", "directory"),
-    "gyri_texture", ReadDiskItem("Label Texture", "Aims texture formats"),
-    "white_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
-    "dw_to_t1", ReadDiskItem("Transformation matrix",
-                             "Transformation matrix"),
+    "ROIs_segmentation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+    "white_mesh", ReadDiskItem(
+        "White Mesh", "Aims mesh formats",
+        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+    "dw_to_t1", ReadDiskItem("Transformation matrix", "Transformation matrix"),
     "min_length_of_fibers_near_cortex", Float(),
     "max_length_of_fibers_near_cortex", Float(),
     "min_distant_fibers_length", Float(),
     "max_distant_fibers_length", Float(),
+
+    # --outputs--
     "subsets_of_fibers_near_cortex", WriteDiskItem(
-        "Fibers Near Cortex", "Aims writable bundles formats"),
+        "Filtered Fascicles Bundles", "Aims writable bundles formats",
+        requiredAttributes={"both_ends_labelled": "Yes", "oversampled": "No"}),
     "subsets_of_distant_fibers", WriteDiskItem(
-        "Very OutSide Fibers Of Cortex", "Aims writable bundles formats"),
+        "Filtered Fascicles Bundles", "Aims writable bundles formats",
+        requiredAttributes={"both_ends_labelled": "No", "oversampled": "No"}),
 )
+
+
+#----------------------------Functions-----------------------------------------
 
 
 def initialization(self):
@@ -101,11 +103,7 @@ def initialization(self):
     self.min_distant_fibers_length = 20.
     self.max_distant_fibers_length = 500.
 
-    # optional parameter
-    self.setOptional("new_patch")
-
     # list of possible databases, while respecting the ontology
-    # ontology: brainvisa-3.2.0
     databases = [h.name for h in neuroHierarchy.hierarchies()
                  if h.fso.name == "brainvisa-3.2.0"]
     self.signature["database"].setChoices(*databases)
@@ -114,87 +112,89 @@ def initialization(self):
     else:
         self.signature["database"] = OpenChoice()
 
+    def link_roi(self, dummy):
+        """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
+        of process.
+        """
+        if self.ROIs_nomenclature is not None:
+            s = ["Select a ROI in this list"]
+            s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
+            self.signature["ROI"] = Choice(*s)
+            self.changeSignature(self.signature)
+
     def link_filtered_bundles(self, dummy):
-        if self.database is not None and self.subject is not None:
+        """Defines all attributs of 'subsets_of_fibers_near_cortex' in order to
+        allow autocompletion.
+        """
+        if (self.database and self.give_the_study_a_name and self.subject
+                and self.ROI) is not None:
             attrs = dict()
             attrs["_database"] = self.database
-            attrs["study"] = self.study
-            attrs["texture"] = self.segmentation_name_used
+            attrs["study"] = self.method
+            attrs["texture"] = self.give_the_study_a_name
             attrs["subject"] = os.path.basename(self.subject.fullPath())
-            if self.new_patch is not None:
-                attrs["gyrus"] = "G" + str(self.new_patch)
-            else:
-                attrs["gyrus"] = "G" + str(self.patch)
-            attrs["minlengthoffibersIn"] = str(
+            attrs["gyrus"] = str(self.ROI)
+            attrs["smallerlength1"] = str(
                 int(self.min_length_of_fibers_near_cortex))
-            attrs["maxlengthoffibersOut"] = str(
+            attrs["greaterlength1"] = str(
                 int(self.max_length_of_fibers_near_cortex))
             filename = self.signature[
                 "subsets_of_fibers_near_cortex"].findValue(attrs)
             return filename
 
     def link_between_filtered_bundles(self, dummy):
-        if self.subsets_of_fibers_near_cortex is not None:
-            attrs = dict(
-                self.subsets_of_fibers_near_cortex.hierarchyAttributes())
-            attrs["minlengthoffibersOut"] = str(
-                int(self.min_distant_fibers_length))
-            attrs["maxlengthoffibersOut"] = str(
-                int(self.max_distant_fibers_length))
+        """Defines all attributs of 'subsets_of_distant_fibers' in order to
+        allow autocompletion.
+        """
+        if (self.database and self.give_the_study_a_name and self.subject
+                and self.ROI) is not None:
+            attrs = dict()
+            attrs["_database"] = self.database
+            attrs["study"] = self.method
+            attrs["texture"] = self.give_the_study_a_name
+            attrs["subject"] = os.path.basename(self.subject.fullPath())
+            attrs["gyrus"] = str(self.ROI)
+            attrs["smallerlength2"] = str(int(self.min_distant_fibers_length))
+            attrs["greaterlength2"] = str(int(self.max_distant_fibers_length))
             filename = self.signature[
                 "subsets_of_distant_fibers"].findValue(attrs)
             return filename
 
+    # link of parameters for autocompletion
+    self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
+    self.linkParameters("dw_to_t1", "subject")
     self.linkParameters("subsets_of_fibers_near_cortex", (
-        "database", "subject", "study", "segmentation_name_used", "patch",
-        "new_patch", "min_length_of_fibers_near_cortex",
+        "database", "subject", "method", "give_the_study_a_name", "ROI",
+        "min_length_of_fibers_near_cortex",
         "max_length_of_fibers_near_cortex"), link_filtered_bundles)
     self.linkParameters(
         "subsets_of_distant_fibers", (
-            "subsets_of_fibers_near_cortex", "max_distant_fibers_length",
-            "min_distant_fibers_length"), link_between_filtered_bundles)
-    self.linkParameters("dw_to_t1", "subject")
+            "database", "subject", "method", "give_the_study_a_name", "ROI",
+            "min_distant_fibers_length",
+            "max_distant_fibers_length"), link_between_filtered_bundles)
 
 
-def load_fiber_tracts(directory, formats):
-    """Load all fiber tracts from patterns for one subject.
-
-    Parameters
-    ----------
-    directory: str (mandatory)
-        pattern of fiber tracts files to download
-    formats: str (mandatory)
-        fiber tracts formats (.bundles or .trk)
-
-    Return
-    ------
-    fnames: list
-        list of bundles files
-    """
-    if formats == "bundles":
-        patterns = [os.path.join(directory, "*.bundles")]
-    elif formats == "trk":
-        patterns = [os.path.join(directory), "*.trk"]
-    fnames = []
-    for pattern in patterns:
-        fnames.extend(glob.glob(pattern))
-    return fnames
+#----------------------------Main program--------------------------------------
 
 
 def execution(self, context):
-    """Run the bundles filtering by giving a min and max length of fibers.
+    """Run the command 'constelBundlesFiltering' to filter the fiber tracts
+    according to length.
+
+    Two type of fiber tracts files are to be considered in this process:
+        - the fibers near cortex are defined as having both ends attached to
+          the mesh (and are consequently labelled)
+        - the distant fibers are defined as having only one end attached to the
+          mesh (the other being not identified)
     """
-    # Users have the opportunity to force the number of gyrus
-    # For this, patch should be "use_new_patch"
-    if self.new_patch is not None:
-        patch = self.new_patch
-    else:
-        patch = self.patch
-
+    # selects all fiber tracts of the given subject
     list_fiber_tracts = load_fiber_tracts(
-        self.subject.fullPath(), self.formats_fiber_tracts)
+        self.subject.fullPath(), self.format_fiber_tracts)
 
-    # name of the command
+    # selects the ROI label corresponding to ROI name
+    ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
+
+    # name of the command (C++)
     cmd = ["constelBundlesFiltering"]
 
     # options of the command
@@ -204,12 +204,12 @@ def execution(self, context):
         "-o", self.subsets_of_fibers_near_cortex,
         "-n", self.subsets_of_distant_fibers,
         "--mesh", self.white_mesh,
-        "--tex", self.gyri_texture,
+        "--tex", self.ROIs_segmentation,
         "--trs", self.dw_to_t1,
         "--mode", "Name1_Name2orNotInMesh",
-        "--names", "^" + str(patch) + "_[0-9]+$",
-        "--names", "^[0-9]+_" + str(patch) + "$",
-        "-g", patch,
+        "--names", "^" + str(ROIlabel) + "_[0-9]+$",
+        "--names", "^[0-9]+_" + str(ROIlabel) + "$",
+        "-g", ROIlabel,
         "-r",
         "-l", self.min_length_of_fibers_near_cortex,
         "-L", self.max_length_of_fibers_near_cortex,
@@ -217,5 +217,5 @@ def execution(self, context):
         "--nimlmax", self.max_distant_fibers_length,
     ]
 
-    # executing the command
+    # executes the command
     context.system(*cmd)
