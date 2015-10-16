@@ -7,41 +7,76 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-# Axon python API module
-from brainvisa.processes import *
+"""
+This script does the following:
+* defines a Brainvisa process
+    - the parameters of a process (Signature),
+    - the linked parameters
+* executes the command 'comistFiberOversampler' to perform an oversampling
+  of the distant fiber tracts.
+
+Main dependencies: axon python API, soma-base, comist
+
+Author: Sandrine Lefranc, 2015
+"""
+
+#----------------------------Imports-------------------------------------------
+
+
+# axon python API module
+from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
+    ValidationError
+
+# soma-base module
 from soma.path import find_in_path
 
 
-# Plot connectomist module
 def validation():
-    """This function is executed at BrainVisa startup when the process is loaded.
-
-    It checks some conditions for the process to be available.
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("comistFiberOversampler"):
+    if not find_in_path("comistFiberOversampler"):  # checks command (C++)
         raise ValidationError(
-            "Please make sure that connectomist module is installed.")
+            "comistFiberOversampler is not contained in PATH environnement "
+            "variable. Please make sure that connectomist is installed.")
+
+
+#----------------------------Header--------------------------------------------
+
 
 name = "Fiber Oversampler"
 userLevel = 2
 
 
-# Argument declaration
 signature = Signature(
+    # --input--
     "filtered_length_distant_fibers", ReadDiskItem(
-        "Very OutSide Fibers Of Cortex", "Aims readable bundles formats"),
+        "Filtered Fascicles bundles", "Aims readable bundles formats",
+        requiredAttributes={"both_ends_labelled": "No", "oversampled": "No"}),
+
+    # --output--
     "oversampled_distant_fibers", WriteDiskItem(
-        "Oversampled Fibers", "Aims writable bundles formats"),
+        "Fascicles bundles", "Aims writable bundles formats",
+        requiredAttributes={"both_ends_labelled": "No", "oversampled": "Yes"}),
 )
 
 
+#----------------------------Functions-----------------------------------------
+
+
 def initialization(self):
+    """Provides link of parameters for autocompletion.
+    """
     self.linkParameters(
         "oversampled_distant_fibers", "filtered_length_distant_fibers")
 
 
+#----------------------------Main program--------------------------------------
+
+
 def execution(self, context):
-    """Run the oversampling on fibers with one end only identified
+    """Run the command 'comistFiberOversampler' on the fiber tracts
+    with only one end identified on the mesh.
     """
     context.system("comistFiberOversampler",
                    "-i", self.filtered_length_distant_fibers,
