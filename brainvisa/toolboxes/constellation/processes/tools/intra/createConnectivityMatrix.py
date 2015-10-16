@@ -7,75 +7,139 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-# Axon python API module
-from brainvisa.processes import *
+"""
+This script does the following:
+* defines a Brainvisa process
+    - the parameters of a process (Signature),
+    - the parameters initialization
+    - the linked parameters
+* executes the command 'constelConnectivityMatrix' to compute the connectivity
+  matrix (ROI vertices, cortical surface vertices)
+
+Main dependencies: axon python API, soma-base, constel
+
+Author: Sandrine Lefranc, 2015
+"""
+
+#----------------------------Imports-------------------------------------------
+
+
+# axon python API module
+from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
+    ValidationError, String
+
+# soma-base module
 from soma.path import find_in_path
 
 # constel module
-from constel.lib.texturetools import identify_patch_number
+try:
+    from constel.lib.utils.files import select_ROI_number
+except:
+    pass
 
 
-# Plot contel
 def validation():
-    """This function is executed at BrainVisa startup when the process is loaded.
-
-    It checks some conditions for the process to be available.
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("constelConnectivityMatrix"):
+    if not find_in_path("constelConnectivityMatrix"):  # checks command (C++)
         raise ValidationError(
-            "Please make sure that constel module is installed.")
+            "constelConnectivityMatrix is not contained in PATH environnement "
+            "variable or please make sure that constellation is installed.")
+
+
+#----------------------------Functions-----------------------------------------
+
 
 name = "Connectivity Matrix"
 userLevel = 2
 
-# Argument declaration
 signature = Signature(
+    # --inputs--
     "oversampled_distant_fibers", ReadDiskItem(
-        "Oversampled Fibers", "Aims readable bundles formats"),
+        "Filtered Fascicles Bundles", "Aims readable bundles formats",
+        requiredAttributes={"both_ends_labelled": "No", "oversampled": "Yes"}),
     "filtered_length_fibers_near_cortex", ReadDiskItem(
-        "Fibers Near Cortex", "Aims readable bundles formats"),
-    "white_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
-    "gyri_texture", ReadDiskItem("Label Texture", "Aims texture formats"),
-    "dw_to_t1", ReadDiskItem(
-        "Transformation matrix", "Transformation matrix"),
+        "Filtered Fascicles Bundles", "Aims readable bundles formats",
+        requiredAttributes={"both_ends_labelled": "Yes", "oversampled": "No"}),
+    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
+    "ROI", String(),
+    "white_mesh", ReadDiskItem(
+        "White Mesh", "Aims mesh formats",
+        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+    "ROIs_segmentation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+    "dw_to_t1", ReadDiskItem("Transformation matrix", "Transformation matrix"),
+
+    # --ouputs--
     "matrix_of_distant_fibers", WriteDiskItem(
-        "Connectivity Matrix Outside Fibers Of Cortex", "Matrix sparse"),
+        "Connectivity Matrix", "Matrix sparse",
+        requiredAttributes={"ends_labelled": "single",
+                            "reduced": "No",
+                            "dense": "No",
+                            "intersubject": "No"}),
     "matrix_of_fibers_near_cortex", WriteDiskItem(
-        "Connectivity Matrix Fibers Near Cortex", "Matrix sparse"),
-    "profile_of_fibers_near_cortex", WriteDiskItem(
-        "Connectivity Profile Fibers Near Cortex", "Gifti file"),
+        "Connectivity Matrix", "Matrix sparse",
+        requiredAttributes={"ends_labelled": "both",
+                            "reduced": "No",
+                            "dense": "No",
+                            "intersubject": "No"}),
     "profile_of_distant_fibers", WriteDiskItem(
-        "Connectivity Profile Outside Fibers Of Cortex",
-        "Gifti file"),
+        "Filtered Connectivity Profile Texture", "Gifti file",
+        requiredAttributes={"both_ends_labelled": "No"}),
+    "profile_of_fibers_near_cortex", WriteDiskItem(
+        "Filtered Connectivity Profile Texture", "Gifti file",
+        requiredAttributes={"both_ends_labelled": "Yes"}),
 )
+
+
+#----------------------------Functions-----------------------------------------
 
 
 def initialization(self):
     """Provides default values and link of parameters"""
-    self.linkParameters(
-        "filtered_length_fibers_near_cortex", "oversampled_distant_fibers")
+    # default value    
+    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+
+    def link_fibertracts2ROI(self, dummy):
+        """Define the attribut 'gyrus' from fibertracts pattern for the
+        signature 'ROI'.
+        """
+        if self.oversampled_distant_fibers is not None:
+            s = str(self.oversampled_distant_fibers.get("gyrus"))
+            name = self.signature["ROI"].findValue(s)
+        return name
+
+    # link of parameters for autocompletion
     self.linkParameters(
         "matrix_of_distant_fibers", "oversampled_distant_fibers")
     self.linkParameters(
-        "matrix_of_fibers_near_cortex", "matrix_of_distant_fibers")
+        "ROI", "oversampled_distant_fibers", link_fibertracts2ROI)
+    self.linkParameters(
+        "matrix_of_fibers_near_cortex", "filtered_length_fibers_near_cortex")
     self.linkParameters(
         "profile_of_distant_fibers", "matrix_of_distant_fibers")
     self.linkParameters(
         "profile_of_fibers_near_cortex", "matrix_of_fibers_near_cortex")
-    self.signature["profile_of_fibers_near_cortex"].userLevel = 2
-    self.signature["profile_of_distant_fibers"].userLevel = 2
+
+
+#----------------------------Main program--------------------------------------
+
 
 def execution(self, context):
-    """Computes two connectivity matrices.
+    """Computes two connectivity matrices
+    (ROI vertices, cortical surface vertices).
 
     (1) case 1: computes connectivity matrix for distant fibers of cortex
                 one end only of fibers is identified
     (2) case 2:computes connectivity matrix for fibers near cortex
                both ends of fibers are well identified
-    """
-    # provides the patch name
-    patch = identify_patch_number(self.oversampled_distant_fibers.fullPath())
-
+    """   
+    # selects the ROI label corresponding to ROI name
+    ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
+    print ROIlabel
+    
     # case 1
     # this command is mostly concerned with fibers leaving the brain stem
     context.system("constelConnectivityMatrix",
@@ -85,12 +149,12 @@ def execution(self, context):
                    "-dist", 0.0,  # no smoothing
                    "-wthresh", 0.001,
                    "-distmax", 5.0,
-                   "-seedregionstex", self.gyri_texture,
+                   "-seedregionstex", self.ROIs_segmentation,
                    "-outconntex", self.profile_of_distant_fibers,
                    "-mesh", self.white_mesh,
                    "-type", "seed_mean_connectivity_profile",
                    "-trs", self.dw_to_t1,
-                   "-seedlabel", patch,
+                   "-seedlabel", ROIlabel,
                    "-normalize", 0,
                    "-verbose", 1)
 
@@ -99,11 +163,11 @@ def execution(self, context):
                    "-bundles", self.filtered_length_fibers_near_cortex,
                    "-connmatrix", self.matrix_of_fibers_near_cortex,
                    "-dist", 0.0,  # no smoothing
-                   "-seedregionstex", self.gyri_texture,
+                   "-seedregionstex", self.ROIs_segmentation,
                    "-outconntex", self.profile_of_fibers_near_cortex,
                    "-mesh", self.white_mesh,
                    "-type", "seed_mean_connectivity_profile",
                    "-trs", self.dw_to_t1,
-                   "-seedlabel", patch,
+                   "-seedlabel", ROIlabel,
                    "-normalize", 0,
                    "-verbose", 1)
