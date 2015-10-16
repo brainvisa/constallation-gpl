@@ -61,13 +61,13 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "give_the_study_a_name", String(),
+    "study_name", String(),
     "database", Choice(),
     "format_fiber_tracts", Choice("bundles", "trk"),
     "method", Choice(("averaged approach", "avg"),
                      ("concatenated approach", "concat")),
     "ROIs_nomenclature", ReadDiskItem("Text file", "Text File"),
-    "ROI", Choice(),
+    "ROI", OpenChoice(),
     "subject", ReadDiskItem("subject", "directory"),
     "ROIs_segmentation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
@@ -119,19 +119,21 @@ def initialization(self):
         if self.ROIs_nomenclature is not None:
             s = ["Select a ROI in this list"]
             s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
-            self.signature["ROI"] = Choice(*s)
-            self.changeSignature(self.signature)
+            self.signature["ROI"].setChoices(*s)
+            if isinstance(self.signature['ROI'], OpenChoice):
+                self.signature["ROI"] = Choice(*s)
+                self.changeSignature(self.signature)
 
     def link_filtered_bundles(self, dummy):
         """Defines all attributs of 'subsets_of_fibers_near_cortex' in order to
         allow autocompletion.
         """
-        if (self.database and self.give_the_study_a_name and self.subject
+        if (self.database and self.study_name and self.subject
                 and self.ROI) is not None:
             attrs = dict()
             attrs["_database"] = self.database
             attrs["study"] = self.method
-            attrs["texture"] = self.give_the_study_a_name
+            attrs["texture"] = self.study_name
             attrs["subject"] = os.path.basename(self.subject.fullPath())
             attrs["gyrus"] = str(self.ROI)
             attrs["smallerlength1"] = str(
@@ -146,12 +148,12 @@ def initialization(self):
         """Defines all attributs of 'subsets_of_distant_fibers' in order to
         allow autocompletion.
         """
-        if (self.database and self.give_the_study_a_name and self.subject
+        if (self.database and self.study_name and self.subject
                 and self.ROI) is not None:
             attrs = dict()
             attrs["_database"] = self.database
             attrs["study"] = self.method
-            attrs["texture"] = self.give_the_study_a_name
+            attrs["texture"] = self.study_name
             attrs["subject"] = os.path.basename(self.subject.fullPath())
             attrs["gyrus"] = str(self.ROI)
             attrs["smallerlength2"] = str(int(self.min_distant_fibers_length))
@@ -164,12 +166,12 @@ def initialization(self):
     self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
     self.linkParameters("dw_to_t1", "subject")
     self.linkParameters("subsets_of_fibers_near_cortex", (
-        "database", "subject", "method", "give_the_study_a_name", "ROI",
+        "database", "subject", "method", "study_name", "ROI",
         "min_length_of_fibers_near_cortex",
         "max_length_of_fibers_near_cortex"), link_filtered_bundles)
     self.linkParameters(
         "subsets_of_distant_fibers", (
-            "database", "subject", "method", "give_the_study_a_name", "ROI",
+            "database", "subject", "method", "study_name", "ROI",
             "min_distant_fibers_length",
             "max_distant_fibers_length"), link_between_filtered_bundles)
 
