@@ -7,56 +7,113 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-# Axon python API modules
-from brainvisa.processes import *
+"""
+This script does the following:
+* defines a Brainvisa process
+    - the parameters of a process (Signature),
+    - the parameters initialization
+    - the linked parameters
+* this process 
+
+Main dependencies: Axon python API, Soma-base, constel
+
+Author: sandrine.lefranc@cea.fr
+"""
+
+
+#----------------------------Imports-------------------------------------------
+
+
+# axon python API module
+from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
+    ValidationError, String
+
+# soma-base module
 from soma.path import find_in_path
 
 # constel module
-from constel.lib.texturetools import identify_patch_number
+try:
+    from constel.lib.utils.files import select_ROI_number
+except:
+    pass
 
 
-# Plot constel module
 def validation():
-    """This function is executed at BrainVisa startup when the process is loaded.
-
-    It checks some conditions for the process to be available.
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
     """
     if not find_in_path("constelMeanConnectivityProfileFromMatrix"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
 
+#----------------------------Header--------------------------------------------
+
+
 name = "Mean Connectivity Profile"
 userLevel = 2
 
-# Argument declaration
 signature = Signature(
+    # --inputs--
     "complete_connectivity_matrix", ReadDiskItem(
-        "Gyrus Connectivity Matrix", "Matrix sparse"),
-    "gyri_texture", ReadDiskItem("Label Texture", "Aims texture formats"),
+        "Connectivity Matrix", "Matrix sparse",
+        requiredAttributes={"ends_labelled": "mixed",
+                            "reduced": "No",
+                            "dense": "No",
+                            "intersubject": "No"}),
+    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
+    "ROI", String(),
+    "gyri_texture", ReadDiskItem("ROI Texture", "Aims texture formats",
+                                 requiredAttributes={"side": "both",
+                                                     "vertex_corr": "Yes"}),
+    # --ouputs--
     "patch_connectivity_profile", WriteDiskItem(
-        "Gyrus Connectivity Profile", "GIFTI file"),
+        "Connectivity Profile Texture", "Aims texture formats",
+        requiredAttributes={"normed": "No",
+                            "thresholded": "No",
+                            "averaged": "No",
+                            "intersubject": "No"}),
 )
+
+
+#----------------------------Functions-----------------------------------------
 
 
 def initialization(self):
     """Provides default values and link of parameters"""
+    # default value
+    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+
+    def link_matrix2ROI(self, dummy):
+        """Define the attribut 'gyrus' from fibertracts pattern for the
+        signature 'ROI'.
+        """
+        if self.complete_connectivity_matrix is not None:
+            s = str(self.complete_connectivity_matrix.get("gyrus"))
+            name = self.signature["ROI"].findValue(s)
+        return name
+    
+    # link of parameters for autocompletion
+    self.linkParameters("ROI", "complete_connectivity_matrix", link_matrix2ROI)
     self.linkParameters("patch_connectivity_profile",
                         "complete_connectivity_matrix")
+
+
+#----------------------------Main program--------------------------------------
 
 
 def execution(self, context):
     """Compute the connectivity profile from connectivity matrix
     """
-    # provides the patch name
-    patch = identify_patch_number(self.complete_connectivity_matrix.fullPath())
+    # selects the ROI label corresponding to ROI name
+    ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
 
     context.system("constelMeanConnectivityProfileFromMatrix",
                    "-connfmt", "binar_sparse",
                    "-connmatrixfile", self.complete_connectivity_matrix,
                    "-outconntex", self.patch_connectivity_profile,
                    "-seedregionstex", self.gyri_texture,
-                   "-seedlabel", patch,
+                   "-seedlabel", ROIlabel,
                    "-type", "seed_mean_connectivity_profile",
                    "-normalize", 0,
                    "-verbose", 1)
