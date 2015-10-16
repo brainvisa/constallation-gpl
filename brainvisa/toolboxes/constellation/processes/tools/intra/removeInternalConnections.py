@@ -7,22 +7,82 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
+"""
+This script does the following:
+* defines a Brainvisa process
+    - the parameters of a process (Signature),
+    - the parameters initialization
+    - the linked parameters
+* this process executes the command 'constelRemoveInternalConnections.py'.
+
+Main dependencies: Axon python API, Soma-base, constel
+
+Author: sandrine.lefranc@cea.fr
+"""
+
+#----------------------------Imports-----------------------------------------
+
+
+# python modules
+import sys
+
 # Axon python API module
-from brainvisa.processes import *
+from brainvisa.processes import Signature, Boolean, ReadDiskItem, String, \
+    WriteDiskItem, ValidationError
+
+# soma-base module
 from soma.path import find_in_path
+
+# constel module
+try:
+    from constel.lib.utils.files import select_ROI_number
+except:
+    pass
+
+
+def validation():
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
+    """
+    try:
+        import constel
+    except:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
+
+
+#----------------------------Header--------------------------------------------
+
 
 name = "Remove Internal Connections"
 userLevel = 2
 
-# Argument declaration
 signature = Signature(
+    # --inputs--
     "patch_connectivity_profile", ReadDiskItem(
-        "Gyrus Connectivity Profile", "Aims texture formats"),
-    "gyri_texture", ReadDiskItem("Label Texture", "Aims texture formats"),
+        "Connectivity Profile Texture", "Aims texture formats",
+        requiredAttributes={"normed": "No",
+                            "thresholded": "No",
+                            "averaged": "No",
+                            "intersubject": "No"}),
+    "gyri_texture", ReadDiskItem("ROI Texture", "Aims texture formats",
+                                 requiredAttributes={"side": "both",
+                                                     "vertex_corr": "Yes"}),
+    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
+    "ROI", String(),
+
+    # --outputs--
     "normed_connectivity_profile", WriteDiskItem(
-        "Normed Connectivity Profile", "Aims texture formats"),
+        "Connectivity Profile Texture", "Aims texture formats",
+        requiredAttributes={"normed": "Yes",
+                            "thresholded": "Yes",
+                            "averaged": "No",
+                            "intersubject": "No"}),
     "keep_internal_connections", Boolean(),
 )
+
+
+#----------------------------Functions-----------------------------------------
 
 
 def initialization(self):
@@ -30,26 +90,43 @@ def initialization(self):
     """
     # default value
     self.keep_internal_connections = False
+    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+
+    def link_matrix2ROI(self, dummy):
+        """Define the attribut 'gyrus' from fibertracts pattern for the
+        signature 'ROI'.
+        """
+        if self.patch_connectivity_profile is not None:
+            s = str(self.patch_connectivity_profile.get("gyrus"))
+            name = self.signature["ROI"].findValue(s)
+        return name
     
+    # link of parameters for autocompletion
+    self.linkParameters("ROI", "patch_connectivity_profile", link_matrix2ROI)
     self.linkParameters(
         "normed_connectivity_profile", "patch_connectivity_profile")
+
+
+#----------------------------Main program--------------------------------------
 
 
 def execution(self, context):
     """
     STEP 1/2: Remove internals connections of patch.
-    STEP 2/2: The profile is normalized. 
+    STEP 2/2: The profile is normalized.
     """
-    args = []
-    args += ["-p", self.patch_connectivity_profile,
-             "-g", self.gyri_texture,
-             "-n", self.normed_connectivity_profile]
-
+    # selects the ROI label corresponding to ROI name
+    ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
+    
     if not self.keep_internal_connections:
-        args += ["-q", self.keep_internal_connections]
+        arg = "-q"
     else:
-        args += ["-c", self.keep_internal_connections]
+        arg = "-c"
 
     context.system(sys.executable,
                    find_in_path("constelRemoveInternalConnections.py"),
-                   *args)
+                   ROIlabel,
+                   self.patch_connectivity_profile,
+                   self.gyri_texture,
+                   self.normed_connectivity_profile,
+                   arg)
