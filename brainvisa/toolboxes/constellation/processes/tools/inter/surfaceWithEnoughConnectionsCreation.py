@@ -7,64 +7,96 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-# Axon python API module
-from brainvisa.processes import *
-from brainvisa.group_utils import Subject
+"""
+This script does the following:
+* defines a Brainvisa process
+    - the parameters of a process (Signature),
+    - the parameters initialization
+    - the linked parameters
+* this process executes the command 'constelConnectivityProfileOverlapMask'
 
-# Soma-base module
-from soma.minf.api import registerClass, readMinf
+Main dependencies: Axon python API, Soma-base, constel
+
+Author: sandrine.lefranc@cea.fr
+"""
+
+#----------------------------Imports-------------------------------------------
+
+
+# python system module
+import os
+import sys
+
+# axon python API module
+from brainvisa.processes import Signature, ListOf, ReadDiskItem, String, \
+    WriteDiskItem, ValidationError
+
+# soma-base module
 from soma.path import find_in_path
 
 
-# Plot constel module
 def validation():
-    """This function is executed at BrainVisa startup when the process is loaded.
-
-    It checks some conditions for the process to be available.
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
     """
     if not find_in_path("constelConnectivityProfileOverlapMask.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
+
+#----------------------------Header--------------------------------------------
+
+
 name = "Creation of a mask"
 userLevel = 2
 
-# Argument declaration
 signature = Signature(
+    # inputs
     "connectivity_profiles", ListOf(
-        ReadDiskItem("Gyrus Connectivity Profile", "Aims texture formats")),
+        ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
+                     requiredAttributes={"normed": "No",
+                                         "thresholded": "No",
+                                         "averaged": "No",
+                                         "intersubject": "No"})),
     "group", ReadDiskItem("Group definition", "XML"),
     "new_name", String(),
-    "mask", WriteDiskItem("Avg Connectivity Mask", "Aims texture formats"), )
+
+    # outputs
+    "mask", WriteDiskItem("Mask Texture", "Aims texture formats"), )
+
+
+#----------------------------Functions-----------------------------------------
 
 
 def initialization(self):
-    """Provides default values and link of parameters
-    """
+    """Provides link of parameters"""
+
     # optional value
     self.setOptional("new_name")
-    
+
+    # link of parameters
     def link_mask(self, dummy):
-        """Function of link between mask and group parameters.
-        """
+        """Function of link between mask and group parameters."""
         if (self.group and self.connectivity_profiles) is not None:
             atts = dict(self.connectivity_profiles[0].hierarchyAttributes())
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.group.fullPath()))
             if self.new_name is not None:
                 atts["texture"] = self.new_name
+            print atts
             return self.signature["mask"].findValue(atts)
 
+    # link of parameters for autocompletion
     self.linkParameters("mask", ("connectivity_profiles", "group", "new_name"),
                         link_mask)
 
 
-def execution(self, context):
+#----------------------------Main program--------------------------------------
 
-    args = []
-    for x in self.connectivity_profiles:
-        args += ["-p", x]
-    args += ["-o", self.mask]
+
+def execution(self, context):
+    # execute the command
     context.system(sys.executable,
                    find_in_path("constelConnectivityProfileOverlapMask.py"),
-                   *args)
+                   self.connectivity_profiles,
+                   self.mask)
