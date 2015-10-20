@@ -18,7 +18,12 @@ name = 'Dendrogram'
 userLevel = 2
 
 signature = Signature(
-    'connectivity_matrix', ReadDiskItem('Group Matrix', 'GIS image'),
+    'connectivity_matrix', ReadDiskItem(
+        'Connectivity Matrix', 'GIS image',
+        requiredAttributes={"ends_labelled":"mixed",
+                            "reduced":"No",
+                            "dense":"No",
+                            "intersubject":"Yes"}),
     'transpose', Boolean(),
     'method_1', Choice('single', 'complete', 'average', 'weighted',
                        'centroid', 'median', 'ward'),

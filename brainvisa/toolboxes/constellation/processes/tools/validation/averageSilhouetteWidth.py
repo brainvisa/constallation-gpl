@@ -25,7 +25,12 @@ userLevel = 2
 
 signature = Signature(
     "output_name_directory", String(),
-    'connectivity_matrix_reduced', ListOf(ReadDiskItem('Group Matrix', 'GIS image')),
+    'connectivity_matrix_reduced', ListOf(
+        ReadDiskItem('Connectivity Matrix', 'GIS image',
+        requiredAttributes={"ends_labelled":"mixed",
+                            "reduced":"No",
+                            "dense":"No",
+                            "intersubject":"Yes"})),
     'kmax', Integer(),
 )
 
