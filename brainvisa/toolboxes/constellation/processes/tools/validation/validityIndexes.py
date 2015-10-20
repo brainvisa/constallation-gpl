@@ -18,7 +18,11 @@ name = 'Validity Indexes'
 userLevel = 2
 
 signature = Signature(
-    'matrix', ReadDiskItem('Group Matrix', 'GIS image'),
+    'matrix', ReadDiskItem('Connectivity Matrix', 'GIS image',
+                           requiredAttributes={"ends_labelled":"mixed",
+                                               "reduced":"No",
+                                               "dense":"No",
+                                               "intersubject":"Yes"}),
     'kmax', Integer(),
     'nbIter', Integer(),
     'indexFile', WriteDiskItem('Text File', ['Text File', 'CSV file']),)
