@@ -30,9 +30,19 @@ userLevel = 2
 
 signature = Signature(
     "clustering_1", ReadDiskItem(
-        "Group Clustering Time", "BrainVISA texture formats"),
+        "Connectivity ROI Texture", "Aims texture formats",
+        requiredAttributes={"roi_autodetect":"No",
+                            "roi_filtered":"No",
+                            "averaged":"No",
+                            "intersubject":"Yes",
+                            "step_time":"Yes"}),
     "clustering_2", ReadDiskItem(
-        "Group Clustering Time", "BrainVISA texture formats"),
+        "Connectivity ROI Texture", "Aims texture formats",
+        requiredAttributes={"roi_autodetect":"No",
+                            "roi_filtered":"No",
+                            "averaged":"No",
+                            "intersubject":"Yes",
+                            "step_time":"Yes"}),
     "time_step_max", Integer(),
     "output_dir", WriteDiskItem("Directory", "Directory")
 )
@@ -65,6 +75,7 @@ def create_page(output, measures, m):
              4951: "right orbitofrontal cortex"}
     patch = re.findall("G[0-9]+", os.path.basename(str(output)))[0]
     patch_nb = int(re.findall("[0-9]+", patch)[0])
+    #patch_nb = 23
     fig = plt.figure()
     fig.suptitle(os.path.basename(output), fontsize=14, fontweight="bold", color="blue")
     ax = plt.subplot(121)
