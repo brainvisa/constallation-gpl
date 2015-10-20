@@ -7,44 +7,91 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-# Axon python API module
-from brainvisa.processes import *
+"""
+This script does the following:
+* defines a Brainvisa process
+    - the parameters of a process (Signature),
+    - the parameters initialization
+    - the linked parameters
+* this process executes the command 'AimsMeshWatershed.py' and
+  'constelFilteringWatershed.py'
+
+Main dependencies: Axon python API, Soma-base, constel
+
+Author: Sandrine Lefranc
+"""
+
+#----------------------------Imports-------------------------------------------
+
+
+# python module
+import sys
+
+# axon python API module
+from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
+    ValidationError
+
+# soma-base module
 from soma import aims
+from soma.path import find_in_path
 
-# System module
-import numpy
-
-
-# Plot constel module
-def validation():
-    """This function is executed at BrainVisa startup when the process is loaded.
-
-    It checks some conditions for the process to be available.
-    """
-    try:
-        import constel
-    except:
-        raise ValidationError("Please make sure that constel module"
-                              "is installed.")
-
+# constel module
 try:
     from constel.lib.texturetools import remove_labels
 except:
     pass
 
 
+def validation():
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
+    """
+    try:
+        import constel
+    except:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
+
+
+#----------------------------Header--------------------------------------------
+
+
 name = "Watershed of Group"
 userLevel = 2
 
 signature = Signature(
+    # --inputs--
     "normed_connectivity_profile", ReadDiskItem(
-        "Avg Normed Connectivity Profile", "Aims texture formats"),
-    "average_mesh", ReadDiskItem("Mesh", "MESH mesh"),
+        "Connectivity Profile Texture", "Aims texture formats",
+        requiredAttributes={"normed": "Yes",
+                            "thresholded": "Yes",
+                            "averaged": "Yes",
+                            "intersubject": "Yes"}),
+    "average_mesh", ReadDiskItem(
+        "White Mesh", "Aims mesh formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes",
+                            "averaged": "Yes"}),
+
+    # --outputs--
     "watershed", WriteDiskItem(
-        "Avg Watershed Texture", "Aims texture formats"),
+        "Connectivity ROI Texture", "Aims texture formats",
+        requiredAttributes={"roi_autodetect": "Yes",
+                            "roi_filtered": "No",
+                            "averaged": "Yes",
+                            "intersubject": "Yes",
+                            "step_time": "No"}),
     "filtered_watershed", WriteDiskItem(
-        "Avg Filtered Watershed", "Aims texture formats"),
+        "Connectivity ROI Texture", "Aims texture formats",
+        requiredAttributes={"roi_autodetect": "Yes",
+                            "roi_filtered": "Yes",
+                            "averaged": "Yes",
+                            "intersubject": "Yes",
+                            "step_time": "No"}),
 )
+
+
+#----------------------------Function------------------------------------------
 
 
 def initialization(self):
@@ -53,11 +100,14 @@ def initialization(self):
     self.linkParameters("filtered_watershed", "normed_connectivity_profile")
 
 
+#----------------------------Main program--------------------------------------
+
+
 def execution(self, context):
     """ A watershed was computed on the joint patch cortical connectivity
     profile texture in order to split the cortical surface into catchment
     basins. Small basins are agglomerated to larger ones based on their
-    depth and area. This set of T regions will be called atrget regions.
+    depth and area. This set of T regions will be called target regions.
     A watershed is performed to obtain different patches of interest.
     """
     context.system("AimsMeshWatershed.py",
@@ -69,14 +119,8 @@ def execution(self, context):
                    "-t", 0.05,
                    "-o", self.watershed)
 
-    # Low connections to gyrus : filtered watershed with "minVertex_nb"
-    minVertex_nb = 20
-    basins_tex = aims.read(self.watershed.fullPath())
-    basinTex_ar = basins_tex[0].arraydata()
-    basins_labels = numpy.unique(basinTex_ar).tolist()
-    labelsToRemove_list = []
-    for basin_label in basins_labels:
-        if numpy.where(basinTex_ar == basin_label)[0].size < minVertex_nb:
-            labelsToRemove_list.append(basin_label)
-    filteredBasins = remove_labels(basins_tex, labelsToRemove_list)
-    aims.write(filteredBasins, self.filtered_watershed.fullPath())
+    # execute the command
+    context.system(sys.executable,
+                   find_in_path("constelFilteringWatershed.py"),
+                   self.watershed,
+                   self.filtered_watershed)
