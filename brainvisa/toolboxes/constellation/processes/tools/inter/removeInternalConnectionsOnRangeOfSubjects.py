@@ -7,34 +7,76 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
+"""
+This script does the following:
+* defines a Brainvisa process
+    - the parameters of a process (Signature),
+    - the parameters initialization
+    - the linked parameters
+* this process executes the command 'constelNormProfile'
+
+Main dependencies: Axon python API, Soma-base, constel
+
+Author: sandrine.lefranc@cea.fr
+"""
+
+#----------------------------Imports-------------------------------------------
+
+
+# python system module
+import os
+import sys
+
 # Axon python API module
-from brainvisa.processes import *
+from brainvisa.processes import Signature, ListOf, ReadDiskItem, String, \
+    WriteDiskItem, ValidationError
+
+# soma-base module
+from soma.path import find_in_path
+
+
+#----------------------------Functions-----------------------------------------
 
 
 # Plot constel module
 def validation():
-    """This function is executed at BrainVisa startup when the process is loaded.
-
-    It checks some conditions for the process to be available.
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
     """
-    try:
-        import soma.aims
-    except:
+    if not find_in_path("constelNormProfile.py"):
         raise ValidationError(
-            "Please make sure that aims module is installed.")
+            "Please make sure that constel module is installed.")
 
 name = "Normed Connectivity Profile of Group"
 userLevel = 2
 
 # Argument declaration
 signature = Signature(
-    "mask", ReadDiskItem("Avg Connectivity Mask", "Aims texture formats"),
+    "mask", ReadDiskItem(
+        "Connectivity Profile Texture", "Aims texture formats",
+        requiredAttributes={"normed":"No",
+                            "thresholded":"No",
+                            "averaged":"Yes",
+                            "intersubject":"Yes",
+                            "binary": "Yes"}),
     "connectivity_profile", ReadDiskItem(
-        "Avg Connectivity Profile", "Aims texture formats"),
+        "Connectivity Profile Texture", "Aims texture formats",
+        requiredAttributes={"normed":"No",
+                            "thresholded":"No",
+                            "averaged":"Yes",
+                            "intersubject":"Yes"}),
     "thresholded_connectivity_profile", WriteDiskItem(
-        "Avg Thresholded Connectivity Profile", "Aims texture formats"),
+        "Connectivity Profile Texture", "Aims texture formats",
+        requiredAttributes={"normed":"No",
+                            "thresholded":"Yes",
+                            "averaged":"Yes",
+                            "intersubject":"Yes"}),
     "normed_connectivity_profile", WriteDiskItem(
-        "Avg Normed Connectivity Profile", "Aims texture formats"),)
+        "Connectivity Profile Texture", "Aims texture formats",
+        requiredAttributes={"normed":"Yes",
+                            "thresholded":"Yes",
+                            "averaged":"Yes",
+                            "intersubject":"Yes"}),)
 
 
 def initialization(self):
@@ -46,24 +88,14 @@ def initialization(self):
         "normed_connectivity_profile", "thresholded_connectivity_profile")
 
 
+#----------------------------Main program--------------------------------------
+
+
 def execution(self, context):
     """
     """
-    mask = aims.read(self.mask.fullPath())
-    meanConnectivityProfileTex = aims.read(
-        self.connectivity_profile.fullPath())
-    for i in xrange(meanConnectivityProfileTex[0].nItem()):
-        if mask[0][i] == 0:
-            meanConnectivityProfileTex[0][i] = 0
-    aims.write(meanConnectivityProfileTex,
-               self.thresholded_connectivity_profile.fullPath())
-
-    tex = aims.read(self.thresholded_connectivity_profile.fullPath())
-    tex_ar = tex[0].arraydata()
-    max_connections_nb = tex_ar.max()
-    if max_connections_nb > 0:
-        z = 1./max_connections_nb
-        for i in xrange(tex[0].nItem()):
-            value = tex[0][i]
-            tex[0][i] = z*value
-    aims.write(tex, self.normed_connectivity_profile.fullPath())
+    context.system(sys.executable,
+                   find_in_path("constelNormProfile.py"),
+                   self.mask,
+                   self.connectivity_profile,
+                   self.normed_connectivity_profile)
