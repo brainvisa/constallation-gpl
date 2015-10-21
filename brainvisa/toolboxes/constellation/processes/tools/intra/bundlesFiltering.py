@@ -26,7 +26,6 @@ Author: Sandrine Lefranc, 2015
 
 # python modules
 import os
-import glob
 
 # axon python API module
 from brainvisa.processes import Signature, String, Choice, Float, \
@@ -66,7 +65,7 @@ signature = Signature(
     "format_fiber_tracts", Choice("bundles", "trk"),
     "method", Choice(("averaged approach", "avg"),
                      ("concatenated approach", "concat")),
-    "ROIs_nomenclature", ReadDiskItem("Text file", "Text File"),
+    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
     "ROI", OpenChoice(),
     "subject", ReadDiskItem("subject", "directory"),
     "ROIs_segmentation", ReadDiskItem(
@@ -102,6 +101,7 @@ def initialization(self):
     self.max_length_of_fibers_near_cortex = 500.
     self.min_distant_fibers_length = 20.
     self.max_distant_fibers_length = 500.
+    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
 
     # list of possible databases, while respecting the ontology
     databases = [h.name for h in neuroHierarchy.hierarchies()
