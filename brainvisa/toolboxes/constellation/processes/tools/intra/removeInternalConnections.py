@@ -20,7 +20,7 @@ Main dependencies: Axon python API, Soma-base, constel
 Author: sandrine.lefranc@cea.fr
 """
 
-#----------------------------Imports-----------------------------------------
+#----------------------------Imports-------------------------------------------
 
 
 # python modules
@@ -65,7 +65,7 @@ signature = Signature(
                             "thresholded": "No",
                             "averaged": "No",
                             "intersubject": "No"}),
-    "gyri_texture", ReadDiskItem("ROI Texture", "Aims texture formats",
+    "ROIs_segmentation", ReadDiskItem("ROI Texture", "Aims texture formats",
                                  requiredAttributes={"side": "both",
                                                      "vertex_corr": "Yes"}),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
@@ -100,7 +100,7 @@ def initialization(self):
             s = str(self.patch_connectivity_profile.get("gyrus"))
             name = self.signature["ROI"].findValue(s)
         return name
-    
+
     # link of parameters for autocompletion
     self.linkParameters("ROI", "patch_connectivity_profile", link_matrix2ROI)
     self.linkParameters(
@@ -127,6 +127,6 @@ def execution(self, context):
                    find_in_path("constelRemoveInternalConnections.py"),
                    ROIlabel,
                    self.patch_connectivity_profile,
-                   self.gyri_texture,
+                   self.ROIs_segmentation,
                    self.normed_connectivity_profile,
                    arg)

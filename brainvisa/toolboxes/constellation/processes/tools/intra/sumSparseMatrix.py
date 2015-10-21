@@ -58,20 +58,20 @@ userLevel = 2
 signature = Signature(
     # --inputs--
     "matrix_of_fibers_near_cortex", ReadDiskItem(
-        "Connectivity Matrix", "Matrix sparse",
+        "Connectivity Matrix", "GIS image",
         requiredAttributes={"ends_labelled": "both",
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "No"}),
     "matrix_of_distant_fibers", ReadDiskItem(
-        "Connectivity Matrix", "Matrix sparse",
+        "Connectivity Matrix", "GIS image",
         requiredAttributes={"ends_labelled": "single",
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "No"}),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
     "ROI", String(),
-    "gyri_texture", ReadDiskItem(
+    "ROIs_segmentation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     "white_mesh", ReadDiskItem(
@@ -81,7 +81,7 @@ signature = Signature(
 
     # --outputs--
     "complete_connectivity_matrix", WriteDiskItem(
-        "Connectivity Matrix", "Matrix sparse",
+        "Connectivity Matrix", "GIS image",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "No",
                             "dense": "No",
@@ -108,35 +108,20 @@ def initialization(self):
             name = self.signature["ROI"].findValue(s)
         return name
 
-    def link_matrix(sef, dummy):
-        """
-        """
-        if self.matrix_of_fibers_near_cortex is not None:
-            attrs = dict(
-                self.matrix_of_fibers_near_cortex.hierarchyAttributes())
-            attrs["smallerlength1"] = None
-            attrs["greaterlength1"] = None
-            filename = self.signature[
-                "matrix_of_distant_fibers"].findValue(attrs)
-            return filename
-
     def link_smooth(self, dummy):
         """
         """
         if (self.matrix_of_distant_fibers and self.smoothing) is not None:
             attrs = dict(self.matrix_of_distant_fibers.hierarchyAttributes())
             attrs["smoothing"] = str(self.smoothing)
-            attrs["smallerlength2"] = None
-            attrs["greaterlength2"] = None
+            attrs["smallerlength2"] = self.matrix_of_distant_fibers.get("smallerlength1")
+            attrs["greaterlength2"] = self.matrix_of_distant_fibers.get("smallerlength1")
             filename = self.signature[
                 "complete_connectivity_matrix"].findValue(attrs)
-            print attrs
             return filename
 
     # link of parameters for autocompletion
     self.linkParameters("ROI", "matrix_of_fibers_near_cortex", link_matrix2ROI)
-    self.linkParameters("matrix_of_fibers_near_cortex",
-                        "matrix_of_distant_fibers", link_matrix)
     self.linkParameters("complete_connectivity_matrix",
                         ("matrix_of_distant_fibers", "smoothing"), link_smooth)
 
@@ -161,5 +146,5 @@ def execution(self, context):
                    "-m", self.white_mesh,
                    "-o", self.complete_connectivity_matrix,
                    "-s", self.smoothing,
-                   "-l", self.gyri_texture,
+                   "-l", self.ROIs_segmentation,
                    "-p", ROIlabel)

@@ -74,22 +74,22 @@ signature = Signature(
 
     # --ouputs--
     "matrix_of_distant_fibers", WriteDiskItem(
-        "Connectivity Matrix", "Matrix sparse",
+        "Connectivity Matrix", "GIS image",
         requiredAttributes={"ends_labelled": "single",
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "No"}),
     "matrix_of_fibers_near_cortex", WriteDiskItem(
-        "Connectivity Matrix", "Matrix sparse",
+        "Connectivity Matrix", "GIS image",
         requiredAttributes={"ends_labelled": "both",
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "No"}),
     "profile_of_distant_fibers", WriteDiskItem(
-        "Filtered Connectivity Profile Texture", "Gifti file",
+        "Filtered Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"both_ends_labelled": "No"}),
     "profile_of_fibers_near_cortex", WriteDiskItem(
-        "Filtered Connectivity Profile Texture", "Gifti file",
+        "Filtered Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"both_ends_labelled": "Yes"}),
 )
 

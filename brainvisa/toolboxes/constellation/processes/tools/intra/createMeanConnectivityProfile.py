@@ -56,14 +56,14 @@ userLevel = 2
 signature = Signature(
     # --inputs--
     "complete_connectivity_matrix", ReadDiskItem(
-        "Connectivity Matrix", "Matrix sparse",
+        "Connectivity Matrix", "GIS image",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "No"}),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
     "ROI", String(),
-    "gyri_texture", ReadDiskItem("ROI Texture", "Aims texture formats",
+    "ROIs_segmentation", ReadDiskItem("ROI Texture", "Aims texture formats",
                                  requiredAttributes={"side": "both",
                                                      "vertex_corr": "Yes"}),
     # --ouputs--
@@ -112,7 +112,7 @@ def execution(self, context):
                    "-connfmt", "binar_sparse",
                    "-connmatrixfile", self.complete_connectivity_matrix,
                    "-outconntex", self.patch_connectivity_profile,
-                   "-seedregionstex", self.gyri_texture,
+                   "-seedregionstex", self.ROIs_segmentation,
                    "-seedlabel", ROIlabel,
                    "-type", "seed_mean_connectivity_profile",
                    "-normalize", 0,

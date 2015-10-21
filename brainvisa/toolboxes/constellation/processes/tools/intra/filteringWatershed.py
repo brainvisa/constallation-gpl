@@ -61,7 +61,7 @@ userLevel = 2
 signature = Signature(
     # inputs
     "complete_connectivity_matrix", ReadDiskItem(
-        "Connectivity Matrix", "Matrix sparse",
+        "Connectivity Matrix", "GIS image",
         requiredAttributes={"ends_labelled":"mixed",
                             "reduced":"No",
                             "dense":"No",
