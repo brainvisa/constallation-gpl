@@ -7,31 +7,70 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
+"""
+This script does the following:
+* defines a Brainvisa process
+    - the parameters of a process (Signature),
+    - the parameters initialization
+    - the linked parameters
+* executes the command 'AimsMeshWatershed'
+
+Main dependencies: axon python API, soma-base
+
+Author: Sandrine Lefranc, 2015
+"""
+
+#----------------------------Imports-------------------------------------------
+
+
+#python system
+import sys
+
 # Axon python API module
-from brainvisa.processes import *
+from brainvisa.processes import ValidationError, Signature, ReadDiskItem, \
+    WriteDiskItem
+
+# soma-base module
 from soma.path import find_in_path
 
 
-# Plot aims module
 def validation():
-    """This function is executed at BrainVisa startup when the process is loaded.
-
-    It checks some conditions for the process to be available.
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
     """
     if not find_in_path("AimsMeshWatershed.py"):
         raise ValidationError(
             "Please make sure that aims module is installed.")
 
+
+#----------------------------Header--------------------------------------------
+
+
 name = "Watershed"
 userLevel = 2
 
-# Argument declaration
 signature = Signature(
+    # inputs
     "normed_connectivity_profile", ReadDiskItem(
-        "Normed Connectivity Profile", "Aims texture formats"),
-    "white_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
-    "watershed", WriteDiskItem("Watershed Texture", "Aims texture formats"),
+        "Connectivity Profile Texture", "Aims texture formats",
+        requiredAttributes={"normed": "Yes"}),
+    "white_mesh", ReadDiskItem("White Mesh", "Aims mesh formats",
+                               requiredAttributes={"side": "both",
+                                                   "vertex_corr": "Yes",
+                                                   "averaged": "No"}),
+
+    # outputs
+    "watershed", WriteDiskItem(
+        "Connectivity ROI Texture", "Aims texture formats",
+        requiredAttributes={"roi_autodetect": "Yes",
+                            "roi_filtered": "No",
+                            "averaged": "No",
+                            "intersubject": "No",
+                            "step_time": "No"}),
 )
+
+
+#----------------------------Function------------------------------------------
 
 
 def initialization(self):
@@ -40,16 +79,15 @@ def initialization(self):
     self.linkParameters("watershed", "normed_connectivity_profile")
 
 
+#----------------------------Main program--------------------------------------
+
+
 def execution(self, context):
     """ Watershed is computed providing a set of target regions
     """
     commandMeshWatershedProcessing = [
         sys.executable, find_in_path("AimsMeshWatershed.py"),
-        "-i", self.normed_connectivity_profile,
-        "-m", self.white_mesh,
-        "-k", 10,
-        "-q", 0.05,
-        "-z", "or",
-        "-t", 0.05,
-        "-o", self.watershed]
+        self.normed_connectivity_profile,
+        self.white_mesh,
+        self.watershed]
     context.system(*commandMeshWatershedProcessing)
