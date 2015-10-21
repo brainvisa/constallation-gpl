@@ -13,8 +13,7 @@ This script does the following:
     - the parameters of a process (Signature),
     - the parameters initialization
     - the linked parameters
-* executes the command 'constelBundlesFiltering' to filter the fiber tracts
-  according to length.
+* executes the command 'constelConnectionDensityTexture'
 
 Main dependencies: axon python API, soma-base, constel
 
@@ -23,6 +22,8 @@ Author: Sandrine Lefranc, 2015
 
 #----------------------------Imports-------------------------------------------
 
+# python module
+import numpy
 
 # axon python API module
 from brainvisa.processes import ValidationError, Signature, ReadDiskItem, \
@@ -32,11 +33,7 @@ from brainvisa.processes import ValidationError, Signature, ReadDiskItem, \
 from soma.path import find_in_path
 from soma import aims
 
-# Sytem module
-import numpy as np
-
-
-# constel modules
+# constel module
 try:
     import constel.lib.texturetools as tt
     from constel.lib.utils.files import read_file, select_ROI_number
@@ -88,9 +85,11 @@ signature = Signature(
 
     #outputs
     "sum_vertices_patch", WriteDiskItem(
-        "Measures Connectivity ROI Texture", "Aims texture formats"),
+        "Measures Connectivity ROI Texture", "Aims texture formats",
+        requiredAttributes={"measure": "sum"}),
     "duplication_value_patch", WriteDiskItem(
-        "Measures Connectivity ROI Texture", "Aims texture formats"),
+        "Measures Connectivity ROI Texture", "Aims texture formats",
+        requiredAttributes={"measure": "spread"}),
     "filtered_watershed", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect":"Yes",
@@ -122,24 +121,27 @@ def initialization(self):
                 self.signature["ROI"] = Choice(*s)
                 self.changeSignature(self.signature)
 
-    def link_watershed(self, dummy):
+    def link_matrix2ROI(self, dummy):
+        """Define the attribut 'ROI' from fibertracts pattern for the
+        signature 'ROI'.
+        """
         if self.complete_connectivity_matrix is not None:
-            attrs = dict(
-                self.complete_connectivity_matrix.hierarchyAttributes())
-            attrs["smoothing"] = "smooth" + str(
-                self.complete_connectivity_matrix.get("smoothing"))
-            filename = self.signature["watershed"].findValue(attrs)
-            return filename
-
+            s = str(self.complete_connectivity_matrix.get("gyrus"))
+            name = self.signature["ROI"].findValue(s)
+        return name
 
     self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
     self.linkParameters(
-        "watershed", "complete_connectivity_matrix", link_watershed)
+        "ROI", "complete_connectivity_matrix", link_matrix2ROI)
+    self.linkParameters("watershed", "complete_connectivity_matrix")
     self.linkParameters("sum_vertices_patch", "complete_connectivity_matrix")
     self.linkParameters(
         "duplication_value_patch", "complete_connectivity_matrix")
     self.linkParameters("filtered_watershed", "complete_connectivity_matrix")
+
+
 #----------------------------Main program--------------------------------------
+
 
 def execution(self, context):
     """ Compute reduced connectivity matrix
@@ -170,14 +172,14 @@ def execution(self, context):
     labels_sort = labels.argsort()
     labelsToRemove_list = labelsToRemove_ar.tolist()
     labelsToRemove_list = sorted(labelsToRemove_list, reverse=True)
-    labelsToRemove_ar = np.asarray(labelsToRemove_list)
+    labelsToRemove_ar = numpy.asarray(labelsToRemove_list)
     labelsSort_CumSum = labelsToRemove_ar.cumsum()
-    invsort_labelsToRemove = np.where(labelsSort_CumSum > threshPercent)[0]
+    invsort_labelsToRemove = numpy.where(labelsSort_CumSum > threshPercent)[0]
     invlabels_toRemove = labels.size - 1 - invsort_labelsToRemove
     labelsToRemove_ar = labels_sort[invlabels_toRemove]
     labelsToRemove_ar = labelsToRemove_ar + 1
     labelsToRemove_list = labelsToRemove_ar.tolist()
-    sup10percentConn_labels = np.where(labels > 0.1)[0] + 1
+    sup10percentConn_labels = numpy.where(labels > 0.1)[0] + 1
 
     for sup10percent_label_i in xrange(sup10percentConn_labels.size):
         sup10percent_label = sup10percentConn_labels[sup10percent_label_i]
