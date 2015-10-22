@@ -7,70 +7,66 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
+"""
+This script does the following:
+* defines a Brainvisa pipeline
+    - the parameters of a pipeline (Signature),
+    - the parameters initialization
+    - the linked parameters between processes
+
+Main dependencies: axon python API, constel
+
+Author: Sandrine Lefranc, 2015
+"""
+
+#----------------------------Imports-------------------------------------------
+
+
 # Axon python API modules
-from brainvisa.processes import *
+from brainvisa.processes import Signature, String, Choice, ReadDiskItem, \
+    Float, OpenChoice, neuroHierarchy, SerialExecutionNode, \
+    ProcessExecutionNode
+
+# constel module
+try:
+    from constel.lib.utils.files import read_file
+except:
+    pass
+
+
+#----------------------------Header--------------------------------------------
+
 
 name = "Constellation within-subject pipeline"
 userLevel = 2
 
-# Argument declaration
 signature = Signature(
+    #inputs
+    "study_name", String(),
     "database", Choice(),
-    "formats_fiber_tracts", Choice("bundles", "trk"),
-    "study", Choice(
+    "format_fiber_tracts", Choice("bundles", "trk"),
+    "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
-    "patch", Choice(
-        ("*** use_new_patch ***", 0),
-        ("left corpus callosum", 1), ("left bankssts", 2),
-        ("left caudal anterior cingulate", 3),
-        ("left caudal middle frontal", 4), ("left cuneus", 6),
-        ("left entorhinal", 7), ("left fusiform", 8),
-        ("left inferior parietal", 9), ("left inferior temporal", 10),
-        ("left isthmus cingulate", 11), ("left lateral occipital", 12),
-        ("left lateral orbitofrontal", 13), ("left lingual", 14),
-        ("left medial orbitofrontal", 15), ("left middle temporal", 16),
-        ("left parahippocampal", 17), ("left paracentral", 18),
-        ("left pars opercularis", 19), ("left pars orbitalis", 20),
-        ("left pars triangularis", 21), ("left pericalcarine", 22),
-        ("left postcentral", 23), ("left posterior cingulate", 24),
-        ("left precentral", 25), ("left precuneus", 26),
-        ("left rostral anterior cingulate", 27),
-        ("left rostral middle frontal", 28), ("left superior frontal", 29),
-        ("left superior parietal", 30), ("left superior temporal", 31),
-        ("left supramarginal", 32), ("left frontal pole", 33),
-        ("left temporal pole", 34), ("left transverse temporal", 35),
-        ("left insula", 36), ("right corpus callosum", 37),
-        ("right bankssts", 38), ("right caudal anterior cingulate", 39),
-        ("right caudal middle frontal", 40), ("right cuneus", 42),
-        ("right entorhinal", 43), ("right fusiform", 44),
-        ("right inferior parietal", 45), ("right inferior temporal", 46),
-        ("right isthmus cingulate", 47), ("right lateral occipital", 48),
-        ("right lateral orbitofrontal", 49), ("right lingual", 50),
-        ("right medial orbitofrontal", 51), ("right middle temporal", 52),
-        ("right parahippocampal", 53), ("right paracentral", 54),
-        ("right pars opercularis", 55), ("right pars orbitalis", 56),
-        ("right pars triangularis", 57), ("right pericalcarine", 58),
-        ("right postcentral", 59), ("right posterior cingulate", 60),
-        ("right precentral", 61), ("right precuneus", 62),
-        ("right rostral anterior cingulate", 63),
-        ("right rostral middle frontal", 64), ("right superior frontal", 65),
-        ("right superior parietal", 66), ("right superior temporal", 67),
-        ("right supramarginal", 68), ("right frontal pole", 69),
-        ("right temporal pole", 70), ("right transverse temporal", 71),
-        ("right insula", 72)),
-    "new_patch", Integer(),
-    "segmentation_name_used", String(),
+    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
+    "ROI", OpenChoice(),
     "subject", ReadDiskItem("subject", "directory"),
-    "gyri_texture", ReadDiskItem("Label Texture", "Aims texture formats"),
-    "white_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
+    "ROIs_segmentation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+    "white_mesh", ReadDiskItem(
+        "White Mesh", "Aims mesh formats",
+        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     "smoothing", Float(),
 )
+
+
+#----------------------------Functions-----------------------------------------
 
 
 def initialization(self):
     """Provides default values and link of parameters
     """
-    
+
     # list of possible databases, while respecting the ontology
     # ontology: brainvisa-3.2.0
     databases = [h.name for h in neuroHierarchy.hierarchies()
@@ -83,33 +79,46 @@ def initialization(self):
 
     # default value
     self.smoothing = 3.0
-    
-    # optional value
-    self.setOptional("new_patch")
+    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+
+    def link_roi(self, dummy):
+        """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
+        of process.
+        """
+        if self.ROIs_nomenclature is not None:
+            s = ["Select a ROI in this list"]
+            s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
+            self.signature["ROI"].setChoices(*s)
+            if isinstance(self.signature["ROI"], OpenChoice):
+                self.signature["ROI"] = Choice(*s)
+                self.changeSignature(self.signature)
+
+    # link of parameters for autocompletion
+    self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
 
     ###########################################################################
-    #        link of parameters for the "Bundles Filtering" process           #
+    #        link of parameters for the process: "Bundles Filtering"          #
     ###########################################################################
+
     eNode.addChild(
         "filter", ProcessExecutionNode("bundlesFiltering", optional=1))
 
     eNode.addDoubleLink("filter.database", "database")
-    eNode.addDoubleLink("filter.formats_fiber_tracts", "formats_fiber_tracts")
-    eNode.addDoubleLink("filter.study", "study")
-    eNode.addDoubleLink("filter.patch", "patch")
-    eNode.addDoubleLink("filter.new_patch", "new_patch")
-    eNode.addDoubleLink("filter.segmentation_name_used",
-                        "segmentation_name_used")
+    eNode.addDoubleLink("filter.format_fiber_tracts", "format_fiber_tracts")
+    eNode.addDoubleLink("filter.method", "method")
+    eNode.addDoubleLink("filter.ROI", "ROI")
+    eNode.addDoubleLink("filter.study_name", "study_name")
     eNode.addDoubleLink("filter.subject", "subject")
-    eNode.addDoubleLink("filter.gyri_texture", "gyri_texture")
+    eNode.addDoubleLink("filter.ROIs_segmentation", "ROIs_segmentation")
     eNode.addDoubleLink("filter.white_mesh", "white_mesh")
 
     ###########################################################################
-    #        link of parameters with the "Fiber Oversampler" process          #
+    #        link of parameters with the process: "Fiber Oversampler"         #
     ###########################################################################
+
     eNode.addChild(
         "oversampler", ProcessExecutionNode("fiberOversampler", optional=1))
 
@@ -117,8 +126,9 @@ def initialization(self):
                         "filter.subsets_of_distant_fibers")
 
     ###########################################################################
-    #        link of parameters with the "Connectivity Matrix" process        #
+    #        link of parameters with the process: "Connectivity Matrix"       #
     ###########################################################################
+
     eNode.addChild(
         "ConnectivityMatrix", ProcessExecutionNode("createConnectivityMatrix",
                                                    optional=1))
@@ -128,47 +138,55 @@ def initialization(self):
     eNode.addDoubleLink(
         "ConnectivityMatrix.filtered_length_fibers_near_cortex",
         "filter.subsets_of_fibers_near_cortex")
-    eNode.addDoubleLink("ConnectivityMatrix.gyri_texture", "gyri_texture")
+    eNode.addDoubleLink(
+        "ConnectivityMatrix.ROIs_segmentation", "ROIs_segmentation")
     eNode.addDoubleLink("ConnectivityMatrix.white_mesh", "white_mesh")
     eNode.addDoubleLink("ConnectivityMatrix.dw_to_t1", "filter.dw_to_t1")
 
     ###########################################################################
-    #    link of parameters with the "Sum Sparse Matrix Smoothing" process    #
+    #    link of parameters with the process: "Sum Sparse Matrix Smoothing"   #
     ###########################################################################
+
     eNode.addChild(
         "smoothing", ProcessExecutionNode("sumSparseMatrix", optional=1))
 
     eNode.addDoubleLink("smoothing.matrix_of_fibers_near_cortex",
                         "ConnectivityMatrix.matrix_of_fibers_near_cortex")
+    eNode.addDoubleLink("smoothing.matrix_of_distant_fibers",
+                        "ConnectivityMatrix.matrix_of_distant_fibers")
     eNode.addDoubleLink("smoothing.white_mesh", "white_mesh")
-    eNode.addDoubleLink("smoothing.gyri_texture", "gyri_texture")
+    eNode.addDoubleLink("smoothing.ROIs_segmentation", "ROIs_segmentation")
     eNode.addDoubleLink("smoothing.smoothing", "smoothing")
 
     ###########################################################################
-    #    link of parameters with the "Mean Connectivity Profile" process      #
+    #    link of parameters with the process: "Mean Connectivity Profile"     #
     ###########################################################################
+
     eNode.addChild(
         "MeanProfile", ProcessExecutionNode("createMeanConnectivityProfile",
                                             optional=1))
 
     eNode.addDoubleLink("MeanProfile.complete_connectivity_matrix",
                         "smoothing.complete_connectivity_matrix")
-    eNode.addDoubleLink("MeanProfile.gyri_texture", "gyri_texture")
+    eNode.addDoubleLink("MeanProfile.ROIs_segmentation", "ROIs_segmentation")
 
     ###########################################################################
-    #    link of parameters with the "Remove Internal Connections" process    #
+    #    link of parameters with the process: "Remove Internal Connections"   #
     ###########################################################################
+
     eNode.addChild("InternalConnections",
                    ProcessExecutionNode("removeInternalConnections",
                                         optional=1))
 
     eNode.addDoubleLink("InternalConnections.patch_connectivity_profile",
                         "MeanProfile.patch_connectivity_profile")
-    eNode.addDoubleLink("InternalConnections.gyri_texture", "gyri_texture")
+    eNode.addDoubleLink(
+        "InternalConnections.ROIs_segmentation", "ROIs_segmentation")
 
     ###########################################################################
-    #        link of parameters with the "Watershed" process                  #
+    #        link of parameters with the process: "Watershed"                 #
     ###########################################################################
+
     eNode.addChild(
         "Watershed",
         ProcessExecutionNode("watershedReflectingConnectionsToGyrus",
@@ -176,10 +194,12 @@ def initialization(self):
 
     eNode.addDoubleLink("Watershed.normed_connectivity_profile",
                         "InternalConnections.normed_connectivity_profile")
+    eNode.addDoubleLink("Watershed.white_mesh", "white_mesh")
 
     ###########################################################################
-    # link of parameters with the "Filtering Watershed" process               #
+    # link of parameters with the process: "Filtering Watershed"              #
     ###########################################################################
+
     eNode.addChild("FilteringWatershed",
                    ProcessExecutionNode("filteringWatershed",
                                         optional=1, selected=False))
@@ -187,24 +207,27 @@ def initialization(self):
     eNode.addDoubleLink("FilteringWatershed.watershed", "Watershed.watershed")
     eNode.addDoubleLink("FilteringWatershed.complete_connectivity_matrix",
                         "MeanProfile.complete_connectivity_matrix")
-    eNode.addDoubleLink("FilteringWatershed.gyri_texture", "gyri_texture")
+    eNode.addDoubleLink(
+        "FilteringWatershed.ROIs_segmentation", "ROIs_segmentation")
     eNode.addDoubleLink("FilteringWatershed.white_mesh", "white_mesh")
 
     ###########################################################################
-    #    link of parameters with the "Reduced Connectivity Matrix" process    #
+    #    link of parameters with the process: "Reduced Connectivity Matrix"   #
     ###########################################################################
+
     eNode.addChild("ReducedMatrix",
                    ProcessExecutionNode("createReducedConnectivityMatrix",
                                         optional=1, selected=False))
 
     eNode.addDoubleLink("ReducedMatrix.complete_connectivity_matrix",
                         "FilteringWatershed.complete_connectivity_matrix")
-    eNode.addDoubleLink("ReducedMatrix.gyri_texture", "gyri_texture")
+    eNode.addDoubleLink("ReducedMatrix.ROIs_segmentation", "ROIs_segmentation")
     eNode.addDoubleLink("ReducedMatrix.white_mesh", "white_mesh")
 
     ###########################################################################
-    #        link of parameters with the "Clustering" process                 #
+    #        link of parameters with the process: "Clustering"                #
     ###########################################################################
+
     eNode.addChild("ClusteringIntraSubjects",
                    ProcessExecutionNode("ClusteringIntrasubject",
                                         optional=1, selected=False))
@@ -212,7 +235,7 @@ def initialization(self):
     eNode.addDoubleLink("ClusteringIntraSubjects.reduced_connectivity_matrix",
                         "ReducedMatrix.reduced_connectivity_matrix")
     eNode.addDoubleLink(
-        "ClusteringIntraSubjects.gyri_texture", "gyri_texture")
+        "ClusteringIntraSubjects.ROIs_segmentation", "ROIs_segmentation")
     eNode.addDoubleLink("ClusteringIntraSubjects.white_mesh", "white_mesh")
 
     self.setExecutionNode(eNode)
