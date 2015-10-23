@@ -51,7 +51,6 @@ def validation():
 name = "Connectivity Profile of Group"
 userLevel = 2
 
-# Argument declaration
 signature = Signature(
     # --inputs--
     "normed_connectivity_profiles", ListOf(ReadDiskItem(
@@ -59,8 +58,7 @@ signature = Signature(
         requiredAttributes={"normed": "Yes",
                             "thresholded" :"Yes",
                             "averaged" :"No",
-                            "intersubject" :"No",
-                            "binary": "No"})),
+                            "intersubject" :"No"})),
     "group", ReadDiskItem("Group definition", "XML"),
     "new_name", String(),
     
@@ -95,56 +93,56 @@ def initialization(self):
         profiles = []
         if (self.normed_connectivity_profiles and self.group) is not None:
             for profile in self.normed_connectivity_profiles:
-                if self.new_name is None:
-                    new_name = profile.get("texture")
-                else:
-                    new_name = self.new_name
                 atts = dict()
+                atts["_database"] = profile.get("_database")
+                atts["center"] = profile.get("center")
+                atts["subject"] = profile.get("subject")
+                atts["smoothing"] = profile.get("smoothing")
                 atts["group_of_subjects"] = os.path.basename(
                     os.path.dirname(self.group.fullPath()))
-                atts["texture"] = new_name
-                atts["_database"] = profile.get("_database") 
-                atts["study"] = profile.get("study") 
-                atts["gyrus"] = profile.get("gyrus") 
-                atts["subject"] = profile.get("subject") 
-                atts["smoothing"] = profile.get("smoothing") 
-                atts["normed"] = "Yes"
-                atts["thresholded"] = "Yes"
-                atts["averaged"] = "No"
-                atts["intersubject"] = "Yes"
+                atts["study"] = profile.get("study")
+                atts["gyrus"] = profile.get("gyrus")
+                atts['acquisition'] = ''
+                atts['analysis'] = ''
+                atts['tracking_session'] = ''
+                if self.new_name is None:
+                    atts["texture"] = profile.get("texture")
+                else:
+                    atts["texture"] = self.new_name
                 profile = self.signature[
-                    "normed_connectivity_profile_nb"].findValue(atts)
+                    "normed_connectivity_profile_nb"].contentType.findValue(atts)
                 if profile is not None:
                     profiles.append(profile)
-                print "profile: ", profile
-                print "****", atts
-                print "------------------------------------------------"
             return profiles
 
     def link_group_profiles(self, dummy):
         """Function of link between individual profiles and group profile.
         """
         if (self.group and self.normed_connectivity_profiles) is not None:
-               if (self.group and self.connectivity_profiles) is not None:
             atts = dict()
-            atts["_database"] = self.connectivity_profiles[0].get("_database")
-            atts["smoothing"] = self.connectivity_profiles[0].get("smoothing")
-            atts["study"] = self.connectivity_profiles[0].get("study")
-            atts["gyrus"] = self.connectivity_profiles[0].get("gyrus")
-            atts["normed"] = "Yes"
-            atts["thresholded"] = "Yes"
+            atts["_database"] = self.normed_connectivity_profiles[0].get("_database")
+            atts["center"] = self.normed_connectivity_profiles[0].get("center")
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.group.fullPath()))
             if self.new_name is None:
-                atts["texture"] = self.connectivity_profiles[0].get("texture")
+                atts["texture"] = self.normed_connectivity_profiles[0].get("texture")
+            else:
+                atts["texture"] = self.new_name
+            atts["study"] = self.normed_connectivity_profiles[0].get("study")
+            atts["smoothing"] = self.normed_connectivity_profiles[0].get("smoothing")
+            atts["gyrus"] = self.normed_connectivity_profiles[0].get("gyrus")
+            atts['acquisition'] = ''
+            atts['analysis'] = ''
+            atts['tracking_session'] = ''
             atts["intersubject"] = "Yes"
-            atts["binary"] = "Yes"
-            atts["averaged"] = "No"
-            return self.signature["mask"].findValue(atts)
+            atts["averaged"] = "Yes"
+            atts["normed"] = "No"
+            atts["thresholded"] = "No"
+            return self.signature["group_connectivity_profile"].findValue(atts)
 
     # link of parameters for autocompletion
     self.linkParameters("normed_connectivity_profile_nb", (
-        "normed_connectivity_profiles", "group"), link_profiles)
+        "normed_connectivity_profiles", "group", "new_name"), link_profiles)
     self.linkParameters(
         "group_connectivity_profile",
         ("normed_connectivity_profiles", "group", "new_name"),
