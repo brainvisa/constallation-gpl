@@ -9,28 +9,28 @@
 
 include("diffusion")
 
-# declaration of a new format (explication: GIS image + s defining "sparse")
-Format("Matrix sparse", "f|*.imas")
 
 FileType("Nomenclature ROIs File", "Text file")
 
 
-#----------------------------------Fiber tracts--------------------------------
+#----------------------------Fiber tracts--------------------------------------
 FileType("Filtered Fascicles Bundles", "Fascicles bundles")
 
 
-#----------------------------------Connectivity matrix-------------------------
-FileType("Connectivity Matrix", "Any type", "Matrix sparse")
+#----------------------------Connectivity matrix-------------------------------
+FileType("Matrix", "Any type")
+FileType("Connectivity Matrix", "Matrix")
 
 
-#----------------------------------Connectivity profile texture----------------
+#----------------------------Mask texture--------------------------------------
+FileType("Mask Texture", "Texture")
+
+
+#----------------------------Connectivity profile texture----------------------
 FileType("Connectivity Profile Texture", "Texture")
 FileType("Filtered Connectivity Profile Texture", "Connectivity Profile Texture")
-FileType("Mask Texture", "Connectivity Profile Texture")
 
 
-#----------------------------------Connectivity ROI texture--------------------
+#----------------------------Connectivity ROI texture--------------------------
 FileType("Connectivity ROI Texture", "ROI Texture")
 FileType("Measures Connectivity ROI Texture", "Connectivity ROI Texture")
-FileType("Sum Values From Region", "Measures Connectivity ROI Texture")
-FileType("Spread Value On Region", "Measures Connectivity ROI Texture")
