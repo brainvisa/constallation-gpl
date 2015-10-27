@@ -56,7 +56,7 @@ userLevel = 2
 signature = Signature(
     # --inputs--
     "complete_connectivity_matrix", ReadDiskItem(
-        "Connectivity Matrix", "GIS image",
+        "Connectivity Matrix", "Aims writable volume formats",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "No",
                             "dense": "No",

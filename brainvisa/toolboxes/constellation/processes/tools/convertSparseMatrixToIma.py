@@ -12,9 +12,17 @@ userLevel = 2
 
 signature = Signature(
     'sparse_connectivity_matrix', ReadDiskItem(
-        'Gyrus Connectivity Matrix', 'Matrix sparse'),
+        'Connectivity Matrix', 'Aims writable volume formats',
+        requiredAttributes={"ends_labelled":"mixed",
+                            "reduced":"No",
+                            "dense":"No",
+                            "intersubject":"No"}),
     'dense_connectivity_matrix', WriteDiskItem(
-        'Patch Connectivity Matrix', 'GIS image'))
+        'Connectivity Matrix', 'Aims writable volume formats',
+        requiredAttributes={"ends_labelled":"mixed",
+                            "reduced":"No",
+                            "dense":"Yes",
+                            "intersubject":"No"}))
 
 
 def initialization(self):

@@ -27,9 +27,14 @@ userLevel = 2
 # Argument declaration
 signature = Signature(
     "name_group_of_subjects", String(),
-    "white_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
+    "white_mesh", ReadDiskItem("White Mesh", "Aims mesh formats"),
     "clustering_texture", ReadDiskItem(
-        "Group Clustering Time", "Aims texture formats"),
+        "Connectivity ROI Texture", "Aims texture formats",
+        requiredAttributes={"roi_autodetect":"No",
+                            "roi_filtered":"No",
+                            "averaged":"No",
+                            "intersubject":"Yes",
+                            "step_time":"Yes"}),
     "number_of_clusters", Integer(),
     "transfo_joy", ReadDiskItem(
         "Transform Raw T1 MRI to Talairach-AC/PC-Anatomist",

@@ -13,10 +13,14 @@ name = 'Merge Labels From texture'
 userLevel = 2
 
 signature = Signature(
-    'gyri_texture', ReadDiskItem('Label Texture', 'Aims texture formats'),
+    'gyri_texture', ReadDiskItem('ROI Texture', 'Aims texture formats',
+                                 requiredAttributes={"side":"both",
+                                                     "vertex_corr":"Yes"}),
     'old_labels', ListOf(Integer()),
     'new_label', Integer(),
-    'new_gyri_texture', WriteDiskItem('Label Texture', 'Aims texture formats'),
+    'new_gyri_texture', WriteDiskItem('ROI Texture', 'Aims texture formats',
+                                      requiredAttributes={"side":"both",
+                                                          "vertex_corr":"Yes"}),
     'keep_only_merged_regions', Boolean(),)
 
 
