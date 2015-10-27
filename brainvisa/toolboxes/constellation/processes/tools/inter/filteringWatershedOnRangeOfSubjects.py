@@ -111,13 +111,9 @@ def execution(self, context):
     A watershed is performed to obtain different patches of interest.
     """
     context.system("AimsMeshWatershed.py",
-                   "-i", self.normed_connectivity_profile,
-                   "-m", self.average_mesh,
-                   "-k", 10,
-                   "-q", 0.05,
-                   "-z", "or",
-                   "-t", 0.05,
-                   "-o", self.watershed)
+                   self.normed_connectivity_profile,
+                   self.average_mesh,
+                   self.watershed)
 
     # execute the command
     context.system(sys.executable,
