@@ -1,3 +1,26 @@
+###############################################################################
+# This software and supporting documentation are distributed by CEA/NeuroSpin,
+# Batiment 145, 91191 Gif-sur-Yvette cedex, France. This software is governed
+# by the CeCILL license version 2 under French law and abiding by the rules of
+# distribution of free software. You can  use, modify and/or redistribute the
+# software under the terms of the CeCILL license version 2 as circulated by
+# CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+###############################################################################
+
+"""
+This script does the following:
+*
+*
+
+Main dependencies:
+
+Author: Sandrine Lefranc, 2015
+"""
+
+#----------------------------Imports-------------------------------------------
+
+
+# axon python API module
 from brainvisa.processes import *
 try:
     from brainvisa import anatomist as ana
@@ -12,20 +35,35 @@ def validation():
 
 from soma.path import find_in_path
 from PyQt4 import QtGui
-#import gtk
+
+
+#----------------------------Header--------------------------------------------
+
 
 name = 'Anatomist view Texture Time'
 roles = ('viewer',)
 userLevel = 0
 
 signature = Signature(
-    'clustering_texture', ListOf(ReadDiskItem('Group Clustering Texture', 'anatomist texture formats')),
-    'white_mesh', ListOf(ReadDiskItem('Mesh', 'Aims mesh formats')),
+    'clustering_texture', ListOf(
+        ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
+        requiredAttributes={"roi_autodetect":"No",
+                            "roi_filtered":"No",
+                            "averaged":"No",
+                            "intersubject":"Yes",
+                            "step_time":"Yes"})),
+    'white_mesh', ListOf(ReadDiskItem('White Mesh', 'Aims mesh formats')),
 )
+
+
+#----------------------------Function------------------------------------------
 
 
 def initialization(self):
     pass
+
+
+#----------------------------Main program--------------------------------------
 
 
 def get_screen_config():

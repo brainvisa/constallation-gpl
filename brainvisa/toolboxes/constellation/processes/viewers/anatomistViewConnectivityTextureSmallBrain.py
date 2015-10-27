@@ -48,12 +48,26 @@ roles = ("viewer", )
 
 signature = Signature(
     'connectivity_matrix', ListOf(
-        ReadDiskItem('Group Matrix', 'aims readable volume formats')),
+        ReadDiskItem('Connectivity Matrix', 'aims readable volume formats',
+        requiredAttributes={"ends_labelled":"mixed",
+                            "reduced":"No",
+                            "dense":"No",
+                            "intersubject":"Yes"})),
     'mesh', ReadDiskItem('BothAverageBrainWhite', 'Aims mesh formats'),
     'basins_texture', ListOf(
-        ReadDiskItem('Avg Filtered Watershed', 'anatomist texture formats')),
+        ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
+        requiredAttributes={"roi_autodetect":"Yes",
+                            "roi_filtered":"Yes",
+                            "averaged":"Yes",
+                            "intersubject":"Yes",
+                            "step_time":"No"})),
     'clustering_texture', ListOf(
-        ReadDiskItem('Group Clustering Texture', 'anatomist texture formats')),
+        ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
+        requiredAttributes={"roi_autodetect":"No",
+                            "roi_filtered":"No",
+                            "averaged":"No",
+                            "intersubject":"Yes",
+                            "step_time":"Yes"})),
     'time_step', ListOf(Integer()),
     'major_texture', ReadDiskItem(
         'Label Texture', 'anatomist texture formats'),
