@@ -7,8 +7,26 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
+"""
+This script does the following:
+*
+*
+
+Main dependencies:
+
+Author: Sandrine Lefranc, 2015
+"""
+
+
+#----------------------------Imports-------------------------------------------
+
+# python module
+import os
+
 # Axon python API module
-from brainvisa.processes import *
+from brainvisa.processes import Signature, ValidationError, ReadDiskItem, \
+    WriteDiskItem, String, ListOf, ParallelExecutionNode, ExecutionNode, \
+    mapValuesToChildrenParameters
 from brainvisa.group_utils import Subject
 
 # Soma-base modules
@@ -17,28 +35,58 @@ from soma.minf.api import registerClass, readMinf
 from soma.functiontools import partial
 
 
-# Plot constel module
 def validation():
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
+    """
     if not find_in_path("constelConnectionDensityTexture"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
+
+#----------------------------Header--------------------------------------------
+
+
 name = "Reduced Connectivity Matrix"
 userLevel = 2
 
-# Argument declaration
 signature = Signature(
+    # --inputs--
     "filtered_watershed", ReadDiskItem(
-        "Avg Filtered Watershed", "Aims texture formats"),
+        "Connectivity ROI Texture", "Aims texture formats",
+        requiredAttributes={"roi_autodetect": "Yes",
+                            "roi_filtered": "Yes",
+                            "averaged": "Yes",
+                            "intersubject": "Yes",
+                            "step_time": "No"}),
     "group", ReadDiskItem("Group definition", "XML"),
     "segmentation_name_used", String(),
-    "complete_connectivity_matrix", ListOf(
-        ReadDiskItem("Gyrus Connectivity Matrix", "Matrix sparse")),
-    "average_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
-    "gyri_texture", ListOf(
-        ReadDiskItem("Label Texture", "Aims texture formats")),
-    "reduced_connectivity_matrix", ListOf(
-        WriteDiskItem("Group Reduced Connectivity Matrix", "GIS image")))
+    "complete_connectivity_matrix", ListOf(ReadDiskItem(
+        "Connectivity Matrix", "Aims writable volume formats",
+        requiredAttributes={"ends_labelled": "mixed",
+                            "reduced": "No",
+                            "dense": "No",
+                            "intersubject": "No"})),
+    "average_mesh", ReadDiskItem(
+        "White Mesh", "Aims mesh formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes",
+                            "averaged": "Yes"}),
+    "ROIs_segmentation", ListOf(ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"})),
+
+    # --outputs--
+    "reduced_connectivity_matrix", ListOf(WriteDiskItem(
+        "Connectivity Matrix", "Aims writable volume formats",
+        requiredAttributes={"ends_labelled": "mixed",
+                            "reduced": "Yes",
+                            "dense": "No",
+                            "intersubject": "Yes"})))
+
+
+#----------------------------Functions-----------------------------------------
 
 
 def afterChildAddedCallback(self, parent, key, child):
@@ -50,8 +98,7 @@ def afterChildAddedCallback(self, parent, key, child):
         "filtered_watershed"]
     child.signature["white_mesh"] = parent.signature["average_mesh"]
     child.signature["reduced_connectivity_matrix"] = WriteDiskItem(
-        "Group Reduced Connectivity Matrix", "GIS image")
-
+        "Connectivity Matrix", "Aims writable volume formats")
 
     child.filtered_watershed = parent.filtered_watershed
     child.white_mesh = parent.average_mesh
@@ -67,55 +114,82 @@ def beforeChildRemovedCallback(self, parent, key, child):
 
 
 def initialization(self):
-    """Provides default values and link of parameters
+    """Provides default values and link of parameters.
     """
-    
+
     def link_watershed(self, dummy):
         """Function of link between the filtered watershed and the
         complete matrices.
         """
-        if (self.filtered_watershed and self.group) is not None:
+        if (self.filtered_watershed and self.group
+                and self.segmentation_name_used) is not None:
             registerClass("minf_2.0", Subject, "Subject")
             groupOfSubjects = readMinf(self.group.fullPath())
             matrices = []
             for subject in groupOfSubjects:
-                atts = dict(self.filtered_watershed.hierarchyAttributes())
+                atts = dict()
+                atts["_database"] = self.filtered_watershed.get("_database")
+                atts["center"] = self.filtered_watershed.get("center")
                 atts["texture"] = self.segmentation_name_used
-                matrix = ReadDiskItem(
-                    "Gyrus Connectivity Matrix", "Matrix sparse").findValue(
-                        atts, subject.attributes())
+                atts["study"] = self.filtered_watershed.get("study")
+                atts["gyrus"] = self.filtered_watershed.get("gyrus")
+                atts["smoothing"] = self.filtered_watershed.get("smoothing")
+                atts["ends_labelled"] = "mixed",
+                atts["reduced"] = "No",
+                atts["dense"] = "No",
+                atts["intersubject"] = "No"
+                matrix = self.signature[
+                    "complete_connectivity_matrix"].contentType.findValue(
+                    atts, subject.attributes())
                 if matrix is not None:
                     matrices.append(matrix)
             return matrices
-                
 
     def link_matrices(self, dummy):
         """Function of link between the complete matrices and
         the reduced matrices.
         """
-        if (self.group and self.complete_connectivity_matrix) is not None:
+        if (self.group and self.complete_connectivity_matrix and
+                self.filtered_watershed) is not None:
             matrices = []
-            for matrix in self.complete_connectivity_matrix:
-                atts = dict(matrix.hierarchyAttributes())
+            registerClass("minf_2.0", Subject, "Subject")
+            groupOfSubjects = readMinf(self.group.fullPath())
+            for subject in groupOfSubjects:
+                atts = dict()
+                atts["_database"] = self.complete_connectivity_matrix[0].get(
+                    "_database")
+                atts["center"] = self.complete_connectivity_matrix[0].get(
+                    "center")
+                atts["texture"] = self.segmentation_name_used
+                atts["study"] = self.complete_connectivity_matrix[0].get(
+                    "study")
+                atts["gyrus"] = self.complete_connectivity_matrix[0].get(
+                    "gyrus")
+                atts["smoothing"] = self.complete_connectivity_matrix[0].get(
+                    "smoothing")
                 atts["group_of_subjects"] = os.path.basename(
                     os.path.dirname(self.group.fullPath()))
-                atts["texture"] = os.path.basename(os.path.dirname(
-                    os.path.dirname(
-                        os.path.dirname(self.filtered_watershed.fullPath()))))
-                matrix = WriteDiskItem("Group Reduced Connectivity Matrix",
-                                   "GIS image").findValue(atts)
+                atts["texture"] = self.filtered_watershed.get("texture")
+                atts["ends_labelled"] = "mixed",
+                atts["reduced"] = "Yes",
+                atts["dense"] = "No",
+                atts["intersubject"] = "Yes"
+                matrix = self.signature[
+                    "reduced_connectivity_matrix"].contentType.findValue(
+                    atts, subject.attributes())
                 if matrix is not None:
                     matrices.append(matrix)
             return matrices
 
-    # link of parameters
+    # link of parameters for autocompletion
     self.linkParameters(
         "complete_connectivity_matrix",
         ("filtered_watershed", "group", "segmentation_name_used"),
         link_watershed)
     self.linkParameters(
         "reduced_connectivity_matrix",
-        ("complete_connectivity_matrix", "group"), link_matrices)
+        ("complete_connectivity_matrix", "group", "filtered_watershed"),
+        link_matrices)
 
     # define the main node of the pipeline
     eNode = ParallelExecutionNode(
@@ -133,7 +207,7 @@ def initialization(self):
     # Add links to refresh child nodes when main lists are modified
     eNode.addLink(
         None, "complete_connectivity_matrix",
-        partial(brainvisa.processes.mapValuesToChildrenParameters, eNode,
+        partial(mapValuesToChildrenParameters, eNode,
                 eNode, "complete_connectivity_matrix",
                 "complete_connectivity_matrix",
                 defaultProcess="createReducedConnectivityMatrix",
@@ -141,16 +215,16 @@ def initialization(self):
 
     eNode.addLink(
         None, "reduced_connectivity_matrix",
-        partial(brainvisa.processes.mapValuesToChildrenParameters, eNode,
+        partial(mapValuesToChildrenParameters, eNode,
                 eNode, "reduced_connectivity_matrix",
                 "reduced_connectivity_matrix",
                 defaultProcess="createReducedConnectivityMatrix",
                 name="createReducedConnectivityMatrix"))
 
-    #~eNode.addLink(
-        #~None, "gyri_texture",
-        #~partial(brainvisa.processes.mapValuesToChildrenParameters, eNode,
-                #~eNode, "gyri_texture",
-                #~"gyri_texture",
-                #~defaultProcess="createReducedConnectivityMatrix",
-                #~name="createReducedConnectivityMatrix"))
+    eNode.addLink(
+        None, "ROIs_segmentation",
+        partial(mapValuesToChildrenParameters, eNode,
+                eNode, "ROIs_segmentation",
+                "ROIs_segmentation",
+                defaultProcess="createReducedConnectivityMatrix",
+                name="createReducedConnectivityMatrix"))
