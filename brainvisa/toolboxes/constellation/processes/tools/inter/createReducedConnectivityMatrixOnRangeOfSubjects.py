@@ -149,8 +149,8 @@ def initialization(self):
         """Function of link between the complete matrices and
         the reduced matrices.
         """
-        if (self.group and self.complete_connectivity_matrix and
-                self.filtered_watershed) is not None:
+        if self.group and self.complete_connectivity_matrix and \
+                self.filtered_watershed:
             matrices = []
             registerClass("minf_2.0", Subject, "Subject")
             groupOfSubjects = readMinf(self.group.fullPath())

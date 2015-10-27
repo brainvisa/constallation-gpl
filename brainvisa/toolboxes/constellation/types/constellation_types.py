@@ -7,7 +7,20 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
+from brainvisa.data.neuroDiskItems import createFormatList
+
 include("diffusion")
+
+Format("Sparse Matrix", "f|*.imas")
+
+createFormatList(
+    'Aims matrix formats',
+    (
+      'gz compressed NIFTI-1 image',
+      'NIFTI-1 image',
+      'GIS Image',
+    )
+  )
 
 
 FileType("Nomenclature ROIs File", "Text file")
@@ -19,7 +32,9 @@ FileType("Filtered Fascicles Bundles", "Fascicles bundles")
 
 #----------------------------Connectivity matrix-------------------------------
 FileType("Matrix", "Any type")
-FileType("Connectivity Matrix", "Matrix")
+FileType("Connectivity Matrix", "Matrix",
+         ["Sparse Matrix", "GIS image", "gz compressed NIFTI-1 image",
+          "NIFTI-1 image"])
 
 
 #----------------------------Mask texture--------------------------------------

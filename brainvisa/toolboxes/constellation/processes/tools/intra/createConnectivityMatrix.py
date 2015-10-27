@@ -74,13 +74,13 @@ signature = Signature(
 
     # --ouputs--
     "matrix_of_distant_fibers", WriteDiskItem(
-        "Connectivity Matrix", "GIS image",
+        "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "single",
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "No"}),
     "matrix_of_fibers_near_cortex", WriteDiskItem(
-        "Connectivity Matrix", "GIS image",
+        "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "both",
                             "reduced": "No",
                             "dense": "No",

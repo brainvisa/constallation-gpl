@@ -58,13 +58,13 @@ userLevel = 2
 signature = Signature(
     # --inputs--
     "matrix_of_fibers_near_cortex", ReadDiskItem(
-        "Connectivity Matrix", "Aims writable volume formats",
+        "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "both",
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "No"}),
     "matrix_of_distant_fibers", ReadDiskItem(
-        "Connectivity Matrix", "Aims writable volume formats",
+        "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "single",
                             "reduced": "No",
                             "dense": "No",
@@ -81,7 +81,7 @@ signature = Signature(
 
     # --outputs--
     "complete_connectivity_matrix", WriteDiskItem(
-        "Connectivity Matrix", "Aims writable volume formats",
+        "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "No",
                             "dense": "No",
