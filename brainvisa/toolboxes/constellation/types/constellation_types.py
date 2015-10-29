@@ -13,14 +13,10 @@ include("diffusion")
 
 Format("Sparse Matrix", "f|*.imas")
 
-createFormatList(
-    'Aims matrix formats',
-    (
-      'gz compressed NIFTI-1 image',
-      'NIFTI-1 image',
-      'GIS Image',
-    )
-  )
+createFormatList("Aims matrix formats",
+                 ("gz compressed NIFTI-1 image",
+                  "NIFTI-1 image",
+                  "GIS Image"))
 
 
 FileType("Nomenclature ROIs File", "Text file")
