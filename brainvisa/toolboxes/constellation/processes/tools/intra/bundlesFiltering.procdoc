@@ -1,50 +1,120 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <minf expander="minf_2.0">
 <d>
-  <d name="en">
-    <xhtml name="short">Selection of tracking fibers according to a white matter mesh with label texture.</xhtml>
+  <d name="fr">
+    <xhtml name="short">Filtrages des fibres individuelles appartenant à une région d'étude.<br/>
+<br/>
+<img SRC="../../images/labeled_fibers.jpg" ALT=""/>
+<img SRC="../../images/semilabeled_fibers.jpg" ALT=""/><br/></xhtml>
     <d name="parameters">
-      <xhtml name="max_length_of_fibers_near_cortex">Maximum length for a near cortex fiber (i.e., both ends of fibers are well identified as attached in such or such gyri), necessary for the filter from length.</xhtml>
-      <xhtml name="min_distant_fibers_length">Minimum length for a distant fiber (i.e., one end only is identified because fibers leave the brain stem), necessary for the filter from length.</xhtml>
-      <xhtml name="gyri_texture">Several possibilities depending on the study:<br/>
-<i>(1) Averaged approach:</i> average gyri segmentation corresponding to a group of subject<br/>
-<i>(2) Concatenated approach:</i> individual gyri segmentation
-</xhtml>
-      <xhtml name="max_distant_fibers_length">Maximum length for a distant fiber (i.e., one end only is identified because fibers leave the brain stem), necessary for the filter from length.</xhtml>
-      <xhtml name="dw_to_t1">Transformation from t2 to anat</xhtml>
-      <xhtml name="min_length_of_fibers_near_cortex">Minimum length for a near cortex fiber (i.e., both ends of fibers are well identified as attached in such or such gyri), necessary for the filter from length.</xhtml>
-      <xhtml name="database">Ontology: brainvisa-3.x<br/>
-All output files will be in a database. Please make sure that this database exist, otherwise, it will not appear on the process. </xhtml>
-      <xhtml name="study">There are two possibilities:<br/>
-<i>(1) Averaged approach:</i> the goal is to obtain a parcellation of patch for a group of subject<br/>
-<i>(2) Concatenated approach:</i> the goal is to obtain a parcellation for each subject 
-</xhtml>
-      <xhtml name="texture">The desired name of the used texture (total freedom of choice). For instance, "fs01to40"  corresponds exactly to the FreeSurfer texture for the group of subjects: 001 to 040 in the case of averaged study.</xhtml>
-      <xhtml name="patch">Labels used to select a region was on subdivision into gyri of FreeSurfer.
-For instance, postcentral gyrus corresponds to 23. By default, pacth is not defined ("use_new_patch").</xhtml>
-      <xhtml name="listOf_subsets_of_tract">All of the diffusion data for the selected subject (.bundles)</xhtml>
-      <xhtml name="new_patch">Users have the opportunity to force the number of gyrus. For this, pacth should be "use_new_patch" (i.e. not defined), necessary to use a new numbering with new_patch.</xhtml>
-      <xhtml name="subsets_of_fibers_near_cortex">Fibers are filtered according to selected patch.<br/>
-<i>Feature:</i> Both ends of fibers are well identified as attached in such or such gyri</xhtml>
-      <xhtml name="subsets_of_distant_fibers">Fibers are filtered according to selected patch.<br/>
-<i>Feature:</i> One end only is identified because fibers coming from gyrus leave the brain stem</xhtml>
-      <xhtml name="white_mesh">Indivdual both brain mesh</xhtml>
-      <xhtml name="subject">Subject directory where all files will be create</xhtml>
-    </d>
-    <xhtml name="long">This filtering is organized as follow:<br/>
-<br/>
-
+      <xhtml name="ROI">Grâce à la table de correspondance importé dans l'onglet "ROIs_nomenclature", l'ensemble des noms des régions de départ est récupéré, vous n'avez plus qu'à choisir la région à étudier.</xhtml>
+      <xhtml name="white_mesh">Maillage de la surface corticale, définie comme étant l'interface entre la substance blanche et la substance grise (également appelé interface gris/blanc).</xhtml>
+      <xhtml name="labeled_fibers">L'ensemble des fibres ayant leur deux extrémités identifiées sur le maillage et répondant aux différents critères de ce process sont réunis en un seul fichier de sortie.</xhtml>
+      <xhtml name="maxlength_labeled_fibers">Longueur maximale (en mm) acceptée pour les fibres ayant leur deux extrémités identifiées sur le maillage (labelisées). Les fibres plus longues que ce seuil ne seront pas gardées.</xhtml>
+      <xhtml name="dw_to_t1">Matrice de transformation</xhtml>
+      <xhtml name="semilabeled_fibers">L'ensemble des fibres ayant qu'une seule extrémité identifiée sur le maillage et répondant aux différents critères de ce process sont réunis en un seul fichier de sortie.</xhtml>
+      <xhtml name="study_name">Ce paramètre obligatoire est libre et permet de donner un nom au pipeline. La valeur de "study_name" sera intégrée à chaque nom de fichier de sortie ainsi qu'à l'arborescence de la base de données qui récupère les fichiers de sortie. </xhtml>
+      <xhtml name="maxlength_semilabeled_fibers">Longueur maximale (en mm) acceptée pour les fibres ayant qu'une seule extrémité identifiée sur le maillage (semi-labelisée). Les fibres plus longues que ce seuil ne seront pas gardées.</xhtml>
+      <xhtml name="dirsubject">Ce paramètre a une double utilité. Il donne à la fois le chemin pour récupérer les fichiers de fibres et le nom du sujet. Avec le paramètre "format_fiber_tracts", les fichiers de l'extension voulu sont récupérés.</xhtml>
+      <xhtml name="ROIs_nomenclature">Table de correspondance entre les noms des régions de départ et leur label associé. Il s'agit d'un fichier texte organisé comme ceci: 
 <ul>
-<li><b><i>reads fibers:</i> </b>The tractography of Connectomist is subdivided into x files "listOf_subsets_of_tract" but it is entirely possible to enter a single file. <br/></li>
-<br/>
-<li><b><i>set gyrus pair name on each fiber:</i></b> while distinguishing two types of fibers "fibers near cortex" and "distant fibers"<br/></li>
-<br/>
-<li><b><i>select bundles from names:</i></b> keeping only the fibers attached to the selected patch with one of its extremities (not necessarily both ends)<br/></li>
-<br/>
-<li><b><i>filter by length:</i></b> the fiber tracts were filtered in order to remove tracts shorter than a minimum length<br/></li>
-<br/>
-<li><b><i>merge the files:</i></b> sorts fibers into consistent bundles, two final files "subsets_of_fibers_near_cortex" and "subsets_of_distant_fibers"<br/></li>
+<li><b><i> 1ère colonne : </i> </b>numéro de la région</li> 
+<li><b><i> 2e colonne : </i> </b>nom de la région</li> 
 </ul>
+Une table de correspondence est proposée par défaut représentant les gyri de l'atlas de Desikan et Killiany.</xhtml>
+      <xhtml name="minlength_labeled_fibers">Longueur minimale (en mm) acceptée pour les fibres ayant leur deux extrémités identifiées sur le maillage (labelisées). Les fibres plus courtes que ce seuil ne seront pas gardées.</xhtml>
+      <xhtml name="format_fiber_tracts">Actuellement, seules les fichiers de fibres issues de Connectomist-2.0 (.bundles) ou de TrackVis (.trk) sont acceptés. Ce paramètre permet de filtrer les fichiers en fonction de leur extension.</xhtml>
+      <xhtml name="minlength_semilabeled_fibers">Longueur minimale (en mm) acceptée pour les fibres ayant qu'une seule extrémité identifiée sur le maillage (semi-labelisée). Les fibres plus courtes que ce seuil ne seront pas gardées.</xhtml>
+      <xhtml name="method">Deux méthodes sont proposées: <br/>
+<i><b>(1) "averaged approach" </b></i> pour obtenir un unique résultat de groupe. <br/>
+<i><b>(2) "concatenated approach"</b></i> pour obtenir des résultats individuels à l'échelle du groupe.  <br/>
+<br/>
+<span style="text-decoration:underline">Incidences du choix de la méthode sur le paramètre "ROIs_nomenclature":</span><br/>
+<i><b>(1) "averaged approach" </b></i>, dans le cadre de cette approche le paramètre "ROIs_nomenclature" doit être un fichier représentant la segmentation moyenne du groupe de sujets <br/>
+<i><b>(2) "concatenated approach"</b></i>, le paramètre "ROIs_nomenclature" est une segmentation individuelle. <br/></xhtml>
+      <xhtml name="outputs_database">Une base de donnée BrainVisa est obligatoire pour l'autocomplétion et l'écriture des fichiers de ce process. Sans celle-ci, aucune donnée pourra être générer. (voir la documentation pour ajouter une base de données dans la configuration de BrainVisa). Ce paramètre récupère l'ensemble des bases de données ayant une ontologie brainvisa présente dans votre configuration, vous n'avez plus qu'à choisir celle qui vous convient pour écrire les fichiers générés.</xhtml>
+      <xhtml name="ROIs_segmentation">Segmentation en régions de départ. Par exemple, la parcellisation en gyri de FreeSufer (atlas de Desikan et Killiany).
+Une correspondance point-à-point entre les sujets est obligatoire afin de permettre une analyse des résultats de groupe (une région anatomique chez un sujet correspond à la même région anatomique chez un autre sujet).</xhtml>
+    </d>
+    <xhtml name="long">En fonction de la région de départ étudiée, les faisceaux de fibres peuvent être filtrés selon trois  critères : <br/>
+<br/>
+<i>(1)</i> seuls les tracts connectés à la région de départ sont conservés <b>(critère obligatoire)</b> <br/>
+<i>(2)</i> les fibres de longueur inférieure à un seuil sont supprimées <b>(critère obligatoire)</b> <br/>
+<i>(3)</i> les fibres de longueur supérieure à un seuil sont supprimées <b>(critère obligatoire)</b> <br/>
+<br/>
+<br/>
+Decription des différentes étapes réalisées :<br/>
+<ul>
+<li><b><i> lecture des fichiers de fibres : </i> </b> Seules les fibres générées par les logiciels Connectomist-2.0 et TrackVis sont acceptés. Il est possible de mettre une liste de fichiers. </li>
+<li><b><i> attribution des pairs de labels aux fibres : </i> </b> chaque extrémité des fibres est associée à un noeud du maillage, lui même labelisé par la segmentation en région de départ. Ce label est attribué à la fibre. Si une extrémité de fibre n'est pas identifiée sur la maillage dans ce cas, elle est labelisée "notInMesh". </li>
+<li><b><i> sélection des fibres par leur label : </i> </b> les fibres appartenant au moins par une extrémité à la région de départ sont gardées. </li>
+<li><b><i> filtrage par longueur : </i> </b>  les fibres plus petites que le seuil "minlength_?" ou plus grande que le seuil "maxlength_?" sont supprimées. </li>
+<li><b><i> fusion des fichiers : </i> </b> création d'un seul fichier en sortie par type de fibres (voir ci-dessous) . </li>
+</ul>
+<br/>
+Deux types de fibres sont à considérer dans cette brique:<br/>
+<ul>
+<li><b><i>les fibres labelisées</i> </b> sont définit comme ayant les deux extrémités associées chacune à un point du maillage (et sont par conséquent labelisées) </li>
+<li><b><i>les fibres semi-labelisées</i></b> sont définit comme ayant qu'une seule extrémité associée à un point du maillage (l'autre n'étant pas identifiée) </li>
+</ul>
+</xhtml>
+  </d>
+  <d name="en">
+    <xhtml name="short">Filtering individual fibers belonging to a starting area. <br/>
+<br/>
+<img SRC="../../images/labeled_fibers.jpg" ALT=""/>
+<img SRC="../../images/semilabeled_fibers.jpg" ALT=""/><br/></xhtml>
+    <d name="parameters">
+      <xhtml name="ROI">Due to the correspondence table imported in the "ROIs nomenclature", all names starting regions is recovered, you have to choose the region to study.</xhtml>
+      <xhtml name="white_mesh">Indivdual both brain mesh</xhtml>
+      <xhtml name="labeled_fibers">All the fibers having their ends identified on the mesh and corresponding to the various criteria in this process are merged into one output file.</xhtml>
+      <xhtml name="maxlength_labeled_fibers">Maximum length (in mm) accepted for fibers having their two ends identified on the mesh (labelled). The fibers longer than this threshold will not be kept.</xhtml>
+      <xhtml name="dw_to_t1">Transformation from t2 to anat</xhtml>
+      <xhtml name="semilabeled_fibers">All the fibers having one end identified on the mesh and  corresponding to the various criteria of this process are merged into one output file.</xhtml>
+      <xhtml name="study_name">This mandatory parameter is free and allows to give a name to the pipeline. The value of "study_name" will be integrated into each output file name as well as the directory of the database that retrieves the output files.</xhtml>
+      <xhtml name="maxlength_semilabeled_fibers">Maximum length (in mm) accepted for fibers having one end identified in the mesh (semi-labelled). The fibers longer than this threshold will not be kept.</xhtml>
+      <xhtml name="dirsubject">This parameter is useful in two ways. It gives both the path to recover files fibers and the name of the subject. With the "format_fiber_tracts" parameter, the desired file extension are recovered.</xhtml>
+      <xhtml name="ROIs_nomenclature">Correspondence table between the names of the starting regions and their associated label. This is a text file organized as following:
+<ul>
+<li><b><i> first column: </i> </b>number of the region</li> 
+<li><b><i> second column: </i> </b>name of the region</li> 
+</ul>
+A correspondence table is the default gyri representing the atlas and Desikan Killiany.</xhtml>
+      <xhtml name="minlength_labeled_fibers">Minimum length (in mm) accepted for fibers having their two ends identified on the mesh (labelled). Shorter fibers than this threshold will not be retained.</xhtml>
+      <xhtml name="format_fiber_tracts">Currently, only files of fibers from Connectomist-2.0 (.bundles) or TrackVis (.trk) softwares are accepted. This parameter allows to filter files based on their extension.</xhtml>
+      <xhtml name="minlength_semilabeled_fibers">Minimum length (in mm) accepted for fibers having one end identified in the mesh (semi-labelled). Shorter fibers than this threshold will not be retained.</xhtml>
+      <xhtml name="method">Two methods are proposed: <br/>
+<i><b>(1) "averaged approach" </b></i> to obtain a single result group. <br/>
+<i><b>(2) "concatenated approach"</b></i> to obtain individual results across the group.  <br/>
+<br/>
+<span style="text-decoration:underline">Implications of the choice of method on the parameter "ROIs_nomenclature":</span><br/>
+<i><b>(1) "averaged approach" </b></i>, in the context of this approach the "ROIs_nomenclature" parameter must be a file representing the average segmentation group of subjects <br/>
+<i><b>(2) "concatenated approach"</b></i>, the "ROIs_nomenclature" parameter is an individual segmentation. <br/>entation</xhtml>
+      <xhtml name="outputs_database">A BrainVisa database is mandatory for autocompletion and writing files in this process. Without it, no data will be generated. (see the documentation to add a database in the BrainVisa configuration). This parameter retrieves all databases with brainvisa ontology present in your configuration, you just have to pick the right one to write the generated files.</xhtml>
+      <xhtml name="ROIs_segmentation">Segmentation by starting regions. (for example, the gyri segmentation of FreeSufer: Desikan-Killiany atlas) . A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
+    </d>
+    <xhtml name="long">Depending on the starting region of interest, the fiber bundles can be filtered according to three criteria:<br/>
+<br/>
+<i>(1)</i> only fibers connected to the starting region are retained <b>(mandatory criteria)</b> <br/>
+<i>(2)</i> the fibers  less than a threshold in length are removed <b>(mandatory criteria)</b> <br/>
+<i>(3)</i> the fibers of longer than a threshold are removed <b>(mandatory criteria)</b> <br/>
+<br/>
+<br/>
+This filtering is organized as follow:<br/>
+<ul>
+<li><b><i>reads fibers:</i> </b> Only fibers generated by the Connectomist-2.0 and TrackVis softwares are accepted. It is possible to put a list of files. <br/></li>
+<li><b><i>set gyrus pair name on each fiber:</i></b> Each end of the fibers is associated with a vertex of the mesh, itself labeled by the starting region segmentation. This label is awarded to the fiber. If a fiber end is not identified on the mesh, it is labelled "notInMesh".<br/></li>
+<li><b><i>select bundles from names:</i></b> the fibers from at least one end to the starting region are kept.<br/></li>
+<li><b><i>filter by length:</i></b> smaller fibers than the threshold "maxlength?" or larger than the threshold "maxlength_?" are deleted.<br/></li>
+<li><b><i>merge the files:</i></b> creating a single file output by fiber type (see below)<br/></li>
+</ul>
+<br/>
+Two types of fiber tracts files are to be considered in this process:<br/>
+<ul>
+<li><b><i>labeled fibers</i> </b> are defined as having both ends attached to the mesh (and are consequently labelled) </li>
+<li><b><i>semilabeled fibers</i></b> are defined as having only one end attached to the mesh (the other being not identified) </li>
+</ul>
+
 </xhtml>
   </d>
 </d>
