@@ -55,25 +55,25 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Filtering Watershed"
+name = "Filtering Reduced Profile"
 userLevel = 2
 
 signature = Signature(
     # inputs
-    "complete_connectivity_matrix", ReadDiskItem(
-        "Connectivity Matrix", "Aims writable volume formats",
+    "complete_matrix", ReadDiskItem(
+        "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled":"mixed",
                             "reduced":"No",
                             "dense":"No",
                             "intersubject":"No"}),
-    "watershed", ReadDiskItem(
+    "reduced_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect":"Yes",
                             "roi_filtered":"No",
                             "averaged":"No",
                             "intersubject":"No",
                             "step_time":"No"}),
-        
+
     "ROIs_segmentation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side":"both", "vertex_corr":"Yes"}),
@@ -90,7 +90,7 @@ signature = Signature(
     "duplication_value_patch", WriteDiskItem(
         "Measures Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"measure": "spread"}),
-    "filtered_watershed", WriteDiskItem(
+    "filtered_reduced_profile", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect":"Yes",
                             "roi_filtered":"Yes",
@@ -125,19 +125,19 @@ def initialization(self):
         """Define the attribut 'ROI' from fibertracts pattern for the
         signature 'ROI'.
         """
-        if self.complete_connectivity_matrix is not None:
-            s = str(self.complete_connectivity_matrix.get("gyrus"))
+        if self.complete_matrix is not None:
+            s = str(self.complete_matrix.get("gyrus"))
             name = self.signature["ROI"].findValue(s)
         return name
 
     self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
     self.linkParameters(
-        "ROI", "complete_connectivity_matrix", link_matrix2ROI)
-    self.linkParameters("watershed", "complete_connectivity_matrix")
-    self.linkParameters("sum_vertices_patch", "complete_connectivity_matrix")
+        "ROI", "complete_matrix", link_matrix2ROI)
+    self.linkParameters("reduced_profile", "complete_matrix")
+    self.linkParameters("sum_vertices_patch", "complete_matrix")
     self.linkParameters(
-        "duplication_value_patch", "complete_connectivity_matrix")
-    self.linkParameters("filtered_watershed", "complete_connectivity_matrix")
+        "duplication_value_patch", "complete_matrix")
+    self.linkParameters("filtered_reduced_profile", "complete_matrix")
 
 
 #----------------------------Main program--------------------------------------
@@ -146,14 +146,14 @@ def initialization(self):
 def execution(self, context):
     """ Compute reduced connectivity matrix
     """
-   
+
     # selects the ROI label corresponding to ROI name
     ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
 
     context.system("constelConnectionDensityTexture",
                    "-mesh", self.white_mesh,
-                   "-connmatrixfile", self.complete_connectivity_matrix,
-                   "-targetregionstex", self.watershed,
+                   "-connmatrixfile", self.complete_matrix,
+                   "-targetregionstex", self.reduced_profile,
                    "-seedregionstex", self.ROIs_segmentation,
                    "-seedlabel", ROIlabel,
                    "-type", "oneSeedRegion_to_targets",
@@ -162,7 +162,7 @@ def execution(self, context):
                    "-normalize", 1)
     fibersNbByWatershedBasinsTarget_tex = aims.read(
         self.duplication_value_patch.fullPath())
-    subjectWatershedBasins_tex = aims.read(self.watershed.fullPath())
+    subjectWatershedBasins_tex = aims.read(self.reduced_profile.fullPath())
 
     # TO DO: assorted improvements??? (it is not clear yet...)
     labelsToRemove_ar = fibersNbByWatershedBasinsTarget_tex[0].arraydata()
@@ -195,4 +195,4 @@ def execution(self, context):
     filteredWatershedBasins_tex = tt.remove_labels(
         subjectWatershedBasins_tex, labelsToRemove_list)
     aims.write(
-        filteredWatershedBasins_tex, self.filtered_watershed.fullPath())
+        filteredWatershedBasins_tex, self.filtered_reduced_profile.fullPath())

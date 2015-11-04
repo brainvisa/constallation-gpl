@@ -61,13 +61,13 @@ userLevel = 2
 signature = Signature(
     # --inputs--
     "study_name", String(),
-    "database", Choice(),
+    "outputs_database", Choice(),
     "format_fiber_tracts", Choice("bundles", "trk"),
     "method", Choice(("averaged approach", "avg"),
                      ("concatenated approach", "concat")),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
     "ROI", OpenChoice(),
-    "subject", ReadDiskItem("subject", "directory"),
+    "dirsubject", ReadDiskItem("subject", "directory"),
     "ROIs_segmentation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
@@ -75,16 +75,16 @@ signature = Signature(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     "dw_to_t1", ReadDiskItem("Transformation matrix", "Transformation matrix"),
-    "min_length_of_fibers_near_cortex", Float(),
-    "max_length_of_fibers_near_cortex", Float(),
-    "min_distant_fibers_length", Float(),
-    "max_distant_fibers_length", Float(),
+    "minlength_labeled_fibers", Float(),
+    "maxlength_labeled_fibers", Float(),
+    "minlength_semilabeled_fibers", Float(),
+    "maxlength_semilabeled_fibers", Float(),
 
     # --outputs--
-    "subsets_of_fibers_near_cortex", WriteDiskItem(
+    "labeled_fibers", WriteDiskItem(
         "Filtered Fascicles Bundles", "Aims writable bundles formats",
         requiredAttributes={"both_ends_labelled": "Yes", "oversampled": "No"}),
-    "subsets_of_distant_fibers", WriteDiskItem(
+    "semilabeled_fibers", WriteDiskItem(
         "Filtered Fascicles Bundles", "Aims writable bundles formats",
         requiredAttributes={"both_ends_labelled": "No", "oversampled": "No"}),
 )
@@ -97,20 +97,21 @@ def initialization(self):
     """Provides default values and link of parameters
     """
     # default values
-    self.min_length_of_fibers_near_cortex = 30.
-    self.max_length_of_fibers_near_cortex = 500.
-    self.min_distant_fibers_length = 20.
-    self.max_distant_fibers_length = 500.
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+    self.minlength_labeled_fibers = 30.
+    self.maxlength_labeled_fibers = 500.
+    self.minlength_semilabeled_fibers = 20.
+    self.maxlength_semilabeled_fibers = 500.
+    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({
+        "atlasname": "desikan_freesurfer"})
 
     # list of possible databases, while respecting the ontology
     databases = [h.name for h in neuroHierarchy.hierarchies()
                  if h.fso.name == "brainvisa-3.2.0"]
-    self.signature["database"].setChoices(*databases)
+    self.signature["outputs_database"].setChoices(*databases)
     if len(databases) != 0:
-        self.database = databases[0]
+        self.outputs_database = databases[0]
     else:
-        self.signature["database"] = OpenChoice()
+        self.signature["outputs_database"] = OpenChoice()
 
     def link_roi(self, dummy):
         """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
@@ -125,55 +126,53 @@ def initialization(self):
                 self.changeSignature(self.signature)
 
     def link_filtered_bundles(self, dummy):
-        """Defines all attributs of 'subsets_of_fibers_near_cortex' in order to
+        """Defines all attributs of 'abeled_fibers' in order to
         allow autocompletion.
         """
-        if (self.database and self.study_name and self.subject
+        if (self.outputs_database and self.study_name and self.dirsubject
                 and self.ROI) is not None:
             attrs = dict()
-            attrs["_database"] = self.database
+            attrs["_database"] = self.outputs_database
             attrs["study"] = self.method
             attrs["texture"] = self.study_name
-            attrs["subject"] = os.path.basename(self.subject.fullPath())
+            attrs["subject"] = os.path.basename(self.dirsubject.fullPath())
             attrs["gyrus"] = str(self.ROI)
-            attrs["smallerlength1"] = str(
-                int(self.min_length_of_fibers_near_cortex))
-            attrs["greaterlength1"] = str(
-                int(self.max_length_of_fibers_near_cortex))
-            filename = self.signature[
-                "subsets_of_fibers_near_cortex"].findValue(attrs)
+            attrs["smallerlength1"] = str(int(self.minlength_labeled_fibers))
+            attrs["greaterlength1"] = str(int(self.maxlength_labeled_fibers))
+            filename = self.signature["labeled_fibers"].findValue(attrs)
             return filename
 
     def link_between_filtered_bundles(self, dummy):
-        """Defines all attributs of 'subsets_of_distant_fibers' in order to
+        """Defines all attributs of 'semilabeled_fibers' in order to
         allow autocompletion.
         """
-        if (self.database and self.study_name and self.subject
+        if (self.outputs_database and self.study_name and self.dirsubject
                 and self.ROI) is not None:
             attrs = dict()
-            attrs["_database"] = self.database
+            attrs["_database"] = self.outputs_database
             attrs["study"] = self.method
             attrs["texture"] = self.study_name
-            attrs["subject"] = os.path.basename(self.subject.fullPath())
+            attrs["subject"] = os.path.basename(self.dirsubject.fullPath())
             attrs["gyrus"] = str(self.ROI)
-            attrs["smallerlength2"] = str(int(self.min_distant_fibers_length))
-            attrs["greaterlength2"] = str(int(self.max_distant_fibers_length))
-            filename = self.signature[
-                "subsets_of_distant_fibers"].findValue(attrs)
+            attrs["smallerlength2"] = str(
+                int(self.minlength_semilabeled_fibers))
+            attrs["greaterlength2"] = str(
+                int(self.maxlength_semilabeled_fibers))
+            filename = self.signature["semilabeled_fibers"].findValue(attrs)
             return filename
 
     # link of parameters for autocompletion
     self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
-    self.linkParameters("dw_to_t1", "subject")
-    self.linkParameters("subsets_of_fibers_near_cortex", (
-        "database", "subject", "method", "study_name", "ROI",
-        "min_length_of_fibers_near_cortex",
-        "max_length_of_fibers_near_cortex"), link_filtered_bundles)
+    self.linkParameters("dw_to_t1", "dirsubject")
+    self.linkParameters("labeled_fibers", (
+        "outputs_database", "dirsubject", "method", "study_name", "ROI",
+        "minlength_labeled_fibers",
+        "maxlength_labeled_fibers"), link_filtered_bundles)
     self.linkParameters(
-        "subsets_of_distant_fibers", (
-            "database", "subject", "method", "study_name", "ROI",
-            "min_distant_fibers_length",
-            "max_distant_fibers_length"), link_between_filtered_bundles)
+        "semilabeled_fibers", (
+            "outputs_database", "dirsubject", "method", "study_name", "ROI",
+            "minlength_semilabeled_fibers",
+            "maxlength_semilabeled_fibers"), link_between_filtered_bundles)
 
 
 #----------------------------Main program--------------------------------------
@@ -191,7 +190,7 @@ def execution(self, context):
     """
     # selects all fiber tracts of the given subject
     list_fiber_tracts = load_fiber_tracts(
-        self.subject.fullPath(), self.format_fiber_tracts)
+        self.dirsubject.fullPath(), self.format_fiber_tracts)
 
     # selects the ROI label corresponding to ROI name
     ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
@@ -203,8 +202,8 @@ def execution(self, context):
     for fiber_tract in list_fiber_tracts:
         cmd += ["-i", fiber_tract]
     cmd += [
-        "-o", self.subsets_of_fibers_near_cortex,
-        "-n", self.subsets_of_distant_fibers,
+        "-o", self.labeled_fibers,
+        "-n", self.semilabeled_fibers,
         "--mesh", self.white_mesh,
         "--tex", self.ROIs_segmentation,
         "--trs", self.dw_to_t1,
@@ -213,10 +212,10 @@ def execution(self, context):
         "--names", "^[0-9]+_" + str(ROIlabel) + "$",
         "-g", ROIlabel,
         "-r",
-        "-l", self.min_length_of_fibers_near_cortex,
-        "-L", self.max_length_of_fibers_near_cortex,
-        "--nimlmin", self.min_distant_fibers_length,
-        "--nimlmax", self.max_distant_fibers_length,
+        "-l", self.minlength_labeled_fibers,
+        "-L", self.maxlength_labeled_fibers,
+        "--nimlmin", self.minlength_semilabeled_fibers,
+        "--nimlmax", self.maxlength_semilabeled_fibers,
     ]
 
     # executes the command

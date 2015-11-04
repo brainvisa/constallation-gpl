@@ -52,18 +52,18 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Smoothing Matrix"
+name = "Sum and Smoothing Matrix"
 userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "matrix_of_fibers_near_cortex", ReadDiskItem(
+    "matrix_labeled_fibers", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "both",
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "No"}),
-    "matrix_of_distant_fibers", ReadDiskItem(
+    "matrix_semilabeled_fibers", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "single",
                             "reduced": "No",
@@ -80,7 +80,7 @@ signature = Signature(
     "smoothing", Float(),
 
     # --outputs--
-    "complete_connectivity_matrix", WriteDiskItem(
+    "complete_matrix", WriteDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "No",
@@ -103,27 +103,27 @@ def initialization(self):
         """Define the attribut 'gyrus' from fibertracts pattern for the
         signature 'ROI'.
         """
-        if self.matrix_of_fibers_near_cortex is not None:
-            s = str(self.matrix_of_fibers_near_cortex.get("gyrus"))
+        if self.matrix_labeled_fibers is not None:
+            s = str(self.matrix_labeled_fibers.get("gyrus"))
             name = self.signature["ROI"].findValue(s)
         return name
 
     def link_smooth(self, dummy):
         """
         """
-        if (self.matrix_of_distant_fibers and self.smoothing) is not None:
-            attrs = dict(self.matrix_of_distant_fibers.hierarchyAttributes())
+        if (self.matrix_semilabeled_fibers and self.smoothing) is not None:
+            attrs = dict(self.matrix_semilabeled_fibers.hierarchyAttributes())
             attrs["smoothing"] = str(self.smoothing)
-            attrs["smallerlength2"] = self.matrix_of_distant_fibers.get("smallerlength1")
-            attrs["greaterlength2"] = self.matrix_of_distant_fibers.get("smallerlength1")
+            attrs["smallerlength2"] = self.matrix_semilabeled_fibers.get("smallerlength1")
+            attrs["greaterlength2"] = self.matrix_semilabeled_fibers.get("smallerlength1")
             filename = self.signature[
-                "complete_connectivity_matrix"].findValue(attrs)
+                "complete_matrix"].findValue(attrs)
             return filename
 
     # link of parameters for autocompletion
-    self.linkParameters("ROI", "matrix_of_fibers_near_cortex", link_matrix2ROI)
-    self.linkParameters("complete_connectivity_matrix",
-                        ("matrix_of_distant_fibers", "smoothing"), link_smooth)
+    self.linkParameters("ROI", "matrix_labeled_fibers", link_matrix2ROI)
+    self.linkParameters("complete_matrix",
+                        ("matrix_semilabeled_fibers", "smoothing"), link_smooth)
 
 
 #----------------------------Main program--------------------------------------
@@ -136,15 +136,15 @@ def execution(self, context):
 
     # sum matrix
     context.system("AimsSumSparseMatrix",
-                   "-i", self.matrix_of_distant_fibers,
-                   "-i", self.matrix_of_fibers_near_cortex,
-                   "-o", self.complete_connectivity_matrix)
+                   "-i", self.matrix_semilabeled_fibers,
+                   "-i", self.matrix_labeled_fibers,
+                   "-o", self.complete_matrix)
 
     # smoothing matrix: -s in millimetres
     context.system("AimsSparseMatrixSmoothing",
-                   "-i", self.complete_connectivity_matrix,
+                   "-i", self.complete_matrix,
                    "-m", self.white_mesh,
-                   "-o", self.complete_connectivity_matrix,
+                   "-o", self.complete_matrix,
                    "-s", self.smoothing,
                    "-l", self.ROIs_segmentation,
                    "-p", ROIlabel)

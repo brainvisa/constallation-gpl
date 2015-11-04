@@ -50,12 +50,12 @@ userLevel = 2
 
 signature = Signature(
     # --input--
-    "filtered_length_distant_fibers", ReadDiskItem(
+    "semilabeled_fibers", ReadDiskItem(
         "Filtered Fascicles bundles", "Aims readable bundles formats",
         requiredAttributes={"both_ends_labelled": "No", "oversampled": "No"}),
 
     # --output--
-    "oversampled_distant_fibers", WriteDiskItem(
+    "oversampled_semilabeled_fibers", WriteDiskItem(
         "Fascicles bundles", "Aims writable bundles formats",
         requiredAttributes={"both_ends_labelled": "No", "oversampled": "Yes"}),
 )
@@ -68,7 +68,7 @@ def initialization(self):
     """Provides link of parameters for autocompletion.
     """
     self.linkParameters(
-        "oversampled_distant_fibers", "filtered_length_distant_fibers")
+        "oversampled_semilabeled_fibers", "semilabeled_fibers")
 
 
 #----------------------------Main program--------------------------------------
@@ -79,7 +79,7 @@ def execution(self, context):
     with only one end identified on the mesh.
     """
     context.system("comistFiberOversampler",
-                   "-i", self.filtered_length_distant_fibers,
-                   "-o", self.oversampled_distant_fibers,
+                   "-i", self.semilabeled_fibers,
+                   "-o", self.oversampled_semilabeled_fibers,
                    "-points", 3,  # number of pts to intercalate between 2 pts
                    "-verbose", 1)

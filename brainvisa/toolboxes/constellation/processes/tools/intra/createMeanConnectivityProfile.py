@@ -13,7 +13,7 @@ This script does the following:
     - the parameters of a process (Signature),
     - the parameters initialization
     - the linked parameters
-* this process 
+* this process
 
 Main dependencies: Axon python API, Soma-base, constel
 
@@ -55,8 +55,8 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "complete_connectivity_matrix", ReadDiskItem(
-        "Connectivity Matrix", "Aims writable volume formats",
+    "complete_matrix", ReadDiskItem(
+        "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "No",
                             "dense": "No",
@@ -64,10 +64,10 @@ signature = Signature(
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
     "ROI", String(),
     "ROIs_segmentation", ReadDiskItem("ROI Texture", "Aims texture formats",
-                                 requiredAttributes={"side": "both",
-                                                     "vertex_corr": "Yes"}),
+                                      requiredAttributes={"side": "both",
+                                                          "vertex_corr": "Yes"}),
     # --ouputs--
-    "patch_connectivity_profile", WriteDiskItem(
+    "mean_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed": "No",
                             "thresholded": "No",
@@ -88,15 +88,15 @@ def initialization(self):
         """Define the attribut 'gyrus' from fibertracts pattern for the
         signature 'ROI'.
         """
-        if self.complete_connectivity_matrix is not None:
-            s = str(self.complete_connectivity_matrix.get("gyrus"))
+        if self.complete_matrix is not None:
+            s = str(self.complete_matrix.get("gyrus"))
             name = self.signature["ROI"].findValue(s)
         return name
-    
+
     # link of parameters for autocompletion
-    self.linkParameters("ROI", "complete_connectivity_matrix", link_matrix2ROI)
-    self.linkParameters("patch_connectivity_profile",
-                        "complete_connectivity_matrix")
+    self.linkParameters("ROI", "complete_matrix", link_matrix2ROI)
+    self.linkParameters("mean_profile",
+                        "complete_matrix")
 
 
 #----------------------------Main program--------------------------------------
@@ -110,8 +110,8 @@ def execution(self, context):
 
     context.system("constelMeanConnectivityProfileFromMatrix",
                    "-connfmt", "binar_sparse",
-                   "-connmatrixfile", self.complete_connectivity_matrix,
-                   "-outconntex", self.patch_connectivity_profile,
+                   "-connmatrixfile", self.complete_matrix,
+                   "-outconntex", self.mean_profile,
                    "-seedregionstex", self.ROIs_segmentation,
                    "-seedlabel", ROIlabel,
                    "-type", "seed_mean_connectivity_profile",

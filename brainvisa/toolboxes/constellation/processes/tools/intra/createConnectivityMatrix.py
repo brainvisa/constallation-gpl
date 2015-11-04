@@ -56,10 +56,10 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "oversampled_distant_fibers", ReadDiskItem(
+    "oversampled_semilabeled_fibers", ReadDiskItem(
         "Filtered Fascicles Bundles", "Aims readable bundles formats",
         requiredAttributes={"both_ends_labelled": "No", "oversampled": "Yes"}),
-    "filtered_length_fibers_near_cortex", ReadDiskItem(
+    "labeled_fibers", ReadDiskItem(
         "Filtered Fascicles Bundles", "Aims readable bundles formats",
         requiredAttributes={"both_ends_labelled": "Yes", "oversampled": "No"}),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
@@ -73,24 +73,32 @@ signature = Signature(
     "dw_to_t1", ReadDiskItem("Transformation matrix", "Transformation matrix"),
 
     # --ouputs--
-    "matrix_of_distant_fibers", WriteDiskItem(
+    "matrix_semilabeled_fibers", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "single",
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "No"}),
-    "matrix_of_fibers_near_cortex", WriteDiskItem(
+    "matrix_labeled_fibers", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "both",
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "No"}),
-    "profile_of_distant_fibers", WriteDiskItem(
+    "profile_semilabeled_fibers", WriteDiskItem(
         "Filtered Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"both_ends_labelled": "No"}),
-    "profile_of_fibers_near_cortex", WriteDiskItem(
+        requiredAttributes={"normed": "No",
+                            "thresholded": "Yes",
+                            "averaged": "No",
+                            "intersubject": "No",
+                            "both_ends_labelled": "No"}),
+    "profile_labeled_fibers", WriteDiskItem(
         "Filtered Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"both_ends_labelled": "Yes"}),
+        requiredAttributes={"normed": "No",
+                            "thresholded": "Yes",
+                            "averaged": "No",
+                            "intersubject": "No",
+                            "both_ends_labelled": "Yes"}),
 )
 
 
@@ -106,22 +114,22 @@ def initialization(self):
         """Define the attribut 'gyrus' from fibertracts pattern for the
         signature 'ROI'.
         """
-        if self.oversampled_distant_fibers is not None:
-            s = str(self.oversampled_distant_fibers.get("gyrus"))
+        if self.oversampled_semilabeled_fibers is not None:
+            s = str(self.oversampled_semilabeled_fibers.get("gyrus"))
             name = self.signature["ROI"].findValue(s)
         return name
 
     # link of parameters for autocompletion
     self.linkParameters(
-        "matrix_of_distant_fibers", "oversampled_distant_fibers")
+        "matrix_semilabeled_fibers", "oversampled_semilabeled_fibers")
     self.linkParameters(
-        "ROI", "oversampled_distant_fibers", link_fibertracts2ROI)
+        "ROI", "oversampled_semilabeled_fibers", link_fibertracts2ROI)
     self.linkParameters(
-        "matrix_of_fibers_near_cortex", "filtered_length_fibers_near_cortex")
+        "matrix_labeled_fibers", "labeled_fibers")
     self.linkParameters(
-        "profile_of_distant_fibers", "matrix_of_distant_fibers")
+        "profile_semilabeled_fibers", "matrix_semilabeled_fibers")
     self.linkParameters(
-        "profile_of_fibers_near_cortex", "matrix_of_fibers_near_cortex")
+        "profile_labeled_fibers", "matrix_labeled_fibers")
 
 
 #----------------------------Main program--------------------------------------
@@ -143,14 +151,14 @@ def execution(self, context):
     # case 1
     # this command is mostly concerned with fibers leaving the brain stem
     context.system("constelConnectivityMatrix",
-                   "-bundles", self.oversampled_distant_fibers,
-                   "-connmatrix", self.matrix_of_distant_fibers,
+                   "-bundles", self.oversampled_semilabeled_fibers,
+                   "-connmatrix", self.matrix_semilabeled_fibers,
                    "-matrixcompute", "meshintersectionpoint",
                    "-dist", 0.0,  # no smoothing
                    "-wthresh", 0.001,
                    "-distmax", 5.0,
                    "-seedregionstex", self.ROIs_segmentation,
-                   "-outconntex", self.profile_of_distant_fibers,
+                   "-outconntex", self.profile_semilabeled_fibers,
                    "-mesh", self.white_mesh,
                    "-type", "seed_mean_connectivity_profile",
                    "-trs", self.dw_to_t1,
@@ -160,11 +168,11 @@ def execution(self, context):
 
     # case 2
     context.system("constelConnectivityMatrix",
-                   "-bundles", self.filtered_length_fibers_near_cortex,
-                   "-connmatrix", self.matrix_of_fibers_near_cortex,
+                   "-bundles", self.labeled_fibers,
+                   "-connmatrix", self.matrix_labeled_fibers,
                    "-dist", 0.0,  # no smoothing
                    "-seedregionstex", self.ROIs_segmentation,
-                   "-outconntex", self.profile_of_fibers_near_cortex,
+                   "-outconntex", self.profile_labeled_fibers,
                    "-mesh", self.white_mesh,
                    "-type", "seed_mean_connectivity_profile",
                    "-trs", self.dw_to_t1,

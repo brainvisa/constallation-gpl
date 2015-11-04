@@ -13,7 +13,7 @@ This script does the following:
     - the parameters of a process (Signature),
     - the parameters initialization
     - the linked parameters
-* 
+*
 
 Main dependencies: axon python API, soma-base, constel
 
@@ -53,13 +53,13 @@ userLevel = 2
 
 signature = Signature(
     # inputs
-    "complete_connectivity_matrix", ReadDiskItem(
-        "Connectivity Matrix", "Aims writable volume formats",
+    "complete_matrix", ReadDiskItem(
+        "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled":"mixed",
                             "reduced":"No",
                             "dense":"No",
                             "intersubject":"No"}),
-    "filtered_watershed", ReadDiskItem(
+    "filtered_reduced_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect":"Yes",
                             "roi_filtered":"Yes",
@@ -76,8 +76,8 @@ signature = Signature(
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
 
     #outputs
-    "reduced_connectivity_matrix", WriteDiskItem(
-        "Connectivity Matrix", "Aims writable volume formats",
+    "reduced_matrix", WriteDiskItem(
+        "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled":"mixed",
                             "reduced":"Yes",
                             "dense":"No",
@@ -109,16 +109,16 @@ def initialization(self):
         """Define the attribut 'gyrus' from fibertracts pattern for the
         signature 'ROI'.
         """
-        if self.complete_connectivity_matrix is not None:
-            s = str(self.complete_connectivity_matrix.get("gyrus"))
+        if self.complete_matrix is not None:
+            s = str(self.complete_matrix.get("gyrus"))
             name = self.signature["ROI"].findValue(s)
         return name
 
     # link of parameters for autocompletion
-    self.linkParameters("filtered_watershed", "complete_connectivity_matrix")
+    self.linkParameters("filtered_reduced_profile", "complete_matrix")
     self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
-    self.linkParameters("ROI", "complete_connectivity_matrix", link_matrix2ROI)
-    self.linkParameters("reduced_connectivity_matrix", "filtered_watershed")
+    self.linkParameters("ROI", "complete_matrix", link_matrix2ROI)
+    self.linkParameters("reduced_matrix", "filtered_reduced_profile")
 
 
 #----------------------------Main program--------------------------------------
@@ -133,11 +133,11 @@ def execution(self, context):
     # M(target regions, patch vertices)
     context.system("constelConnectionDensityTexture",
                    "-mesh", self.white_mesh,
-                   "-connmatrixfile", self.complete_connectivity_matrix,
-                   "-targetregionstex", self.filtered_watershed,
+                   "-connmatrixfile", self.complete_matrix,
+                   "-targetregionstex", self.filtered_reduced_profile,
                    "-seedregionstex", str(self.ROIs_segmentation),
                    "-seedlabel", ROIlabel,
                    "-type", "seedVertex_to_targets",
-                   "-connmatrix", self.reduced_connectivity_matrix,
+                   "-connmatrix", self.reduced_matrix,
                    "-normalize", 1,
                    "-verbose", 1)
