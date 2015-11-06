@@ -98,7 +98,7 @@ def initialization(self):
         if self.reduced_individual_matrix is not None:
             s = str(self.reduced_individual_matrix.get("gyrus"))
             name = self.signature["ROI"].findValue(s)
-        return name
+            return name
 
     # link of parameters for autocompletion
     self.linkParameters("ROI", "reduced_individual_matrix", link_matrix2ROI)

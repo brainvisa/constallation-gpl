@@ -78,16 +78,17 @@ def initialization(self):
     # link of parameters
     def link_mask(self, dummy):
         """Function of link between mask and group parameters."""
-        if (self.subjects_group and self.mean_individual_profiles) is not None:
+        if self.subjects_group and self.mean_individual_profiles:
             atts = dict(self.mean_individual_profiles[0].hierarchyAttributes())
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.subjects_group.fullPath()))
-            if self.new_study_name is None:
-                atts["texture"] = self.mean_individual_profiles[0].get("texture")
-            else:
+            if self.new_study_name:
                 atts["texture"] = self.new_study_name
+            else:
+                atts["texture"] = \
+                    self.mean_individual_profiles[0].get("texture")
             return self.signature["group_mask"].findValue(atts)
-            
+
     # link of parameters for autocompletion
     self.linkParameters("group_mask", ("mean_individual_profiles", "subjects_group", "new_study_name"),
                         link_mask)

@@ -91,34 +91,37 @@ def initialization(self):
         """Function of link between individual profiles and normed profiles.
         """
         profiles = []
-        if (self.normed_individual_profiles and self.subjects_group) is not None:
+        if self.normed_individual_profiles and self.subjects_group:
             for profile in self.normed_individual_profiles:
-                atts = dict()
-                atts["_database"] = profile.get("_database")
-                atts["center"] = profile.get("center")
-                atts["subject"] = profile.get("subject")
-                atts["smoothing"] = profile.get("smoothing")
-                atts["group_of_subjects"] = os.path.basename(
-                    os.path.dirname(self.subjects_group.fullPath()))
-                atts["study"] = profile.get("study")
-                atts["gyrus"] = profile.get("gyrus")
-                atts['acquisition'] = ''
-                atts['analysis'] = ''
-                atts['tracking_session'] = ''
-                if self.new_study_name is None:
-                    atts["texture"] = profile.get("texture")
+                if not profile:
+                    profiles.append(None)
                 else:
-                    atts["texture"] = self.new_study_name
-                profile = self.signature[
-                    "new_normed_individual_profiles"].contentType.findValue(atts)
-                if profile is not None:
-                    profiles.append(profile)
+                    atts = dict()
+                    atts["_database"] = profile.get("_database")
+                    atts["center"] = profile.get("center")
+                    atts["subject"] = profile.get("subject")
+                    atts["smoothing"] = profile.get("smoothing")
+                    atts["group_of_subjects"] = os.path.basename(
+                        os.path.dirname(self.subjects_group.fullPath()))
+                    atts["study"] = profile.get("study")
+                    atts["gyrus"] = profile.get("gyrus")
+                    atts['acquisition'] = ''
+                    atts['analysis'] = ''
+                    atts['tracking_session'] = ''
+                    if self.new_study_name is None:
+                        atts["texture"] = profile.get("texture")
+                    else:
+                        atts["texture"] = self.new_study_name
+                    profile = self.signature[
+                        "new_normed_individual_profiles"].contentType.findValue(atts)
+                    if profile is not None:
+                        profiles.append(profile)
             return profiles
 
     def link_group_profiles(self, dummy):
         """Function of link between individual profiles and group profile.
         """
-        if (self.subjects_group and self.normed_individual_profiles) is not None:
+        if self.subjects_group and self.normed_individual_profiles:
             atts = dict()
             atts["_database"] = self.normed_individual_profiles[0].get("_database")
             atts["center"] = self.normed_individual_profiles[0].get("center")

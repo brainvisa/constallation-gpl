@@ -25,7 +25,7 @@ Author: Sandrine Lefranc, 2015
 
 # axon python API modules
 from brainvisa.processes import Signature, ReadDiskItem, ValidationError, \
-    WriteDiskItem, OpenChoice, Choice
+    WriteDiskItem, String
 from soma.path import find_in_path
 
 # constel modules
@@ -67,7 +67,7 @@ signature = Signature(
                             "intersubject":"No",
                             "step_time":"No"}),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
-    "ROI", OpenChoice(),
+    "ROI", String(),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
@@ -93,30 +93,16 @@ def initialization(self):
     # default value
     self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
 
-    def link_roi(self, dummy):
-        """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
-        of process.
-        """
-        if self.ROIs_nomenclature is not None:
-            s = ["Select a ROI in this list"]
-            s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
-            self.signature["ROI"].setChoices(*s)
-            if isinstance(self.signature['ROI'], OpenChoice):
-                self.signature["ROI"] = Choice(*s)
-                self.changeSignature(self.signature)
-
     def link_matrix2ROI(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
         signature 'ROI'.
         """
         if self.complete_individual_matrix is not None:
             s = str(self.complete_individual_matrix.get("gyrus"))
-            name = self.signature["ROI"].findValue(s)
-        return name
+            return s
 
     # link of parameters for autocompletion
     self.linkParameters("filtered_reduced_individual_profile", "complete_individual_matrix")
-    self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
     self.linkParameters("ROI", "complete_individual_matrix", link_matrix2ROI)
     self.linkParameters("reduced_individual_matrix", "filtered_reduced_individual_profile")
 

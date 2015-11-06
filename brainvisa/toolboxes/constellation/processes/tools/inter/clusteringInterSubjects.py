@@ -81,7 +81,7 @@ signature = Signature(
     "reduced_group_matrix", WriteDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "No",
+                            "reduced": "Yes",
                             "dense": "No",
                             "intersubject": "Yes"}),
     "ROI_clustering", ListOf(WriteDiskItem(
@@ -107,39 +107,62 @@ def initialization(self):
         """Function of link between the reduced connectivity matrices and
         the group matrix
         """
-        if (self.subjects_group and self.intersubject_reduced_matrices) is not None:
+        print 'link_matrices'
+        if self.subjects_group and self.intersubject_reduced_matrices:
+            print 'make value'
             atts = dict(
                 self.intersubject_reduced_matrices[0].hierarchyAttributes())
+            for att_name in [
+                    'name_serie', 'tracking_session',
+                    '_declared_attributes_location', 'analysis', '_ontology',
+                    'acquisition']:
+                if att_name in atts:
+                    del atts[att_name]
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.subjects_group.fullPath()))
+            print 'atts:', atts
+            print 'value:', self.signature["reduced_group_matrix"].findValue(atts)
             return self.signature["reduced_group_matrix"].findValue(atts)
 
     def linkClustering(self, dummy):
         """function of link between clustering time and individualm reduced
         connectivity matrices
         """
-        if (self.subjects_group and self.intersubject_reduced_matrices) is not None:
+        if self.subjects_group and self.intersubject_reduced_matrices:
             tmp = dict(
                 self.intersubject_reduced_matrices[0].hierarchyAttributes())
             if tmp["study"] == "avg":
                 atts = dict(
                     self.intersubject_reduced_matrices[0].hierarchyAttributes())
                 atts["subject"] = "avgSubject"
-                return self.signature["ROI_clustering"].findValue(atts)
+                for att_name in [
+                        'name_serie', 'tracking_session',
+                        '_declared_attributes_location', 'analysis',
+                        '_ontology', 'acquisition']:
+                    if att_name in atts:
+                        del atts[att_name]
+                return self.signature[
+                    "ROI_clustering"].contentType.findValue(atts)
             elif tmp["study"] == "concat":
                 profiles = []
                 for matrix in self.intersubject_reduced_matrices:
                     atts = dict(matrix.hierarchyAttributes())
-                    profile = ReadDiskItem(
-                        "Group Clustering Time",
-                        "BrainVISA texture formats").findValue(atts)
+                    for att_name in [
+                            'name_serie', 'tracking_session',
+                            '_declared_attributes_location', 'analysis',
+                            '_ontology', 'acquisition']:
+                        if att_name in atts:
+                            del atts[att_name]
+                    profile = self.signature[
+                        'ROI_clustering'].contentType.findValue(atts)
                     if profile is not None:
                         profiles.append(profile)
                 return profiles
 
     # link of parameters for autocompletion
     self.linkParameters(
-        "reduced_group_matrix", ("subjects_group", "intersubject_reduced_matrices"),
+        "reduced_group_matrix", ("subjects_group",
+                                 "intersubject_reduced_matrices"),
         link_matrices)
     self.linkParameters(
         "ROI_clustering", ("subjects_group", "intersubject_reduced_matrices",),

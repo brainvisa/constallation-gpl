@@ -33,6 +33,10 @@ from brainvisa.group_utils import Subject
 from soma.path import find_in_path
 from soma.minf.api import registerClass, readMinf
 from soma.functiontools import partial
+try:
+    from constel.lib.utils.files import read_file
+except:
+    pass
 
 
 def validation():
@@ -61,6 +65,8 @@ signature = Signature(
                             "step_time": "No"}),
     "subjects_group", ReadDiskItem("Group definition", "XML"),
     "study_name", String(),
+    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
+    "ROI", String(),
     "complete_individual_matrices", ListOf(ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "mixed",
@@ -95,36 +101,46 @@ def afterChildAddedCallback(self, parent, key, child):
         "filtered_reduced_individual_profile", "complete_individual_matrix")
     child.removeLink(
         "reduced_individual_matrix", "filtered_reduced_individual_profile")
+    child.removeLink("ROI", "complete_individual_matrix")
 
-    child.signature["filtered_reduced_profile"] = parent.signature[
+    child.signature["filtered_reduced_individual_profile"] = parent.signature[
         "filtered_reduced_group_profile"]
     child.signature["white_mesh"] = parent.signature["average_mesh"]
-    child.signature["intersubject_reduced_matrices"] = WriteDiskItem(
-        "Connectivity Matrix", "Aims writable volume formats")
+    child.signature["reduced_individual_matrix"] = \
+        parent.signature["intersubject_reduced_matrices"].contentType
 
-    child.filtered_reduced_profile = parent.filtered_reduced_group_profile
+    child.filtered_reduced_individual_profile = parent.filtered_reduced_group_profile
     child.white_mesh = parent.average_mesh
+    child.ROIs_nomenclature = parent.ROIs_nomenclature
+    child.ROI = parent.ROI
 
     # Add link between eNode.ListOf_Input_3dImage and pNode.Input_3dImage
-    parent.addLink(key + ".filtered_reduced_profile", "filtered_reduced_group_profile")
-    parent.addLink(key + ".white_mesh", "average_mesh")
+    parent.addDoubleLink(key + ".filtered_reduced_individual_profile", "filtered_reduced_group_profile")
+    parent.addDoubleLink(key + ".white_mesh", "average_mesh")
+    parent.addDoubleLink(key + ".ROIs_nomenclature", "ROIs_nomenclature")
+    parent.addDoubleLink(key + ".ROI", "ROI")
 
 
 def beforeChildRemovedCallback(self, parent, key, child):
-    parent.removeLink(key + ".filtered_reduced_profile", "filtered_reduced_group_profile")
-    parent.removeLink(key + ".white_mesh", "average_mesh")
+    parent.removeDoubleLink(key + ".filtered_reduced_individual_profile", "filtered_reduced_group_profile")
+    parent.removeDoubleLink(key + ".white_mesh", "average_mesh")
+    parent.removeDoubleLink(key + ".ROIs_nomenclature", "ROIs_nomenclature")
+    parent.removeDoubleLink(key + ".ROI", "ROI")
 
 
 def initialization(self):
     """Provides default values and link of parameters.
     """
 
+    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue(
+        {"atlasname": "desikan_freesurfer"})
+
     def link_watershed(self, dummy):
         """Function of link between the filtered watershed and the
         complete matrices.
         """
-        if (self.filtered_reduced_group_profile and self.subjects_group
-                and self.study_name) is not None:
+        if self.filtered_reduced_group_profile and self.subjects_group \
+                and self.study_name:
             registerClass("minf_2.0", Subject, "Subject")
             groupOfSubjects = readMinf(self.subjects_group.fullPath())
             matrices = []
@@ -183,7 +199,14 @@ def initialization(self):
                     matrices.append(matrix)
             return matrices
 
+    def link_roi(self, dummy):
+        if self.filtered_reduced_group_profile is not None:
+            s = str(self.filtered_reduced_group_profile.get("gyrus"))
+            return s
+
+
     # link of parameters for autocompletion
+    self.linkParameters("ROI", "filtered_reduced_group_profile", link_roi)
     self.linkParameters(
         "complete_individual_matrices",
         ("filtered_reduced_group_profile", "subjects_group", "study_name"),
@@ -210,7 +233,7 @@ def initialization(self):
     eNode.addLink(
         None, "complete_individual_matrices",
         partial(mapValuesToChildrenParameters, eNode,
-                eNode, "complete_individual_matrices",
+                eNode, "complete_individual_matrix",
                 "complete_individual_matrices",
                 defaultProcess="createReducedConnectivityMatrix",
                 name="createReducedConnectivityMatrix"))
@@ -218,7 +241,7 @@ def initialization(self):
     eNode.addLink(
         None, "intersubject_reduced_matrices",
         partial(mapValuesToChildrenParameters, eNode,
-                eNode, "intersubject_reduced_matrices",
+                eNode, "reduced_individual_matrix",
                 "intersubject_reduced_matrices",
                 defaultProcess="createReducedConnectivityMatrix",
                 name="createReducedConnectivityMatrix"))

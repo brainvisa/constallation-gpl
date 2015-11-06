@@ -57,13 +57,13 @@ signature = Signature(
                      requiredAttributes={"normed": "No",
                                          "thresholded": "No",
                                          "averaged": "No",
-                                         "group": "No"})),
+                                         "intersubject": "No"})),
     "normed_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
                      requiredAttributes={"normed": "Yes",
-                                         "thresholded": "No",
+                                         "thresholded": "Yes",
                                          "averaged": "No",
-                                         "group": "No"})),
+                                         "intersubject": "No"})),
     "average_mesh", ReadDiskItem("White Mesh", "Aims mesh formats",
                                  requiredAttributes={"side": "both",
                                                      "vertex_corr": "Yes",
@@ -118,23 +118,28 @@ def initialization(self):
     def link_profiles(self, dummy):
         """Function of link to determine the connectivity profiles
         """
-        if self.subjects_group is not None:
+        print 'link_profiles'
+        if self.subjects_group and self.method and self.ROI \
+                and self.smoothing and self.study_name:
+            print 'there will be a value'
             registerClass("minf_2.0", Subject, "Subject")
             groupOfSubjects = readMinf(self.subjects_group.fullPath())
             profiles = []
             for subject in groupOfSubjects:
-                atts = dict(self.subjects_group.hierarchyAttributes())
+                print "subject:", subject
+                atts = {}
                 atts["study"] = self.method
-                if self.new_patch is not None:
-                    atts["gyrus"] = "G" + str(self.new_patch)
-                else:
-                    atts["gyrus"] = "G" + str(self.patch)
+                atts["gyrus"] = str(self.ROI)
                 atts["smoothing"] = str(self.smoothing)
                 atts["texture"] = self.study_name
-                profile = ReadDiskItem(
-                    "Gyrus Connectivity Profile",
-                    "Aims texture formats").findValue(
-                    atts, subject.attributes())
+                atts["_database"] = self.subjects_group.get("_database")
+                atts.update(subject.attributes())
+                print 'atts:', atts
+                print 'subject.attributes():', subject.attributes()
+                profile = self.signature[
+                    'mean_individual_profiles'].contentType.findValue(
+                        atts) #, subject.attributes())
+                print 'profile:', profile
                 if profile is not None:
                     profiles.append(profile)
             return profiles
