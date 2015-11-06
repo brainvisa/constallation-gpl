@@ -79,7 +79,8 @@ def initialization(self):
 
     # default value
     self.smoothing = 3.0
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue(
+        {"atlasname": "desikan_freesurfer"})
 
     def link_roi(self, dummy):
         """Reads the ROIs nomenclature and proposes them in the signature 'ROI'

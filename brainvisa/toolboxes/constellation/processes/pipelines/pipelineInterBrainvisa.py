@@ -31,6 +31,7 @@ from brainvisa.group_utils import Subject
 # Plot constel module
 try:
     import constel
+    from constel.lib.utils.files import read_file
 except:
     raise ValidationError("Please make sure that constel module is installed.")
 
@@ -93,7 +94,8 @@ def initialization(self):
 
     # default value
     self.smoothing = 3.0
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue(
+        {"atlasname": "desikan_freesurfer"})
 
     # optional value
     self.setOptional("new_study_name")
