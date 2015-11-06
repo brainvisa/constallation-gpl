@@ -55,8 +55,8 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "complete_matrix", ReadDiskItem(
-        "Connectivity Matrix", "Aims matrix formats",
+    "complete_individual_matrix", ReadDiskItem(
+        "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "No",
                             "dense": "No",
@@ -67,7 +67,7 @@ signature = Signature(
                                       requiredAttributes={"side": "both",
                                                           "vertex_corr": "Yes"}),
     # --ouputs--
-    "mean_profile", WriteDiskItem(
+    "mean_individual_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed": "No",
                             "thresholded": "No",
@@ -88,15 +88,15 @@ def initialization(self):
         """Define the attribut 'gyrus' from fibertracts pattern for the
         signature 'ROI'.
         """
-        if self.complete_matrix is not None:
-            s = str(self.complete_matrix.get("gyrus"))
+        if self.complete_individual_matrix is not None:
+            s = str(self.complete_individual_matrix.get("gyrus"))
             name = self.signature["ROI"].findValue(s)
         return name
 
     # link of parameters for autocompletion
-    self.linkParameters("ROI", "complete_matrix", link_matrix2ROI)
-    self.linkParameters("mean_profile",
-                        "complete_matrix")
+    self.linkParameters("ROI", "complete_individual_matrix", link_matrix2ROI)
+    self.linkParameters("mean_individual_profile",
+                        "complete_individual_matrix")
 
 
 #----------------------------Main program--------------------------------------
@@ -110,8 +110,8 @@ def execution(self, context):
 
     context.system("constelMeanConnectivityProfileFromMatrix",
                    "-connfmt", "binar_sparse",
-                   "-connmatrixfile", self.complete_matrix,
-                   "-outconntex", self.mean_profile,
+                   "-connmatrixfile", self.complete_individual_matrix,
+                   "-outconntex", self.mean_individual_profile,
                    "-seedregionstex", self.ROIs_segmentation,
                    "-seedlabel", ROIlabel,
                    "-type", "seed_mean_connectivity_profile",

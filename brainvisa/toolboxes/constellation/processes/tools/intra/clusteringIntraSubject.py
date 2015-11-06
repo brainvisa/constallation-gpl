@@ -54,7 +54,7 @@ userLevel = 2
 
 signature = Signature(
     # inputs
-    "reduced_matrix", ReadDiskItem(
+    "reduced_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled":"mixed",
                             "reduced":"Yes",
@@ -71,7 +71,7 @@ signature = Signature(
     "kmax", Integer(),
 
     # outputs
-    "ROI_clustering", WriteDiskItem(
+    "individual_ROI_clustering", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect":"No",
                             "roi_filtered":"No",
@@ -95,14 +95,14 @@ def initialization(self):
         """Define the attribut 'gyrus' from fibertracts pattern for the
         signature 'ROI'.
         """
-        if self.reduced_matrix is not None:
-            s = str(self.reduced_matrix.get("gyrus"))
+        if self.reduced_individual_matrix is not None:
+            s = str(self.reduced_individual_matrix.get("gyrus"))
             name = self.signature["ROI"].findValue(s)
         return name
 
     # link of parameters for autocompletion
-    self.linkParameters("ROI", "reduced_matrix", link_matrix2ROI)
-    self.linkParameters("ROI_clustering", "reduced_matrix")
+    self.linkParameters("ROI", "reduced_individual_matrix", link_matrix2ROI)
+    self.linkParameters("individual_ROI_clustering", "reduced_individual_matrix")
     self.linkParameters("ROIs_segmentation", "white_mesh")
 
 
@@ -117,9 +117,9 @@ def execution(self, context):
 
     context.system("python",
                    find_in_path("constelIntraSubjectClustering.py"),
-                   "matrix", self.reduced_matrix,
+                   "matrix", self.reduced_individual_matrix,
                    "patch", ROIlabel,
                    "gyri_segmentation", self.ROIs_segmentation,
                    "mesh", self.white_mesh,
                    "kmax", self.kmax,
-                   "clustering_time", self.ROI_clustering)
+                   "clustering_time", self.individual_ROI_clustering)

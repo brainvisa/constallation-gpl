@@ -61,7 +61,7 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "normed_connectivity_profile", ReadDiskItem(
+    "normed_group_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed": "Yes",
                             "thresholded": "Yes",
@@ -74,14 +74,14 @@ signature = Signature(
                             "averaged": "Yes"}),
 
     # --outputs--
-    "watershed", WriteDiskItem(
+    "reduced_group_profile", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "Yes",
                             "roi_filtered": "No",
                             "averaged": "Yes",
                             "intersubject": "Yes",
                             "step_time": "No"}),
-    "filtered_watershed", WriteDiskItem(
+    "filtered_reduced_group_profile", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "Yes",
                             "roi_filtered": "Yes",
@@ -96,8 +96,8 @@ signature = Signature(
 
 def initialization(self):
     """Provides default values and link of parameters"""
-    self.linkParameters("watershed", "normed_connectivity_profile")
-    self.linkParameters("filtered_watershed", "normed_connectivity_profile")
+    self.linkParameters("reduced_group_profile", "normed_group_profile")
+    self.linkParameters("filtered_reduced_group_profile", "normed_group_profile")
 
 
 #----------------------------Main program--------------------------------------
@@ -111,12 +111,12 @@ def execution(self, context):
     A watershed is performed to obtain different patches of interest.
     """
     context.system("AimsMeshWatershed.py",
-                   self.normed_connectivity_profile,
+                   self.normed_group_profile,
                    self.average_mesh,
-                   self.watershed)
+                   self.reduced_group_profile)
 
     # execute the command
     context.system(sys.executable,
                    find_in_path("constelFilteringWatershed.py"),
-                   self.watershed,
-                   self.filtered_watershed)
+                   self.reduced_group_profile,
+                   self.filtered_reduced_group_profile)

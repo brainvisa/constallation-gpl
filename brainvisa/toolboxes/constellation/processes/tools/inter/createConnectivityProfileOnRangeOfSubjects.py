@@ -53,23 +53,23 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "normed_connectivity_profiles", ListOf(ReadDiskItem(
+    "normed_individual_profiles", ListOf(ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed": "Yes",
                             "thresholded" :"Yes",
                             "averaged" :"No",
                             "intersubject" :"No"})),
-    "group", ReadDiskItem("Group definition", "XML"),
-    "new_name", String(),
-    
+    "subjects_group", ReadDiskItem("Group definition", "XML"),
+    "new_study_name", String(),
+
     # --outputs--
-    "normed_connectivity_profile_nb", ListOf(WriteDiskItem(
+    "new_normed_individual_profiles", ListOf(WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed": "Yes",
                             "thresholded": "Yes",
                             "averaged": "No",
                             "intersubject": "Yes"})),
-    "group_connectivity_profile", WriteDiskItem(
+    "group_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed": "No",
                             "thresholded": "No",
@@ -85,32 +85,32 @@ def initialization(self):
     """Provides default values and link of parameters"""
 
     # optional value
-    self.setOptional("new_name")
+    self.setOptional("new_study_name")
 
     def link_profiles(self, dummy):
         """Function of link between individual profiles and normed profiles.
         """
         profiles = []
-        if (self.normed_connectivity_profiles and self.group) is not None:
-            for profile in self.normed_connectivity_profiles:
+        if (self.normed_individual_profiles and self.subjects_group) is not None:
+            for profile in self.normed_individual_profiles:
                 atts = dict()
                 atts["_database"] = profile.get("_database")
                 atts["center"] = profile.get("center")
                 atts["subject"] = profile.get("subject")
                 atts["smoothing"] = profile.get("smoothing")
                 atts["group_of_subjects"] = os.path.basename(
-                    os.path.dirname(self.group.fullPath()))
+                    os.path.dirname(self.subjects_group.fullPath()))
                 atts["study"] = profile.get("study")
                 atts["gyrus"] = profile.get("gyrus")
                 atts['acquisition'] = ''
                 atts['analysis'] = ''
                 atts['tracking_session'] = ''
-                if self.new_name is None:
+                if self.new_study_name is None:
                     atts["texture"] = profile.get("texture")
                 else:
-                    atts["texture"] = self.new_name
+                    atts["texture"] = self.new_study_name
                 profile = self.signature[
-                    "normed_connectivity_profile_nb"].contentType.findValue(atts)
+                    "new_normed_individual_profiles"].contentType.findValue(atts)
                 if profile is not None:
                     profiles.append(profile)
             return profiles
@@ -118,19 +118,19 @@ def initialization(self):
     def link_group_profiles(self, dummy):
         """Function of link between individual profiles and group profile.
         """
-        if (self.group and self.normed_connectivity_profiles) is not None:
+        if (self.subjects_group and self.normed_individual_profiles) is not None:
             atts = dict()
-            atts["_database"] = self.normed_connectivity_profiles[0].get("_database")
-            atts["center"] = self.normed_connectivity_profiles[0].get("center")
+            atts["_database"] = self.normed_individual_profiles[0].get("_database")
+            atts["center"] = self.normed_individual_profiles[0].get("center")
             atts["group_of_subjects"] = os.path.basename(
-                os.path.dirname(self.group.fullPath()))
-            if self.new_name is None:
-                atts["texture"] = self.normed_connectivity_profiles[0].get("texture")
+                os.path.dirname(self.subjects_group.fullPath()))
+            if self.new_study_name is None:
+                atts["texture"] = self.normed_individual_profiles[0].get("texture")
             else:
-                atts["texture"] = self.new_name
-            atts["study"] = self.normed_connectivity_profiles[0].get("study")
-            atts["smoothing"] = self.normed_connectivity_profiles[0].get("smoothing")
-            atts["gyrus"] = self.normed_connectivity_profiles[0].get("gyrus")
+                atts["texture"] = self.new_study_name
+            atts["study"] = self.normed_individual_profiles[0].get("study")
+            atts["smoothing"] = self.normed_individual_profiles[0].get("smoothing")
+            atts["gyrus"] = self.normed_individual_profiles[0].get("gyrus")
             atts['acquisition'] = ''
             atts['analysis'] = ''
             atts['tracking_session'] = ''
@@ -138,14 +138,14 @@ def initialization(self):
             atts["averaged"] = "Yes"
             atts["normed"] = "No"
             atts["thresholded"] = "No"
-            return self.signature["group_connectivity_profile"].findValue(atts)
+            return self.signature["group_profile"].findValue(atts)
 
     # link of parameters for autocompletion
-    self.linkParameters("normed_connectivity_profile_nb", (
-        "normed_connectivity_profiles", "group", "new_name"), link_profiles)
+    self.linkParameters("new_normed_individual_profiles", (
+        "normed_individual_profiles", "subjects_group", "new_study_name"), link_profiles)
     self.linkParameters(
-        "group_connectivity_profile",
-        ("normed_connectivity_profiles", "group", "new_name"),
+        "group_profile",
+        ("normed_individual_profiles", "subjects_group", "new_study_name"),
         link_group_profiles)
 
 
@@ -158,6 +158,6 @@ def execution(self, context):
     """
     context.system(sys.executable,
                    find_in_path("constelAvgConnectivityProfile.py"),
-                   self.normed_connectivity_profiles,
-                   self.normed_connectivity_profile_nb,
-                   self.group_connectivity_profile)
+                   self.normed_individual_profiles,
+                   self.new_normed_individual_profiles,
+                   self.group_profile)

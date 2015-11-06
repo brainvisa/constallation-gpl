@@ -52,17 +52,17 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "filtered_watershed", ReadDiskItem(
+    "filtered_reduced_group_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "Yes",
                             "roi_filtered": "Yes",
                             "averaged": "Yes",
                             "intersubject": "Yes",
                             "step_time": "No"}),
-    "group", ReadDiskItem("Group definition", "XML"),
-    "segmentation_name_used", String(),
-    "complete_connectivity_matrix", ListOf(ReadDiskItem(
-        "Connectivity Matrix", "Aims writable volume formats",
+    "subjects_group", ReadDiskItem("Group definition", "XML"),
+    "study_name", String(),
+    "complete_individual_matrices", ListOf(ReadDiskItem(
+        "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "No",
                             "dense": "No",
@@ -78,8 +78,8 @@ signature = Signature(
                             "vertex_corr": "Yes"})),
 
     # --outputs--
-    "reduced_connectivity_matrix", ListOf(WriteDiskItem(
-        "Connectivity Matrix", "Aims writable volume formats",
+    "intersubject_reduced_matrices", ListOf(WriteDiskItem(
+        "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "Yes",
                             "dense": "No",
@@ -91,25 +91,27 @@ signature = Signature(
 
 def afterChildAddedCallback(self, parent, key, child):
     # Set default values
-    child.removeLink("filtered_watershed", "complete_connectivity_matrix")
-    child.removeLink("reduced_connectivity_matrix", "filtered_watershed")
+    child.removeLink(
+        "filtered_reduced_individual_profile", "complete_individual_matrix")
+    child.removeLink(
+        "reduced_individual_matrix", "filtered_reduced_individual_profile")
 
-    child.signature["filtered_watershed"] = parent.signature[
-        "filtered_watershed"]
+    child.signature["filtered_reduced_profile"] = parent.signature[
+        "filtered_reduced_group_profile"]
     child.signature["white_mesh"] = parent.signature["average_mesh"]
-    child.signature["reduced_connectivity_matrix"] = WriteDiskItem(
+    child.signature["intersubject_reduced_matrices"] = WriteDiskItem(
         "Connectivity Matrix", "Aims writable volume formats")
 
-    child.filtered_watershed = parent.filtered_watershed
+    child.filtered_reduced_profile = parent.filtered_reduced_group_profile
     child.white_mesh = parent.average_mesh
 
     # Add link between eNode.ListOf_Input_3dImage and pNode.Input_3dImage
-    parent.addLink(key + ".filtered_watershed", "filtered_watershed")
+    parent.addLink(key + ".filtered_reduced_profile", "filtered_reduced_group_profile")
     parent.addLink(key + ".white_mesh", "average_mesh")
 
 
 def beforeChildRemovedCallback(self, parent, key, child):
-    parent.removeLink(key + ".filtered_watershed", "filtered_watershed")
+    parent.removeLink(key + ".filtered_reduced_profile", "filtered_reduced_group_profile")
     parent.removeLink(key + ".white_mesh", "average_mesh")
 
 
@@ -121,25 +123,25 @@ def initialization(self):
         """Function of link between the filtered watershed and the
         complete matrices.
         """
-        if (self.filtered_watershed and self.group
-                and self.segmentation_name_used) is not None:
+        if (self.filtered_reduced_group_profile and self.subjects_group
+                and self.study_name) is not None:
             registerClass("minf_2.0", Subject, "Subject")
-            groupOfSubjects = readMinf(self.group.fullPath())
+            groupOfSubjects = readMinf(self.subjects_group.fullPath())
             matrices = []
             for subject in groupOfSubjects:
                 atts = dict()
-                atts["_database"] = self.filtered_watershed.get("_database")
-                atts["center"] = self.filtered_watershed.get("center")
-                atts["texture"] = self.segmentation_name_used
-                atts["study"] = self.filtered_watershed.get("study")
-                atts["gyrus"] = self.filtered_watershed.get("gyrus")
-                atts["smoothing"] = self.filtered_watershed.get("smoothing")
+                atts["_database"] = self.filtered_reduced_group_profile.get("_database")
+                atts["center"] = self.filtered_reduced_group_profile.get("center")
+                atts["texture"] = self.study_name
+                atts["study"] = self.filtered_reduced_group_profile.get("study")
+                atts["gyrus"] = self.filtered_reduced_group_profile.get("gyrus")
+                atts["smoothing"] = self.filtered_reduced_group_profile.get("smoothing")
                 atts["ends_labelled"] = "mixed",
                 atts["reduced"] = "No",
                 atts["dense"] = "No",
                 atts["intersubject"] = "No"
                 matrix = self.signature[
-                    "complete_connectivity_matrix"].contentType.findValue(
+                    "complete_individual_matrices"].contentType.findValue(
                     atts, subject.attributes())
                 if matrix is not None:
                     matrices.append(matrix)
@@ -149,33 +151,33 @@ def initialization(self):
         """Function of link between the complete matrices and
         the reduced matrices.
         """
-        if self.group and self.complete_connectivity_matrix and \
-                self.filtered_watershed:
+        if self.subjects_group and self.complete_individual_matrices and \
+                self.filtered_reduced_group_profile:
             matrices = []
             registerClass("minf_2.0", Subject, "Subject")
-            groupOfSubjects = readMinf(self.group.fullPath())
+            groupOfSubjects = readMinf(self.subjects_group.fullPath())
             for subject in groupOfSubjects:
                 atts = dict()
-                atts["_database"] = self.complete_connectivity_matrix[0].get(
+                atts["_database"] = self.complete_individual_matrices[0].get(
                     "_database")
-                atts["center"] = self.complete_connectivity_matrix[0].get(
+                atts["center"] = self.complete_individual_matrices[0].get(
                     "center")
-                atts["texture"] = self.segmentation_name_used
-                atts["study"] = self.complete_connectivity_matrix[0].get(
+                atts["texture"] = self.study_name
+                atts["study"] = self.complete_individual_matrices[0].get(
                     "study")
-                atts["gyrus"] = self.complete_connectivity_matrix[0].get(
+                atts["gyrus"] = self.complete_individual_matrices[0].get(
                     "gyrus")
-                atts["smoothing"] = self.complete_connectivity_matrix[0].get(
+                atts["smoothing"] = self.complete_individual_matrices[0].get(
                     "smoothing")
                 atts["group_of_subjects"] = os.path.basename(
-                    os.path.dirname(self.group.fullPath()))
-                atts["texture"] = self.filtered_watershed.get("texture")
+                    os.path.dirname(self.subjects_group.fullPath()))
+                atts["texture"] = self.filtered_reduced_group_profile.get("texture")
                 atts["ends_labelled"] = "mixed",
                 atts["reduced"] = "Yes",
                 atts["dense"] = "No",
                 atts["intersubject"] = "Yes"
                 matrix = self.signature[
-                    "reduced_connectivity_matrix"].contentType.findValue(
+                    "intersubject_reduced_matrices"].contentType.findValue(
                     atts, subject.attributes())
                 if matrix is not None:
                     matrices.append(matrix)
@@ -183,12 +185,12 @@ def initialization(self):
 
     # link of parameters for autocompletion
     self.linkParameters(
-        "complete_connectivity_matrix",
-        ("filtered_watershed", "group", "segmentation_name_used"),
+        "complete_individual_matrices",
+        ("filtered_reduced_group_profile", "subjects_group", "study_name"),
         link_watershed)
     self.linkParameters(
-        "reduced_connectivity_matrix",
-        ("complete_connectivity_matrix", "group", "filtered_watershed"),
+        "intersubject_reduced_matrices",
+        ("complete_individual_matrices", "subjects_group", "filtered_reduced_group_profile"),
         link_matrices)
 
     # define the main node of the pipeline
@@ -206,18 +208,18 @@ def initialization(self):
 
     # Add links to refresh child nodes when main lists are modified
     eNode.addLink(
-        None, "complete_connectivity_matrix",
+        None, "complete_individual_matrices",
         partial(mapValuesToChildrenParameters, eNode,
-                eNode, "complete_connectivity_matrix",
-                "complete_connectivity_matrix",
+                eNode, "complete_individual_matrices",
+                "complete_individual_matrices",
                 defaultProcess="createReducedConnectivityMatrix",
                 name="createReducedConnectivityMatrix"))
 
     eNode.addLink(
-        None, "reduced_connectivity_matrix",
+        None, "intersubject_reduced_matrices",
         partial(mapValuesToChildrenParameters, eNode,
-                eNode, "reduced_connectivity_matrix",
-                "reduced_connectivity_matrix",
+                eNode, "intersubject_reduced_matrices",
+                "intersubject_reduced_matrices",
                 defaultProcess="createReducedConnectivityMatrix",
                 name="createReducedConnectivityMatrix"))
 

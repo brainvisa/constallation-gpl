@@ -52,17 +52,18 @@ userLevel = 2
 
 signature = Signature(
     # inputs
-    "connectivity_profiles", ListOf(
+    "mean_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
                      requiredAttributes={"normed": "No",
                                          "thresholded": "No",
                                          "averaged": "No",
                                          "intersubject": "No"})),
-    "group", ReadDiskItem("Group definition", "XML"),
-    "new_name", String(),
+    "subjects_group", ReadDiskItem("Group definition", "XML"),
+    "new_study_name", String(),
 
     # outputs
-    "mask", WriteDiskItem("Mask Texture", "Aims texture formats"), )
+    "group_mask", WriteDiskItem(
+        "Mask Texture", "Aims texture formats"), )
 
 
 #----------------------------Functions-----------------------------------------
@@ -72,22 +73,23 @@ def initialization(self):
     """Provides link of parameters"""
 
     # optional value
-    self.setOptional("new_name")
+    self.setOptional("new_study_name")
 
     # link of parameters
     def link_mask(self, dummy):
         """Function of link between mask and group parameters."""
-        if (self.group and self.connectivity_profiles) is not None:
-            atts = dict(self.connectivity_profiles[0].hierarchyAttributes())
+        if (self.subjects_group and self.mean_individual_profiles) is not None:
+            atts = dict(self.mean_individual_profiles[0].hierarchyAttributes())
             atts["group_of_subjects"] = os.path.basename(
-                os.path.dirname(self.group.fullPath()))
-            if self.new_name is not None:
-                atts["texture"] = self.new_name
-            print atts
-            return self.signature["mask"].findValue(atts)
-
+                os.path.dirname(self.subjects_group.fullPath()))
+            if self.new_study_name is None:
+                atts["texture"] = self.mean_individual_profiles[0].get("texture")
+            else:
+                atts["texture"] = self.new_study_name
+            return self.signature["group_mask"].findValue(atts)
+            
     # link of parameters for autocompletion
-    self.linkParameters("mask", ("connectivity_profiles", "group", "new_name"),
+    self.linkParameters("group_mask", ("mean_individual_profiles", "subjects_group", "new_study_name"),
                         link_mask)
 
 
@@ -98,5 +100,5 @@ def execution(self, context):
     # execute the command
     context.system(sys.executable,
                    find_in_path("constelConnectivityProfileOverlapMask.py"),
-                   self.connectivity_profiles,
-                   self.mask)
+                   self.mean_individual_profiles,
+                   self.group_mask)

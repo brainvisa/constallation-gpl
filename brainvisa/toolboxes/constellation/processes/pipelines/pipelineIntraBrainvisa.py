@@ -43,13 +43,13 @@ userLevel = 2
 signature = Signature(
     #inputs
     "study_name", String(),
-    "database", Choice(),
+    "outputs_database", Choice(),
     "format_fiber_tracts", Choice("bundles", "trk"),
     "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
     "ROI", OpenChoice(),
-    "subject", ReadDiskItem("subject", "directory"),
+    "dirsubject", ReadDiskItem("subject", "directory"),
     "ROIs_segmentation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
@@ -71,11 +71,11 @@ def initialization(self):
     # ontology: brainvisa-3.2.0
     databases = [h.name for h in neuroHierarchy.hierarchies()
                  if h.fso.name == "brainvisa-3.2.0"]
-    self.signature["database"].setChoices(*databases)
+    self.signature["outputs_database"].setChoices(*databases)
     if len(databases) != 0:
-        self.database = databases[0]
+        self.outputs_database = databases[0]
     else:
-        self.signature["database"] = OpenChoice()
+        self.signature["outputs_database"] = OpenChoice()
 
     # default value
     self.smoothing = 3.0
@@ -106,12 +106,13 @@ def initialization(self):
     eNode.addChild(
         "filter", ProcessExecutionNode("bundlesFiltering", optional=1))
 
-    eNode.addDoubleLink("filter.database", "database")
+    eNode.addDoubleLink("filter.outputs_database", "outputs_database")
     eNode.addDoubleLink("filter.format_fiber_tracts", "format_fiber_tracts")
     eNode.addDoubleLink("filter.method", "method")
     eNode.addDoubleLink("filter.ROI", "ROI")
+    eNode.addDoubleLink("filter.ROIs_nomenclature", "ROIs_nomenclature")
     eNode.addDoubleLink("filter.study_name", "study_name")
-    eNode.addDoubleLink("filter.subject", "subject")
+    eNode.addDoubleLink("filter.dirsubject", "dirsubject")
     eNode.addDoubleLink("filter.ROIs_segmentation", "ROIs_segmentation")
     eNode.addDoubleLink("filter.white_mesh", "white_mesh")
 
@@ -122,8 +123,8 @@ def initialization(self):
     eNode.addChild(
         "oversampler", ProcessExecutionNode("fiberOversampler", optional=1))
 
-    eNode.addDoubleLink("oversampler.filtered_length_distant_fibers",
-                        "filter.subsets_of_distant_fibers")
+    eNode.addDoubleLink("oversampler.semilabeled_fibers",
+                        "filter.semilabeled_fibers")
 
     ###########################################################################
     #        link of parameters with the process: "Connectivity Matrix"       #
@@ -133,11 +134,13 @@ def initialization(self):
         "ConnectivityMatrix", ProcessExecutionNode("createConnectivityMatrix",
                                                    optional=1))
 
-    eNode.addDoubleLink("ConnectivityMatrix.oversampled_distant_fibers",
-                        "oversampler.oversampled_distant_fibers")
+    eNode.addDoubleLink("ConnectivityMatrix.oversampled_semilabeled_fibers",
+                        "oversampler.oversampled_semilabeled_fibers")
     eNode.addDoubleLink(
-        "ConnectivityMatrix.filtered_length_fibers_near_cortex",
-        "filter.subsets_of_fibers_near_cortex")
+        "ConnectivityMatrix.labeled_fibers", "filter.labeled_fibers")
+    eNode.addDoubleLink(
+        "ConnectivityMatrix.ROIs_nomenclature", "ROIs_nomenclature")
+    eNode.addDoubleLink("ConnectivityMatrix.ROI", "ROI")
     eNode.addDoubleLink(
         "ConnectivityMatrix.ROIs_segmentation", "ROIs_segmentation")
     eNode.addDoubleLink("ConnectivityMatrix.white_mesh", "white_mesh")
@@ -150,10 +153,13 @@ def initialization(self):
     eNode.addChild(
         "smoothing", ProcessExecutionNode("sumSparseMatrix", optional=1))
 
-    eNode.addDoubleLink("smoothing.matrix_of_fibers_near_cortex",
-                        "ConnectivityMatrix.matrix_of_fibers_near_cortex")
-    eNode.addDoubleLink("smoothing.matrix_of_distant_fibers",
-                        "ConnectivityMatrix.matrix_of_distant_fibers")
+    eNode.addDoubleLink("smoothing.matrix_labeled_fibers",
+                        "ConnectivityMatrix.matrix_labeled_fibers")
+    eNode.addDoubleLink("smoothing.matrix_semilabeled_fibers",
+                        "ConnectivityMatrix.matrix_semilabeled_fibers")
+    eNode.addDoubleLink(
+        "smoothing.ROIs_nomenclature", "ConnectivityMatrix.ROIs_nomenclature")
+    eNode.addDoubleLink("smoothing.ROI", "ConnectivityMatrix.ROI")
     eNode.addDoubleLink("smoothing.white_mesh", "white_mesh")
     eNode.addDoubleLink("smoothing.ROIs_segmentation", "ROIs_segmentation")
     eNode.addDoubleLink("smoothing.smoothing", "smoothing")
@@ -166,8 +172,11 @@ def initialization(self):
         "MeanProfile", ProcessExecutionNode("createMeanConnectivityProfile",
                                             optional=1))
 
-    eNode.addDoubleLink("MeanProfile.complete_connectivity_matrix",
-                        "smoothing.complete_connectivity_matrix")
+    eNode.addDoubleLink("MeanProfile.complete_individual_matrix",
+                        "smoothing.complete_individual_matrix")
+    eNode.addDoubleLink(
+        "MeanProfile.ROIs_nomenclature", "smoothing.ROIs_nomenclature")
+    eNode.addDoubleLink("MeanProfile.ROI", "smoothing.ROI")
     eNode.addDoubleLink("MeanProfile.ROIs_segmentation", "ROIs_segmentation")
 
     ###########################################################################
@@ -178,8 +187,11 @@ def initialization(self):
                    ProcessExecutionNode("removeInternalConnections",
                                         optional=1))
 
-    eNode.addDoubleLink("InternalConnections.patch_connectivity_profile",
-                        "MeanProfile.patch_connectivity_profile")
+    eNode.addDoubleLink("InternalConnections.mean_individual_profile",
+                        "MeanProfile.mean_individual_profile")
+    eNode.addDoubleLink("InternalConnections.ROIs_nomenclature",
+                        "MeanProfile.ROIs_nomenclature")
+    eNode.addDoubleLink("InternalConnections.ROI", "MeanProfile.ROI")
     eNode.addDoubleLink(
         "InternalConnections.ROIs_segmentation", "ROIs_segmentation")
 
@@ -192,8 +204,8 @@ def initialization(self):
         ProcessExecutionNode("watershedReflectingConnectionsToGyrus",
                              optional=1, selected=False))
 
-    eNode.addDoubleLink("Watershed.normed_connectivity_profile",
-                        "InternalConnections.normed_connectivity_profile")
+    eNode.addDoubleLink("Watershed.normed_individual_profile",
+                        "InternalConnections.normed_individual_profile")
     eNode.addDoubleLink("Watershed.white_mesh", "white_mesh")
 
     ###########################################################################
@@ -204,9 +216,13 @@ def initialization(self):
                    ProcessExecutionNode("filteringWatershed",
                                         optional=1, selected=False))
 
-    eNode.addDoubleLink("FilteringWatershed.watershed", "Watershed.watershed")
-    eNode.addDoubleLink("FilteringWatershed.complete_connectivity_matrix",
-                        "MeanProfile.complete_connectivity_matrix")
+    eNode.addDoubleLink("FilteringWatershed.reduced_individual_profile",
+                        "Watershed.reduced_individual_profile")
+    eNode.addDoubleLink("FilteringWatershed.complete_individual_matrix",
+                        "MeanProfile.complete_individual_matrix")
+    eNode.addDoubleLink("FilteringWatershed.ROIs_nomenclature",
+                        "MeanProfile.ROIs_nomenclature")
+    eNode.addDoubleLink("FilteringWatershed.ROI", "MeanProfile.ROI")
     eNode.addDoubleLink(
         "FilteringWatershed.ROIs_segmentation", "ROIs_segmentation")
     eNode.addDoubleLink("FilteringWatershed.white_mesh", "white_mesh")
@@ -219,8 +235,11 @@ def initialization(self):
                    ProcessExecutionNode("createReducedConnectivityMatrix",
                                         optional=1, selected=False))
 
-    eNode.addDoubleLink("ReducedMatrix.complete_connectivity_matrix",
-                        "FilteringWatershed.complete_connectivity_matrix")
+    eNode.addDoubleLink("ReducedMatrix.complete_individual_matrix",
+                        "FilteringWatershed.complete_individual_matrix")
+    eNode.addDoubleLink("ReducedMatrix.ROIs_nomenclature",
+                        "FilteringWatershed.ROIs_nomenclature")
+    eNode.addDoubleLink("ReducedMatrix.ROI", "FilteringWatershed.ROI")
     eNode.addDoubleLink("ReducedMatrix.ROIs_segmentation", "ROIs_segmentation")
     eNode.addDoubleLink("ReducedMatrix.white_mesh", "white_mesh")
 
@@ -232,8 +251,11 @@ def initialization(self):
                    ProcessExecutionNode("ClusteringIntrasubject",
                                         optional=1, selected=False))
 
-    eNode.addDoubleLink("ClusteringIntraSubjects.reduced_connectivity_matrix",
-                        "ReducedMatrix.reduced_connectivity_matrix")
+    eNode.addDoubleLink("ClusteringIntraSubjects.reduced_individual_matrix",
+                        "ReducedMatrix.reduced_individual_matrix")
+    eNode.addDoubleLink("ClusteringIntraSubjects.ROIs_nomenclature",
+                        "ReducedMatrix.ROIs_nomenclature")
+    eNode.addDoubleLink("ClusteringIntraSubjects.ROI", "ReducedMatrix.ROI")
     eNode.addDoubleLink(
         "ClusteringIntraSubjects.ROIs_segmentation", "ROIs_segmentation")
     eNode.addDoubleLink("ClusteringIntraSubjects.white_mesh", "white_mesh")

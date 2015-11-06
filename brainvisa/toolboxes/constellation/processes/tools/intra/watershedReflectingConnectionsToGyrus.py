@@ -51,7 +51,7 @@ userLevel = 2
 
 signature = Signature(
     # inputs
-    "normed_profile", ReadDiskItem(
+    "normed_individual_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed": "Yes"}),
     "white_mesh", ReadDiskItem("White Mesh", "Aims mesh formats",
@@ -60,7 +60,7 @@ signature = Signature(
                                                    "averaged": "No"}),
 
     # outputs
-    "reduced_profile", WriteDiskItem(
+    "reduced_individual_profile", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "Yes",
                             "roi_filtered": "No",
@@ -76,7 +76,7 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters.
     """
-    self.linkParameters("reduced_profile", "normed_profile")
+    self.linkParameters("reduced_individual_profile", "normed_individual_profile")
 
 
 #----------------------------Main program--------------------------------------
@@ -87,7 +87,7 @@ def execution(self, context):
     """
     commandMeshWatershedProcessing = [
         sys.executable, find_in_path("AimsMeshWatershed.py"),
-        self.normed_profile,
+        self.normed_individual_profile,
         self.white_mesh,
-        self.reduced_profile]
+        self.reduced_individual_profile]
     context.system(*commandMeshWatershedProcessing)

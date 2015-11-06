@@ -52,20 +52,20 @@ userLevel = 2
 
 # Argument declaration
 signature = Signature(
-    "mask", ReadDiskItem("Mask Texture", "Aims texture formats"),
-    "connectivity_profile", ReadDiskItem(
+    "group_mask", ReadDiskItem("Mask Texture", "Aims texture formats"),
+    "group_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed":"No",
                             "thresholded":"No",
                             "averaged":"Yes",
                             "intersubject":"Yes"}),
-    "thresholded_connectivity_profile", WriteDiskItem(
+    "thresholded_group_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed":"No",
                             "thresholded":"Yes",
                             "averaged":"Yes",
                             "intersubject":"Yes"}),
-    "normed_connectivity_profile", WriteDiskItem(
+    "normed_group_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed":"Yes",
                             "thresholded":"Yes",
@@ -79,16 +79,16 @@ def initialization(self):
     def link_profiles(self, dummy):
         """
         """
-        if self.connectivity_profile is not None:
+        if self.group_profile is not None:
             atts = dict()
-            atts["_database"] = self.connectivity_profile.get("_database")
-            atts["center"] = self.connectivity_profile.get("center")
-            atts["group_of_subjects"] = self.connectivity_profile.get(
+            atts["_database"] = self.group_profile.get("_database")
+            atts["center"] = self.group_profile.get("center")
+            atts["group_of_subjects"] = self.group_profile.get(
                 "group_of_subjects")
-            atts["texture"] = self.connectivity_profile.get("texture")
-            atts["study"] = self.connectivity_profile.get("study")
-            atts["smoothing"] = self.connectivity_profile.get("smoothing")
-            atts["gyrus"] = self.connectivity_profile.get("gyrus")
+            atts["texture"] = self.group_profile.get("texture")
+            atts["study"] = self.group_profile.get("study")
+            atts["smoothing"] = self.group_profile.get("smoothing")
+            atts["gyrus"] = self.group_profile.get("gyrus")
             atts['acquisition'] = ''
             atts['analysis'] = ''
             atts['tracking_session'] = ''
@@ -96,20 +96,20 @@ def initialization(self):
             atts["averaged"] = "Yes"
             atts["normed"] = "No"
             atts["thresholded"] = "Yes"
-            return self.signature["thresholded_connectivity_profile"].findValue(atts)
+            return self.signature["thresholded_group_profile"].findValue(atts)
 
     def link_gprofiles(self, dummy):
         """
         """
-        if self.thresholded_connectivity_profile is not None:
+        if self.thresholded_group_profile is not None:
             atts = dict()
-            atts["_database"] = self.thresholded_connectivity_profile.get("_database")
-            atts["center"] = self.thresholded_connectivity_profile.get("center")
-            atts["group_of_subjects"] = self.thresholded_connectivity_profile.get("group_of_subjects")
-            atts["texture"] = self.thresholded_connectivity_profile.get("texture")
-            atts["study"] = self.thresholded_connectivity_profile.get("study")
-            atts["smoothing"] = self.thresholded_connectivity_profile.get("smoothing")
-            atts["gyrus"] = self.thresholded_connectivity_profile.get("gyrus")
+            atts["_database"] = self.thresholded_group_profile.get("_database")
+            atts["center"] = self.thresholded_group_profile.get("center")
+            atts["group_of_subjects"] = self.thresholded_group_profile.get("group_of_subjects")
+            atts["texture"] = self.thresholded_group_profile.get("texture")
+            atts["study"] = self.thresholded_group_profile.get("study")
+            atts["smoothing"] = self.thresholded_group_profile.get("smoothing")
+            atts["gyrus"] = self.thresholded_group_profile.get("gyrus")
             atts['acquisition'] = ''
             atts['analysis'] = ''
             atts['tracking_session'] = ''
@@ -117,15 +117,15 @@ def initialization(self):
             atts["averaged"] = "Yes"
             atts["normed"] = "Yes"
             atts["thresholded"] = "Yes"
-            return self.signature["normed_connectivity_profile"].findValue(atts)
+            return self.signature["normed_group_profile"].findValue(atts)
 
-    self.linkParameters("connectivity_profile", "mask")
+    self.linkParameters("group_profile", "group_mask")
     self.linkParameters(
-        "thresholded_connectivity_profile",
-        "connectivity_profile", link_profiles)
+        "thresholded_group_profile",
+        "group_profile", link_profiles)
     self.linkParameters(
-        "normed_connectivity_profile",
-        "thresholded_connectivity_profile", link_gprofiles)
+        "normed_group_profile",
+        "thresholded_group_profile", link_gprofiles)
 
 
 #----------------------------Main program--------------------------------------
@@ -136,6 +136,6 @@ def execution(self, context):
     """
     context.system(sys.executable,
                    find_in_path("constelNormProfile.py"),
-                   self.mask,
-                   self.connectivity_profile,
-                   self.normed_connectivity_profile)
+                   self.group_mask,
+                   self.group_profile,
+                   self.normed_group_profile)

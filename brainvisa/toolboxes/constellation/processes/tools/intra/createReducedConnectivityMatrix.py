@@ -53,13 +53,13 @@ userLevel = 2
 
 signature = Signature(
     # inputs
-    "complete_matrix", ReadDiskItem(
-        "Connectivity Matrix", "Aims matrix formats",
+    "complete_individual_matrix", ReadDiskItem(
+        "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled":"mixed",
                             "reduced":"No",
                             "dense":"No",
                             "intersubject":"No"}),
-    "filtered_reduced_profile", ReadDiskItem(
+    "filtered_reduced_individual_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect":"Yes",
                             "roi_filtered":"Yes",
@@ -76,7 +76,7 @@ signature = Signature(
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
 
     #outputs
-    "reduced_matrix", WriteDiskItem(
+    "reduced_individual_matrix", WriteDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled":"mixed",
                             "reduced":"Yes",
@@ -109,16 +109,16 @@ def initialization(self):
         """Define the attribut 'gyrus' from fibertracts pattern for the
         signature 'ROI'.
         """
-        if self.complete_matrix is not None:
-            s = str(self.complete_matrix.get("gyrus"))
+        if self.complete_individual_matrix is not None:
+            s = str(self.complete_individual_matrix.get("gyrus"))
             name = self.signature["ROI"].findValue(s)
         return name
 
     # link of parameters for autocompletion
-    self.linkParameters("filtered_reduced_profile", "complete_matrix")
+    self.linkParameters("filtered_reduced_individual_profile", "complete_individual_matrix")
     self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
-    self.linkParameters("ROI", "complete_matrix", link_matrix2ROI)
-    self.linkParameters("reduced_matrix", "filtered_reduced_profile")
+    self.linkParameters("ROI", "complete_individual_matrix", link_matrix2ROI)
+    self.linkParameters("reduced_individual_matrix", "filtered_reduced_individual_profile")
 
 
 #----------------------------Main program--------------------------------------
@@ -133,11 +133,11 @@ def execution(self, context):
     # M(target regions, patch vertices)
     context.system("constelConnectionDensityTexture",
                    "-mesh", self.white_mesh,
-                   "-connmatrixfile", self.complete_matrix,
-                   "-targetregionstex", self.filtered_reduced_profile,
+                   "-connmatrixfile", self.complete_individual_matrix,
+                   "-targetregionstex", self.filtered_reduced_individual_profile,
                    "-seedregionstex", str(self.ROIs_segmentation),
                    "-seedlabel", ROIlabel,
                    "-type", "seedVertex_to_targets",
-                   "-connmatrix", self.reduced_matrix,
+                   "-connmatrix", self.reduced_individual_matrix,
                    "-normalize", 1,
                    "-verbose", 1)

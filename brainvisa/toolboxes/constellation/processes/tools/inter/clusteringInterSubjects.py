@@ -58,16 +58,16 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "reduced_connectivity_matrix", ListOf(ReadDiskItem(
-        "Connectivity Matrix", "Aims writable volume formats",
+    "intersubject_reduced_matrices", ListOf(ReadDiskItem(
+        "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "Yes",
                             "dense": "No",
                             "intersubject": "Yes"})),
-    "study", Choice(
+    "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
-    "group", ReadDiskItem("Group definition", "XML"),
-    "gyri_texture", ListOf(ReadDiskItem(
+    "subjects_group", ReadDiskItem("Group definition", "XML"),
+    "ROIs_segmentation", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"})),
     "average_mesh", ReadDiskItem(
@@ -75,16 +75,16 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
                             "averaged": "Yes"}),
-    "kmax", Integer(),
+    "nb_clusters", Integer(),
 
     # --outputs--
-    "group_matrix", WriteDiskItem(
-        "Connectivity Matrix", "Aims writable volume formats",
+    "reduced_group_matrix", WriteDiskItem(
+        "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "Yes"}),
-    "clustering_time", ListOf(WriteDiskItem(
+    "ROI_clustering", ListOf(WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "No",
                             "roi_filtered": "No",
@@ -101,34 +101,34 @@ def initialization(self):
     """Provides default values and link of parameters"""
     
     # default value
-    self.kmax = 12
+    self.nb_clusters = 12
 
     def link_matrices(self, dummy):
         """Function of link between the reduced connectivity matrices and
         the group matrix
         """
-        if (self.group and self.reduced_connectivity_matrix) is not None:
+        if (self.subjects_group and self.intersubject_reduced_matrices) is not None:
             atts = dict(
-                self.reduced_connectivity_matrix[0].hierarchyAttributes())
+                self.intersubject_reduced_matrices[0].hierarchyAttributes())
             atts["group_of_subjects"] = os.path.basename(
-                os.path.dirname(self.group.fullPath()))
-            return self.signature["group_matrix"].findValue(atts)
+                os.path.dirname(self.subjects_group.fullPath()))
+            return self.signature["reduced_group_matrix"].findValue(atts)
 
     def linkClustering(self, dummy):
         """function of link between clustering time and individualm reduced
         connectivity matrices
         """
-        if (self.group and self.reduced_connectivity_matrix) is not None:
+        if (self.subjects_group and self.intersubject_reduced_matrices) is not None:
             tmp = dict(
-                self.reduced_connectivity_matrix[0].hierarchyAttributes())
+                self.intersubject_reduced_matrices[0].hierarchyAttributes())
             if tmp["study"] == "avg":
                 atts = dict(
-                    self.reduced_connectivity_matrix[0].hierarchyAttributes())
+                    self.intersubject_reduced_matrices[0].hierarchyAttributes())
                 atts["subject"] = "avgSubject"
-                return self.signature["clustering_time"].findValue(atts)
+                return self.signature["ROI_clustering"].findValue(atts)
             elif tmp["study"] == "concat":
                 profiles = []
-                for matrix in self.reduced_connectivity_matrix:
+                for matrix in self.intersubject_reduced_matrices:
                     atts = dict(matrix.hierarchyAttributes())
                     profile = ReadDiskItem(
                         "Group Clustering Time",
@@ -139,10 +139,10 @@ def initialization(self):
 
     # link of parameters for autocompletion
     self.linkParameters(
-        "group_matrix", ("group", "reduced_connectivity_matrix"),
+        "reduced_group_matrix", ("subjects_group", "intersubject_reduced_matrices"),
         link_matrices)
     self.linkParameters(
-        "clustering_time", ("group", "reduced_connectivity_matrix",),
+        "ROI_clustering", ("subjects_group", "intersubject_reduced_matrices",),
         linkClustering)
 
 
@@ -157,24 +157,24 @@ def execution(self, context):
     as dissimilarity measure.
     """
     # provides the patch name
-    patch = identify_patch_number(self.group_matrix.fullPath())
+    patch = identify_patch_number(self.reduced_group_matrix.fullPath())
 
     args = []
-    for x in self.reduced_connectivity_matrix:
+    for x in self.intersubject_reduced_matrices:
         args += ["-m", x]
 
-    args += ["-o", self.group_matrix, "-s", self.study]
+    args += ["-o", self.reduced_group_matrix, "-s", self.method]
     context.system("python", find_in_path("constelCalculateGroupMatrix.py"),
                    *args)
-    ma = aims.read(self.group_matrix.fullPath())
+    ma = aims.read(self.reduced_group_matrix.fullPath())
     context.write(ma.header())
 
     cmd_args = []
-    for t in self.clustering_time:
+    for t in self.ROI_clustering:
         cmd_args += ["-p", t]
-    for y in self.gyri_texture:
+    for y in self.ROIs_segmentation:
         cmd_args += ["-t", y]
     cmd_args += ["-m", self.average_mesh, "-l", str(patch),
-                 "-s", self.study, "-g", self.group_matrix, "-a", self.kmax]
+                 "-s", self.method, "-g", self.reduced_group_matrix, "-a", self.nb_clusters]
     context.system("python", find_in_path("constelInterSubjectClustering.py"),
                    *cmd_args)

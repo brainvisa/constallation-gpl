@@ -80,8 +80,8 @@ signature = Signature(
     "smoothing", Float(),
 
     # --outputs--
-    "complete_matrix", WriteDiskItem(
-        "Connectivity Matrix", "Aims matrix formats",
+    "complete_individual_matrix", WriteDiskItem(
+        "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "No",
                             "dense": "No",
@@ -117,12 +117,12 @@ def initialization(self):
             attrs["smallerlength2"] = self.matrix_semilabeled_fibers.get("smallerlength1")
             attrs["greaterlength2"] = self.matrix_semilabeled_fibers.get("smallerlength1")
             filename = self.signature[
-                "complete_matrix"].findValue(attrs)
+                "complete_individual_matrix"].findValue(attrs)
             return filename
 
     # link of parameters for autocompletion
     self.linkParameters("ROI", "matrix_labeled_fibers", link_matrix2ROI)
-    self.linkParameters("complete_matrix",
+    self.linkParameters("complete_individual_matrix",
                         ("matrix_semilabeled_fibers", "smoothing"), link_smooth)
 
 
@@ -138,13 +138,13 @@ def execution(self, context):
     context.system("AimsSumSparseMatrix",
                    "-i", self.matrix_semilabeled_fibers,
                    "-i", self.matrix_labeled_fibers,
-                   "-o", self.complete_matrix)
+                   "-o", self.complete_individual_matrix)
 
     # smoothing matrix: -s in millimetres
     context.system("AimsSparseMatrixSmoothing",
-                   "-i", self.complete_matrix,
+                   "-i", self.complete_individual_matrix,
                    "-m", self.white_mesh,
-                   "-o", self.complete_matrix,
+                   "-o", self.complete_individual_matrix,
                    "-s", self.smoothing,
                    "-l", self.ROIs_segmentation,
                    "-p", ROIlabel)

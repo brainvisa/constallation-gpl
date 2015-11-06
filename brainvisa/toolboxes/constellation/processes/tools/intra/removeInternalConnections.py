@@ -59,7 +59,7 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "mean_profile", ReadDiskItem(
+    "mean_individual_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed": "No",
                             "thresholded": "No",
@@ -72,7 +72,7 @@ signature = Signature(
     "ROI", String(),
 
     # --outputs--
-    "normed_profile", WriteDiskItem(
+    "normed_individual_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed": "Yes",
                             "thresholded": "Yes",
@@ -96,15 +96,15 @@ def initialization(self):
         """Define the attribut 'gyrus' from fibertracts pattern for the
         signature 'ROI'.
         """
-        if self.mean_profile is not None:
-            s = str(self.mean_profile.get("gyrus"))
+        if self.mean_individual_profile is not None:
+            s = str(self.mean_individual_profile.get("gyrus"))
             name = self.signature["ROI"].findValue(s)
         return name
 
     # link of parameters for autocompletion
-    self.linkParameters("ROI", "mean_profile", link_matrix2ROI)
+    self.linkParameters("ROI", "mean_individual_profile", link_matrix2ROI)
     self.linkParameters(
-        "normed_profile", "mean_profile")
+        "normed_individual_profile", "mean_individual_profile")
 
 
 #----------------------------Main program--------------------------------------
@@ -126,7 +126,7 @@ def execution(self, context):
     context.system(sys.executable,
                    find_in_path("constelRemoveInternalConnections.py"),
                    ROIlabel,
-                   self.mean_profile,
+                   self.mean_individual_profile,
                    self.ROIs_segmentation,
-                   self.normed_profile,
+                   self.normed_individual_profile,
                    arg)

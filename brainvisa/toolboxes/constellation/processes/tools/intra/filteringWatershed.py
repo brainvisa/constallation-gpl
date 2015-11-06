@@ -60,13 +60,13 @@ userLevel = 2
 
 signature = Signature(
     # inputs
-    "complete_matrix", ReadDiskItem(
-        "Connectivity Matrix", "Aims matrix formats",
+    "complete_individual_matrix", ReadDiskItem(
+        "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled":"mixed",
                             "reduced":"No",
                             "dense":"No",
                             "intersubject":"No"}),
-    "reduced_profile", ReadDiskItem(
+    "reduced_individual_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect":"Yes",
                             "roi_filtered":"No",
@@ -90,7 +90,7 @@ signature = Signature(
     "duplication_value_patch", WriteDiskItem(
         "Measures Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"measure": "spread"}),
-    "filtered_reduced_profile", WriteDiskItem(
+    "filtered_reduced_individual_profile", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect":"Yes",
                             "roi_filtered":"Yes",
@@ -125,19 +125,19 @@ def initialization(self):
         """Define the attribut 'ROI' from fibertracts pattern for the
         signature 'ROI'.
         """
-        if self.complete_matrix is not None:
-            s = str(self.complete_matrix.get("gyrus"))
+        if self.complete_individual_matrix is not None:
+            s = str(self.complete_individual_matrix.get("gyrus"))
             name = self.signature["ROI"].findValue(s)
         return name
 
     self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
     self.linkParameters(
-        "ROI", "complete_matrix", link_matrix2ROI)
-    self.linkParameters("reduced_profile", "complete_matrix")
-    self.linkParameters("sum_vertices_patch", "complete_matrix")
+        "ROI", "complete_individual_matrix", link_matrix2ROI)
+    self.linkParameters("reduced_individual_profile", "complete_individual_matrix")
+    self.linkParameters("sum_vertices_patch", "complete_individual_matrix")
     self.linkParameters(
-        "duplication_value_patch", "complete_matrix")
-    self.linkParameters("filtered_reduced_profile", "complete_matrix")
+        "duplication_value_patch", "complete_individual_matrix")
+    self.linkParameters("filtered_reduced_individual_profile", "complete_individual_matrix")
 
 
 #----------------------------Main program--------------------------------------
@@ -152,8 +152,8 @@ def execution(self, context):
 
     context.system("constelConnectionDensityTexture",
                    "-mesh", self.white_mesh,
-                   "-connmatrixfile", self.complete_matrix,
-                   "-targetregionstex", self.reduced_profile,
+                   "-connmatrixfile", self.complete_individual_matrix,
+                   "-targetregionstex", self.reduced_individual_profile,
                    "-seedregionstex", self.ROIs_segmentation,
                    "-seedlabel", ROIlabel,
                    "-type", "oneSeedRegion_to_targets",
@@ -162,7 +162,7 @@ def execution(self, context):
                    "-normalize", 1)
     fibersNbByWatershedBasinsTarget_tex = aims.read(
         self.duplication_value_patch.fullPath())
-    subjectWatershedBasins_tex = aims.read(self.reduced_profile.fullPath())
+    subjectWatershedBasins_tex = aims.read(self.reduced_individual_profile.fullPath())
 
     # TO DO: assorted improvements??? (it is not clear yet...)
     labelsToRemove_ar = fibersNbByWatershedBasinsTarget_tex[0].arraydata()
@@ -195,4 +195,4 @@ def execution(self, context):
     filteredWatershedBasins_tex = tt.remove_labels(
         subjectWatershedBasins_tex, labelsToRemove_list)
     aims.write(
-        filteredWatershedBasins_tex, self.filtered_reduced_profile.fullPath())
+        filteredWatershedBasins_tex, self.filtered_reduced_individual_profile.fullPath())
