@@ -54,7 +54,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Normalization Mean Individual Profile"
+name = "Mean Individual Profile Normalization"
 userLevel = 2
 
 signature = Signature(
