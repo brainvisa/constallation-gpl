@@ -70,7 +70,8 @@ signature = Signature(
     "ROIs_segmentation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
-    "dw_to_t1", ReadDiskItem("Transformation matrix", "Transformation matrix"),
+    "dw_to_t1", ReadDiskItem("Transform T2 Diffusion MR to Raw T1 MRI",
+                             "Transformation matrix"),
 
     # --ouputs--
     "matrix_semilabeled_fibers", WriteDiskItem(
@@ -130,6 +131,7 @@ def initialization(self):
         "profile_semilabeled_fibers", "matrix_semilabeled_fibers")
     self.linkParameters(
         "profile_labeled_fibers", "matrix_labeled_fibers")
+    self.linkParameters("dw_to_t1", "labeled_fibers")
 
 
 #----------------------------Main program--------------------------------------

@@ -74,7 +74,8 @@ signature = Signature(
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
-    "dw_to_t1", ReadDiskItem("Transformation matrix", "Transformation matrix"),
+    "dw_to_t1", ReadDiskItem("Transform T2 Diffusion MR to Raw T1 MRI",
+                             "Transformation matrix"),
     "minlength_labeled_fibers", Float(),
     "maxlength_labeled_fibers", Float(),
     "minlength_semilabeled_fibers", Float(),
