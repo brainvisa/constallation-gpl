@@ -46,7 +46,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Reduced Individual Profile From Normed Profile"
+name = "Individual High Connectivity Regions"
 userLevel = 2
 
 signature = Signature(

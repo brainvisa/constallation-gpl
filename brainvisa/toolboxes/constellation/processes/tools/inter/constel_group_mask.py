@@ -47,7 +47,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Individual Profiles Overlap Mask"
+name = "Group Connectivity Mask"
 userLevel = 2
 
 signature = Signature(

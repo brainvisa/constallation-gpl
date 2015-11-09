@@ -55,7 +55,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Filtering Reduced Individual Profile"
+name = "Individual Regions Filtering"
 userLevel = 2
 
 signature = Signature(

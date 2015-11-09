@@ -37,8 +37,8 @@ except:
 #----------------------------Header--------------------------------------------
 
 
-name = "Constellation within-subject pipeline"
-userLevel = 2
+name = "Constellation Individual Pipeline"
+userLevel = 0
 
 signature = Signature(
     #inputs
@@ -105,7 +105,8 @@ def initialization(self):
     ###########################################################################
 
     eNode.addChild(
-        "filter", ProcessExecutionNode("bundlesFiltering", optional=1))
+        "filter", ProcessExecutionNode("constel_brain_tracts_filtering",
+                                       optional=1))
 
     eNode.addDoubleLink("filter.outputs_database", "outputs_database")
     eNode.addDoubleLink("filter.format_fiber_tracts", "format_fiber_tracts")
@@ -122,7 +123,8 @@ def initialization(self):
     ###########################################################################
 
     eNode.addChild(
-        "oversampler", ProcessExecutionNode("fiberOversampler", optional=1))
+        "oversampler", ProcessExecutionNode("constel_fiber_oversampler",
+                                            optional=1))
 
     eNode.addDoubleLink("oversampler.semilabeled_fibers",
                         "filter.semilabeled_fibers")
@@ -132,8 +134,8 @@ def initialization(self):
     ###########################################################################
 
     eNode.addChild(
-        "ConnectivityMatrix", ProcessExecutionNode("createConnectivityMatrix",
-                                                   optional=1))
+        "ConnectivityMatrix",
+        ProcessExecutionNode("constel_sparse_individual_matrices", optional=1))
 
     eNode.addDoubleLink("ConnectivityMatrix.oversampled_semilabeled_fibers",
                         "oversampler.oversampled_semilabeled_fibers")
@@ -152,7 +154,7 @@ def initialization(self):
     ###########################################################################
 
     eNode.addChild(
-        "smoothing", ProcessExecutionNode("sumSparseMatrix", optional=1))
+        "smoothing", ProcessExecutionNode("constel_smooth_matrix", optional=1))
 
     eNode.addDoubleLink("smoothing.matrix_labeled_fibers",
                         "ConnectivityMatrix.matrix_labeled_fibers")
@@ -170,7 +172,7 @@ def initialization(self):
     ###########################################################################
 
     eNode.addChild(
-        "MeanProfile", ProcessExecutionNode("createMeanConnectivityProfile",
+        "MeanProfile", ProcessExecutionNode("constel_mean_individual_profile",
                                             optional=1))
 
     eNode.addDoubleLink("MeanProfile.complete_individual_matrix",
@@ -185,7 +187,7 @@ def initialization(self):
     ###########################################################################
 
     eNode.addChild("InternalConnections",
-                   ProcessExecutionNode("removeInternalConnections",
+                   ProcessExecutionNode("constel_normalize_individual_profile",
                                         optional=1))
 
     eNode.addDoubleLink("InternalConnections.mean_individual_profile",
@@ -202,7 +204,7 @@ def initialization(self):
 
     eNode.addChild(
         "Watershed",
-        ProcessExecutionNode("watershedReflectingConnectionsToGyrus",
+        ProcessExecutionNode("constel_individual_high_connectivity_regions",
                              optional=1, selected=False))
 
     eNode.addDoubleLink("Watershed.normed_individual_profile",
@@ -214,7 +216,7 @@ def initialization(self):
     ###########################################################################
 
     eNode.addChild("FilteringWatershed",
-                   ProcessExecutionNode("filteringWatershed",
+                   ProcessExecutionNode("constel_individual_regions_filtering",
                                         optional=1, selected=False))
 
     eNode.addDoubleLink("FilteringWatershed.reduced_individual_profile",
@@ -233,7 +235,7 @@ def initialization(self):
     ###########################################################################
 
     eNode.addChild("ReducedMatrix",
-                   ProcessExecutionNode("createReducedConnectivityMatrix",
+                   ProcessExecutionNode("constel_individual_reduced_matrix",
                                         optional=1, selected=False))
 
     eNode.addDoubleLink("ReducedMatrix.complete_individual_matrix",
@@ -249,7 +251,7 @@ def initialization(self):
     ###########################################################################
 
     eNode.addChild("ClusteringIntraSubjects",
-                   ProcessExecutionNode("ClusteringIntrasubject",
+                   ProcessExecutionNode("constel_individual_clustering",
                                         optional=1, selected=False))
 
     eNode.addDoubleLink("ClusteringIntraSubjects.reduced_individual_matrix",

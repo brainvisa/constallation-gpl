@@ -39,8 +39,8 @@ except:
 #----------------------------Header--------------------------------------------
 
 
-name = "Constellation inter-subject pipeline"
-userLevel = 2
+name = "Constellation Group Pipeline"
+userLevel = 0
 
 
 signature = Signature(
@@ -83,7 +83,7 @@ def linkGroup(self, param1):
         if node.name() == "Parallel Node":
             node.addChild(
                 "N%d" % len(list(node.children())), ProcessExecutionNode(
-                    "createReducedConnectivityMatrixOnRangeOfSubjects",
+                    "constel_reduced_individual_matrices_from_group_regions",
                     optional=1))
 
 
@@ -165,7 +165,7 @@ def initialization(self):
 
     eNode.addChild("CreateMask",
                    ProcessExecutionNode(
-                       "surfaceWithEnoughConnectionsCreation",
+                       "constel_group_mask",
                        optional=1))
 
     eNode.addDoubleLink("CreateMask.subjects_group", "subjects_group")
@@ -177,75 +177,76 @@ def initialization(self):
     #   link of parameters for the "Connectivity Profile of Group" process    #
     ###########################################################################
 
-    eNode.addChild("ConnectivityProfileGroup",
+    eNode.addChild("GroupConnectivityProfile",
                    ProcessExecutionNode(
-                       "createConnectivityProfileOnRangeOfSubjects",
+                       "constel_group_profile",
                        optional=1))
 
     eNode.addDoubleLink(
-        "ConnectivityProfileGroup.subjects_group", "subjects_group")
+        "GroupConnectivityProfile.subjects_group", "subjects_group")
     eNode.addDoubleLink(
-        "ConnectivityProfileGroup.new_study_name", "new_study_name")
+        "GroupConnectivityProfile.new_study_name", "new_study_name")
     eNode.addDoubleLink(
-        "ConnectivityProfileGroup.normed_individual_profiles",
+        "GroupConnectivityProfile.normed_individual_profiles",
         "normed_individual_profiles")
 
     ###########################################################################
     #link of parameters for the "Normed Connectivity Profile of Group" process#
     ###########################################################################
 
-    eNode.addChild("NormedProfileGroup",
+    eNode.addChild("NormedGroupProfile",
                    ProcessExecutionNode(
-                       "removeInternalConnectionsOnRangeOfSubjects",
+                       "constel_group_mask_normalize_profile",
                        optional=1))
 
     eNode.addDoubleLink(
-        "NormedProfileGroup.group_mask", "CreateMask.group_mask")
+        "NormedGroupProfile.group_mask", "CreateMask.group_mask")
 
     ###########################################################################
     #        link of parameters for the "Watershed of Group" process          #
     ###########################################################################
 
-    eNode.addChild("WatershedGroup",
-                   ProcessExecutionNode("filteringWatershedOnRangeOfSubjects",
+    eNode.addChild("GroupRegionsFiltering",
+                   ProcessExecutionNode("constel_group_regions_filtering",
                                         optional=1))
 
-    eNode.addDoubleLink("WatershedGroup.average_mesh", "average_mesh")
-    eNode.addDoubleLink("WatershedGroup.normed_group_profile",
-                        "NormedProfileGroup.normed_group_profile")
+    eNode.addDoubleLink("GroupRegionsFiltering.average_mesh", "average_mesh")
+    eNode.addDoubleLink("GroupRegionsFiltering.normed_group_profile",
+                        "NormedGroupProfile.normed_group_profile")
 
     ###########################################################################
     #    link of parameters for the "Reduced Connectivity Matrix" process     #
     ###########################################################################
 
-    eNode.addChild("ReducedMatrixGroup",
-                   ProcessExecutionNode(
-                       "createReducedConnectivityMatrixOnRangeOfSubjects",
-                       optional=1))
+    eNode.addChild(
+        "ReducedGroupMatrix",
+        ProcessExecutionNode(
+            "constel_reduced_individual_matrices_from_group_regions",
+            optional=1))
 
-    eNode.addDoubleLink("ReducedMatrixGroup.subjects_group", "subjects_group")
-    eNode.addDoubleLink("ReducedMatrixGroup.study_name",
+    eNode.addDoubleLink("ReducedGroupMatrix.subjects_group", "subjects_group")
+    eNode.addDoubleLink("ReducedGroupMatrix.study_name",
                         "study_name")
-    eNode.addDoubleLink("ReducedMatrixGroup.average_mesh", "average_mesh")
+    eNode.addDoubleLink("ReducedGroupMatrix.average_mesh", "average_mesh")
     eNode.addDoubleLink(
-        "ReducedMatrixGroup.ROIs_segmentation", "ROIs_segmentation")
-    eNode.addDoubleLink("ReducedMatrixGroup.filtered_reduced_group_profile",
-                        "WatershedGroup.filtered_reduced_group_profile")
+        "ReducedGroupMatrix.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("ReducedGroupMatrix.filtered_reduced_group_profile",
+                        "GroupRegionsFiltering.filtered_reduced_group_profile")
 
     ###########################################################################
     #        link of parameters for the "Clustering of Group" process         #
     ###########################################################################
 
-    eNode.addChild("ClusteringGroup",
-                   ProcessExecutionNode("clusteringInterSubjects",
+    eNode.addChild("GroupClustering",
+                   ProcessExecutionNode("constel_group_clustering",
                                         optional=1))
 
-    eNode.addDoubleLink("ClusteringGroup.subjects_group", "subjects_group")
-    eNode.addDoubleLink("ClusteringGroup.method", "method")
-    eNode.addDoubleLink("ClusteringGroup.average_mesh", "average_mesh")
+    eNode.addDoubleLink("GroupClustering.subjects_group", "subjects_group")
+    eNode.addDoubleLink("GroupClustering.method", "method")
+    eNode.addDoubleLink("GroupClustering.average_mesh", "average_mesh")
     eNode.addDoubleLink(
-        "ClusteringGroup.ROIs_segmentation", "ROIs_segmentation")
-    eNode.addDoubleLink("ClusteringGroup.intersubject_reduced_matrices",
-                        "ReducedMatrixGroup.intersubject_reduced_matrices")
+        "GroupClustering.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("GroupClustering.intersubject_reduced_matrices",
+                        "ReducedGroupMatrix.intersubject_reduced_matrices")
 
     self.setExecutionNode(eNode)

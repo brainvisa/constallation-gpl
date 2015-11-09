@@ -55,7 +55,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Filtering Brain Tracts"
+name = "Brain Tracts Filtering"
 userLevel = 2
 
 signature = Signature(

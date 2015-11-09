@@ -47,7 +47,7 @@ def validation():
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
-name = "Normed Connectivity Profile of Group"
+name = "Mask and Normalize Group Profile"
 userLevel = 2
 
 # Argument declaration

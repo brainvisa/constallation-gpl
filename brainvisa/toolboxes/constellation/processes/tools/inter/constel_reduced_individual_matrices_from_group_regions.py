@@ -51,7 +51,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Reduced Intersubject Matrices From Filtered Reduced Group Profile"
+name = "Reduced Individual Matrices From Group Regions"
 userLevel = 2
 
 signature = Signature(

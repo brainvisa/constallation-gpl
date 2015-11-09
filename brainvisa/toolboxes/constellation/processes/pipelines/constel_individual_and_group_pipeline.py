@@ -34,8 +34,8 @@ except:
 #----------------------------Header--------------------------------------------
 
 
-name = "Constellation full pipeline"
-userLevel = 2
+name = "Constellation Individual And Group pipeline"
+userLevel = 0
 
 signature = Signature(
     # inputs
@@ -94,9 +94,11 @@ def initialization( self ):
     eNode = SerialExecutionNode(self.name, parameterized=self)
     
     #eNode.addChild(
-        #"pipelineIntra", ProcessExecutionNode("pipelineIntraBrainvisa", optional=1))
+        #"pipelineIntra", ProcessExecutionNode("constel_individual_pipeline",
+        #    optional=1))
 
     eNode.addChild(
-        "pipelineInter", ProcessExecutionNode("pipelineInterBrainvisa", optional=1))
+        "pipelineInter", ProcessExecutionNode("constel_group_pipeline",
+                                              optional=1))
     
     self.setExecutionNode(eNode)
