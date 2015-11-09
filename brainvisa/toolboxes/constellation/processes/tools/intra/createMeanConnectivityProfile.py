@@ -50,7 +50,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Mean Connectivity Profile"
+name = "Mean Individual Profile From Smoothed Matrix"
 userLevel = 2
 
 signature = Signature(

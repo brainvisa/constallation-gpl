@@ -51,7 +51,7 @@ def validation():
 #----------------------------Functions-----------------------------------------
 
 
-name = "Connectivity Matrix"
+name = "Sparse Individual Matrices and Profiles From Tracts"
 userLevel = 2
 
 signature = Signature(

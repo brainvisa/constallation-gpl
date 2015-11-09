@@ -52,7 +52,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Sum and Smoothing Matrix"
+name = "Sum Sparse Individual Matrices and Smoothing"
 userLevel = 2
 
 signature = Signature(

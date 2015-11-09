@@ -46,7 +46,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Reduced Profile"
+name = "Reduced Individual Profile From Normed Profile"
 userLevel = 2
 
 signature = Signature(

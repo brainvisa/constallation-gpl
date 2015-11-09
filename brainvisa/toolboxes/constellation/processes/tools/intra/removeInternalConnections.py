@@ -54,7 +54,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Remove Internal Connections"
+name = "Normalization Mean Individual Profile"
 userLevel = 2
 
 signature = Signature(

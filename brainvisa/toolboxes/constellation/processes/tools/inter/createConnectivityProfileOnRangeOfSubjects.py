@@ -48,7 +48,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Connectivity Profile of Group"
+name = "Group Profile From Normed Individual Profiles"
 userLevel = 2
 
 signature = Signature(

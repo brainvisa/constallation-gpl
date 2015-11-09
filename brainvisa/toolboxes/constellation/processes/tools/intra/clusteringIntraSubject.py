@@ -49,7 +49,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Clustering"
+name = "Clustering From Reduced Individual Matrix"
 userLevel = 2
 
 signature = Signature(

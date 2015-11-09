@@ -56,7 +56,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Watershed of Group"
+name = "Filtered Reduced Group Profile"
 userLevel = 2
 
 signature = Signature(

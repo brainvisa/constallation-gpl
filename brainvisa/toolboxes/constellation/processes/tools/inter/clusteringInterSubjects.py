@@ -53,7 +53,7 @@ def validation():
 #----------------------------Header--------------------------------------------
 
 
-name = "Clustering of Group"
+name = "Clustering From Reduced Group Matrix"
 userLevel = 2
 
 signature = Signature(
