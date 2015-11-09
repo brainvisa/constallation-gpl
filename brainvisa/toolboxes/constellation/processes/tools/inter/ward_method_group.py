@@ -34,10 +34,20 @@ signature = Signature(
     "patch", Integer(), # TODO: to put a label to a name?
     "group_matrix", String(), # TODO: to define a type
     "distance_matrix_file", String(), # TODO: to define a type
-    "average_mesh", ReadDiskItem("Mesh", "Aims mesh formats"),
-    "gyri_texture", ListOf(ReadDiskItem("Label Texture", "Aims texture formats")),
+    "average_mesh", ReadDiskItem("White Mesh", "Aims mesh formats",
+                                 requiredAttributes={"side":"both",
+                                                     "vertex_corr":"Yes",
+                                                     "averaged":"Yes"}),
+    "gyri_texture", ListOf(ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side":"both", "vertex_corr":"Yes"})),
     "tex_time", ListOf(
-        WriteDiskItem("Group Clustering Time", "Aims texture formats")),
+        WriteDiskItem("Connectivity ROI Texture", "Aims texture formats",
+                      requiredAttributes={"roi_autodetect":"No",
+                                          "roi_filtered":"No",
+                                          "averaged":"No",
+                                          "intersubject":"Yes",
+                                          "step_time":"Yes"})),
 )
 
 

@@ -1,79 +1,47 @@
-# -*- coding: utf-8 -*-
+###############################################################################
+# This software and supporting documentation are distributed by CEA/NeuroSpin,
+# Batiment 145, 91191 Gif-sur-Yvette cedex, France. This software is governed
+# by the CeCILL license version 2 under French law and abiding by the rules of
+# distribution of free software. You can  use, modify and/or redistribute the
+# software under the terms of the CeCILL license version 2 as circulated by
+# CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+###############################################################################
 
-include( 'diffusion' )
+from brainvisa.data.neuroDiskItems import createFormatList
 
-Format( 'Matrix sparse', "f|*.imas" )
+include("diffusion")
 
-# Bundles
-FileType( 'Bundles selection', 'Fascicles bundles' )
-FileType( 'Fibers Near Cortex', 'Bundles selection' )
-FileType( 'Very OutSide Fibers Of Cortex', 'Bundles selection' )
-FileType( 'Oversampled Fibers', 'Bundles selection' )
+Format("Sparse Matrix", "f|*.imas")
 
-# File
-FileType( 'Full Clustering Result', 'Text file' )
-FileType( 'Gyrus Clustering Result', 'Text file' )
-FileType( 'Group Clustering Results', 'Text file' )
+createFormatList("Aims matrix formats",
+                 ("gz compressed NIFTI-1 image",
+                  "NIFTI-1 image",
+                  "GIS Image"))
 
-# Volume
-FileType( 'Connectivity Matrix Volume', '3D volume' )
-FileType( 'Group Connectivity Matrix Volume', 'Connectivity Matrix Volume' )
 
-FileType( 'Patch Connectivity Matrix', 'Connectivity Matrix Volume' )
-FileType( 'Reduced Connectivity Matrix', 'Connectivity Matrix Volume' )
+FileType("Nomenclature ROIs File", "Text file")
 
-FileType( 'Group Reduced Connectivity Matrix', 'Group Connectivity Matrix Volume' )
-FileType( 'Group Matrix', 'Group Connectivity Matrix Volume' )
 
-FileType( 'Connectivity Matrix Fibers Near Cortex', 'Any type', 'Matrix sparse' )
-FileType( 'Connectivity Matrix Outside Fibers Of Cortex', 'Any type', 'Matrix sparse' )
-FileType( 'Gyrus Connectivity Matrix', 'Any type', 'Matrix sparse' )
+#----------------------------Fiber tracts--------------------------------------
+FileType("Filtered Fascicles Bundles", "Fascicles bundles")
 
-# Connectivity matrix (texture)
-FileType( 'Connectivity Profile Texture', 'Label Texture' )
-FileType( 'Connectivity Profile Selection', 'Connectivity Profile Texture' )
-FileType( 'Group Connectivity Profile Texture',  'Connectivity Profile Texture' )
-FileType( 'Avg Connectivity Profile Texture',  'Connectivity Profile Texture' )
 
-FileType( 'Normed Connectivity Profile', 'Connectivity Profile Texture' )
-FileType( 'Thresholded Connectivity Profile', 'Connectivity Profile Texture' )
-FileType( 'Gyrus Connectivity Profile', 'Connectivity Profile Texture' )
+#----------------------------Connectivity matrix-------------------------------
+FileType("Matrix", "Any type")
+FileType("Connectivity Matrix", "Matrix",
+         ["Sparse Matrix", "GIS image", "gz compressed NIFTI-1 image",
+          "NIFTI-1 image"])
 
-FileType( 'Connectivity Profile Fibers Near Cortex', 'Connectivity Profile Selection' )
-FileType( 'Connectivity Profile Outside Fibers Of Cortex', 'Connectivity Profile Selection' )
 
-FileType( 'Group Normed Connectivity Profile', 'Group Connectivity Profile Texture' )
-FileType( 'Avg Connectivity Mask', 'Avg Connectivity Profile Texture' )
-FileType( 'Avg Connectivity Profile', 'Avg Connectivity Profile Texture' )
-FileType( 'Avg Thresholded Connectivity Profile', 'Avg Connectivity Profile Texture' )
-FileType( 'Avg Normed Connectivity Profile', 'Avg Connectivity Profile Texture' )
+#----------------------------Mask texture--------------------------------------
+FileType("Mask Texture", "Texture")
 
-# Watershed (texture)
-FileType( 'ROI Texture', 'Label Texture' )
-FileType( 'Watershed Texture', 'ROI Texture' )
-FileType( 'Watershed Measures', 'ROI Texture' )
-FileType( 'Average Texture', 'ROI Texture' )
 
-FileType( 'Avg Watershed Texture', 'Average Texture' )
-FileType( 'Avg Filtered Watershed', 'Average Texture' )
+#----------------------------Connectivity profile texture----------------------
+FileType("Connectivity Profile Texture", "Texture")
+FileType("Filtered Connectivity Profile Texture", "Connectivity Profile Texture")
 
-FileType( 'Filtered Watershed', 'ROI Texture' )
-FileType( 'Sum Values From Region', 'Watershed Measures' )
-FileType( 'Spread Value On Region', 'Watershed Measures' )
 
-#FileType( 'Avg Watershed Texture', 'ROI Texture' )
-#FileType( 'Avg Filtered Watershed', 'Avg Watershed Texture' )
-
-# Clustering (texture)
-FileType( 'Clustering Texture', 'Label Texture' )
-FileType( 'Group Clustering Texture', 'Clustering Texture' )
-
-FileType( 'Clustering Time', 'Clustering Texture' )
-FileType( 'Clustering kOpt', 'Clustering Texture' )
-FileType( 'Clustering Silhouette Time', 'Clustering Texture' )
-FileType( 'Patch Clustering Time', 'Clustering Texture' )
-FileType( 'Clustering Vertex Silhouette Time', 'Clustering Texture' )
-
-FileType( 'Group Clustering Time', 'Group Clustering Texture' )
-FileType( 'Group Clustering Kopt', 'Group Clustering Texture' )
-FileType( 'Group Clustering Silhouette', 'Group Clustering Texture' )
+#----------------------------Connectivity ROI texture--------------------------
+FileType("Connectivity ROI Texture", "ROI Texture")
+FileType("Measures Connectivity ROI Texture", "Connectivity ROI Texture")

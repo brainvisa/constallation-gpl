@@ -24,9 +24,12 @@ signature = Signature(
     'dw_to_t1', ReadDiskItem(
         'Transformation matrix', 'Transformation matrix'),
     'white_mesh', ReadDiskItem(
-        'AimsBothWhite', 'anatomist mesh formats'),
+        'White Mesh', 'anatomist mesh formats',
+        requiredAttributes={"side":"both",
+                            "vertex_corr":"Yes",
+                            "averaged":"No"}),
     'clustering_texture', ReadDiskItem(
-        'Group Clustering Texture', 'anatomist texture formats'),
+        'Connectivity ROI Texture', 'anatomist texture formats'),
     'cluster_number', String(), 
     'max_number_of_fibers', Integer(),
     'clustering_texture_timestep', Integer(), )

@@ -26,10 +26,14 @@ userLevel = 0
 
 signature = Signature(
     'connectivity_matrix', ReadDiskItem(
-        'Gyrus connectivity matrix', 'Matrix sparse'),
-    'white_mesh', ReadDiskItem('FreesurferMesh', 'anatomist mesh formats'),
+        'Connectivity Matrix', 'GIS image',
+        requiredAttributes={"ends_labelled":"mixed",
+                            "reduced":"No",
+                            "dense":"No",
+                            "intersubject":"No"}),
+    'white_mesh', ReadDiskItem('White Mesh', 'anatomist mesh formats'),
     'gyrus_texture', 
-        ReadDiskItem('Label texture', 'anatomist texture formats'), )
+        ReadDiskItem('ROI texture', 'anatomist texture formats'), )
 
 def initialization(self):
     self.linkParameters('white_mesh', 'connectivity_matrix')

@@ -1,26 +1,10 @@
-###############################################################################
-# This software and supporting documentation are distributed by CEA/NeuroSpin,
-# Batiment 145, 91191 Gif-sur-Yvette cedex, France. This software is governed
-# by the CeCILL license version 2 under French law and abiding by the rules of
-# distribution of free software. You can  use, modify and/or redistribute the
-# software under the terms of the CeCILL license version 2 as circulated by
-# CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
-###############################################################################
-
+# -*- coding: utf-8 -*-
 """
-This script does the following:
-*
-*
+Created on Fri Apr 24 16:39:17 2015
 
-Main dependencies:
-
-Author: Sandrine Lefranc, 2015
+@author: sl236442
 """
 
-#----------------------------Imports-------------------------------------------
-
-
-# axon python API module
 from brainvisa.processes import *
 try:
     from brainvisa import anatomist as ana
@@ -35,17 +19,21 @@ def validation():
 
 from soma.path import find_in_path
 from PyQt4 import QtGui
+#import gtk
 
-
-#----------------------------Header--------------------------------------------
-
-
-name = 'Anatomist view Texture Time'
+name = 'Anatomist view Fusion Texture Time'
 roles = ('viewer',)
 userLevel = 0
 
 signature = Signature(
-    'clustering_texture', ListOf(
+    'clustering_texture_1', ListOf(
+        ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
+        requiredAttributes={"roi_autodetect":"No",
+                            "roi_filtered":"No",
+                            "averaged":"No",
+                            "intersubject":"Yes",
+                            "step_time":"Yes"})),
+    'clustering_texture_2', ListOf(
         ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
         requiredAttributes={"roi_autodetect":"No",
                             "roi_filtered":"No",
@@ -56,14 +44,8 @@ signature = Signature(
 )
 
 
-#----------------------------Function------------------------------------------
-
-
 def initialization(self):
     pass
-
-
-#----------------------------Main program--------------------------------------
 
 
 def get_screen_config():
@@ -103,7 +85,7 @@ def get_screen_config():
     #print "monitor %d: %d x %d (current)" % (curmon,width,height)
 
 def execution(self, context):
-    nb_tex = len(self.clustering_texture)
+    nb_tex = len(self.clustering_texture_1)
     a = ana.Anatomist()
 
     curmon, monitor = mainThreadActions().call(get_screen_config)
@@ -113,10 +95,13 @@ def execution(self, context):
     t = []
     for i in xrange(nb_tex):
         mesh = a.loadObject(self.white_mesh[i])
-        texture = a.loadObject(self.clustering_texture[i])
-        texture.setPalette(palette='random', absoluteMode=True)
-        textured_mesh = a.fusionObjects([mesh, texture], method='FusionTexSurfMethod')
-        a.execute('TexturingParams', objects=[textured_mesh], interpolation='rgb')
+        texture1 = a.loadObject(self.clustering_texture_1[i])
+        texture2 = a.loadObject(self.clustering_texture_2[i])
+        texture1.setPalette(palette='random', absoluteMode=True)
+        texture2.setPalette(palette='random', absoluteMode=True)
+        multi_textures = a.fusionObjects([texture1, texture2], method='FusionMultiTextureMethod')
+        textured_mesh = a.fusionObjects([mesh, multi_textures], method='FusionTexSurfMethod')
+        a.execute('TexturingParams', objects=[texture1, texture2], interpolation='rgb')
         win = a.createWindow('Sagittal', block=block, no_decoration=False)
         win.addObjects(textured_mesh)
         w.append(win)
