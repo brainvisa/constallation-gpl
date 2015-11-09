@@ -76,7 +76,8 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters.
     """
-    self.linkParameters("reduced_individual_profile", "normed_individual_profile")
+    self.linkParameters("reduced_individual_profile",
+                        "normed_individual_profile")
 
 
 #----------------------------Main program--------------------------------------

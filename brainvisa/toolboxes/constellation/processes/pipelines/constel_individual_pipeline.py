@@ -55,7 +55,8 @@ signature = Signature(
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both", "vertex_corr": "Yes",
+                            "inflated": "No"}),
     "smoothing", Float(),
 )
 
@@ -94,8 +95,31 @@ def initialization(self):
                 self.signature["ROI"] = Choice(*s)
                 self.changeSignature(self.signature)
 
+    def linkSubject(self, dummy):
+        # restrict subject dir to the chosen database
+        if self.outputs_database is not None:
+            self.signature["dirsubject"].requiredAttributes = {
+                "_database": self.outputs_database}
+            self.changeSignature(self.signature)
+
+    def linkMesh(self, dummy):
+        if self.method == "avg":
+            if self.ROIs_segmentation is not None:
+                return self.signature["white_mesh"].findValue(
+                    self.ROIs_segmentation)
+            return None
+        else:
+            if self.dirsubject is not None:
+                atts = {"subject": self.dirsubject.get("subject")}
+                return self.signature["white_mesh"].findValue(atts)
+
     # link of parameters for autocompletion
     self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
+    self.linkParameters("white_mesh", ["dirsubject", "method",
+                                       "ROIs_segmentation"], linkMesh)
+    self.linkParameters(None, "outputs_database", linkSubject)
+    # initialize filter
+    linkSubject(self, self)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
@@ -254,6 +278,7 @@ def initialization(self):
                    ProcessExecutionNode("constel_individual_clustering",
                                         optional=1, selected=False))
 
+    eNode.ClusteringIntraSubjects.removeLink("ROIs_segmentation", "white_mesh")
     eNode.addDoubleLink("ClusteringIntraSubjects.reduced_individual_matrix",
                         "ReducedMatrix.reduced_individual_matrix")
     eNode.addDoubleLink("ClusteringIntraSubjects.ROIs_nomenclature",
