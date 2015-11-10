@@ -107,9 +107,7 @@ def initialization(self):
         """Function of link between the reduced connectivity matrices and
         the group matrix
         """
-        print 'link_matrices'
         if self.subjects_group and self.intersubject_reduced_matrices:
-            print 'make value'
             atts = dict(
                 self.intersubject_reduced_matrices[0].hierarchyAttributes())
             for att_name in [
@@ -120,8 +118,6 @@ def initialization(self):
                     del atts[att_name]
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.subjects_group.fullPath()))
-            print 'atts:', atts
-            print 'value:', self.signature["reduced_group_matrix"].findValue(atts)
             return self.signature["reduced_group_matrix"].findValue(atts)
 
     def linkClustering(self, dummy):
