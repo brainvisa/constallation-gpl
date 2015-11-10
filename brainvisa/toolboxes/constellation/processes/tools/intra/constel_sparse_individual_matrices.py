@@ -148,7 +148,6 @@ def execution(self, context):
     """   
     # selects the ROI label corresponding to ROI name
     ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
-    print ROIlabel
     
     # case 1
     # this command is mostly concerned with fibers leaving the brain stem

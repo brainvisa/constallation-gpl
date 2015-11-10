@@ -51,7 +51,7 @@ signature = Signature(
     "study_name", String(),
     "new_study_name", String(),
     "smoothing", Float(),
-    "subjects_group", ReadDiskItem("Group definition", "XML"),
+    "subjects_group", ReadDiskItem("Group definition", "XML", exactType=True),
     "mean_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
                      requiredAttributes={"normed": "No",
@@ -64,14 +64,14 @@ signature = Signature(
                                          "thresholded": "Yes",
                                          "averaged": "No",
                                          "intersubject": "No"})),
-    "average_mesh", ReadDiskItem("White Mesh", "Aims mesh formats",
-                                 requiredAttributes={"side": "both",
-                                                     "vertex_corr": "Yes",
-                                                     "averaged": "Yes"}),
     "ROIs_segmentation", ListOf(
         ReadDiskItem("ROI Texture", "Aims texture formats",
                      requiredAttributes={"side": "both",
                                          "vertex_corr": "Yes"})),
+    "average_mesh", ReadDiskItem("White Mesh", "Aims mesh formats",
+                                 requiredAttributes={"side": "both",
+                                                     "vertex_corr": "Yes",
+                                                     "averaged": "Yes"}),
 )
 
 
@@ -118,15 +118,12 @@ def initialization(self):
     def link_profiles(self, dummy):
         """Function of link to determine the connectivity profiles
         """
-        print 'link_profiles'
         if self.subjects_group and self.method and self.ROI \
                 and self.smoothing and self.study_name:
-            print 'there will be a value'
             registerClass("minf_2.0", Subject, "Subject")
             groupOfSubjects = readMinf(self.subjects_group.fullPath())
             profiles = []
             for subject in groupOfSubjects:
-                print "subject:", subject
                 atts = {}
                 atts["study"] = self.method
                 atts["gyrus"] = str(self.ROI)
@@ -134,15 +131,53 @@ def initialization(self):
                 atts["texture"] = self.study_name
                 atts["_database"] = self.subjects_group.get("_database")
                 atts.update(subject.attributes())
-                print 'atts:', atts
-                print 'subject.attributes():', subject.attributes()
                 profile = self.signature[
                     'mean_individual_profiles'].contentType.findValue(
                         atts) #, subject.attributes())
-                print 'profile:', profile
                 if profile is not None:
                     profiles.append(profile)
             return profiles
+
+    def linkMesh(self, dummy):
+        if self.ROIs_segmentation:
+            return self.signature["average_mesh"].findValue(
+                self.ROIs_segmentation[0])
+
+    def linkROIsegmentation(self, dummy):
+        if self.method == "avg":
+            if self.subjects_group is not None:
+                atts = {
+                    "freesurfer_group_of_subjects":
+                        self.subjects_group.get("group_of_subjects"),
+                    "group_of_subjects":
+                        self.subjects_group.get("group_of_subjects"),
+                }
+                roi_seg = self.signature[
+                    "ROIs_segmentation"].contentType.findValue(
+                        atts, requiredAttributes={"averaged": "Yes"})
+                if roi_seg:
+                    return [roi_seg]
+        else:
+            if self.subjects_group:
+                registerClass("minf_2.0", Subject, "Subject")
+                groupOfSubjects = readMinf(self.subjects_group.fullPath())
+                roi_seg = []
+                rdi = signature["ROIs_segmentation"].contentType
+                for subject in groupOfSubjects:
+                    req = {"averaged": "No", "subject": subject.subject}
+                    req.update(rdi.requiredAttributes)
+                    items = list(rdi.findValues({}, req, False))
+                    if len(items) == 1:
+                        roi_seg.append(items[0])
+                    elif len(items) > 1:
+                        # ambiguous. Find FS gyri (arbitrarily)
+                        prio = [item for item in items
+                                if '.aparc.annot.' in item.fullPath()]
+                        if prio:
+                            roi_seg.append(prio[0])
+                        else:
+                            roi_seg.append(items[0])
+                return roi_seg
 
     # link of parameters
     self.linkParameters(
@@ -151,6 +186,9 @@ def initialization(self):
          "subjects_group"), link_profiles)
     self.linkParameters(
         "normed_individual_profiles", "mean_individual_profiles")
+    self.linkParameters("ROIs_segmentation", ["subjects_group", "method"],
+                        linkROIsegmentation)
+    self.linkParameters("average_mesh", "ROIs_segmentation", linkMesh)
 
     # visibility level for the user
     self.signature["mean_individual_profiles"].userLevel = 3
