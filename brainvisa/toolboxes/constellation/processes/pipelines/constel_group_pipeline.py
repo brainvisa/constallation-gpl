@@ -118,15 +118,12 @@ def initialization(self):
     def link_profiles(self, dummy):
         """Function of link to determine the connectivity profiles
         """
-        print 'link_profiles'
         if self.subjects_group and self.method and self.ROI \
                 and self.smoothing and self.study_name:
-            print 'there will be a value'
             registerClass("minf_2.0", Subject, "Subject")
             groupOfSubjects = readMinf(self.subjects_group.fullPath())
             profiles = []
             for subject in groupOfSubjects:
-                print "subject:", subject
                 atts = {}
                 atts["study"] = self.method
                 atts["gyrus"] = str(self.ROI)
@@ -134,12 +131,9 @@ def initialization(self):
                 atts["texture"] = self.study_name
                 atts["_database"] = self.subjects_group.get("_database")
                 atts.update(subject.attributes())
-                print 'atts:', atts
-                print 'subject.attributes():', subject.attributes()
                 profile = self.signature[
                     'mean_individual_profiles'].contentType.findValue(
                         atts) #, subject.attributes())
-                print 'profile:', profile
                 if profile is not None:
                     profiles.append(profile)
             return profiles
