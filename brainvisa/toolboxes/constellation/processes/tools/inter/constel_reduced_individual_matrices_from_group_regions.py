@@ -219,7 +219,7 @@ def initialization(self):
     # define the main node of the pipeline
     eNode = ParallelExecutionNode(
         "Reduced_connectivity_matrix", parameterized=self,
-        possibleChildrenProcesses=["createReducedConnectivityMatrix"],
+        possibleChildrenProcesses=["constel_individual_reduced_matrix"],
         notify=True)
     self.setExecutionNode(eNode)
 
@@ -235,21 +235,21 @@ def initialization(self):
         partial(mapValuesToChildrenParameters, eNode,
                 eNode, "complete_individual_matrix",
                 "complete_individual_matrices",
-                defaultProcess="createReducedConnectivityMatrix",
-                name="createReducedConnectivityMatrix"))
+                defaultProcess="constel_individual_reduced_matrix",
+                name="constel_individual_reduced_matrix"))
 
     eNode.addLink(
         None, "intersubject_reduced_matrices",
         partial(mapValuesToChildrenParameters, eNode,
                 eNode, "reduced_individual_matrix",
                 "intersubject_reduced_matrices",
-                defaultProcess="createReducedConnectivityMatrix",
-                name="createReducedConnectivityMatrix"))
+                defaultProcess="constel_individual_reduced_matrix",
+                name="constel_individual_reduced_matrix"))
 
     eNode.addLink(
         None, "ROIs_segmentation",
         partial(mapValuesToChildrenParameters, eNode,
                 eNode, "ROIs_segmentation",
                 "ROIs_segmentation",
-                defaultProcess="createReducedConnectivityMatrix",
-                name="createReducedConnectivityMatrix"))
+                defaultProcess="constel_individual_reduced_matrix",
+                name="constel_individual_reduced_matrix"))
