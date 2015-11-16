@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short"/>
+    <d name="parameters">
+      <xhtml name="mean_individual_profiles"/>
+      <xhtml name="ROI">Due to the correspondence table imported in the "ROIs nomenclature", all names starting regions is recovered, you have to choose the region to study.</xhtml>
+      <xhtml name="normed_individual_profiles"/>
+      <xhtml name="average_mesh"/>
+      <xhtml name="new_study_name"/>
+      <xhtml name="study_name">This mandatory parameter is free and allows to give a name to the pipeline. The value of "study_name" will be integrated into each output file name as well as the directory of the database that retrieves the output files.</xhtml>
+      <xhtml name="smoothing"/>
+      <xhtml name="ROIs_nomenclature">Correspondence table between the names of the starting regions and their associated label. This is a text file organized as following:
+<ul>
+<li><b><i> first column: </i> </b>number of the region</li> 
+<li><b><i> second column: </i> </b>name of the region</li> 
+</ul>
+A correspondence table is the default gyri representing the atlas and Desikan Killiany.</xhtml>
+      <xhtml name="subjects_group"/>
+      <xhtml name="method">Two methods are proposed: <br/>
+<i><b>(1) "averaged approach" </b></i> to obtain a single result group. <br/>
+<i><b>(2) "concatenated approach"</b></i> to obtain individual results across the group.  <br/>
+<br/>
+<span style="text-decoration:underline">Implications of the choice of method on the parameter "ROIs_nomenclature":</span><br/>
+<i><b>(1) "averaged approach" </b></i>, in the context of this approach the "ROIs_nomenclature" parameter must be a file representing the average segmentation group of subjects <br/>
+<i><b>(2) "concatenated approach"</b></i>, the "ROIs_nomenclature" parameter is an individual segmentation. <br/>entation</xhtml>
+      <xhtml name="ROIs_segmentation">Segmentation by starting regions. (for example, the gyri segmentation of FreeSufer: Desikan-Killiany atlas) . A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>

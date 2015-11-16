@@ -4,8 +4,8 @@
   <d name="en">
     <xhtml name="short"/>
     <d name="parameters">
-      <xhtml name="normed_connectivity_profile"/>
-      <xhtml name="watershed"/>
+      <xhtml name="normed_individual_profile"/>
+      <xhtml name="reduced_individual_profile"/>
       <xhtml name="white_mesh">Indivdual both brain mesh</xhtml>
     </d>
     <xhtml name="long"/>

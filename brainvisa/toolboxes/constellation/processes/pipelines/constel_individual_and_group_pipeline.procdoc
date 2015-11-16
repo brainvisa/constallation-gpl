@@ -30,11 +30,11 @@ Une correspondance point-à-point entre les sujets est obligatoire afin de perme
     <xhtml name="long"/>
   </d>
   <d name="en">
-    <xhtml name="short">A complete pipeline: an intra_subject chain which builds the individual connectivity matrices. The preprocessings are done using FreeSurfer for the anatomical data, and Connectomist for the diffusion data.</xhtml>
+    <xhtml name="short"/>
     <d name="parameters">
       <xhtml name="ROI">Due to the correspondence table imported in the "ROIs nomenclature", all names starting regions is recovered, you have to choose the region to study.</xhtml>
       <xhtml name="white_mesh">Indivdual both brain mesh</xhtml>
-      <xhtml name="smoothing">Degree of smoothing (in millimetres)</xhtml>
+      <xhtml name="smoothing"/>
       <xhtml name="study_name">This mandatory parameter is free and allows to give a name to the pipeline. The value of "study_name" will be integrated into each output file name as well as the directory of the database that retrieves the output files.</xhtml>
       <xhtml name="dirsubject">This parameter is useful in two ways. It gives both the path to recover files fibers and the name of the subject. With the "format_fiber_tracts" parameter, the desired file extension are recovered.</xhtml>
       <xhtml name="ROIs_nomenclature">Correspondence table between the names of the starting regions and their associated label. This is a text file organized as following:
