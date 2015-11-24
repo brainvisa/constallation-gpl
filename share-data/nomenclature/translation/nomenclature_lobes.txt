@@ -1,0 +1,14 @@
+1 lh.unknown
+2 lh.temporal.lobe
+3 lh.limbic.lobe
+4 lh.frontal.lobe
+5 lh.occipital.lobe
+6 lh.parietal.lobe
+7 lh.insula
+8 rh.unknown
+9 rh.temporal.lobe
+10 rh.limbic.lobe
+11 rh.frontal.lobe
+12 rh.occipital.lobe
+13 rh.parietal.lobe
+14 rh.insula
