@@ -95,13 +95,6 @@ def initialization(self):
                 self.signature["ROI"] = Choice(*s)
                 self.changeSignature(self.signature)
 
-    def linkSubject(self, dummy):
-        # restrict subject dir to the chosen database
-        if self.outputs_database is not None:
-            self.signature["dirsubject"].requiredAttributes = {
-                "_database": self.outputs_database}
-            self.changeSignature(self.signature)
-
     def linkMesh(self, dummy):
         if self.method == "avg":
             if self.ROIs_segmentation is not None:
@@ -117,9 +110,6 @@ def initialization(self):
     self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
     self.linkParameters("white_mesh", ["dirsubject", "method",
                                        "ROIs_segmentation"], linkMesh)
-    self.linkParameters(None, "outputs_database", linkSubject)
-    # initialize filter
-    linkSubject(self, self)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
