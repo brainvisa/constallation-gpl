@@ -4,17 +4,21 @@
   <d name="en">
     <xhtml name="short">Connectivity matrices computation</xhtml>
     <d name="parameters">
-      <xhtml name="gyri_texture">Several possibilities depending on the study:<br/>
-<i>(1) Averaged approach:</i> average gyri segmentation corresponding to a group of subject<br/>
-<i>(2) Concatenated approach:</i> individual gyri segmentation</xhtml>
+      <xhtml name="ROI">Due to the correspondence table imported in the "ROIs nomenclature", all names starting regions is recovered, you have to choose the region to study.</xhtml>
       <xhtml name="dw_to_t1">Transformation from t2 to anat</xhtml>
-      <xhtml name="profile_of_distant_fibers"/>
-      <xhtml name="matrix_of_distant_fibers"/>
-      <xhtml name="oversampled_distant_fibers">Fibers are oversampled to attach its end leaving by the brain stem with the cortical surface.</xhtml>
-      <xhtml name="patch">Labels used to select a region was on subdivision into gyri of FreeSurfer. For instance, postcentral gyrus corresponds to 23. By default, pacth is not defined ("use_new_patch").</xhtml>
-      <xhtml name="matrix_of_fibers_near_cortex"/>
-      <xhtml name="filtered_length_fibers_near_cortex">Feature: Both ends of fibers are well identified as attached in such or such gyri</xhtml>
-      <xhtml name="profile_of_fibers_near_cortex"/>
+      <xhtml name="oversampled_semilabeled_fibers"/>
+      <xhtml name="labeled_fibers"/>
+      <xhtml name="ROIs_nomenclature">Correspondence table between the names of the starting regions and their associated label. This is a text file organized as following:
+<ul>
+<li><b><i> first column: </i> </b>number of the region</li> 
+<li><b><i> second column: </i> </b>name of the region</li> 
+</ul>
+A correspondence table is the default gyri representing the atlas and Desikan Killiany.</xhtml>
+      <xhtml name="profile_semilabeled_fibers"/>
+      <xhtml name="profile_labeled_fibers"/>
+      <xhtml name="ROIs_segmentation">Segmentation by starting regions. (for example, the gyri segmentation of FreeSufer: Desikan-Killiany atlas) . A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
+      <xhtml name="matrix_semilabeled_fibers"/>
+      <xhtml name="matrix_labeled_fibers"/>
       <xhtml name="white_mesh">Indivdual both brain mesh</xhtml>
     </d>
     <xhtml name="long">The cortical connectivity matrix of given patch is computed using tractography results and its individual cortical surface. This connectivity matrix is computed by counting fibers connecting cells of the patch to all others cells.</xhtml>

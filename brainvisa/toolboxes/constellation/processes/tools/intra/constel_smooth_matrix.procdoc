@@ -4,14 +4,18 @@
   <d name="en">
     <xhtml name="short">Smoothing on the connectivity matrix resulting from the addition of two matrices. </xhtml>
     <d name="parameters">
-      <xhtml name="gyri_texture">Several possibilities depending on the study:<br/>
-<i>(1) Averaged approach:</i> average gyri segmentation corresponding to a group of subject<br/>
-<i>(2) Concatenated approach:</i> individual gyri segmentation</xhtml>
-      <xhtml name="matrix_of_distant_fibers"/>
+      <xhtml name="ROI">Due to the correspondence table imported in the "ROIs nomenclature", all names starting regions is recovered, you have to choose the region to study.</xhtml>
+      <xhtml name="complete_individual_matrix"/>
+      <xhtml name="matrix_labeled_fibers"/>
       <xhtml name="smoothing">Degree of smoothing (in millimetres)</xhtml>
-      <xhtml name="matrix_of_fibers_near_cortex"/>
-      <xhtml name="complete_connectivity_matrix">complete connectivity matrix of size (patch vertices, cortex vertices)</xhtml>
-      <xhtml name="patch">Labels used to select a region was on subdivision into gyri of FreeSurfer. For instance, postcentral gyrus corresponds to 23. By default, pacth is not defined ("use_new_patch").</xhtml>
+      <xhtml name="ROIs_nomenclature">Correspondence table between the names of the starting regions and their associated label. This is a text file organized as following:
+<ul>
+<li><b><i> first column: </i> </b>number of the region</li> 
+<li><b><i> second column: </i> </b>name of the region</li> 
+</ul>
+A correspondence table is the default gyri representing the atlas and Desikan Killiany.</xhtml>
+      <xhtml name="ROIs_segmentation">Segmentation by starting regions. (for example, the gyri segmentation of FreeSufer: Desikan-Killiany atlas) . A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
+      <xhtml name="matrix_semilabeled_fibers"/>
       <xhtml name="white_mesh">Indivdual both brain mesh</xhtml>
     </d>
     <xhtml name="long">There are two matrices, ones for each type of fibers (near or distant of cortex),  and subsequently summed to give complete connectivity matrix (patch vertices, cortex vertices) .

@@ -4,13 +4,17 @@
   <d name="en">
     <xhtml name="short">Remove internals connection of patch and normalization of profile.</xhtml>
     <d name="parameters">
-      <xhtml name="patch_connectivity_profile"/>
-      <xhtml name="patch">Labels used to select a region was on subdivision into gyri of FreeSurfer. For instance, postcentral gyrus corresponds to 23. By default, pacth is not defined ("use_new_patch").</xhtml>
-      <xhtml name="gyri_texture">Several possibilities depending on the study:<br/>
-<i>(1) Averaged approach:</i> average gyri segmentation corresponding to a group of subject<br/>
-<i>(2) Concatenated approach:</i> individual gyri segmentation</xhtml>
-      <xhtml name="normed_connectivity_profile"/>
-      <xhtml name="white_mesh">Indivdual both brain mesh</xhtml>
+      <xhtml name="ROI">Due to the correspondence table imported in the "ROIs nomenclature", all names starting regions is recovered, you have to choose the region to study.</xhtml>
+      <xhtml name="keep_internal_connections"/>
+      <xhtml name="mean_individual_profile"/>
+      <xhtml name="ROIs_nomenclature">Correspondence table between the names of the starting regions and their associated label. This is a text file organized as following:
+<ul>
+<li><b><i> first column: </i> </b>number of the region</li> 
+<li><b><i> second column: </i> </b>name of the region</li> 
+</ul>
+A correspondence table is the default gyri representing the atlas and Desikan Killiany.</xhtml>
+      <xhtml name="normed_individual_profile"/>
+      <xhtml name="ROIs_segmentation">Segmentation by starting regions. (for example, the gyri segmentation of FreeSufer: Desikan-Killiany atlas) . A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
     </d>
     <xhtml name="long">The connectivity profile is normalized by the number of tracts reaching the patch.</xhtml>
   </d>
