@@ -9,7 +9,7 @@
 
 """
 This script does the following:
-*
+* get screen config
 *
 
 Main dependencies:
@@ -19,22 +19,24 @@ Author: Sandrine Lefranc, 2015
 
 #----------------------------Imports-------------------------------------------
 
+# module PyGt4
+from PyQt4 import QtGui
 
 # axon python API module
-from brainvisa.processes import *
+from brainvisa.processes import Signature, ListOf, ReadDiskItem, Integer, \
+    mainThreadActions, ValidationError
+
 try:
     from brainvisa import anatomist as ana
 except:
     pass
+
 
 def validation():
     try:
         from brainvisa import anatomist as ana
     except:
         raise ValidationError(_t_('Anatomist not available'))
-
-from soma.path import find_in_path
-from PyQt4 import QtGui
 
 
 #----------------------------Header--------------------------------------------
@@ -47,12 +49,14 @@ userLevel = 0
 signature = Signature(
     'clustering_texture', ListOf(
         ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
-        requiredAttributes={"roi_autodetect":"No",
-                            "roi_filtered":"No",
-                            "averaged":"No",
-                            "intersubject":"Yes",
-                            "step_time":"Yes"})),
+                     requiredAttributes={"roi_autodetect": "No",
+                                         "roi_filtered": "No",
+                                         "averaged": "No",
+                                         "intersubject": "Yes",
+                                         "step_time": "Yes"})),
     'white_mesh', ListOf(ReadDiskItem('White Mesh', 'Aims mesh formats')),
+    "min_width", Integer(),
+    "min_height", Integer(),
 )
 
 
@@ -60,65 +64,127 @@ signature = Signature(
 
 
 def initialization(self):
-    pass
+    """Provides default values and link of parameters"""
+
+    # optional value
+    self.setOptional("min_width")
+    self.setOptional("min_height")
+
+
+def get_screen_config():
+    """Collect the config of the screens :
+                - numbers of screen,
+                - size,
+                - resolution.
+    """
+    # the screen contains all monitors
+    desktop = QtGui.qApp.desktop()
+    print "desktop size: %d x %d" % (desktop.width(), desktop.height())
+
+    # collect data about each monitor
+    monitors = []
+    nmons = desktop.screenCount()
+    print "there are %d monitors" % nmons
+    for m in range(nmons):
+        mg = desktop.availableGeometry(m)
+        print "monitor %d: %d, %d, %d x %d" % (
+            m, mg.x(), mg.y(), mg.width(), mg.height())
+        monitors.append((mg.x(), mg.y(), mg.width(), mg.height()))
+        print "monitors --> ", monitors
+
+    # current monitor (test)
+    curmon = desktop.screenNumber(QtGui.QCursor.pos())
+    x, y, width, height = monitors[curmon]
+    print "monitor %d: %d x %d (current)" % (curmon, width, height)
+
+    return (curmon, width, height)
 
 
 #----------------------------Main program--------------------------------------
 
 
-def get_screen_config():
-    desktop = QtGui.qApp.desktop()
-    print "desktop size: %d x %d" % (desktop.width(), desktop.height())
-    monitors = []
-    nmons = desktop.screenCount()
-    print "there are %d monitors" % nmons
-    for m in range(nmons):
-        #mg = desktop.screen(m)
-        mg = desktop.availableGeometry(m)
-        print "monitor %d: %d, %d, %d x %d" % (m, mg.x(), mg.y(), mg.width(), mg.height())
-        monitors.append((mg.x(), mg.y(), mg.width(), mg.height()))
-#    # current monitor
-#    curmon = screen.get_monitor_at_window(screen.get_active_window())
-    curmon = desktop.screenNumber(QtGui.QCursor.pos())
-#    print "monitor %d: %d x %d (current)" % (curmon,width,height)  
-    #~print "monitor %d: %d x %d (current)" % (curmon,width,height)
-    return (curmon, monitors[curmon])
-
-    #window = gtk.Window()
-    ## the screen contains all monitors
-    #screen = window.get_screen()
-    #print "screen size: %d x %d" % (gtk.gdk.screen_width(),gtk.gdk.screen_height())
-    ## collect data about each monitor
-    #monitors = []
-    #nmons = screen.get_n_monitors()
-    #print "there are %d monitors" % nmons
-    #for m in range(nmons):
-        #mg = screen.get_monitor_geometry(m)
-        #print "monitor %d: %d x %d" % (m,mg.width,mg.height)
-        #monitors.append(mg)
-
-    ## current monitor
-    #curmon = screen.get_monitor_at_window(screen.get_active_window())
-    #x, y, width, height = monitors[curmon]
-    #print "monitor %d: %d x %d (current)" % (curmon,width,height)
-
 def execution(self, context):
-    nb_tex = len(self.clustering_texture)
+    """
+    """
+    # instance of anatomist
     a = ana.Anatomist()
 
-    curmon, monitor = mainThreadActions().call(get_screen_config)
-    block = a.createWindowsBlock(nbCols=3, nbRows=3)
+    # define screen config
+    curmon, width, height = mainThreadActions().call(get_screen_config)
 
+    # define the minimal values (width and height) of the image
+    min_width = self.min_width
+    min_height = self.min_height
+    if min_width is None or min_height is None:
+        min_width = 300
+        min_height = 200
+
+    # deduce the maximale number of lines and columns accepted
+    nb_rows = width / min_width
+    nb_columns = height / min_height
+
+    # define the number of files
+    nb_files = len(self.clustering_texture)
+
+    # define the number of cases in the block
+    nb_blocks = nb_rows*nb_columns
+
+    # generate the widgets
+    blocklist = []
+    for element in range(14):
+        blocklist.append(
+            a.createWindowsBlock(nbRows=nb_columns, nbCols=nb_rows))
+
+    # empty list to add the windows
     w = []
+
+    # empty list to add the objects
     t = []
-    for i in xrange(nb_tex):
+
+    count = 1
+    c = 0
+    for i in xrange(nb_files):
+        # load an object from a file (mesh, texture)
         mesh = a.loadObject(self.white_mesh[i])
-        texture = a.loadObject(self.clustering_texture[i])
-        texture.setPalette(palette='random', absoluteMode=True)
-        textured_mesh = a.fusionObjects([mesh, texture], method='FusionTexSurfMethod')
-        a.execute('TexturingParams', objects=[textured_mesh], interpolation='rgb')
-        win = a.createWindow('Sagittal', block=block, no_decoration=False)
-        win.addObjects(textured_mesh)
-        w.append(win)
-        t.append(textured_mesh)
+        roi_clustering = a.loadObject(self.clustering_texture[i])
+
+        # assign a palette to object
+        roi_clustering.setPalette(palette='random', absoluteMode=True)
+
+        # create a fusionned multi object that contains all given objects
+        textured_mesh = a.fusionObjects(
+            [mesh, roi_clustering], method='FusionTexSurfMethod')
+
+        # executes a command in anatomist application
+        a.execute(
+            'TexturingParams', objects=[textured_mesh], interpolation='rgb')
+
+        # create the first window
+        if i < (nb_blocks):
+            # create a new window and opens it
+            win = a.createWindow(
+                'Sagittal', block=blocklist[0], no_decoration=True)
+
+            # add objects in windows
+            win.addObjects(textured_mesh)
+
+            # create a list with all windows
+            w.append(win)
+
+            # create a list with all objects
+            t.append(textured_mesh)
+
+        # create the others
+        if i >= (nb_blocks) and (
+                count * (nb_blocks) <= i < (count+1) * (nb_blocks)):
+            c += 1
+            win2 = a.createWindow(
+                'Sagittal', block=blocklist[count], no_decoration=True)
+            win2.addObjects(textured_mesh)
+            w.append(win2)
+            t.append(textured_mesh)
+            if c == nb_blocks:
+                count += 1
+                c = 0
+
     return [w, t]
