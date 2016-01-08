@@ -10,9 +10,10 @@
 """
 This script does the following:
 * get screen config
-*
+* plotting the connectivity-based parcellation (clustering, basins)
+* the possibility to use the mesh : inflated, not inflated, group or individual
 
-Main dependencies:
+Main dependencies: PyQt4
 
 Author: Sandrine Lefranc, 2015
 """
@@ -36,25 +37,20 @@ def validation():
     try:
         from brainvisa import anatomist as ana
     except:
-        raise ValidationError(_t_('Anatomist not available'))
+        raise ValidationError(_t_("Anatomist not available"))
 
 
 #----------------------------Header--------------------------------------------
 
 
-name = 'Anatomist view Texture Time'
-roles = ('viewer',)
+name = "Anatomist Plotting Connectivity-based Parcellation"
+roles = ("viewer",)
 userLevel = 0
 
 signature = Signature(
-    'clustering_texture', ListOf(
-        ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
-                     requiredAttributes={"roi_autodetect": "No",
-                                         "roi_filtered": "No",
-                                         "averaged": "No",
-                                         "intersubject": "Yes",
-                                         "step_time": "Yes"})),
-    'white_mesh', ListOf(ReadDiskItem('White Mesh', 'Aims mesh formats')),
+    "connectivity_based_parcellation", ListOf(
+        ReadDiskItem("Connectivity ROI Texture", "anatomist texture formats")),
+    "white_mesh", ListOf(ReadDiskItem("White Mesh", "Aims mesh formats")),
     "min_width", Integer(),
     "min_height", Integer(),
 )
@@ -90,7 +86,6 @@ def get_screen_config():
         print "monitor %d: %d, %d, %d x %d" % (
             m, mg.x(), mg.y(), mg.width(), mg.height())
         monitors.append((mg.x(), mg.y(), mg.width(), mg.height()))
-        print "monitors --> ", monitors
 
     # current monitor (test)
     curmon = desktop.screenNumber(QtGui.QCursor.pos())
@@ -124,7 +119,7 @@ def execution(self, context):
     nb_columns = height / min_height
 
     # define the number of files
-    nb_files = len(self.clustering_texture)
+    nb_files = len(self.connectivity_based_parcellation)
 
     # define the number of cases in the block
     nb_blocks = nb_rows*nb_columns
@@ -146,24 +141,24 @@ def execution(self, context):
     for i in xrange(nb_files):
         # load an object from a file (mesh, texture)
         mesh = a.loadObject(self.white_mesh[i])
-        roi_clustering = a.loadObject(self.clustering_texture[i])
+        roi_clustering = a.loadObject(self.connectivity_based_parcellation[i])
 
         # assign a palette to object
-        roi_clustering.setPalette(palette='random', absoluteMode=True)
+        roi_clustering.setPalette(palette="random", absoluteMode=True)
 
         # create a fusionned multi object that contains all given objects
         textured_mesh = a.fusionObjects(
-            [mesh, roi_clustering], method='FusionTexSurfMethod')
+            [mesh, roi_clustering], method="FusionTexSurfMethod")
 
         # executes a command in anatomist application
         a.execute(
-            'TexturingParams', objects=[textured_mesh], interpolation='rgb')
+            "TexturingParams", objects=[textured_mesh], interpolation='rgb')
 
         # create the first window
         if i < (nb_blocks):
             # create a new window and opens it
             win = a.createWindow(
-                'Sagittal', block=blocklist[0], no_decoration=True)
+                "Sagittal", block=blocklist[0], no_decoration=True)
 
             # add objects in windows
             win.addObjects(textured_mesh)
@@ -179,7 +174,7 @@ def execution(self, context):
                 count * (nb_blocks) <= i < (count+1) * (nb_blocks)):
             c += 1
             win2 = a.createWindow(
-                'Sagittal', block=blocklist[count], no_decoration=True)
+                "Sagittal", block=blocklist[count], no_decoration=True)
             win2.addObjects(textured_mesh)
             w.append(win2)
             t.append(textured_mesh)
