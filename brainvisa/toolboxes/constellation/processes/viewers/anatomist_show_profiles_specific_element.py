@@ -28,7 +28,7 @@ Author: Sandrine Lefranc, 2015
 
 
 # axon python API module
-from brainvisa.processes import Signature, ReadDiskItem,
+from brainvisa.processes import Signature, ReadDiskItem
 
 try:
     from brainvisa import anatomist as ana
