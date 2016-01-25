@@ -13,7 +13,9 @@ This script does the following:
     - the parameters of a process (Signature),
     - the parameters initialization
     - the linked parameters
-*
+* calculate the matrix of size (clusters, basins)
+* calculate the same matrix with the values relative to the total number of
+  connections (per rows, in percent)
 
 Main dependencies: axon python API, soma-base, constel
 
@@ -23,14 +25,21 @@ Author: Sandrine Lefranc, 2015
 #----------------------------Imports-------------------------------------------
 
 
+# system module
+import numpy
+
 # axon python API modules
-from brainvisa.processes import Signature, ReadDiskItem, ValidationError, \
-    WriteDiskItem, Integer, String
+from brainvisa.processes import Signature, ReadDiskItem, Integer, String
+
+# soma module
+from soma import aims
 
 # constel modules
 try:
-    from constel.lib.connmatrix.connmatrixtools import compute_mclusters_by_nbasins_matrix
+    from constel.lib.connmatrix.connmatrixtools import \
+        compute_mclusters_by_nbasins_matrix
     from constel.lib.connmatrix.connmatrixtools import write_matrix2csv
+    from constel.lib.statistical_tools import calculate_percentage
 except:
     pass
 
@@ -43,25 +52,21 @@ userLevel = 2
 
 signature = Signature(
     # inputs
-    "reduced_matrix", ReadDiskItem("Connectivity Matrix", "Aims writable volume formats",
+    "reduced_matrix", ReadDiskItem(
+        "Connectivity Matrix", "Aims writable volume formats",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "Yes",
                             "dense": "No",
                             "intersubject": "Yes"}),
-    "filtered_basins", ReadDiskItem("Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "Yes",
-                            "roi_filtered": "Yes",
-                            "averaged": "Yes",
-                            "intersubject": "Yes",
-                            "step_time": "No"}),
-    "clustering", ReadDiskItem("Connectivity ROI Texture", "Aims texture formats",
+    "clustering", ReadDiskItem(
+        "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "No",
                             "roi_filtered": "No",
                             "averaged": "No",
                             "intersubject": "Yes",
                             "step_time": "Yes"}),
     "timestep", Integer(),
-    
+
     # outputs
     "csv_file", String(),
 )
@@ -80,9 +85,21 @@ def initialization(self):
 def execution(self, context):
     """
     """
-    reduced_matrix = aims.read(self.reduced_matrix)
+    # read the matrix by converting it into numpy array
+    reduced_matrix = aims.read(self.reduced_matrix.fullPath())
     matrix = numpy.array(reduced_matrix)[:, :, 0, 0]
-    parcels = aims.read(self.clustering)
-    m = compute_mclusters_by_nbasins_matrix(matrix, parcels, self.timestep, mode="meanOfProfiles")
-    write_matrix2csv(matrix, self.csv_file)
-    
+
+    # read the clusters texture by converting it into numpy array
+    clusters_aims = aims.read(self.clustering.fullPath())
+    clusters = clusters_aims[0].arraydata()
+
+    # give the matrix of size M(clusters, basins)
+    clusters_matrix = compute_mclusters_by_nbasins_matrix(
+        matrix, clusters, self.timestep, mode="mean")
+
+    # give the same matrix with the values relative to the total number of
+    # connections (per rows, in percent)
+    percent_matrix = calculate_percentage(clusters_matrix)
+
+    # write the results in a CSV file
+    write_matrix2csv(percent_matrix, self.csv_file)
