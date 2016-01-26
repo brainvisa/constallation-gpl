@@ -101,7 +101,7 @@ def afterChildAddedCallback(self, parent, key, child):
         "filtered_reduced_group_profile"]
     child.signature["white_mesh"] = parent.signature["average_mesh"]
     child.signature["reduced_individual_matrix"] = \
-        parent.signature["intersubject_reduced_matrices"]
+        parent.signature["intersubject_reduced_matrices"].contentType
 
     child.filtered_reduced_individual_profile = \
         parent.filtered_reduced_group_profile
