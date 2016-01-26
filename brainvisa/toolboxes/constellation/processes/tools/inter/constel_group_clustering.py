@@ -18,7 +18,7 @@ This script does the following:
 
 Main dependencies: Axon python API, Soma-base, constel
 
-Author: sandrine.lefranc@cea.fr
+Author: Sandrine Lefranc, 2015
 """
 
 #----------------------------Imports-------------------------------------------
@@ -27,7 +27,7 @@ Author: sandrine.lefranc@cea.fr
 import os
 
 # axon python API modules
-from brainvisa.processes import Signature, ListOf, Choice, Integer, \
+from brainvisa.processes import Signature, ListOf, Choice, Integer, String, \
     ReadDiskItem, WriteDiskItem, ValidationError
 
 # soma-base module
@@ -36,7 +36,7 @@ from soma import aims
 
 # constel module
 try:
-    from constel.lib.texturetools import identify_patch_number
+    from constel.lib.utils.files import select_ROI_number
 except:
     pass
 
@@ -66,6 +66,8 @@ signature = Signature(
                             "intersubject": "Yes"})),
     "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
+    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
+    "ROI", String(),
     "subjects_group", ReadDiskItem("Group definition", "XML"),
     "ROIs_segmentation", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
@@ -81,7 +83,7 @@ signature = Signature(
     "reduced_group_matrix", WriteDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "Yes",
+                            "reduced": "No",
                             "dense": "No",
                             "intersubject": "Yes"}),
     "ROI_clustering", ListOf(WriteDiskItem(
@@ -99,9 +101,20 @@ signature = Signature(
 
 def initialization(self):
     """Provides default values and link of parameters"""
-    
+
     # default value
     self.nb_clusters = 12
+    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue(
+        {"atlasname": "desikan_freesurfer"})
+
+    def link_matrix2ROI(self, dummy):
+        """Define the attribut 'gyrus' from fibertracts pattern for the
+        signature 'ROI'.
+        """
+        if self.intersubject_reduced_matrices:
+            s = self.intersubject_reduced_matrices[0].get("gyrus")
+            name = self.signature["ROI"].findValue(s)
+            return name
 
     def link_matrices(self, dummy):
         """Function of link between the reduced connectivity matrices and
@@ -111,44 +124,40 @@ def initialization(self):
             atts = dict(
                 self.intersubject_reduced_matrices[0].hierarchyAttributes())
             for att_name in [
-                    'name_serie', 'tracking_session',
-                    '_declared_attributes_location', 'analysis', '_ontology',
-                    'acquisition']:
+                    "name_serie", "tracking_session",
+                    "_declared_attributes_location", "analysis", "_ontology",
+                    "acquisition", "subject"]:
                 if att_name in atts:
                     del atts[att_name]
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.subjects_group.fullPath()))
+            if self.method == "avg":
+                atts["study"] = "avg"
+            else:
+                atts["study"] = "concat"
             return self.signature["reduced_group_matrix"].findValue(atts)
 
-    def linkClustering(self, dummy):
-        """function of link between clustering time and individualm reduced
+    def link_clustering(self, dummy):
+        """function of link between clustering time and individual reduced
         connectivity matrices
         """
         if self.subjects_group and self.intersubject_reduced_matrices:
-            tmp = dict(
-                self.intersubject_reduced_matrices[0].hierarchyAttributes())
-            if tmp["study"] == "avg":
+            if self.method == "avg":
                 atts = dict(
-                    self.intersubject_reduced_matrices[0].hierarchyAttributes())
+                    self.intersubject_reduced_matrices[0].hierarchyAttributes()
+                    )
                 atts["subject"] = "avgSubject"
-                for att_name in [
-                        'name_serie', 'tracking_session',
-                        '_declared_attributes_location', 'analysis',
-                        '_ontology', 'acquisition']:
-                    if att_name in atts:
-                        del atts[att_name]
-                return self.signature[
+                atts["study"] = "avg"
+                atts["tracking_session"] = None
+                filename = self.signature[
                     "ROI_clustering"].contentType.findValue(atts)
-            elif tmp["study"] == "concat":
+                return filename
+            else:
                 profiles = []
                 for matrix in self.intersubject_reduced_matrices:
                     atts = dict(matrix.hierarchyAttributes())
-                    for att_name in [
-                            'name_serie', 'tracking_session',
-                            '_declared_attributes_location', 'analysis',
-                            '_ontology', 'acquisition']:
-                        if att_name in atts:
-                            del atts[att_name]
+                    atts["study"] = "concat"
+                    atts["tracking_session"] = None
                     profile = self.signature[
                         'ROI_clustering'].contentType.findValue(atts)
                     if profile is not None:
@@ -157,12 +166,15 @@ def initialization(self):
 
     # link of parameters for autocompletion
     self.linkParameters(
-        "reduced_group_matrix", ("subjects_group",
-                                 "intersubject_reduced_matrices"),
+        "ROI", "intersubject_reduced_matrices", link_matrix2ROI)
+    self.linkParameters(
+        "reduced_group_matrix",
+        ("subjects_group", "intersubject_reduced_matrices", "method"),
         link_matrices)
     self.linkParameters(
-        "ROI_clustering", ("subjects_group", "intersubject_reduced_matrices",),
-        linkClustering)
+        "ROI_clustering",
+        ("subjects_group", "intersubject_reduced_matrices", "method"),
+        link_clustering)
 
 
 #----------------------------Main program--------------------------------------
@@ -175,8 +187,9 @@ def execution(self, context):
     classical kmedoids algorithm and the Euclidean distance between profiles
     as dissimilarity measure.
     """
-    # provides the patch name
-    patch = identify_patch_number(self.reduced_group_matrix.fullPath())
+    # selects the ROI label corresponding to ROI name
+    ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
+    context.write(ROIlabel)
 
     args = []
     for x in self.intersubject_reduced_matrices:
@@ -193,7 +206,10 @@ def execution(self, context):
         cmd_args += ["-p", t]
     for y in self.ROIs_segmentation:
         cmd_args += ["-t", y]
-    cmd_args += ["-m", self.average_mesh, "-l", str(patch),
-                 "-s", self.method, "-g", self.reduced_group_matrix, "-a", self.nb_clusters]
+    cmd_args += ["-m", self.average_mesh,
+                 "-l", str(ROIlabel),
+                 "-s", self.method,
+                 "-g", self.reduced_group_matrix,
+                 "-a", self.nb_clusters]
     context.system("python", find_in_path("constelInterSubjectClustering.py"),
                    *cmd_args)

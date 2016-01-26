@@ -56,9 +56,9 @@ signature = Signature(
     "normed_individual_profiles", ListOf(ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed": "Yes",
-                            "thresholded" :"Yes",
-                            "averaged" :"No",
-                            "intersubject" :"No"})),
+                            "thresholded": "Yes",
+                            "averaged": "No",
+                            "intersubject": "No"})),
     "subjects_group", ReadDiskItem("Group definition", "XML"),
     "new_study_name", String(),
 
@@ -112,8 +112,8 @@ def initialization(self):
                         atts["texture"] = profile.get("texture")
                     else:
                         atts["texture"] = self.new_study_name
-                    profile = self.signature[
-                        "new_normed_individual_profiles"].contentType.findValue(atts)
+                    profile = self.signature["new_normed_individual_profiles"
+                                             ].contentType.findValue(atts)
                     if profile is not None:
                         profiles.append(profile)
             return profiles
@@ -123,16 +123,19 @@ def initialization(self):
         """
         if self.subjects_group and self.normed_individual_profiles:
             atts = dict()
-            atts["_database"] = self.normed_individual_profiles[0].get("_database")
+            atts["_database"] = self.normed_individual_profiles[0].get(
+                "_database")
             atts["center"] = self.normed_individual_profiles[0].get("center")
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.subjects_group.fullPath()))
             if self.new_study_name is None:
-                atts["texture"] = self.normed_individual_profiles[0].get("texture")
+                atts["texture"] = self.normed_individual_profiles[0].get(
+                    "texture")
             else:
                 atts["texture"] = self.new_study_name
             atts["study"] = self.normed_individual_profiles[0].get("study")
-            atts["smoothing"] = self.normed_individual_profiles[0].get("smoothing")
+            atts["smoothing"] = self.normed_individual_profiles[0].get(
+                "smoothing")
             atts["gyrus"] = self.normed_individual_profiles[0].get("gyrus")
             atts['acquisition'] = ''
             atts['analysis'] = ''
@@ -145,7 +148,8 @@ def initialization(self):
 
     # link of parameters for autocompletion
     self.linkParameters("new_normed_individual_profiles", (
-        "normed_individual_profiles", "subjects_group", "new_study_name"), link_profiles)
+        "normed_individual_profiles", "subjects_group", "new_study_name"),
+        link_profiles)
     self.linkParameters(
         "group_profile",
         ("normed_individual_profiles", "subjects_group", "new_study_name"),
@@ -159,6 +163,7 @@ def execution(self, context):
     """ A connectivity profile is determinated on a range of subjects
     (for a group of subjects)
     """
+    context.write(self.normed_individual_profiles)
     context.system(sys.executable,
                    find_in_path("constelAvgConnectivityProfile.py"),
                    self.normed_individual_profiles,
