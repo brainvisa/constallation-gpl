@@ -25,19 +25,19 @@ insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}
 #----------------------------------filteredTracts------------------------------
 
 
-"{gyrus}", SetContent(     
+"{gyrus}", SetContent(
 "filteredTracts", SetContent(
 
     "<subject>_<texture>_<gyrus>_outsideFibersOfCortex_{smallerlength2}to{greaterlength2}mm_oversampled",
         SetType("Filtered Fascicles Bundles"),
         SetWeakAttr("both_ends_labelled", "No",
                     "oversampled", "Yes"),
-            
+
     "<subject>_<texture>_<gyrus>_fibersNearCortex_{smallerlength1}to{greaterlength1}mm",
         SetType("Filtered Fascicles Bundles"),
         SetWeakAttr("both_ends_labelled", "Yes",
                     "oversampled", "No"),
-            
+
     "<subject>_<texture>_<gyrus>_outsideFibersOfCortex_{smallerlength2}to{greaterlength2}mm",
         SetType("Filtered Fascicles Bundles"),
         SetWeakAttr("both_ends_labelled", "No",
@@ -65,9 +65,9 @@ insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}
                     "averaged", "No",
                     "intersubject", "No",
                     "both_ends_labelled", "Yes"),
-        
+
     "<subject>_<texture>_<gyrus>_connectivityMatrix_outsideFibersOfCortex_{smallerlength2}to{greaterlength2}mm",
-        SetType("Connectivity Matrix"), 
+        SetType("Connectivity Matrix"),
         SetWeakAttr("ends_labelled", "single",
                     "reduced", "No",
                     "dense", "No",
@@ -80,14 +80,14 @@ insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}
                     "averaged", "No",
                     "intersubject", "No",
                     "both_ends_labelled", "No"),
-        
+
     "<subject>_<texture>_<gyrus>_connectivityMatrixSmooth{smoothing}",
         SetType("Connectivity Matrix"),
         SetWeakAttr("ends_labelled", "mixed",
                     "reduced", "No",
                     "dense", "No",
                     "intersubject", "No"),
-        
+
     "<subject>_<texture>_<gyrus>_patchConnectivityMatrix",
         SetType("Connectivity Matrix"),
         SetWeakAttr("ends_labelled", "mixed",
@@ -100,8 +100,8 @@ insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}
 #----------------------------------clustering----------------------------------
 
 "clustering", SetContent(
-"{smoothing}", SetContent(
-    
+"smooth{smoothing}", SetContent(
+
     "<subject>_<texture>_<gyrus>_meanConnectivityProfile",
         SetType("Connectivity Profile Texture"),
         SetWeakAttr("normed", "No",
@@ -185,7 +185,7 @@ insert("{center}/group_analysis/{group_of_subjects}",
 #----------------------------------Group result--------------------------------
 
 "{gyrus}", SetContent(
-"{smoothing}", SetContent(
+"smooth{smoothing}", SetContent(
 
     "<group_of_subjects>_<study>_<texture>_<gyrus>_mask",
         SetType("Mask Texture"),
@@ -233,9 +233,9 @@ insert("{center}/group_analysis/{group_of_subjects}",
                     "reduced", "No",
                     "dense", "No",
                     "intersubject", "Yes"),
-            
+
 #----------------------------------Individual Result---------------------------
-          
+
 "{subject}", SetContent(
 
     "<group_of_subjects>_<study>_<texture>_<gyrus>_<subject>_ConnectivityProfile_nb_normed",
@@ -251,7 +251,7 @@ insert("{center}/group_analysis/{group_of_subjects}",
                     "reduced", "Yes",
                     "dense", "No",
                     "intersubject", "Yes"),
-        
+
     "<group_of_subjects>_<study>_<texture>_<gyrus>_<subject>_clusteringTime",
         SetType("Connectivity ROI Texture"),
         SetWeakAttr("roi_autodetect", "No",
@@ -267,4 +267,4 @@ insert("{center}/group_analysis/{group_of_subjects}",
 ), # end study
 ), # end connectivity_clustering
 ) # end
- 
+
