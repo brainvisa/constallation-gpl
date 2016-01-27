@@ -113,7 +113,9 @@ def execution(self, context):
     context.system("AimsMeshWatershed.py",
                    self.normed_group_profile,
                    self.average_mesh,
-                   self.reduced_group_profile)
+                   self.reduced_group_profile,
+                   "--threshold", 0.05,
+                   "--mode", "or")
 
     # execute the command
     context.system(sys.executable,
