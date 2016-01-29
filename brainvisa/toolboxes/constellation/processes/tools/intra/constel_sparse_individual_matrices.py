@@ -108,7 +108,7 @@ signature = Signature(
 
 def initialization(self):
     """Provides default values and link of parameters"""
-    # default value    
+    # default value
     self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
 
     def link_fibertracts2ROI(self, dummy):
@@ -131,8 +131,6 @@ def initialization(self):
         "profile_semilabeled_fibers", "matrix_semilabeled_fibers")
     self.linkParameters(
         "profile_labeled_fibers", "matrix_labeled_fibers")
-    self.linkParameters("dw_to_t1", "labeled_fibers")
-
 
 #----------------------------Main program--------------------------------------
 
@@ -145,10 +143,10 @@ def execution(self, context):
                 one end only of fibers is identified
     (2) case 2:computes connectivity matrix for fibers near cortex
                both ends of fibers are well identified
-    """   
+    """
     # selects the ROI label corresponding to ROI name
     ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
-    
+
     # case 1
     # this command is mostly concerned with fibers leaving the brain stem
     context.system("constelConnectivityMatrix",
