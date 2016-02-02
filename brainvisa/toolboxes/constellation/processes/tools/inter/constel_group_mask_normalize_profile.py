@@ -24,12 +24,11 @@ Author: sandrine.lefranc@cea.fr
 
 
 # python system module
-import os
 import sys
 
 # Axon python API module
-from brainvisa.processes import Signature, ListOf, ReadDiskItem, String, \
-    WriteDiskItem, ValidationError
+from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
+    ValidationError
 
 # soma-base module
 from soma.path import find_in_path
@@ -55,84 +54,30 @@ signature = Signature(
     "group_mask", ReadDiskItem("Mask Texture", "Aims texture formats"),
     "group_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed":"No",
-                            "thresholded":"No",
-                            "averaged":"Yes",
-                            "intersubject":"Yes"}),
-    "thresholded_group_profile", WriteDiskItem(
-        "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed":"No",
-                            "thresholded":"Yes",
-                            "averaged":"Yes",
-                            "intersubject":"Yes"}),
+        requiredAttributes={"normed": "No",
+                            "thresholded": "No",
+                            "averaged": "Yes",
+                            "intersubject": "Yes"}),
     "normed_group_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed":"Yes",
-                            "thresholded":"Yes",
-                            "averaged":"Yes",
-                            "intersubject":"Yes"}),)
+        requiredAttributes={"normed": "Yes",
+                            "thresholded": "Yes",
+                            "averaged": "Yes",
+                            "intersubject": "Yes"}),)
 
 
 def initialization(self):
     """Provides default values and link of parameters"""
 
-    def link_profiles(self, dummy):
-        """
-        """
-        if self.group_profile is not None:
-            atts = dict()
-            atts["_database"] = self.group_profile.get("_database")
-            atts["center"] = self.group_profile.get("center")
-            atts["group_of_subjects"] = self.group_profile.get(
-                "group_of_subjects")
-            atts["texture"] = self.group_profile.get("texture")
-            atts["study"] = self.group_profile.get("study")
-            atts["smoothing"] = self.group_profile.get("smoothing")
-            atts["gyrus"] = self.group_profile.get("gyrus")
-            atts['acquisition'] = ''
-            atts['analysis'] = ''
-            atts['tracking_session'] = ''
-            atts["intersubject"] = "Yes"
-            atts["averaged"] = "Yes"
-            atts["normed"] = "No"
-            atts["thresholded"] = "Yes"
-            return self.signature["thresholded_group_profile"].findValue(atts)
-
-    def link_gprofiles(self, dummy):
-        """
-        """
-        if self.thresholded_group_profile is not None:
-            atts = dict()
-            atts["_database"] = self.thresholded_group_profile.get("_database")
-            atts["center"] = self.thresholded_group_profile.get("center")
-            atts["group_of_subjects"] = self.thresholded_group_profile.get("group_of_subjects")
-            atts["texture"] = self.thresholded_group_profile.get("texture")
-            atts["study"] = self.thresholded_group_profile.get("study")
-            atts["smoothing"] = self.thresholded_group_profile.get("smoothing")
-            atts["gyrus"] = self.thresholded_group_profile.get("gyrus")
-            atts['acquisition'] = ''
-            atts['analysis'] = ''
-            atts['tracking_session'] = ''
-            atts["intersubject"] = "Yes"
-            atts["averaged"] = "Yes"
-            atts["normed"] = "Yes"
-            atts["thresholded"] = "Yes"
-            return self.signature["normed_group_profile"].findValue(atts)
-
     self.linkParameters("group_profile", "group_mask")
-    self.linkParameters(
-        "thresholded_group_profile",
-        "group_profile", link_profiles)
-    self.linkParameters(
-        "normed_group_profile",
-        "thresholded_group_profile", link_gprofiles)
+    self.linkParameters("normed_group_profile", "group_profile")
 
 
 #----------------------------Main program--------------------------------------
 
 
 def execution(self, context):
-    """
+    """Execute the command to create a group profile normed.
     """
     context.system(sys.executable,
                    find_in_path("constelNormProfile.py"),
