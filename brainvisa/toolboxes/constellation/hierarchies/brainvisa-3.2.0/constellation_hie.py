@@ -197,13 +197,6 @@ insert("{center}/group_analysis/{group_of_subjects}",
                     "averaged", "Yes",
                     "intersubject", "Yes"),
 
-    "<group_of_subjects>_<study>_<texture>_<gyrus>_thresholdedMeanConnectivityProfile",
-        SetType("Connectivity Profile Texture"),
-        SetWeakAttr("normed", "No",
-                    "thresholded", "Yes",
-                    "averaged", "Yes",
-                    "intersubject", "Yes"),
-
     "<group_of_subjects>_<study>_<texture>_<gyrus>_normedMeanConnectivityProfile",
         SetType("Connectivity Profile Texture"),
         SetWeakAttr("normed", "Yes",
@@ -237,13 +230,6 @@ insert("{center}/group_analysis/{group_of_subjects}",
 #----------------------------------Individual Result---------------------------
 
 "{subject}", SetContent(
-
-    "<group_of_subjects>_<study>_<texture>_<gyrus>_<subject>_ConnectivityProfile_nb_normed",
-        SetType("Connectivity Profile Texture"),
-        SetWeakAttr("normed", "Yes",
-                    "thresholded", "Yes",
-                    "averaged", "No",
-                    "intersubject", "Yes"),
 
     "<group_of_subjects>_<study>_<texture>_<gyrus>_<subject>_reducedMatrix",
         SetType("Connectivity Matrix"),
