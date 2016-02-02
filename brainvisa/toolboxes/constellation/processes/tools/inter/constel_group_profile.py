@@ -63,12 +63,6 @@ signature = Signature(
     "new_study_name", String(),
 
     # --outputs--
-    "new_normed_individual_profiles", ListOf(WriteDiskItem(
-        "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "Yes",
-                            "thresholded": "Yes",
-                            "averaged": "No",
-                            "intersubject": "Yes"})),
     "group_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed": "No",
@@ -86,37 +80,6 @@ def initialization(self):
 
     # optional value
     self.setOptional("new_study_name")
-
-    def link_profiles(self, dummy):
-        """Function of link between individual profiles and normed profiles.
-        """
-        profiles = []
-        if self.normed_individual_profiles and self.subjects_group:
-            for profile in self.normed_individual_profiles:
-                if not profile:
-                    profiles.append(None)
-                else:
-                    atts = dict()
-                    atts["_database"] = profile.get("_database")
-                    atts["center"] = profile.get("center")
-                    atts["subject"] = profile.get("subject")
-                    atts["smoothing"] = profile.get("smoothing")
-                    atts["group_of_subjects"] = os.path.basename(
-                        os.path.dirname(self.subjects_group.fullPath()))
-                    atts["study"] = profile.get("study")
-                    atts["gyrus"] = profile.get("gyrus")
-                    atts['acquisition'] = ''
-                    atts['analysis'] = ''
-                    atts['tracking_session'] = ''
-                    if self.new_study_name is None:
-                        atts["texture"] = profile.get("texture")
-                    else:
-                        atts["texture"] = self.new_study_name
-                    profile = self.signature["new_normed_individual_profiles"
-                                             ].contentType.findValue(atts)
-                    if profile is not None:
-                        profiles.append(profile)
-            return profiles
 
     def link_group_profiles(self, dummy):
         """Function of link between individual profiles and group profile.
@@ -147,9 +110,6 @@ def initialization(self):
             return self.signature["group_profile"].findValue(atts)
 
     # link of parameters for autocompletion
-    self.linkParameters("new_normed_individual_profiles", (
-        "normed_individual_profiles", "subjects_group", "new_study_name"),
-        link_profiles)
     self.linkParameters(
         "group_profile",
         ("normed_individual_profiles", "subjects_group", "new_study_name"),
@@ -167,5 +127,4 @@ def execution(self, context):
     context.system(sys.executable,
                    find_in_path("constelAvgConnectivityProfile.py"),
                    self.normed_individual_profiles,
-                   self.new_normed_individual_profiles,
                    self.group_profile)
