@@ -69,8 +69,30 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters"""
 
+    def link_normprofile(self, dummy):
+        """
+        """
+        if self.group_profile is not None:
+            atts = dict()
+            atts["_database"] = self.group_profile.get("_database")
+            atts["center"] = self.group_profile.get("center")
+            atts["group_of_subjects"] = self.group_profile.get("group_of_subjects")
+            atts["texture"] = self.group_profile.get("texture")
+            atts["study"] = self.group_profile.get("study")
+            atts["smoothing"] = self.group_profile.get("smoothing")
+            atts["gyrus"] = self.group_profile.get("gyrus")
+            atts['acquisition'] = ''
+            atts['analysis'] = ''
+            atts['tracking_session'] = ''
+            atts["intersubject"] = "Yes"
+            atts["averaged"] = "Yes"
+            atts["normed"] = "Yes"
+            atts["thresholded"] = "Yes"
+            return self.signature["normed_group_profile"].findValue(atts)
+
+
     self.linkParameters("group_profile", "group_mask")
-    self.linkParameters("normed_group_profile", "group_profile")
+    self.linkParameters("normed_group_profile", "group_profile", link_normprofile)
 
 
 #----------------------------Main program--------------------------------------
