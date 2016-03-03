@@ -60,6 +60,6 @@ def initialization(self):
 def execution(self, context):
     context.system('python', find_in_path(
                    'constelGyriTextureCleaningIsolatedVertices.py'),
-                   '-i', self.gyri_texture,
-                   '-m', self.mesh,
-                   '-o', self.clean_gyri_texture)
+                   self.gyri_texture,
+                   self.mesh,
+                   self.clean_gyri_texture)
