@@ -13,6 +13,7 @@
 14 lh.lingual
 15 lh.medialorbitofrontal
 16 lh.middletemporal
+17 lh.parahippocampal
 18 lh.paracentral 
 19 lh.parsopercularis
 20 lh.parsorbitalis
