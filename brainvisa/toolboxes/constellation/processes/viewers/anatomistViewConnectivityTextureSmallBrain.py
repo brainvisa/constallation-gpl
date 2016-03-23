@@ -126,7 +126,7 @@ def execution_mainthread(self, context):
         # compute the reduce matrix for each cluster
         # M(parcels_number, basins_number)
         reduced_matrix = clcmt.compute_mclusters_by_nbasins_matrix(
-            numpy.transpose(matrix), aims_clusters, self.time_step[index])
+            matrix, aims_clusters, self.time_step[index])
         reduced_matrix = numpy.asarray(reduced_matrix)
 
         # create a bouding box from mesh
@@ -257,8 +257,7 @@ def execution_mainthread(self, context):
     ana_major_texture = a.loadObject(self.major_texture)
 
     # define a palette
-    ana_major_texture.setPalette(
-        palette="parcellation720", minVal=11, maxVal=730, absoluteMode=True)
+    ana_major_texture.setPalette(palette="parcellation720")
 
     # fusion between mesh and texure
     major_textured_mesh = a.fusionObjects(
