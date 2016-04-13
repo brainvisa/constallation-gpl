@@ -56,7 +56,7 @@ signature = Signature(
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes",
-                            "inflated": "No"}),
+                            "inflated": "No", "averaged": "No"}),
     "smoothing", Float(),
 )
 
@@ -105,6 +105,27 @@ def initialization(self):
             else:
                 self.setValue('ROI', current, True)
 
+    def method_changed(self, dummy):
+        signature = self.signature
+        if self.method == "avg":
+            signature["ROIs_segmentation"] = ReadDiskItem(
+                "ROI Texture", "Aims texture formats",
+                requiredAttributes={"side": "both", "vertex_corr": "Yes",
+                                    "averaged": "Yes"})
+            self.changeSignature(signature)
+            self.setValue("ROIs_segmentation",
+                          signature["ROIs_segmentation"].findValue(
+                              self.dirsubject), True)
+        else:
+            signature["ROIs_segmentation"] = ReadDiskItem(
+                "ROI Texture", "Aims texture formats",
+                requiredAttributes={"side": "both", "vertex_corr": "Yes",
+                                    "averaged": "No"})
+            self.changeSignature(signature)
+            self.setValue("ROIs_segmentation",
+                          signature["ROIs_segmentation"].findValue(
+                              self.dirsubject), True)
+
     def linkMesh(self, dummy):
         if self.method == "avg":
             if self.ROIs_segmentation is not None:
@@ -118,8 +139,10 @@ def initialization(self):
 
     # link of parameters for autocompletion
     self.linkParameters(None, "ROIs_nomenclature", reset_roi)
-    #self.linkParameters("white_mesh", ["dirsubject", "method",
+    self.linkParameters(None, "method", method_changed)
+    self.linkParameters("white_mesh", "dirsubject") #, "method",
                                        #"ROIs_segmentation"], linkMesh)
+    method_changed(self, self.method)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
