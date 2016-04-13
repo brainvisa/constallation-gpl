@@ -16,13 +16,13 @@ from brainvisa import anatomist
 
 name = 'Anatomist view connectivity'
 userLevel = 0
-roles = ('viewer', )
+#roles = ('viewer', )
 
 signature = Signature(
     'bundles', ReadDiskItem(
         'Fascicles bundles', 'Aims readable bundles formats'),
     'dw_to_t1', ReadDiskItem(
-        'Transformation matrix', 'Transformation matrix'),
+        'Transform T2 Diffusion MR to Raw T1 MRI', 'Transformation matrix'),
     'white_mesh', ReadDiskItem(
         'White Mesh', 'anatomist mesh formats',
         requiredAttributes={"side":"both",
@@ -32,10 +32,32 @@ signature = Signature(
         'Connectivity ROI Texture', 'anatomist texture formats'),
     'cluster_number', String(), 
     'max_number_of_fibers', Integer(),
-    'clustering_texture_timestep', Integer(), )
+    'clustering_texture_timestep', Integer(),
+    'inflated_mesh', Boolean(),
+)
 
 def initialization( self ):
+    def link_mesh(self, dummy):
+        if self.bundles is not None:
+            atts = ['center', 'subject']
+            datts = dict([(att, self.bundles.get(att)) for att in atts
+                           if self.bundles.get(att) is not None])
+            datts['inflated'] = 'Yes'
+            yes_no = ['Yes', 'No']
+            datts['inflated'] = yes_no[1 - int(self.inflated_mesh)]
+            print 'link_mesh, datts:', datts
+            res = self.signature['white_mesh'].findValue(datts)
+            if res is None:
+                datts['inflated'] = yes_no[int(self.inflated_mesh)]
+                print 'try other mesh:', datts
+                res = self.signature['white_mesh'].findValue(datts)
+            print 'res:', res
+            return res
+
+    self.inflated_mesh = True
     self.linkParameters('bundles', 'clustering_texture')
+    self.linkParameters('dw_to_t1', 'bundles')
+    self.linkParameters('white_mesh', ['bundles', 'inflated_mesh'], link_mesh)
     self.max_number_of_fibers = 10000
     self.clustering_texture_timestep = 0
 
