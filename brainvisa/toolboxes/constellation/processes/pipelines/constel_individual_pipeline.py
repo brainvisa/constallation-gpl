@@ -25,7 +25,7 @@ Author: Sandrine Lefranc, 2015
 # Axon python API modules
 from brainvisa.processes import Signature, String, Choice, ReadDiskItem, \
     Float, OpenChoice, neuroHierarchy, SerialExecutionNode, \
-    ProcessExecutionNode
+    ProcessExecutionNode, WriteDiskItem
 
 # constel module
 try:
@@ -42,7 +42,7 @@ userLevel = 0
 
 signature = Signature(
     #inputs
-    "study_name", String(),
+    "study_name", OpenChoice(),
     "outputs_database", Choice(),
     "format_fiber_tracts", Choice("bundles", "trk"),
     "method", Choice(
@@ -82,6 +82,15 @@ def initialization(self):
     self.smoothing = 3.0
     self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
+
+    def fill_study_choice(self, dummy=None):
+        if self.outputs_database is not None:
+            database = neuroHierarchy.databases.database(self.outputs_database)
+            self.signature['study_name'].setChoices(
+                *[x[0] for x in database.findAttributes(
+                    ['study'], _type='Filtered Fascicles Bundles')])
+        else:
+            self.signature['study_name'].setChoices()
 
     def reset_roi(self, dummy):
         """ This callback reads the ROIs nomenclature and proposes them in the
@@ -137,12 +146,14 @@ def initialization(self):
                 atts = {"subject": self.dirsubject.get("subject")}
                 return self.signature["white_mesh"].findValue(atts)
 
+    fill_study_choice(self)
     # link of parameters for autocompletion
     self.linkParameters(None, "ROIs_nomenclature", reset_roi)
     self.linkParameters(None, "method", method_changed)
     self.linkParameters("white_mesh", "dirsubject") #, "method",
                                        #"ROIs_segmentation"], linkMesh)
     method_changed(self, self.method)
+    self.linkParameters(None, "outputs_database", fill_study_choice)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
