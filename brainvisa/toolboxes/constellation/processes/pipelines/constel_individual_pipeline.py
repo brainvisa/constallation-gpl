@@ -133,9 +133,7 @@ def initialization(self):
                 requiredAttributes={"side": "both", "vertex_corr": "Yes",
                                     "averaged": "No"})
             self.changeSignature(signature)
-            self.setValue("ROIs_segmentation",
-                          signature["ROIs_segmentation"].findValue(
-                              self.dirsubject), True)
+            self.setValue("ROIs_segmentation", link_roi(self), True)
         fill_study_choice(self)
 
     def linkMesh(self, dummy):
@@ -149,7 +147,7 @@ def initialization(self):
                 atts = {"subject": self.dirsubject.get("subject")}
                 return self.signature["white_mesh"].findValue(atts)
 
-    def link_roi(self, dummy):
+    def link_roi(self, dummy=None):
         if self.method == "avg" and self.study_name:
             # just in case study_name corresponds to subjects group...
             res = self.signature["ROIs_segmentation"].findValue(
