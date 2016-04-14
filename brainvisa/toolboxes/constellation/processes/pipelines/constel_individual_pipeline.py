@@ -146,7 +146,6 @@ def initialization(self):
                 atts = {"subject": self.dirsubject.get("subject")}
                 return self.signature["white_mesh"].findValue(atts)
 
-    fill_study_choice(self)
     # link of parameters for autocompletion
     self.linkParameters(None, "ROIs_nomenclature", reset_roi)
     self.linkParameters(None, "method", method_changed)
@@ -324,3 +323,7 @@ def initialization(self):
     eNode.addDoubleLink("ClusteringIntraSubjects.white_mesh", "white_mesh")
 
     self.setExecutionNode(eNode)
+
+    fill_study_choice(self)
+    if len(self.signature['study_name'].values) != 0:
+        self.study_name = self.signature['study_name'].values[0][0]
