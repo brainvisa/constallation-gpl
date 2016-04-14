@@ -42,11 +42,11 @@ userLevel = 0
 
 signature = Signature(
     #inputs
+    "method", Choice(
+        ("averaged approach", "avg"), ("concatenated approach", "concat")),
     "study_name", OpenChoice(),
     "outputs_database", Choice(),
     "format_fiber_tracts", Choice("bundles", "trk"),
-    "method", Choice(
-        ("averaged approach", "avg"), ("concatenated approach", "concat")),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
     "ROI", OpenChoice(),
     "dirsubject", ReadDiskItem("subject", "directory"),
@@ -86,9 +86,11 @@ def initialization(self):
     def fill_study_choice(self, dummy=None):
         if self.outputs_database is not None:
             database = neuroHierarchy.databases.database(self.outputs_database)
+            sel = {"study": self.method}
             self.signature['study_name'].setChoices(
                 *sorted([x[0] for x in database.findAttributes(
-                    ['texture'], _type='Filtered Fascicles Bundles')]))
+                    ['texture'], selection=sel,
+                    _type='Filtered Fascicles Bundles')]))
         else:
             self.signature['study_name'].setChoices()
 
@@ -134,6 +136,7 @@ def initialization(self):
             self.setValue("ROIs_segmentation",
                           signature["ROIs_segmentation"].findValue(
                               self.dirsubject), True)
+        fill_study_choice(self)
 
     def linkMesh(self, dummy):
         if self.method == "avg":
@@ -146,6 +149,24 @@ def initialization(self):
                 atts = {"subject": self.dirsubject.get("subject")}
                 return self.signature["white_mesh"].findValue(atts)
 
+    def link_roi(self, dummy):
+        if self.method == "avg" and self.study_name:
+            # just in case study_name corresponds to subjects group...
+            res = self.signature["ROIs_segmentation"].findValue(
+                {"freesurfer_group_of_subjects": self.study_name})
+            if res is None:
+                res = self.signature["ROIs_segmentation"].findValue(
+                    {"group_of_subjects": self.study_name})
+            return res
+        elif self.method == "concat" and self.dirsubject is not None:
+            res = self.signature["ROIs_segmentation"].findValue(
+                self.dirsubject)
+            if res is None:
+                res = self.signature["ROIs_segmentation"].findValue(
+                    self.dirsubject,
+                    requiredAttributes={"_type": "BothResampledGyri"})
+            return res
+
     # link of parameters for autocompletion
     self.linkParameters(None, "ROIs_nomenclature", reset_roi)
     self.linkParameters(None, "method", method_changed)
@@ -153,6 +174,8 @@ def initialization(self):
                                        #"ROIs_segmentation"], linkMesh)
     method_changed(self, self.method)
     self.linkParameters(None, "outputs_database", fill_study_choice)
+    self.linkParameters("ROIs_segmentation",
+                        ["study_name", "dirsubject", "method"], link_roi)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
