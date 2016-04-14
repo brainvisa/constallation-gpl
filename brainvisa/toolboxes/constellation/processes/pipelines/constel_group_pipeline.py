@@ -24,13 +24,15 @@ Author: Sandrine Lefranc, 2015
 
 # axon python API modules
 from brainvisa.processes import Signature, Choice, ReadDiskItem, OpenChoice, \
-    String, Float, ListOf, SerialExecutionNode, ProcessExecutionNode
-from soma.minf.api import registerClass, readMinf
+    String, Float, ListOf, SerialExecutionNode, ProcessExecutionNode, \
+    ValidationError
 from brainvisa.group_utils import Subject
 
-# Plot constel module
+# soma module
+from soma.minf.api import registerClass, readMinf
+
+# constel module
 try:
-    import constel
     from constel.lib.utils.files import read_file
 except:
     raise ValidationError("Please make sure that constel module is installed.")
@@ -51,7 +53,7 @@ signature = Signature(
     "study_name", String(),
     "new_study_name", String(),
     "smoothing", Float(),
-    "subjects_group", ReadDiskItem("Group definition", "XML", exactType=True),
+    "subjects_group", ReadDiskItem("Group definition", "XML"),
     "mean_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
                      requiredAttributes={"normed": "No",
@@ -132,8 +134,7 @@ def initialization(self):
                 atts["_database"] = self.subjects_group.get("_database")
                 atts.update(subject.attributes())
                 profile = self.signature[
-                    'mean_individual_profiles'].contentType.findValue(
-                        atts) #, subject.attributes())
+                    "mean_individual_profiles"].contentType.findValue(atts)
                 if profile is not None:
                     profiles.append(profile)
             return profiles
@@ -148,13 +149,13 @@ def initialization(self):
             if self.subjects_group is not None:
                 atts = {
                     "freesurfer_group_of_subjects":
-                        self.subjects_group.get("group_of_subjects"),
+                    self.subjects_group.get("group_of_subjects"),
                     "group_of_subjects":
-                        self.subjects_group.get("group_of_subjects"),
+                    self.subjects_group.get("group_of_subjects"),
                 }
                 roi_seg = self.signature[
                     "ROIs_segmentation"].contentType.findValue(
-                        atts, requiredAttributes={"averaged": "Yes"})
+                    atts, requiredAttributes={"averaged": "Yes"})
                 if roi_seg:
                     return [roi_seg]
         else:
@@ -186,8 +187,8 @@ def initialization(self):
          "subjects_group"), link_profiles)
     self.linkParameters(
         "normed_individual_profiles", "mean_individual_profiles")
-    self.linkParameters("ROIs_segmentation", ["subjects_group", "method"],
-                        linkROIsegmentation)
+    #self.linkParameters("ROIs_segmentation", ["subjects_group", "method"],
+    #                    linkROIsegmentation)
     self.linkParameters("average_mesh", "ROIs_segmentation", linkMesh)
 
     # visibility level for the user

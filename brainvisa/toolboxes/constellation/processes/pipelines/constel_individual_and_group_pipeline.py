@@ -23,10 +23,12 @@ Author: Sandrine Lefranc, 2015
 
 
 from brainvisa.processes import Signature, String, Choice, ReadDiskItem, \
-    Float, SerialExecutionNode, ProcessExecutionNode, neuroHierarchy
+    Float, SerialExecutionNode, ProcessExecutionNode, neuroHierarchy, \
+    ValidationError, OpenChoice
 
+# constel module
 try:
-    import constel
+    from constel.lib.utils.files import read_file
 except:
     raise ValidationError("Please make sure that constel module is installed.")
 
@@ -41,11 +43,11 @@ signature = Signature(
     # inputs
     "study_name", String(),
     "outputs_database", Choice(),
-    "format_fiber_tracts", Choice(),
+    "format_fiber_tracts", Choice("bundles", "trk"),
     "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
-    "ROI", String(),
+    "ROI", OpenChoice(),
     "dirsubject", ReadDiskItem("subject", "directory"),
     "ROIs_segmentation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
@@ -54,13 +56,19 @@ signature = Signature(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     "smoothing", Float(),
+    "subjects_group", ReadDiskItem("Group definition", "XML"),
+    "new_study_name", String(),
+    "average_mesh", ReadDiskItem("White Mesh", "Aims mesh formats",
+                                 requiredAttributes={"side": "both",
+                                                     "vertex_corr": "Yes",
+                                                     "averaged": "Yes"}),
 )
 
 
 #----------------------------Functions-----------------------------------------
 
 
-def initialization( self ):
+def initialization(self):
     """Provides default values and link of parameters
     """
     # list of possible databases, while respecting the ontology
@@ -73,9 +81,13 @@ def initialization( self ):
     else:
         self.signature["outputs_database"] = OpenChoice()
 
+    # optional value
+    self.setOptional("new_study_name")
+
     # default value
     self.smoothing = 3.0
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue(
+        {"atlasname": "desikan_freesurfer"})
 
     def link_roi(self, dummy):
         """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
@@ -92,13 +104,48 @@ def initialization( self ):
     # link of parameters for autocompletion
     self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
     eNode = SerialExecutionNode(self.name, parameterized=self)
-    
-    #eNode.addChild(
-        #"pipelineIntra", ProcessExecutionNode("constel_individual_pipeline",
-        #    optional=1))
+
+    ###########################################################################
+    #      link of parameters for the Constellation Individual Pipeline       #
+    ###########################################################################
+
+    eNode.addChild(
+        "pipelineIntra", ProcessExecutionNode("constel_individual_pipeline",
+                                              optional=1))
+
+    eNode.pipelineIntra.removeLink("ROI", "ROIs_nomenclature")
+
+    eNode.addDoubleLink("pipelineIntra.study_name", "study_name")
+    eNode.addDoubleLink("pipelineIntra.outputs_database", "outputs_database")
+    eNode.addDoubleLink(
+        "pipelineIntra.format_fiber_tracts", "format_fiber_tracts")
+    eNode.addDoubleLink("pipelineIntra.method", "method")
+    eNode.addDoubleLink("pipelineIntra.ROIs_nomenclature", "ROIs_nomenclature")
+    eNode.addDoubleLink("pipelineIntra.ROI", "ROI")
+    eNode.addDoubleLink("pipelineIntra.dirsubject", "dirsubject")
+    eNode.addDoubleLink("pipelineIntra.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("pipelineIntra.white_mesh", "white_mesh")
+    eNode.addDoubleLink("pipelineIntra.smoothing", "smoothing")
+
+    ###########################################################################
+    #        link of parameters for the Constellation Group Pipeline          #
+    ###########################################################################
 
     eNode.addChild(
         "pipelineInter", ProcessExecutionNode("constel_group_pipeline",
                                               optional=1))
-    
+
+    eNode.pipelineInter.removeLink("ROI", "ROIs_nomenclature")
+    eNode.pipelineInter.removeLink("average_mesh", "ROIs_nomenclature")
+
+    eNode.addDoubleLink("pipelineInter.method", "method")
+    eNode.addDoubleLink("pipelineInter.ROIs_nomenclature", "ROIs_nomenclature")
+    eNode.addDoubleLink("pipelineInter.ROI", "ROI")
+    eNode.addDoubleLink("pipelineInter.study_name", "study_name")
+    eNode.addDoubleLink("pipelineInter.new_study_name", "new_study_name")
+    eNode.addDoubleLink("pipelineInter.smoothing", "smoothing")
+    eNode.addDoubleLink("pipelineInter.subjects_group", "subjects_group")
+    #eNode.addDoubleLink("pipelineInter.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("pipelineInter.average_mesh", "average_mesh")
+
     self.setExecutionNode(eNode)

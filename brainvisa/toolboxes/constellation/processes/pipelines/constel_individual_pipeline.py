@@ -108,8 +108,8 @@ def initialization(self):
 
     # link of parameters for autocompletion
     self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
-    self.linkParameters("white_mesh", ["dirsubject", "method",
-                                       "ROIs_segmentation"], linkMesh)
+    #self.linkParameters("white_mesh", ["dirsubject", "method",
+                                       #"ROIs_segmentation"], linkMesh)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
@@ -161,6 +161,7 @@ def initialization(self):
     eNode.addDoubleLink(
         "ConnectivityMatrix.ROIs_segmentation", "ROIs_segmentation")
     eNode.addDoubleLink("ConnectivityMatrix.white_mesh", "white_mesh")
+    #eNode.filter.removeLink("dw_to_t1", "labeled_fibers")
     eNode.addDoubleLink("ConnectivityMatrix.dw_to_t1", "filter.dw_to_t1")
 
     ###########################################################################
