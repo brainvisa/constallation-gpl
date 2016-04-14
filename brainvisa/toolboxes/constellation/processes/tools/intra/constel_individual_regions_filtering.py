@@ -109,17 +109,27 @@ def initialization(self):
     # default value
     self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
 
-    def link_roi(self, dummy):
-        """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
-        of process.
+    def reset_roi(self, dummy):
+        """ This callback reads the ROIs nomenclature and proposes them in the
+        signature 'ROI' of process.
+        It also resets the ROI paramter to default state after
+        the nomenclature changes.
         """
+        current = self.ROI
+        self.setValue('ROI', current, True)
         if self.ROIs_nomenclature is not None:
-            s = ["Select a ROI in this list"]
+            s = [("Select a ROI in this list", None)]
+            # temporarily set a value which will remain valid
+            self.ROI = s[0][1]
             s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
             self.signature["ROI"].setChoices(*s)
-            if isinstance(self.signature['ROI'], OpenChoice):
+            if isinstance(self.signature["ROI"], OpenChoice):
                 self.signature["ROI"] = Choice(*s)
                 self.changeSignature(self.signature)
+            if current not in s:
+                self.setValue('ROI', s[0][1], True)
+            else:
+                self.setValue('ROI', current, True)
 
     def link_matrix2ROI(self, dummy):
         """Define the attribut 'ROI' from fibertracts pattern for the
@@ -130,7 +140,7 @@ def initialization(self):
             name = self.signature["ROI"].findValue(s)
         return name
 
-    self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
+    self.linkParameters(None, "ROIs_nomenclature", reset_roi)
     self.linkParameters(
         "ROI", "complete_individual_matrix", link_matrix2ROI)
     self.linkParameters("reduced_individual_profile", "complete_individual_matrix")

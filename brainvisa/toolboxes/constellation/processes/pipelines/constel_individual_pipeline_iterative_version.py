@@ -47,11 +47,11 @@ userLevel = 0
 
 signature = Signature(
     #inputs
-    "study_name", String(),
-    "outputs_database", Choice(),
-    "format_fiber_tracts", Choice("bundles", "trk"),
     "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
+    "study_name", OpenChoice(),
+    "outputs_database", Choice(),
+    "format_fiber_tracts", Choice("bundles", "trk"),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
     "ROI", OpenChoice(),
     "dirsubject", ListOf(ReadDiskItem("subject", "directory")),
@@ -73,7 +73,9 @@ def afterChildAddedCallback(self, parent, key, child):
     """
     """
     # remove link of the sub process
-    child.removeLink("ROI", "ROIs_nomenclature")
+    child.removeLink("white_mesh", "dirsubject")
+    child.removeLink("ROIs_segmentation",
+                     ["study_name", "dirsubject", "method"])
 
     # Set default values
     child.study_name = parent.study_name
@@ -124,22 +126,94 @@ def initialization(self):
     self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
-    def link_roi(self, dummy):
-        """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
-        of process.
+    def fill_study_choice(self, dummy=None):
+        if self.outputs_database is not None:
+            database = neuroHierarchy.databases.database(self.outputs_database)
+            sel = {"study": self.method}
+            self.signature['study_name'].setChoices(
+                *sorted([x[0] for x in database.findAttributes(
+                    ['texture'], selection=sel,
+                    _type='Filtered Fascicles Bundles')]))
+        else:
+            self.signature['study_name'].setChoices()
+
+    def reset_roi(self, dummy):
+        """ This callback reads the ROIs nomenclature and proposes them in the
+        signature 'ROI' of process.
+        It also resets the ROI paramter to default state after
+        the nomenclature changes.
         """
+        current = self.ROI
+        self.setValue('ROI', current, True)
         if self.ROIs_nomenclature is not None:
-            s = ["Select a ROI in this list"]
+            s = [("Select a ROI in this list", None)]
+            # temporarily set a value which will remain valid
+            self.ROI = s[0][1]
             s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
             self.signature["ROI"].setChoices(*s)
             if isinstance(self.signature["ROI"], OpenChoice):
                 self.signature["ROI"] = Choice(*s)
                 self.changeSignature(self.signature)
+            if current not in s:
+                self.setValue('ROI', s[0][1], True)
+            else:
+                self.setValue('ROI', current, True)
+
+    def method_changed(self, dummy):
+        signature = self.signature
+        if self.method == "avg":
+            item_type = ReadDiskItem(
+                "ROI Texture", "Aims texture formats",
+                requiredAttributes={"side": "both", "vertex_corr": "Yes",
+                                    "averaged": "Yes"})
+        else:
+            item_type = ReadDiskItem(
+                "ROI Texture", "Aims texture formats",
+                requiredAttributes={"side": "both", "vertex_corr": "Yes",
+                                    "averaged": "No"})
+        signature["ROIs_segmentation"] = ListOf(item_type)
+        self.changeSignature(signature)
+        self.setValue("ROIs_segmentation", link_roi(self), True)
+        fill_study_choice(self)
+
+    #def linkMesh(self, dummy):
+        #item_type = self.signature["white_mesh"]
+        #if self.method == "avg":
+            #return [item_type.findValue(roi_seg)
+                    #for roi_seg in self.ROIs_segmentation]
+        #else:
+            #return [item_type.findValue({"subject": dirsubject.get("subject")})
+                    #for dirsubject in self.dirsubject]
+
+    def link_roi(self, dummy=None):
+        if self.method == "avg" and self.study_name:
+            # just in case study_name corresponds to subjects group...
+            res = self.signature["ROIs_segmentation"].findValue(
+                {"freesurfer_group_of_subjects": self.study_name})
+            if res is None:
+                res = self.signature["ROIs_segmentation"].findValue(
+                    {"group_of_subjects": self.study_name})
+            if res is not None:
+                return [res] * len(self.executionNode().childrenNames())
+        elif self.method == "concat" and self.dirsubject is not None:
+            item_type = self.signature["ROIs_segmentation"].contentType
+            res = [item_type.findValue(dirsubject)
+                   for dirsubject in self.dirsubject]
+            if res == [None] * len(self.dirsubject):
+                res = [item_type.findValue(dirsubject,
+                          requiredAttributes={"_type": "BothResampledGyri"})
+                       for dirsubject in self.dirsubject]
+            return res
 
     # link of parameters for autocompletion
-    self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
+    self.linkParameters(None, "ROIs_nomenclature", reset_roi)
+    self.linkParameters(None, "method", method_changed)
+    self.linkParameters("white_mesh", "dirsubject")
+    self.linkParameters(None, "outputs_database", fill_study_choice)
+    self.linkParameters("ROIs_segmentation",
+                        ["study_name", "dirsubject", "method"], link_roi)
 
-   # define the main node of the pipeline
+    # define the main node of the pipeline
     eNode = ParallelExecutionNode(
         "Pipeline_iterative_version", parameterized=self,
         possibleChildrenProcesses=["constel_individual_pipeline"],
@@ -176,3 +250,7 @@ def initialization(self):
                 "ROIs_segmentation",
                 defaultProcess="constel_individual_pipeline",
                 name="constel_individual_pipeline"))
+
+    fill_study_choice(self)
+    if len(self.signature['study_name'].values) != 0:
+        self.study_name = self.signature['study_name'].values[0][0]

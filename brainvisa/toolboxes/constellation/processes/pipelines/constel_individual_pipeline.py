@@ -25,7 +25,7 @@ Author: Sandrine Lefranc, 2015
 # Axon python API modules
 from brainvisa.processes import Signature, String, Choice, ReadDiskItem, \
     Float, OpenChoice, neuroHierarchy, SerialExecutionNode, \
-    ProcessExecutionNode
+    ProcessExecutionNode, WriteDiskItem
 
 # constel module
 try:
@@ -42,11 +42,11 @@ userLevel = 0
 
 signature = Signature(
     #inputs
-    "study_name", String(),
-    "outputs_database", Choice(),
-    "format_fiber_tracts", Choice("bundles", "trk"),
     "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
+    "study_name", OpenChoice(),
+    "outputs_database", Choice(),
+    "format_fiber_tracts", Choice("bundles", "trk"),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
     "ROI", OpenChoice(),
     "dirsubject", ReadDiskItem("subject", "directory"),
@@ -56,7 +56,7 @@ signature = Signature(
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes",
-                            "inflated": "No"}),
+                            "inflated": "No", "averaged": "No"}),
     "smoothing", Float(),
 )
 
@@ -83,17 +83,58 @@ def initialization(self):
     self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
-    def link_roi(self, dummy):
-        """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
-        of process.
+    def fill_study_choice(self, dummy=None):
+        if self.outputs_database is not None:
+            database = neuroHierarchy.databases.database(self.outputs_database)
+            sel = {"study": self.method}
+            self.signature['study_name'].setChoices(
+                *sorted([x[0] for x in database.findAttributes(
+                    ['texture'], selection=sel,
+                    _type='Filtered Fascicles Bundles')]))
+        else:
+            self.signature['study_name'].setChoices()
+
+    def reset_roi(self, dummy):
+        """ This callback reads the ROIs nomenclature and proposes them in the
+        signature 'ROI' of process.
+        It also resets the ROI paramter to default state after
+        the nomenclature changes.
         """
+        current = self.ROI
+        self.setValue('ROI', current, True)
         if self.ROIs_nomenclature is not None:
-            s = ["Select a ROI in this list"]
+            s = [("Select a ROI in this list", None)]
+            # temporarily set a value which will remain valid
+            self.ROI = s[0][1]
             s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
             self.signature["ROI"].setChoices(*s)
             if isinstance(self.signature["ROI"], OpenChoice):
                 self.signature["ROI"] = Choice(*s)
                 self.changeSignature(self.signature)
+            if current not in s:
+                self.setValue('ROI', s[0][1], True)
+            else:
+                self.setValue('ROI', current, True)
+
+    def method_changed(self, dummy):
+        signature = self.signature
+        if self.method == "avg":
+            signature["ROIs_segmentation"] = ReadDiskItem(
+                "ROI Texture", "Aims texture formats",
+                requiredAttributes={"side": "both", "vertex_corr": "Yes",
+                                    "averaged": "Yes"})
+            self.changeSignature(signature)
+            self.setValue("ROIs_segmentation",
+                          signature["ROIs_segmentation"].findValue(
+                              self.dirsubject), True)
+        else:
+            signature["ROIs_segmentation"] = ReadDiskItem(
+                "ROI Texture", "Aims texture formats",
+                requiredAttributes={"side": "both", "vertex_corr": "Yes",
+                                    "averaged": "No"})
+            self.changeSignature(signature)
+            self.setValue("ROIs_segmentation", link_roi(self), True)
+        fill_study_choice(self)
 
     def linkMesh(self, dummy):
         if self.method == "avg":
@@ -106,10 +147,33 @@ def initialization(self):
                 atts = {"subject": self.dirsubject.get("subject")}
                 return self.signature["white_mesh"].findValue(atts)
 
+    def link_roi(self, dummy=None):
+        if self.method == "avg" and self.study_name:
+            # just in case study_name corresponds to subjects group...
+            res = self.signature["ROIs_segmentation"].findValue(
+                {"freesurfer_group_of_subjects": self.study_name})
+            if res is None:
+                res = self.signature["ROIs_segmentation"].findValue(
+                    {"group_of_subjects": self.study_name})
+            return res
+        elif self.method == "concat" and self.dirsubject is not None:
+            res = self.signature["ROIs_segmentation"].findValue(
+                self.dirsubject)
+            if res is None:
+                res = self.signature["ROIs_segmentation"].findValue(
+                    self.dirsubject,
+                    requiredAttributes={"_type": "BothResampledGyri"})
+            return res
+
     # link of parameters for autocompletion
-    self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
-    #self.linkParameters("white_mesh", ["dirsubject", "method",
+    self.linkParameters(None, "ROIs_nomenclature", reset_roi)
+    self.linkParameters(None, "method", method_changed)
+    self.linkParameters("white_mesh", "dirsubject") #, "method",
                                        #"ROIs_segmentation"], linkMesh)
+    method_changed(self, self.method)
+    self.linkParameters(None, "outputs_database", fill_study_choice)
+    self.linkParameters("ROIs_segmentation",
+                        ["study_name", "dirsubject", "method"], link_roi)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
@@ -280,3 +344,7 @@ def initialization(self):
     eNode.addDoubleLink("ClusteringIntraSubjects.white_mesh", "white_mesh")
 
     self.setExecutionNode(eNode)
+
+    fill_study_choice(self)
+    if len(self.signature['study_name'].values) != 0:
+        self.study_name = self.signature['study_name'].values[0][0]
