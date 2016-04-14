@@ -88,7 +88,7 @@ def initialization(self):
             database = neuroHierarchy.databases.database(self.outputs_database)
             self.signature['study_name'].setChoices(
                 *sorted([x[0] for x in database.findAttributes(
-                    ['study'], _type='Filtered Fascicles Bundles')]))
+                    ['texture'], _type='Filtered Fascicles Bundles')]))
         else:
             self.signature['study_name'].setChoices()
 
