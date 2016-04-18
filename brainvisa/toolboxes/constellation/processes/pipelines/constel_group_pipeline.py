@@ -25,7 +25,7 @@ Author: Sandrine Lefranc, 2015
 # axon python API modules
 from brainvisa.processes import Signature, Choice, ReadDiskItem, OpenChoice, \
     String, Float, ListOf, SerialExecutionNode, ProcessExecutionNode, \
-    ValidationError
+    ValidationError, neuroHierarchy
 from brainvisa.group_utils import Subject
 
 # soma module
@@ -50,7 +50,7 @@ signature = Signature(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
     "ROI", OpenChoice(),
-    "study_name", String(),
+    "study_name", OpenChoice(),
     "new_study_name", String(),
     "smoothing", Float(),
     "subjects_group", ReadDiskItem("Group definition", "XML"),
@@ -102,20 +102,50 @@ def initialization(self):
     # optional value
     self.setOptional("new_study_name")
 
-    def link_roi(self, dummy):
-        """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
-        of process.
+    def fill_study_choice(self, dummy=None):
+        databases = [h.name for h in neuroHierarchy.hierarchies()
+                     if h.fso.name == "brainvisa-3.2.0"]
+        choices = set()
+        for db_name in databases:
+            database = neuroHierarchy.databases.database(db_name)
+            sel = {"study": self.method}
+            choices.update(
+                [x[0] for x in database.findAttributes(
+                    ['texture'], selection=sel,
+                    _type='Filtered Fascicles Bundles')])
+        self.signature['study_name'].setChoices(*sorted(choices))
+        if len(choices) != 0 and self.isDefault('study_name') \
+                and self.study_name not in choices:
+            self.setValue('study_name', list(choices)[0], True)
+
+    def reset_roi(self, dummy):
+        """ This callback reads the ROIs nomenclature and proposes them in the
+        signature 'ROI' of process.
+        It also resets the ROI paramter to default state after
+        the nomenclature changes.
         """
+        current = self.ROI
+        self.setValue('ROI', current, True)
         if self.ROIs_nomenclature is not None:
-            s = ["Select a ROI in this list"]
+            s = [("Select a ROI in this list", None)]
+            # temporarily set a value which will remain valid
+            self.ROI = s[0][1]
             s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
             self.signature["ROI"].setChoices(*s)
             if isinstance(self.signature["ROI"], OpenChoice):
                 self.signature["ROI"] = Choice(*s)
                 self.changeSignature(self.signature)
+            if current not in s:
+                self.setValue('ROI', s[0][1], True)
+            else:
+                self.setValue('ROI', current, True)
 
-    # link of parameters for autocompletion
-    self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
+    def method_changed(self, dummy):
+        if self.method == "avg":
+            pass
+        else:
+            pass
+        fill_study_choice(self)
 
     def link_profiles(self, dummy):
         """Function of link to determine the connectivity profiles
@@ -139,17 +169,12 @@ def initialization(self):
                     profiles.append(profile)
             return profiles
 
-    def linkMesh(self, dummy):
-        if self.ROIs_segmentation:
-            return self.signature["average_mesh"].findValue(
-                self.ROIs_segmentation[0])
-
     def linkROIsegmentation(self, dummy):
         if self.method == "avg":
             if self.subjects_group is not None:
                 atts = {
                     "freesurfer_group_of_subjects":
-                    self.subjects_group.get("group_of_subjects"),
+                    self.subjects_group.get("freesurfer_group_of_subjects"),
                     "group_of_subjects":
                     self.subjects_group.get("group_of_subjects"),
                 }
@@ -180,6 +205,10 @@ def initialization(self):
                             roi_seg.append(items[0])
                 return roi_seg
 
+    # link of parameters for autocompletion
+    self.linkParameters(None, "ROIs_nomenclature", reset_roi)
+    self.linkParameters(None, "method", method_changed)
+
     # link of parameters
     self.linkParameters(
         "mean_individual_profiles",
@@ -187,9 +216,9 @@ def initialization(self):
          "subjects_group"), link_profiles)
     self.linkParameters(
         "normed_individual_profiles", "mean_individual_profiles")
-    #self.linkParameters("ROIs_segmentation", ["subjects_group", "method"],
-    #                    linkROIsegmentation)
-    self.linkParameters("average_mesh", "ROIs_segmentation", linkMesh)
+    self.linkParameters("ROIs_segmentation", ["subjects_group", "method"],
+                        linkROIsegmentation)
+    self.linkParameters("average_mesh", "subjects_group") #, linkMesh)
 
     # visibility level for the user
     self.signature["mean_individual_profiles"].userLevel = 3
@@ -289,3 +318,7 @@ def initialization(self):
                         "ReducedGroupMatrix.intersubject_reduced_matrices")
 
     self.setExecutionNode(eNode)
+
+    fill_study_choice(self)
+    if len(self.signature['study_name'].values) != 0:
+        self.study_name = self.signature['study_name'].values[0][0]

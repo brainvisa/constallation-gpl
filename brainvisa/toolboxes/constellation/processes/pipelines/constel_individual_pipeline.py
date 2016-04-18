@@ -84,15 +84,18 @@ def initialization(self):
         {"atlasname": "desikan_freesurfer"})
 
     def fill_study_choice(self, dummy=None):
+        choices = set()
         if self.outputs_database is not None:
             database = neuroHierarchy.databases.database(self.outputs_database)
             sel = {"study": self.method}
-            self.signature['study_name'].setChoices(
-                *sorted([x[0] for x in database.findAttributes(
+            choices.update(
+                [x[0] for x in database.findAttributes(
                     ['texture'], selection=sel,
-                    _type='Filtered Fascicles Bundles')]))
-        else:
-            self.signature['study_name'].setChoices()
+                    _type='Filtered Fascicles Bundles')])
+        self.signature['study_name'].setChoices(*sorted(choices))
+        if len(choices) != 0 and self.isDefault('study_name') \
+                and self.study_name not in choices:
+            self.setValue('study_name', list(choices)[0], True)
 
     def reset_roi(self, dummy):
         """ This callback reads the ROIs nomenclature and proposes them in the
