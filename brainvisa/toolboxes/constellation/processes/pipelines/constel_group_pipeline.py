@@ -50,13 +50,23 @@ if neuroConfig.gui:
     from PyQt4 import QtGui, QtCore
     from brainvisa.data.qt4gui.readdiskitemGUI import DiskItemEditor
     from brainvisa.processing.qt4gui.neuroProcessesGUI import showProcess
+    from soma.wip.application.api import findIconFile
+    from brainvisa.data.qtgui.neuroDataGUI import buttonIconSize, buttonMargin
 
-    class GroupCreatorEditor( DiskItemEditor ):
+    class GroupCreatorEditor(DiskItemEditor):
         def __init__(self, parameter, parent, name,
                      write=False, context=None):
             super(GroupCreatorEditor, self).__init__(parameter, parent, name,
                                                      write, context)
-            create_btn = QtGui.QPushButton('new')
+            if not hasattr(GroupCreatorEditor, 'new_icon'):
+                GroupCreatorEditor.new_icon \
+                    = QtGui.QIcon(findIconFile('folder_new.png'))
+            create_btn = QtGui.QPushButton()
+            create_btn.setIcon(GroupCreatorEditor.new_icon)
+            create_btn.setIconSize(buttonIconSize)
+            create_btn.setToolTip(_t_("Create new group"))
+            create_btn.setFixedSize(buttonIconSize + buttonMargin)
+            create_btn.setFocusPolicy(QtCore.Qt.NoFocus)
             self.layout().addWidget(create_btn)
             create_btn.clicked.connect(self.create_group)
 
