@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <minf expander="minf_2.0">
 <d>
+  <d name="fr">
+    <xhtml name="short"/>
+    <d name="parameters">
+      <xhtml name="mean_individual_profiles"/>
+      <xhtml name="ROI"/>
+      <xhtml name="normed_individual_profiles"/>
+      <xhtml name="average_mesh"/>
+      <xhtml name="new_study_name"/>
+      <xhtml name="study_name"/>
+      <xhtml name="smoothing"/>
+      <xhtml name="ROIs_nomenclature"/>
+      <xhtml name="subjects_group"/>
+      <xhtml name="method"/>
+      <xhtml name="ROIs_segmentation"/>
+    </d>
+    <xhtml name="long"/>
+  </d>
   <d name="en">
     <xhtml name="short"/>
     <d name="parameters">
@@ -17,7 +34,7 @@
 <li><b><i> second column: </i> </b>name of the region</li> 
 </ul>
 A correspondence table is the default gyri representing the atlas and Desikan Killiany.</xhtml>
-      <xhtml name="subjects_group"/>
+      <xhtml name="subjects_group">We are here in the group pipeline, and a group has to be defined before starting. To build the group, please use the process <a href="bvproces:://createGroup">Creation of a group of subjects</a>. This group is defined in the Constellation database, and the user normally should not use a FreeSurfer group. Subjects in this group should all have undergone the individual pipeline, and contain connectivity profile data.</xhtml>
       <xhtml name="method">Two methods are proposed: <br/>
 <i><b>(1) "averaged approach" </b></i> to obtain a single result group. <br/>
 <i><b>(2) "concatenated approach"</b></i> to obtain individual results across the group.  <br/>
