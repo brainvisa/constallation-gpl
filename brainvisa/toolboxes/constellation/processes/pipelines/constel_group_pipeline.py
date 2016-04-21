@@ -172,15 +172,30 @@ def initialization(self):
     def linkROIsegmentation(self, dummy):
         if self.method == "avg":
             if self.subjects_group is not None:
+                # try to find a Freesurfer group texture matching the
+                # constellation group name
                 atts = {
                     "freesurfer_group_of_subjects":
-                    self.subjects_group.get("freesurfer_group_of_subjects"),
+                    self.subjects_group.get("group_of_subjects"),
                     "group_of_subjects":
                     self.subjects_group.get("group_of_subjects"),
                 }
                 roi_seg = self.signature[
                     "ROIs_segmentation"].contentType.findValue(
                     atts, requiredAttributes={"averaged": "Yes"})
+                if roi_seg is None:
+                    # then try to find a Freesurfer group texture
+                    # matching the same FS group definition
+                    # FIXME: is this case useful after all, the group should
+                    # be a constellation one
+                    atts = {
+                        "freesurfer_group_of_subjects":
+                        self.subjects_group.get(
+                            "freesurfer_group_of_subjects"),
+                    }
+                    roi_seg = self.signature[
+                        "ROIs_segmentation"].contentType.findValue(
+                        atts, requiredAttributes={"averaged": "Yes"})
                 if roi_seg:
                     return [roi_seg]
         else:
@@ -205,6 +220,37 @@ def initialization(self):
                             roi_seg.append(items[0])
                 return roi_seg
 
+    def link_mesh(self, dummy):
+        mesh_type = self.signature['average_mesh']
+        mesh = None
+        if mesh is None and self.method == 'avg' \
+                and len(self.ROIs_segmentation) == 1:
+            mesh = mesh_type.findValue(self.ROIs_segmentation[0])
+        if mesh is None and self.subjects_group is not None:
+            mesh = mesh_type.findValue(self.subjects_group)
+            if mesh is None:
+                atts = {
+                        "freesurfer_group_of_subjects":
+                        self.subjects_group.get(
+                            "group_of_subjects"),
+                        "group_of_subjects":
+                        self.subjects_group.get(
+                            "group_of_subjects"),
+                }
+                mesh = mesh_type.findValue(atts)
+                if mesh is None:
+                    # if the subjects_group is a FS group
+                    atts = {
+                        "freesurfer_group_of_subjects":
+                        self.subjects_group.get(
+                            "freesurfer_group_of_subjects"),
+                        "group_of_subjects":
+                        self.subjects_group.get(
+                            "freesurfer_group_of_subjects"),
+                    }
+                    mesh = mesh_type.findValue(atts)
+        return mesh
+
     # link of parameters for autocompletion
     self.linkParameters(None, "ROIs_nomenclature", reset_roi)
     self.linkParameters(None, "method", method_changed)
@@ -218,7 +264,8 @@ def initialization(self):
         "normed_individual_profiles", "mean_individual_profiles")
     self.linkParameters("ROIs_segmentation", ["subjects_group", "method"],
                         linkROIsegmentation)
-    self.linkParameters("average_mesh", "subjects_group") #, linkMesh)
+    self.linkParameters("average_mesh",
+                        ["subjects_group", "ROIs_segmentation"], link_mesh)
 
     # visibility level for the user
     self.signature["mean_individual_profiles"].userLevel = 3
