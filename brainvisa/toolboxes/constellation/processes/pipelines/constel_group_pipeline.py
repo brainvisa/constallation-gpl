@@ -27,6 +27,7 @@ from brainvisa.processes import Signature, Choice, ReadDiskItem, OpenChoice, \
     String, Float, ListOf, SerialExecutionNode, ProcessExecutionNode, \
     ValidationError, neuroHierarchy
 from brainvisa.group_utils import Subject
+from brainvisa.configuration import neuroConfig
 
 # soma module
 from soma.minf.api import registerClass, readMinf
@@ -43,6 +44,24 @@ except:
 
 name = "Constellation Group Pipeline"
 userLevel = 0
+
+if neuroConfig.gui:
+    import types
+    from PyQt4 import QtGui, QtCore
+    from brainvisa.data.qt4gui.readdiskitemGUI import DiskItemEditor
+    from brainvisa.processing.qt4gui.neuroProcessesGUI import showProcess
+
+    class GroupCreatorEditor( DiskItemEditor ):
+        def __init__(self, parameter, parent, name,
+                     write=False, context=None):
+            super(GroupCreatorEditor, self).__init__(parameter, parent, name,
+                                                     write, context)
+            create_btn = QtGui.QPushButton('new')
+            self.layout().addWidget(create_btn)
+            create_btn.clicked.connect(self.create_group)
+
+        def create_group(self):
+            showProcess('createGroup')
 
 
 signature = Signature(
@@ -102,6 +121,14 @@ def initialization(self):
 
     # optional value
     self.setOptional("new_study_name")
+
+    if neuroConfig.gui:
+        self.signature["constellation_subjects_group"].editor \
+          = types.MethodType(lambda self, parent, name, context:
+                                GroupCreatorEditor(self, parent, name,
+                                                   context=context,
+                                                   write=self._write),
+                             self.signature["constellation_subjects_group"])
 
     def fill_study_choice(self, dummy=None):
         databases = [h.name for h in neuroHierarchy.hierarchies()
@@ -208,9 +235,6 @@ def initialization(self):
     def link_mesh(self, dummy):
         mesh_type = self.signature['average_mesh']
         mesh = None
-        #if mesh is None and self.method == 'avg' \
-                #and len(self.ROIs_segmentation) == 1:
-            #mesh = mesh_type.findValue(self.ROIs_segmentation[0])
         if mesh is None and self.constellation_subjects_group is not None:
             mesh = mesh_type.findValue(self.constellation_subjects_group)
             if mesh is None:
@@ -223,17 +247,6 @@ def initialization(self):
                             "group_of_subjects"),
                 }
                 mesh = mesh_type.findValue(atts)
-                #if mesh is None:
-                    ## if the constellation_subjects_group is a FS group
-                    #atts = {
-                        #"freesurfer_group_of_subjects":
-                        #self.constellation_subjects_group.get(
-                            #"freesurfer_group_of_subjects"),
-                        #"group_of_subjects":
-                        #self.constellation_subjects_group.get(
-                            #"freesurfer_group_of_subjects"),
-                    #}
-                    #mesh = mesh_type.findValue(atts)
         return mesh
 
     # link of parameters for autocompletion
