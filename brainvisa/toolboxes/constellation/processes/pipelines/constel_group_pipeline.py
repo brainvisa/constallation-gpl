@@ -25,8 +25,9 @@ Author: Sandrine Lefranc, 2015
 # axon python API modules
 from brainvisa.processes import Signature, Choice, ReadDiskItem, OpenChoice, \
     String, Float, ListOf, SerialExecutionNode, ProcessExecutionNode, \
-    ValidationError
+    ValidationError, neuroHierarchy
 from brainvisa.group_utils import Subject
+from brainvisa.configuration import neuroConfig
 
 # soma module
 from soma.minf.api import registerClass, readMinf
@@ -44,16 +45,45 @@ except:
 name = "Constellation Group Pipeline"
 userLevel = 0
 
+if neuroConfig.gui:
+    import types
+    from PyQt4 import QtGui, QtCore
+    from brainvisa.data.qt4gui.readdiskitemGUI import DiskItemEditor
+    from brainvisa.processing.qt4gui.neuroProcessesGUI import showProcess
+    from soma.wip.application.api import findIconFile
+    from brainvisa.data.qtgui.neuroDataGUI import buttonIconSize, buttonMargin
+
+    class GroupCreatorEditor(DiskItemEditor):
+        def __init__(self, parameter, parent, name,
+                     write=False, context=None):
+            super(GroupCreatorEditor, self).__init__(parameter, parent, name,
+                                                     write, context)
+            if not hasattr(GroupCreatorEditor, 'new_icon'):
+                GroupCreatorEditor.new_icon \
+                    = QtGui.QIcon(findIconFile('folder_new.png'))
+            create_btn = QtGui.QPushButton()
+            create_btn.setIcon(GroupCreatorEditor.new_icon)
+            create_btn.setIconSize(buttonIconSize)
+            create_btn.setToolTip(_t_("Create new group"))
+            create_btn.setFixedSize(buttonIconSize + buttonMargin)
+            create_btn.setFocusPolicy(QtCore.Qt.NoFocus)
+            self.layout().addWidget(create_btn)
+            create_btn.clicked.connect(self.create_group)
+
+        def create_group(self):
+            showProcess('createGroup')
+
 
 signature = Signature(
     "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
     "ROI", OpenChoice(),
-    "study_name", String(),
+    "study_name", OpenChoice(),
     "new_study_name", String(),
     "smoothing", Float(),
-    "subjects_group", ReadDiskItem("Group definition", "XML"),
+    "constellation_subjects_group", ReadDiskItem("Group definition", "XML",
+                                                 exactType=True),
     "mean_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
                      requiredAttributes={"normed": "No",
@@ -66,14 +96,14 @@ signature = Signature(
                                          "thresholded": "Yes",
                                          "averaged": "No",
                                          "intersubject": "No"})),
-    "ROIs_segmentation", ListOf(
-        ReadDiskItem("ROI Texture", "Aims texture formats",
-                     requiredAttributes={"side": "both",
-                                         "vertex_corr": "Yes"})),
     "average_mesh", ReadDiskItem("White Mesh", "Aims mesh formats",
                                  requiredAttributes={"side": "both",
                                                      "vertex_corr": "Yes",
                                                      "averaged": "Yes"}),
+    "ROIs_segmentation", ListOf(
+        ReadDiskItem("ROI Texture", "Aims texture formats",
+                     requiredAttributes={"side": "both",
+                                         "vertex_corr": "Yes"})),
 )
 
 
@@ -92,7 +122,7 @@ def linkGroup(self, param1):
 def initialization(self):
     """Provides default values and link of parameters
     """
-    self.addLink(None, "subjects_group", self.linkGroup)
+    self.addLink(None, "constellation_subjects_group", self.linkGroup)
 
     # default value
     self.smoothing = 3.0
@@ -102,28 +132,67 @@ def initialization(self):
     # optional value
     self.setOptional("new_study_name")
 
-    def link_roi(self, dummy):
-        """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
-        of process.
+    if neuroConfig.gui:
+        self.signature["constellation_subjects_group"].editor \
+          = types.MethodType(lambda self, parent, name, context:
+                                GroupCreatorEditor(self, parent, name,
+                                                   context=context,
+                                                   write=self._write),
+                             self.signature["constellation_subjects_group"])
+
+    def fill_study_choice(self, dummy=None):
+        databases = [h.name for h in neuroHierarchy.hierarchies()
+                     if h.fso.name == "brainvisa-3.2.0"]
+        choices = set()
+        for db_name in databases:
+            database = neuroHierarchy.databases.database(db_name)
+            sel = {"study": self.method}
+            choices.update(
+                [x[0] for x in database.findAttributes(
+                    ['texture'], selection=sel,
+                    _type='Filtered Fascicles Bundles')])
+        self.signature['study_name'].setChoices(*sorted(choices))
+        if len(choices) != 0 and self.isDefault('study_name') \
+                and self.study_name not in choices:
+            self.setValue('study_name', list(choices)[0], True)
+
+    def reset_roi(self, dummy):
+        """ This callback reads the ROIs nomenclature and proposes them in the
+        signature 'ROI' of process.
+        It also resets the ROI paramter to default state after
+        the nomenclature changes.
         """
+        current = self.ROI
+        self.setValue('ROI', current, True)
         if self.ROIs_nomenclature is not None:
-            s = ["Select a ROI in this list"]
+            s = [("Select a ROI in this list", None)]
+            # temporarily set a value which will remain valid
+            self.ROI = s[0][1]
             s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
             self.signature["ROI"].setChoices(*s)
             if isinstance(self.signature["ROI"], OpenChoice):
                 self.signature["ROI"] = Choice(*s)
                 self.changeSignature(self.signature)
+            if current not in s:
+                self.setValue('ROI', s[0][1], True)
+            else:
+                self.setValue('ROI', current, True)
 
-    # link of parameters for autocompletion
-    self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
+    def method_changed(self, dummy):
+        if self.method == "avg":
+            pass
+        else:
+            pass
+        fill_study_choice(self)
 
     def link_profiles(self, dummy):
         """Function of link to determine the connectivity profiles
         """
-        if self.subjects_group and self.method and self.ROI \
+        if self.constellation_subjects_group and self.method and self.ROI \
                 and self.smoothing and self.study_name:
             registerClass("minf_2.0", Subject, "Subject")
-            groupOfSubjects = readMinf(self.subjects_group.fullPath())
+            groupOfSubjects \
+                = readMinf(self.constellation_subjects_group.fullPath())
             profiles = []
             for subject in groupOfSubjects:
                 atts = {}
@@ -131,7 +200,8 @@ def initialization(self):
                 atts["gyrus"] = str(self.ROI)
                 atts["smoothing"] = str(self.smoothing)
                 atts["texture"] = self.study_name
-                atts["_database"] = self.subjects_group.get("_database")
+                atts["_database"] \
+                    = self.constellation_subjects_group.get("_database")
                 atts.update(subject.attributes())
                 profile = self.signature[
                     "mean_individual_profiles"].contentType.findValue(atts)
@@ -139,29 +209,20 @@ def initialization(self):
                     profiles.append(profile)
             return profiles
 
-    def linkMesh(self, dummy):
-        if self.ROIs_segmentation:
-            return self.signature["average_mesh"].findValue(
-                self.ROIs_segmentation[0])
-
     def linkROIsegmentation(self, dummy):
+        if self.average_mesh is None:
+            return []
+        roi_type = self.signature["ROIs_segmentation"].contentType
         if self.method == "avg":
-            if self.subjects_group is not None:
-                atts = {
-                    "freesurfer_group_of_subjects":
-                    self.subjects_group.get("group_of_subjects"),
-                    "group_of_subjects":
-                    self.subjects_group.get("group_of_subjects"),
-                }
-                roi_seg = self.signature[
-                    "ROIs_segmentation"].contentType.findValue(
-                    atts, requiredAttributes={"averaged": "Yes"})
-                if roi_seg:
-                    return [roi_seg]
+            roi_seg = roi_type.findValue(self.average_mesh)
+            if roi_seg is not None:
+                return [roi_seg]
         else:
-            if self.subjects_group:
+            group = ReadDiskItem("Group definition", "XML").findValue(
+                self.average_mesh)
+            if group:
                 registerClass("minf_2.0", Subject, "Subject")
-                groupOfSubjects = readMinf(self.subjects_group.fullPath())
+                groupOfSubjects = readMinf(group.fullPath())
                 roi_seg = []
                 rdi = signature["ROIs_segmentation"].contentType
                 for subject in groupOfSubjects:
@@ -179,17 +240,41 @@ def initialization(self):
                         else:
                             roi_seg.append(items[0])
                 return roi_seg
+        return []
+
+    def link_mesh(self, dummy):
+        mesh_type = self.signature['average_mesh']
+        mesh = None
+        if mesh is None and self.constellation_subjects_group is not None:
+            mesh = mesh_type.findValue(self.constellation_subjects_group)
+            if mesh is None:
+                atts = {
+                        "freesurfer_group_of_subjects":
+                        self.constellation_subjects_group.get(
+                            "group_of_subjects"),
+                        "group_of_subjects":
+                        self.constellation_subjects_group.get(
+                            "group_of_subjects"),
+                }
+                mesh = mesh_type.findValue(atts)
+        return mesh
+
+    # link of parameters for autocompletion
+    self.linkParameters(None, "ROIs_nomenclature", reset_roi)
+    self.linkParameters(None, "method", method_changed)
 
     # link of parameters
     self.linkParameters(
         "mean_individual_profiles",
         ("method", "ROI", "smoothing", "study_name",
-         "subjects_group"), link_profiles)
+         "constellation_subjects_group"), link_profiles)
     self.linkParameters(
         "normed_individual_profiles", "mean_individual_profiles")
-    #self.linkParameters("ROIs_segmentation", ["subjects_group", "method"],
-    #                    linkROIsegmentation)
-    self.linkParameters("average_mesh", "ROIs_segmentation", linkMesh)
+    self.linkParameters("average_mesh", "constellation_subjects_group",
+                        link_mesh)
+    self.linkParameters("ROIs_segmentation",
+                        ["average_mesh", "method"],
+                        linkROIsegmentation)
 
     # visibility level for the user
     self.signature["mean_individual_profiles"].userLevel = 3
@@ -207,7 +292,8 @@ def initialization(self):
                        "constel_group_mask",
                        optional=1))
 
-    eNode.addDoubleLink("CreateMask.subjects_group", "subjects_group")
+    eNode.addDoubleLink("CreateMask.subjects_group",
+                        "constellation_subjects_group")
     eNode.addDoubleLink("CreateMask.new_study_name", "new_study_name")
     eNode.addDoubleLink(
         "CreateMask.mean_individual_profiles", "mean_individual_profiles")
@@ -222,7 +308,8 @@ def initialization(self):
                        optional=1))
 
     eNode.addDoubleLink(
-        "GroupConnectivityProfile.subjects_group", "subjects_group")
+        "GroupConnectivityProfile.subjects_group",
+        "constellation_subjects_group")
     eNode.addDoubleLink(
         "GroupConnectivityProfile.new_study_name", "new_study_name")
     eNode.addDoubleLink(
@@ -263,7 +350,8 @@ def initialization(self):
             "constel_reduced_individual_matrices_from_group_regions",
             optional=1))
 
-    eNode.addDoubleLink("ReducedGroupMatrix.subjects_group", "subjects_group")
+    eNode.addDoubleLink("ReducedGroupMatrix.subjects_group",
+                        "constellation_subjects_group")
     eNode.addDoubleLink("ReducedGroupMatrix.study_name",
                         "study_name")
     eNode.addDoubleLink("ReducedGroupMatrix.average_mesh", "average_mesh")
@@ -280,7 +368,8 @@ def initialization(self):
                    ProcessExecutionNode("constel_group_clustering",
                                         optional=1))
 
-    eNode.addDoubleLink("GroupClustering.subjects_group", "subjects_group")
+    eNode.addDoubleLink("GroupClustering.subjects_group",
+                        "constellation_subjects_group")
     eNode.addDoubleLink("GroupClustering.method", "method")
     eNode.addDoubleLink("GroupClustering.average_mesh", "average_mesh")
     eNode.addDoubleLink(
@@ -289,3 +378,10 @@ def initialization(self):
                         "ReducedGroupMatrix.intersubject_reduced_matrices")
 
     self.setExecutionNode(eNode)
+
+    fill_study_choice(self)
+    if len(self.signature['study_name'].values) != 0:
+        self.study_name = self.signature['study_name'].values[0][0]
+    self.constellation_subjects_group \
+        = self.signature["constellation_subjects_group"].findValue({})
+

@@ -20,12 +20,13 @@ Author: Sandrine Lefranc, 2015
 
 #----------------------------Imports-------------------------------------------
 
+import math
 # module PyGt4
 from PyQt4 import QtGui
 
 # axon python API module
 from brainvisa.processes import Signature, ListOf, ReadDiskItem, Integer, \
-    mainThreadActions, ValidationError
+    mainThreadActions, ValidationError, Boolean
 
 try:
     from brainvisa import anatomist as ana
@@ -51,9 +52,10 @@ signature = Signature(
     "connectivity_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture",
                      "anatomist texture formats")),
-    "white_mesh", ListOf(ReadDiskItem("White Mesh", "Aims mesh formats")),
+    "white_mesh", ListOf(ReadDiskItem("White Mesh", "Anatomist mesh formats")),
     "min_width", Integer(),
     "min_height", Integer(),
+    "prefer_inflated_meshes", Boolean(),
 )
 
 
@@ -63,9 +65,43 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters"""
 
+    def link_mesh(self, dummy):
+        if self.connectivity_profiles is not None:
+            mesh_type = self.signature["white_mesh"].contentType
+            meshes = []
+            for profile in self.connectivity_profiles:
+                side = profile.get('side')
+                if not side:
+                    side = 'both'
+                atts = {'side': side}
+                if self.prefer_inflated_meshes:
+                    atts['inflated'] = 'Yes'
+                else:
+                    atts['inflated'] = 'No'
+                mesh = mesh_type.findValue(profile, requiredAttributes=atts)
+                if mesh is None:
+                    if self.prefer_inflated_meshes:
+                        atts['inflated'] = 'No'
+                    else:
+                        atts['inflated'] = 'Yes'
+                    mesh = mesh_type.findValue(profile,
+                                               requiredAttributes=atts)
+                meshes.append(mesh)
+            if len(meshes) >= 2:
+                for mesh in meshes[1:]:
+                    if mesh != meshes[0]:
+                        return meshes
+                meshes = [meshes[0]]
+            if meshes == [None]:
+                return []
+            return meshes
+
     # optional value
     self.setOptional("min_width")
     self.setOptional("min_height")
+    self.linkParameters('white_mesh',
+                        ['connectivity_profiles', 'prefer_inflated_meshes'],
+                        link_mesh)
 
 
 def get_screen_config():
@@ -96,6 +132,10 @@ def get_screen_config():
     return (curmon, width, height)
 
 
+#def get_texture_extrema(self, ana_tex):
+    #tex = ana.Anatomist().toAimsObject(ana_tex)
+    #return
+
 #----------------------------Main program--------------------------------------
 
 
@@ -124,12 +164,16 @@ def execution(self, context):
 
     # define the number of cases in the block
     nb_blocks = nb_rows*nb_columns
+    if nb_blocks > nb_files:
+        # if fewer objects than the max possible number on screen: resize
+        nb_columns = int(nb_columns / math.sqrt(nb_blocks / nb_files))
+        nb_rows = int(math.ceil(float(nb_files) / nb_columns))
 
     # generate the widgets
     blocklist = []
     for element in range(14):
         blocklist.append(
-            a.createWindowsBlock(nbRows=nb_columns, nbCols=nb_rows))
+            a.createWindowsBlock(nbRows=nb_rows, nbCols=nb_columns))
 
     # empty list to add the windows
     w = []
@@ -139,13 +183,24 @@ def execution(self, context):
 
     count = 1
     c = 0
+    vmin = 0
+    vmax = 0
+    textures = []
     for i in xrange(nb_files):
         # load an object from a file (mesh, texture)
-        mesh = a.loadObject(self.white_mesh[i])
+        mesh_i = i
+        if i >= len(self.white_mesh):
+            mesh_i = -1
+        mesh = a.loadObject(self.white_mesh[mesh_i])
         roi_clustering = a.loadObject(self.connectivity_profiles[i])
+        tex_info = roi_clustering.getInfos()
+        tmin, tmax = tex_info['texture']['textureMin'], \
+          tex_info['texture']['textureMax']
+        vmin, vmax = min(vmin, tmin), max(vmax, tmax)
 
         # assign a palette to object
-        roi_clustering.setPalette(palette="random", absoluteMode=True)
+        roi_clustering.setPalette(palette="white_blue_red")
+        textures.append(roi_clustering)
 
         # create a fusionned multi object that contains all given objects
         textured_mesh = a.fusionObjects(
@@ -159,7 +214,8 @@ def execution(self, context):
         if i < (nb_blocks):
             # create a new window and opens it
             win = a.createWindow(
-                "Sagittal", block=blocklist[0], no_decoration=True)
+                "3D", block=blocklist[0], no_decoration=True)
+            win.camera(view_quaternion=[0.5, 0.5, 0.5, 0.5])
 
             # add objects in windows
             win.addObjects(textured_mesh)
@@ -182,5 +238,11 @@ def execution(self, context):
             if c == nb_blocks:
                 count += 1
                 c = 0
+
+    # set the same palette values on all
+    # arbitrarily set max to 30%
+    max_tex = vmin + (vmax - vmin) * 0.3
+    a.setObjectPalette(textures, absoluteMode=True, minVal=vmin,
+                       maxVal=max_tex)
 
     return [w, t]
