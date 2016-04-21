@@ -44,8 +44,8 @@ signature = Signature(
     #inputs
     "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
-    "study_name", OpenChoice(),
     "outputs_database", Choice(),
+    "study_name", OpenChoice(),
     "format_fiber_tracts", Choice("bundles", "trk"),
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
     "ROI", OpenChoice(),
@@ -151,19 +151,20 @@ def initialization(self):
                 return self.signature["white_mesh"].findValue(atts)
 
     def link_roi(self, dummy=None):
+        roi_type = self.signature["ROIs_segmentation"]
         if self.method == "avg" and self.study_name:
             # just in case study_name corresponds to subjects group...
-            res = self.signature["ROIs_segmentation"].findValue(
+            res = roi_type.findValue(
                 {"freesurfer_group_of_subjects": self.study_name})
             if res is None:
-                res = self.signature["ROIs_segmentation"].findValue(
+                res = roi_type.findValue(
                     {"group_of_subjects": self.study_name})
             return res
         elif self.method == "concat" and self.dirsubject is not None:
-            res = self.signature["ROIs_segmentation"].findValue(
+            res = roi_type.findValue(
                 self.dirsubject)
             if res is None:
-                res = self.signature["ROIs_segmentation"].findValue(
+                res = roi_type.findValue(
                     self.dirsubject,
                     requiredAttributes={"_type": "BothResampledGyri"})
             return res
