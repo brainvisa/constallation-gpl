@@ -53,14 +53,14 @@ userLevel = 2
 roles = ("viewer", )
 
 signature = Signature(
-    "clustering_texture", ReadDiskItem("Connectivity ROI Texture", 
-                                       "anatomist texture formats"),
     "connectivity_matrix", ReadDiskItem(
         "Connectivity matrix", "aims readable volume formats",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "Yes"}),
+    "clustering_texture", ReadDiskItem("Connectivity ROI Texture", 
+                                       "anatomist texture formats"),
     "time_step", Integer(),
     "transpose", Boolean(),
 )
