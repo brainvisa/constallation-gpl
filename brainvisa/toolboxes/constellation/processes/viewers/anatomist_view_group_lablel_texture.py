@@ -12,42 +12,30 @@ from brainvisa.processes import *
 # Anatomist
 from brainvisa import anatomist
 
-name = 'Anatomist view Connectivity Texture'
+name = 'Anatomist view Group Label Texture'
 userLevel = 0
 roles = ('viewer', )
 
 signature = Signature(
-    'connectivity_texture', ReadDiskItem(
-        'Connectivity Profile Texture', 'aims texture formats'),
-    'mesh', ReadDiskItem("White Mesh", "Aims mesh formats",
-                         requiredAttributes={"side": "both",
-                                             "vertex_corr": "Yes"}),
+    'label_texture', ReadDiskItem('Mask Texture', 'Anatomist texture formats'),
+    'mesh', ReadDiskItem("White Mesh", "Anatomist mesh formats"),
     "prefer_inflated_meshes", Boolean(),
 )
 
 def initialization(self):
     def link_mesh(self, dummy):
-        if self.connectivity_texture is not None:
+        if self.label_texture is not None:
+            mesh_type = self.signature['mesh']
             if self.prefer_inflated_meshes:
                 infl1 = 'Yes'
                 infl2 = 'No'
             else:
                 infl1 = 'No'
                 infl2 = 'Yes'
-            mesh_type = self.signature['mesh']
-            res = mesh_type.findValue(
-                self.connectivity_texture,
-                requiredAttributes={'inflated': infl1})
-            if res is None:
-                res = mesh_type.findValue(
-                    self.connectivity_texture,
-                    requiredAttributes={'inflated': infl2})
-            if res is not None:
-                return res
             atts1 = {
                 'group_of_subjects':
-                    self.connectivity_texture.get('group_of_subjects'),
-                'freesurfer_group_of_subjects': self.connectivity_texture.get(
+                    self.label_texture.get('group_of_subjects'),
+                'freesurfer_group_of_subjects': self.label_texture.get(
                     'freesurfer_group_of_subjects'),
                 'inflated': infl1,
                 "side": "both",
@@ -57,9 +45,9 @@ def initialization(self):
             if res is None:
                 atts2 = {
                 'group_of_subjects':
-                    self.connectivity_texture.get(
+                    self.label_texture.get(
                         'freesurfer_group_of_subjects'),
-                'freesurfer_group_of_subjects': self.connectivity_texture.get(
+                'freesurfer_group_of_subjects': self.label_texture.get(
                     'group_of_subjects'),
                 'inflated': infl1,
                 "side": "both",
@@ -72,15 +60,18 @@ def initialization(self):
             if res is None:
                 atts2['inflated'] = infl2
                 res = mesh_type.findValue(atts2)
+            if res is None:
+                res = mesh_type.findValue(label_texture)
             return res
 
-    self.linkParameters('mesh', 'connectivity_texture', link_mesh)
+    self.prefer_inflated_meshes = False
+    self.linkParameters('mesh', ['label_texture', 'prefer_inflated_meshes'],
+                        link_mesh)
 
 
 def execution(self, context):
     objs = context.runProcess('AnatomistShowTexture',
-                              read=self.connectivity_texture,
-                              mesh=self.mesh, palette='white_blue_red')
-    texture = objs['texture']
-    texture.setPalette(maxVal=0.3)
+                              read=self.label_texture,
+                              mesh=self.mesh, palette='random',
+                              rgb_interpolation=True)
     return objs

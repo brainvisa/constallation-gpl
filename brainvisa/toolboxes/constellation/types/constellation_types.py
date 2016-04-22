@@ -34,7 +34,7 @@ FileType("Connectivity Matrix", "Matrix",
 
 
 #----------------------------Mask texture--------------------------------------
-FileType("Mask Texture", "Texture")
+FileType("Mask Texture", "Label Texture")
 
 
 #----------------------------Connectivity profile texture----------------------
