@@ -85,5 +85,5 @@ def execution(self, context):
                               mesh=self.mesh, palette='random',
                               rgb_interpolation=True)
     texture = objs['texture']
-    texture.setPalette(maxVal=0.3)
+    texture.setPalette(minVal=0., maxVal=1.)
     return objs
