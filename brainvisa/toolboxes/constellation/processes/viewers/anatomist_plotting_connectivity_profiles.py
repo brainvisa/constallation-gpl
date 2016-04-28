@@ -166,7 +166,9 @@ def execution(self, context):
     nb_blocks = nb_rows*nb_columns
     if nb_blocks > nb_files:
         # if fewer objects than the max possible number on screen: resize
-        nb_columns = int(nb_columns / math.sqrt(nb_blocks / nb_files))
+        nb_columns = int(nb_columns / math.sqrt(float(nb_blocks) / nb_files))
+        if nb_columns == 0:
+            nb_columns = 1
         nb_rows = int(math.ceil(float(nb_files) / nb_columns))
 
     # generate the widgets
@@ -231,7 +233,8 @@ def execution(self, context):
                 count * (nb_blocks) <= i < (count+1) * (nb_blocks)):
             c += 1
             win2 = a.createWindow(
-                "Sagittal", block=blocklist[count], no_decoration=True)
+                "3D", block=blocklist[count], no_decoration=True)
+            win2.camera(view_quaternion=[0.5, 0.5, 0.5, 0.5])
             win2.addObjects(textured_mesh)
             w.append(win2)
             t.append(textured_mesh)

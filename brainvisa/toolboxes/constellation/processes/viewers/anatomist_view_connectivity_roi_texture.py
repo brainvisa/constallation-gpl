@@ -28,6 +28,7 @@ signature = Signature(
 def initialization(self):
     def link_mesh(self, dummy):
         if self.connectivity_roi_texture is not None:
+            ct = self.connectivity_roi_texture
             if self.prefer_inflated_meshes:
                 infl1 = 'Yes'
                 infl2 = 'No'
@@ -35,21 +36,36 @@ def initialization(self):
                 infl1 = 'No'
                 infl2 = 'Yes'
             mesh_type = self.signature['mesh']
-            res = mesh_type.findValue(
-                self.connectivity_roi_texture,
-                requiredAttributes={'inflated': infl1})
-            if res is None:
-                res = mesh_type.findValue(
-                    self.connectivity_roi_texture,
-                    requiredAttributes={'inflated': infl2})
+            if ct.get('group_of_subjects') is not None:
+                atts1 = {
+                    'group_of_subjects':
+                        ct.get('group_of_subjects'),
+                    'freesurfer_group_of_subjects':
+                        ct.get('group_of_subjects'),
+                    'inflated': infl1,
+                    "side": "both",
+                    "vertex_corr": "Yes"
+                }
+                res = mesh_type.findValue(atts1)
+                if res is not None:
+                    return res
+                atts1['inflated'] = infl2
+                res = mesh_type.findValue(atts1)
+                if res is not None:
+                    return res
+            res = mesh_type.findValue(ct,
+                                      requiredAttributes={'inflated': infl1})
+            if res is not None:
+                return res
+            res = mesh_type.findValue( ct,
+                                      requiredAttributes={'inflated': infl2})
             if res is not None:
                 return res
             atts1 = {
                 'group_of_subjects':
-                    self.connectivity_roi_texture.get('group_of_subjects'),
+                    ct.get('group_of_subjects'),
                 'freesurfer_group_of_subjects':
-                    self.connectivity_roi_texture.get(
-                    'freesurfer_group_of_subjects'),
+                    ct.get('freesurfer_group_of_subjects'),
                 'inflated': infl1,
                 "side": "both",
                 "vertex_corr": "Yes"
@@ -58,10 +74,10 @@ def initialization(self):
             if res is None:
                 atts2 = {
                 'group_of_subjects':
-                    self.connectivity_roi_texture.get(
+                    ct.get(
                         'freesurfer_group_of_subjects'),
                 'freesurfer_group_of_subjects':
-                    self.connectivity_roi_texture.get(
+                    ct.get(
                     'group_of_subjects'),
                 'inflated': infl1,
                 "side": "both",

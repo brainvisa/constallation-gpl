@@ -28,10 +28,13 @@ Author: Sandrine Lefranc, 2015
 
 
 # axon python API module
-from brainvisa.processes import Signature, ReadDiskItem
+from brainvisa.processes import Signature, ReadDiskItem, getFormats, \
+    mainThreadActions
+import numpy
 
 try:
     from brainvisa import anatomist as ana
+    from soma import aims
 except:
     pass
 
@@ -52,7 +55,8 @@ userLevel = 0
 
 signature = Signature(
     "connectivity_matrix", ReadDiskItem(
-        "connectivity matrix", "aims readable volume formats",
+        "connectivity matrix",
+        getFormats("aims matrix formats").data + ['Sparse Matrix'],
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "Yes",
                             "dense": "No",
@@ -65,16 +69,92 @@ signature = Signature(
                      requiredAttributes={"side": "both",
                                          "vertex_corr": "Yes"}),
     "basins_texture",
-        ReadDiskItem("Label texture", "anatomist texture formats"), )
+        ReadDiskItem("Connectivity ROI texture",
+                     "anatomist texture formats"),
+)
 
 
 #----------------------------Function------------------------------------------
 
 
 def initialization(self):
-    self.linkParameters("white_mesh", "connectivity_matrix")
-    self.linkParameters("gyrus_texture", "connectivity_matrix")
-    self.linkParameters("basins_texture", "connectivity_matrix")
+    def link_mesh(self, dummy):
+        if self.connectivity_matrix is not None:
+            cm = self.connectivity_matrix
+            mesh_type = self.signature["white_mesh"]
+            atts = {
+                "subject": cm.get("subject"),
+                "inflated": "No",
+            }
+            res = mesh_type.findValue(atts)
+            if res is None:
+                atts = {
+                    "group_of_subjects": cm.get("group_of_subjects"),
+                    "freesurfer_group_of_subjects":
+                        cm.get("group_of_subjects"),
+                    "inflated": "No",
+                }
+                res = mesh_type.findValue(atts)
+            if res is None:
+                res = cm
+            return res
+
+    def link_gyrus(self, dummy):
+        if self.connectivity_matrix is not None:
+            cm = self.connectivity_matrix
+            gyrus_type = self.signature["gyrus_texture"]
+            study = cm.get('study')
+            if study == 'avg':
+                atts = {
+                    "group_of_subjects": cm.get("group_of_subjects"),
+                    "freesurfer_group_of_subjects":
+                        cm.get("group_of_subjects"),
+                    "_type": "BothAveragedResampledGyri",
+                }
+                res = gyrus_type.findValue(atts)
+                if res is not None:
+                    return res
+            atts = {
+                "subject": cm.get("subject"),
+                "_type": "BothResampledGyri",
+            }
+            res = gyrus_type.findValue(atts)
+            if res is None:
+                del atts["_type"]
+                res = gyrus_type.findValue(atts)
+            if res is None:
+                res = cm
+            return res
+
+    def link_basins(self, dummy):
+        if self.connectivity_matrix is not None:
+            cm = self.connectivity_matrix
+            basins_type = self.signature["basins_texture"]
+            atts = {
+                "center": cm.get("center"),
+                "subject": cm.get("subject"),
+                "_database": cm.get("_database"),
+                "roi_filtered": "Yes",
+                "gyrus": cm.get("gyrus"),
+                "texture": cm.get("texture"),
+            }
+            res = basins_type.findValue(atts)
+            if res is None:
+                atts = {
+                    "group_of_subject": cm.get("group_of_subject"),
+                    "_database": cm.get("_database"),
+                    "roi_filtered": "Yes",
+                    "gyrus": cm.get("gyrus"),
+                    "texture": cm.get("texture"),
+                }
+                res = basins_type.findValue(atts)
+            if res is None:
+                res = cm
+            return res
+
+    self.linkParameters("white_mesh", "connectivity_matrix", link_mesh)
+    self.linkParameters("gyrus_texture", "connectivity_matrix", link_gyrus)
+    self.linkParameters("basins_texture", "connectivity_matrix", link_basins)
 
 
 #----------------------------Main program--------------------------------------
@@ -84,9 +164,15 @@ def execution(self, context):
     # instance of anatomist
     a = ana.Anatomist()
 
+    objects_to_keep = []
     # load an object from a file
     mesh = a.loadObject(self.white_mesh)
     patch = a.loadObject(self.gyrus_texture)
+    # force reading the matrix as a matrix, not as a volume
+    #matrix_reader = aims.Reader(
+        #typemap={'Volume' : {'DOUBLE': 'SparseOrDenseMatrix'}})
+    #matrix = matrix_reader.read(self.connectivity_matrix.fullPath())
+    # sparse = a.toAObject(matrix)
     sparse = a.loadObject(self.connectivity_matrix)
     basins = a.loadObject(self.basins_texture)
 
@@ -111,4 +197,5 @@ def execution(self, context):
     # changes the selected button in windows menu.
     win.setControl("ConnectivityMatrixControl")
 
-    return [win, conn, basins]
+    objects_to_keep += [win, conn, basins]
+    return objects_to_keep
