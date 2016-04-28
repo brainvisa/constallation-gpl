@@ -31,6 +31,9 @@ FileType("Matrix", "Any type")
 FileType("Connectivity Matrix", "Matrix",
          ["Sparse Matrix", "GIS image", "gz compressed NIFTI-1 image",
           "NIFTI-1 image"])
+FileType("Reduced Connectivity Matrix", "Connectivity Matrix",
+         ["Sparse Matrix", "GIS image", "gz compressed NIFTI-1 image",
+          "NIFTI-1 image"])
 
 
 #----------------------------Mask texture--------------------------------------

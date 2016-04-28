@@ -55,7 +55,7 @@ userLevel = 0
 
 signature = Signature(
     "connectivity_matrix", ReadDiskItem(
-        "connectivity matrix",
+        "Reduced connectivity matrix",
         getFormats("aims matrix formats").data + ['Sparse Matrix'],
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "Yes",

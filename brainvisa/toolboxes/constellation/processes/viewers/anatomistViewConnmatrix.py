@@ -26,18 +26,71 @@ userLevel = 0
 
 signature = Signature(
     'connectivity_matrix', ReadDiskItem(
-        'Connectivity Matrix', 'GIS image',
+        'Connectivity Matrix',
+        getFormats("aims matrix formats").data + ['Sparse Matrix'],
         requiredAttributes={"ends_labelled":"mixed",
                             "reduced":"No",
                             "dense":"No",
                             "intersubject":"No"}),
-    'white_mesh', ReadDiskItem('White Mesh', 'anatomist mesh formats'),
+    'white_mesh', ReadDiskItem('White Mesh', 'anatomist mesh formats',
+                               requiredAttributes={"side": "both"}),
     'gyrus_texture', 
-        ReadDiskItem('ROI texture', 'anatomist texture formats'), )
+        ReadDiskItem('ROI texture', 'anatomist texture formats',
+                     requiredAttributes={"side": "both"}), )
 
 def initialization(self):
-    self.linkParameters('white_mesh', 'connectivity_matrix')
-    self.linkParameters('gyrus_texture', 'connectivity_matrix')
+    def link_mesh(self, dummy):
+        if self.connectivity_matrix is not None:
+            cm = self.connectivity_matrix
+            mesh_type = self.signature["white_mesh"]
+            atts = {
+                "subject": cm.get("subject"),
+                "inflated": "No",
+            }
+            res = mesh_type.findValue(atts)
+            if res is None:
+                atts = {
+                    "group_of_subjects": cm.get("group_of_subjects"),
+                    "freesurfer_group_of_subjects":
+                        cm.get("group_of_subjects"),
+                    "inflated": "No",
+                }
+                res = mesh_type.findValue(atts)
+            if res is None:
+                res = cm
+            return res
+
+    def link_gyrus(self, dummy):
+        if self.connectivity_matrix is not None:
+            cm = self.connectivity_matrix
+            gyrus_type = self.signature["gyrus_texture"]
+            study = cm.get('study')
+            if study == 'avg':
+                print 'averaged study.'
+                atts = {
+                    "group_of_subjects": cm.get("group_of_subjects"),
+                    "freesurfer_group_of_subjects":
+                        cm.get("group_of_subjects"),
+                    "_type": "BothAveragedResampledGyri",
+                }
+                res = gyrus_type.findValue(atts)
+                print 'res:', res
+                if res is not None:
+                    return res
+            atts = {
+                "subject": cm.get("subject"),
+                "_type": "BothResampledGyri",
+            }
+            res = gyrus_type.findValue(atts)
+            if res is None:
+                del atts["_type"]
+                res = gyrus_type.findValue(atts)
+            if res is None:
+                res = cm
+            return res
+
+    self.linkParameters('white_mesh', 'connectivity_matrix', link_mesh)
+    self.linkParameters('gyrus_texture', 'connectivity_matrix', link_gyrus)
 
 
 def execution(self, context):
