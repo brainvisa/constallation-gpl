@@ -21,7 +21,7 @@ def validation():
 
 
 name = 'Anatomist view connectivity matrix'
-roles = ('viewer', )
+#roles = ('viewer', )
 userLevel = 0
 
 signature = Signature(
@@ -68,15 +68,28 @@ def initialization(self):
             if study == 'avg':
                 print 'averaged study.'
                 atts = {
-                    "group_of_subjects": cm.get("group_of_subjects"),
+                    "group_of_subjects": cm.get("texture"),
                     "freesurfer_group_of_subjects":
-                        cm.get("group_of_subjects"),
+                        cm.get("texture"),
                     "_type": "BothAveragedResampledGyri",
                 }
                 res = gyrus_type.findValue(atts)
-                print 'res:', res
                 if res is not None:
                     return res
+                # indiv. matrics have no group, but are built from a group
+                # in avg mode. Find a group object which has this group
+                # attribute
+                ct = ReadDiskItem("Group definition", "XML")
+                x = ct.findValue(cm)
+                if x:
+                    atts = {
+                        "group_of_subjects": x.get("group_of_subjects"),
+                        "freesurfer_group_of_subjects":
+                            x.get("group_of_subjects"),
+                    }
+                    res = gyrus_type.findValue(atts)
+                    if res is not None:
+                        return res
             atts = {
                 "subject": cm.get("subject"),
                 "_type": "BothResampledGyri",
@@ -105,8 +118,9 @@ def execution(self, context):
             'could not fusion objects-matrix, mesh and labels texture may not correspond.')
     
     wgroup = a.createWindowsBlock(2)
-    win = a.createWindow('Sagittal', block=wgroup, no_decoration=False)
+    win = a.createWindow('3D', block=wgroup, no_decoration=False)
     a.execute('WindowConfig', windows=[win], light={'background' : [0.,0.,0.,0.]})
+    win.camera(view_quaternion=[0.5, 0.5, 0.5, 0.5])
 #    win1 = a.createWindow('Sagittal', block=wgroup, no_decoration=True)
 #    a.execute('WindowConfig', windows=[win1], light={'background' : [0.,0.,0.,0.]})
     
@@ -114,5 +128,7 @@ def execution(self, context):
 #    win1.addObjects(conn)
     win.setControl('ConnectivityMatrixControl')
 #    win1.setControl('ConnectivityMatrixControl')
+
+    mainThreadActions().push(wgroup.widgetProxy().widget.resize, 600, 500)
 
     return [win, conn]
