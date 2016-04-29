@@ -43,7 +43,7 @@ def validation():
 
 name = "Anatomist view mozaic visualization of textured mesh"
 userLevel = 2
-roles = ("viewer", )
+#roles = ("viewer", )
 
 
 signature = Signature(
@@ -265,7 +265,7 @@ def execution_mainthread(self, context):
 
     # change major_textured_mesh settings
     a.execute(
-        "TexturingParams", ojects=[major_textured_mesh], interpolation="rgb")
+        "TexturingParams", objects=[ana_major_texture], interpolation="rgb")
 
     # view object
     wgroup = a.createWindowsBlock(nbCols=2)
@@ -279,6 +279,8 @@ def execution_mainthread(self, context):
     action = win1.view().controlSwitch().getAction(
         "SmallBrainSelectionAction")
     action.secondaryView = win2
+
+    wgroup.widgetProxy().widget.resize(1200, 800)
 
     return [ana_mesh, graph_list, ana_clusters,
             major_textured_mesh, win1, win2]

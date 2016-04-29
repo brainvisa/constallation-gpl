@@ -17,16 +17,17 @@ from brainvisa import anatomist as ana
 
 name = 'Anatomist view mozaic visualization of fibers'
 userLevel = 0
-roles = ('viewer', )
+#roles = ('viewer', )
 
 
 signature = Signature(
     'bundles', ListOf(ReadDiskItem('Fascicles bundles', 'Aims bundles')),
-    'dw_to_t1', ReadDiskItem('Transformation matrix', 
+    'dw_to_t1', ReadDiskItem('Transform T2 Diffusion MR to Raw T1 MRI',
                              'Transformation matrix'),
     'white_mesh', ReadDiskItem('White Mesh', 'anatomist mesh formats',
-                               requiredAttributes={"side":"both",
-                                                   "vertex_corr":"Yes"}),
+                               requiredAttributes={"side": "both",
+                                                   "vertex_corr": "Yes",
+                                                   "inflated": "No"}),
     'clustering_texture', ListOf(
         ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
                      requiredAttributes={"roi_autodetect":"No",
@@ -34,14 +35,21 @@ signature = Signature(
                                          "averaged":"No",
                                          "intersubject":"Yes",
                                          "step_time":"Yes"})),
-    'major_texture', ReadDiskItem('Label Texture', 'anatomist texture formats'),
+    'major_texture', ReadDiskItem('Label Texture',
+                                  'anatomist texture formats'),
     'max_number_of_fibers', Integer(),
     'clustering_texture_timestep', ListOf(Integer()),
 )
 
 
 def initialization( self ):
+    def link_trans(self, dummy):
+        if len(self.bundles) != 0:
+            return self.bundles[0]
+
     self.linkParameters('bundles', 'clustering_texture')
+    self.linkParameters('dw_to_t1', 'bundles', link_trans)
+    self.linkParameters('white_mesh', 'dw_to_t1')
     self.max_number_of_fibers = 10000
     self.clustering_texture_timestep = []
 
