@@ -24,7 +24,7 @@ Author: Sandrine Lefranc, 2015
 # Axon python API module
 from brainvisa.processes import Signature, ValidationError, ReadDiskItem, \
     WriteDiskItem, String, ListOf, ParallelExecutionNode, ExecutionNode, \
-    mapValuesToChildrenParameters
+    mapValuesToChildrenParameters, Boolean
 from brainvisa.group_utils import Subject
 
 # Soma-base modules
@@ -83,7 +83,10 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "Yes",
                             "dense": "No",
-                            "intersubject": "Yes"})))
+                            "intersubject": "Yes"})),
+    "normalize", Boolean(),
+)
+                            
 
 
 #----------------------------Functions-----------------------------------------
@@ -102,12 +105,14 @@ def afterChildAddedCallback(self, parent, key, child):
     child.signature["white_mesh"] = parent.signature["average_mesh"]
     child.signature["reduced_individual_matrix"] = \
         parent.signature["intersubject_reduced_matrices"].contentType
+    
 
     child.filtered_reduced_individual_profile = \
         parent.filtered_reduced_group_profile
     child.white_mesh = parent.average_mesh
     child.ROIs_nomenclature = parent.ROIs_nomenclature
     child.ROI = parent.ROI
+    child.normalize = parent.normalize
 
     # Add link between eNode.ListOf_Input_3dImage and pNode.Input_3dImage
     parent.addDoubleLink(key + ".filtered_reduced_individual_profile",
@@ -115,6 +120,8 @@ def afterChildAddedCallback(self, parent, key, child):
     parent.addDoubleLink(key + ".white_mesh", "average_mesh")
     parent.addDoubleLink(key + ".ROIs_nomenclature", "ROIs_nomenclature")
     parent.addDoubleLink(key + ".ROI", "ROI")
+    parent.addDoubleLink(
+        key + ".normalize", "normalize")
 
 
 def beforeChildRemovedCallback(self, parent, key, child):
@@ -123,6 +130,8 @@ def beforeChildRemovedCallback(self, parent, key, child):
     parent.removeDoubleLink(key + ".white_mesh", "average_mesh")
     parent.removeDoubleLink(key + ".ROIs_nomenclature", "ROIs_nomenclature")
     parent.removeDoubleLink(key + ".ROI", "ROI")
+    parent.removeDoubleLink(
+        key + ".normalize", "normalize")
 
 
 def initialization(self):
