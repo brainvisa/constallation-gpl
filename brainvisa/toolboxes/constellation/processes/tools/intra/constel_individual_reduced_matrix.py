@@ -25,12 +25,13 @@ Author: Sandrine Lefranc, 2015
 
 # axon python API modules
 from brainvisa.processes import Signature, ReadDiskItem, ValidationError, \
-    WriteDiskItem, String
+    WriteDiskItem, String, Boolean
 from soma.path import find_in_path
 
 # constel modules
 try:
     from constel.lib.utils.files import read_file, select_ROI_number
+    from constel.lib.connmatrix.connmatrixtools import save_normalization
 except:
     pass
 
@@ -82,6 +83,7 @@ signature = Signature(
                             "reduced":"Yes",
                             "dense":"No",
                             "intersubject":"No"}),
+    "normalize", Boolean(),
 )
 
 
@@ -92,6 +94,7 @@ def initialization(self):
     """Provides default value and link of parameters"""
     # default value
     self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+    self.normalize = True
 
     def link_matrix2ROI(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
@@ -102,9 +105,11 @@ def initialization(self):
             return s
 
     # link of parameters for autocompletion
-    self.linkParameters("filtered_reduced_individual_profile", "complete_individual_matrix")
+    self.linkParameters(
+        "filtered_reduced_individual_profile", "complete_individual_matrix")
     self.linkParameters("ROI", "complete_individual_matrix", link_matrix2ROI)
-    self.linkParameters("reduced_individual_matrix", "filtered_reduced_individual_profile")
+    self.linkParameters(
+        "reduced_individual_matrix", "filtered_reduced_individual_profile")
 
 
 #----------------------------Main program--------------------------------------
@@ -116,6 +121,12 @@ def execution(self, context):
     # selects the ROI label corresponding to ROI name
     ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
 
+    # normalization of the reduced matrix
+    if self.normalize:
+        norm = 1
+    else:
+        norm = 0
+
     # M(target regions, patch vertices)
     context.system("constelConnectionDensityTexture",
                    "-mesh", self.white_mesh,
@@ -125,5 +136,14 @@ def execution(self, context):
                    "-seedlabel", ROIlabel,
                    "-type", "seedVertex_to_targets",
                    "-connmatrix", self.reduced_individual_matrix,
-                   "-normalize", 1,
+                   "-normalize", norm,
                    "-verbose", 1)
+
+    # save the normalization values
+    if not self.normalize:
+        save_normalization(self.reduced_individual_matrix.fullPath())
+    
+    
+    
+    
+    
