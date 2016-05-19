@@ -22,10 +22,13 @@ Author: Sandrine Lefranc
 #----------------------------Imports-------------------------------------------
 
 
-# python system module
-from brainvisa.processes import ValidationError, Signature, ReadDiskItem, \
-    WriteDiskItem, String, ListOf
+# system module
+import numpy
 
+from brainvisa.processes import ValidationError, Signature, ReadDiskItem, \
+    WriteDiskItem, String, ListOf, Integer, WriteDiskItem
+
+# soma module
 from soma import aims
 
 name = 'Concatenate the ROI segmentations on the same mesh'
@@ -40,12 +43,10 @@ signature = Signature(
                             "averaged": "No",
                             "intersubject": "Yes",
                             "step_time": "Yes"})),
-    "average_mesh", ReadDiskItem(
-        "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes",
-                            "averaged": "Yes"}),
-    "concatenated_ROI_segmentations", String()
+    "time_step", ListOf(Integer()),
+    "mesh", ReadDiskItem("White Mesh", "Aims mesh formats"),
+    "concatenated_ROIseg", WriteDiskItem(
+        "Connectivity ROI Texture", "Aims texture formats")
 )
 
 
@@ -61,23 +62,24 @@ def initialization(self):
 def execution(self, context):
     """
     """
-    list_roi_clusterings = []
-    for roi_clustering in self.ROI_clustering:
-        roi = aims.read(roi_clustering.fullPath())
-        list_roi_clusterings.append(roi)
-    print list_roi_clusterings
-    
-    for idx, texfile in enumerate(list_roi_clusterings):
+    for idx, filename in enumerate(self.ROI_clustering):
+        roiseg = aims.read(filename.fullPath())
+        rseg = numpy.array(roiseg[self.time_step[idx]].arraydata())
         if idx == 0:
-            input_roi = list_roi_clusterings[0]
+            tmp_rseg = rseg
+            max_time_step = max(rseg)
         else:
-            vertices_tex = int(input_roi[0].nItem())
-            vertices_added = int(texfile[0].nItem())
-            value = max(input_roi[0].arraydata())
-            for v in xrange(vertices_tex):
-                v_tex_add = texfile[0][v]
-                v_tex = input_roi[0][v]
-                if v_tex_add > 0 and v_tex == 0:
-                    input_roi[0][v] = v_tex_add + value
-    aims.write(input_roi, self.concatenated_ROI_segmentations)
+            l = numpy.unique(rseg)
+            if l[0] == 0:
+                labels = l.nonzero()[0][::-1]
+            else:
+                labels = l[::-1]
+            for label in labels:
+                rseg[rseg == label] = label + max_time_step
+            temp = tmp_rseg[:]
+            tmp_rseg = [x + y for x, y in zip(temp, rseg)]
+            max_time_step = max(rseg)
+    final_rseg = aims.TimeTexture_S16()
+    final_rseg[0].assign(tmp_rseg)
+    aims.write(final_rseg, self.concatenated_ROIseg.fullPath())
 
