@@ -10,10 +10,10 @@
 """
 This script does the following:
 * defines a Brainvisa process
-    - the parameters of a process (Signature),
-    - the linked parameters
-* executes the command 'comistFiberOversampler' to perform an oversampling
-  of the distant fiber tracts.
+    - the signature of the inputs/ouputs,
+    - the interlinkages between inputs/outputs.
+* executes the command 'comistFiberOversampler': the semilabeled fibers are
+  oversampled.
 
 Main dependencies: axon python API, soma-base, comist
 
@@ -27,7 +27,7 @@ Author: Sandrine Lefranc, 2015
 from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
     ValidationError
 
-# soma-base module
+# soma module
 from soma.path import find_in_path
 
 
@@ -67,16 +67,16 @@ signature = Signature(
 def initialization(self):
     """Provides link of parameters for autocompletion.
     """
-    self.linkParameters(
-        "oversampled_semilabeled_fibers", "semilabeled_fibers")
+    self.linkParameters("oversampled_semilabeled_fibers", "semilabeled_fibers")
 
 
 #----------------------------Main program--------------------------------------
 
 
 def execution(self, context):
-    """Run the command 'comistFiberOversampler' on the fiber tracts
-    with only one end identified on the mesh.
+    """Run the command 'comistFiberOversampler'.
+
+    The fiber tracts with only one end identified on the mesh are oversampled.
     """
     context.system("comistFiberOversampler",
                    "-i", self.semilabeled_fibers,
