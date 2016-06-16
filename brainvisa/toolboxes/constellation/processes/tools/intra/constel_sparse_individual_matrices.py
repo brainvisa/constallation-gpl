@@ -10,13 +10,13 @@
 """
 This script does the following:
 * defines a Brainvisa process
-    - the parameters of a process (Signature),
-    - the parameters initialization
-    - the linked parameters
-* executes the command 'constelConnectivityMatrix' to compute the connectivity
-  matrix (ROI vertices, cortical surface vertices)
+    - the signature of the inputs/ouputs,
+    - the initialization (by default) of the inputs,
+    - the interlinkages between inputs/outputs.
+* executes the command 'constelConnectivityMatrix': the connectivity matrix is
+  computed  M(labelname vertices, cortical surface vertices)
 
-Main dependencies: axon python API, soma-base, constel
+Main dependencies: axon python API, soma, constel
 
 Author: Sandrine Lefranc, 2015
 """
@@ -28,7 +28,7 @@ Author: Sandrine Lefranc, 2015
 from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
     ValidationError, String
 
-# soma-base module
+# soma module
 from soma.path import find_in_path
 
 # constel module
@@ -62,12 +62,13 @@ signature = Signature(
     "labeled_fibers", ReadDiskItem(
         "Filtered Fascicles Bundles", "Aims readable bundles formats",
         requiredAttributes={"both_ends_labelled": "Yes", "oversampled": "No"}),
-    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
-    "ROI", String(),
+    "cortical_regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File"),
+    "cortical_region", String(),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
-    "ROIs_segmentation", ReadDiskItem(
+    "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     "dw_to_t1", ReadDiskItem("Transform T2 Diffusion MR to Raw T1 MRI",
@@ -107,24 +108,27 @@ signature = Signature(
 
 
 def initialization(self):
-    """Provides default values and link of parameters"""
+    """Provides default values and link between parameters"""
     # default value
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+    self.cortical_regions_nomenclature = self.signature[
+        "cortical_regions_nomenclature"].findValue(
+        {"atlasname": "desikan_freesurfer"})
 
-    def link_fibertracts2ROI(self, dummy):
+    def link_fibertracts2label(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
-        signature 'ROI'.
+        signature 'cortical_region'.
         """
         if self.oversampled_semilabeled_fibers is not None:
             s = str(self.oversampled_semilabeled_fibers.get("gyrus"))
-            name = self.signature["ROI"].findValue(s)
+            name = self.signature["cortical_region"].findValue(s)
         return name
 
     # link of parameters for autocompletion
     self.linkParameters(
         "matrix_semilabeled_fibers", "oversampled_semilabeled_fibers")
     self.linkParameters(
-        "ROI", "oversampled_semilabeled_fibers", link_fibertracts2ROI)
+        "cortical_region", "oversampled_semilabeled_fibers",
+        link_fibertracts2label)
     self.linkParameters(
         "matrix_labeled_fibers", "labeled_fibers")
     self.linkParameters(
@@ -132,20 +136,24 @@ def initialization(self):
     self.linkParameters(
         "profile_labeled_fibers", "matrix_labeled_fibers")
 
+
 #----------------------------Main program--------------------------------------
 
 
 def execution(self, context):
-    """Computes two connectivity matrices
-    (ROI vertices, cortical surface vertices).
+    """Run the command 'constelConnectivityMatrix'.
 
-    (1) case 1: computes connectivity matrix for distant fibers of cortex
-                one end only of fibers is identified
-    (2) case 2:computes connectivity matrix for fibers near cortex
-               both ends of fibers are well identified
+    Computes two connectivity matrices.
+    (labelname vertices, cortical surface vertices).
+
+    (1) case 1: computes connectivity matrix for semilabeled fibers of cortex
+                one end only of fibers is identified.
+    (2) case 2:computes connectivity matrix for labeled fibers
+               both ends of fibers are well identified.
     """
-    # selects the ROI label corresponding to ROI name
-    ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
+    # selects the label number corresponding to label name
+    label_number = select_ROI_number(
+        self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
 
     # case 1
     # this command is mostly concerned with fibers leaving the brain stem
@@ -156,12 +164,12 @@ def execution(self, context):
                    "-dist", 0.0,  # no smoothing
                    "-wthresh", 0.001,
                    "-distmax", 5.0,
-                   "-seedregionstex", self.ROIs_segmentation,
+                   "-seedregionstex", self.cortical_parcellation,
                    "-outconntex", self.profile_semilabeled_fibers,
                    "-mesh", self.white_mesh,
                    "-type", "seed_mean_connectivity_profile",
                    "-trs", self.dw_to_t1,
-                   "-seedlabel", ROIlabel,
+                   "-seedlabel", label_number,
                    "-normalize", 0,
                    "-verbose", 1)
 
@@ -170,11 +178,11 @@ def execution(self, context):
                    "-bundles", self.labeled_fibers,
                    "-connmatrix", self.matrix_labeled_fibers,
                    "-dist", 0.0,  # no smoothing
-                   "-seedregionstex", self.ROIs_segmentation,
+                   "-seedregionstex", self.cortical_parcellation,
                    "-outconntex", self.profile_labeled_fibers,
                    "-mesh", self.white_mesh,
                    "-type", "seed_mean_connectivity_profile",
                    "-trs", self.dw_to_t1,
-                   "-seedlabel", ROIlabel,
+                   "-seedlabel", label_number,
                    "-normalize", 0,
                    "-verbose", 1)

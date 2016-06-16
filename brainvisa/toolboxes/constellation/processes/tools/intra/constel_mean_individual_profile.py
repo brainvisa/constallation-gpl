@@ -10,14 +10,15 @@
 """
 This script does the following:
 * defines a Brainvisa process
-    - the parameters of a process (Signature),
-    - the parameters initialization
-    - the linked parameters
-* this process
+    - the signature of the inputs/ouputs,
+    - the initialization (by default) of the inputs,
+    - the interlinkages between inputs/outputs.
+* this process executes the command 'constelMeanConnectivityProfileFromMatrix':
+  connection density textures are computed and write on the disk.
 
-Main dependencies: Axon python API, Soma-base, constel
+Main dependencies: axon python API, soma, constel
 
-Author: sandrine.lefranc@cea.fr
+Author: Sandrine Lefranc, 2015
 """
 
 
@@ -28,7 +29,7 @@ Author: sandrine.lefranc@cea.fr
 from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
     ValidationError, String
 
-# soma-base module
+# soma module
 from soma.path import find_in_path
 
 # constel module
@@ -61,11 +62,12 @@ signature = Signature(
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "No"}),
-    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
-    "ROI", String(),
-    "ROIs_segmentation", ReadDiskItem("ROI Texture", "Aims texture formats",
-                                      requiredAttributes={"side": "both",
-                                                          "vertex_corr": "Yes"}),
+    "cortical_regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File"),
+    "cortical_region", String(),
+    "cortical_parcellation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     # --ouputs--
     "mean_individual_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
@@ -82,19 +84,23 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters"""
     # default value
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+    self.cortical_regions_nomenclature = self.signature[
+        "cortical_regions_nomenclature"].findValue(
+        {"atlasname": "desikan_freesurfer"})
 
-    def link_matrix2ROI(self, dummy):
+    def link_matrix2label(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
-        signature 'ROI'.
+        signature 'cortical_region'.
         """
         if self.complete_individual_matrix is not None:
             s = str(self.complete_individual_matrix.get("gyrus"))
-            name = self.signature["ROI"].findValue(s)
+            name = self.signature["cortical_region"].findValue(s)
         return name
 
     # link of parameters for autocompletion
-    self.linkParameters("ROI", "complete_individual_matrix", link_matrix2ROI)
+    self.linkParameters("cortical_region",
+                        "complete_individual_matrix",
+                        link_matrix2label)
     self.linkParameters("mean_individual_profile",
                         "complete_individual_matrix")
 
@@ -103,17 +109,20 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Compute the connectivity profile from connectivity matrix
+    """Run the command 'constelMeanConnectivityProfileFromMatrix'.
+
+    Compute the connectivity profile (no normalize) from connectivity matrix.
     """
-    # selects the ROI label corresponding to ROI name
-    ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
+    # selects the label number corresponding to label name
+    label_number = select_ROI_number(
+        self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
 
     context.system("constelMeanConnectivityProfileFromMatrix",
                    "-connfmt", "binar_sparse",
                    "-connmatrixfile", self.complete_individual_matrix,
                    "-outconntex", self.mean_individual_profile,
-                   "-seedregionstex", self.ROIs_segmentation,
-                   "-seedlabel", ROIlabel,
+                   "-seedregionstex", self.cortical_parcellation,
+                   "-seedlabel", label_number,
                    "-type", "seed_mean_connectivity_profile",
                    "-normalize", 0,
                    "-verbose", 1)

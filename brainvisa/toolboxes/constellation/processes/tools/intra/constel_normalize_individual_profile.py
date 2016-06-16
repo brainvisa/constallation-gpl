@@ -10,14 +10,14 @@
 """
 This script does the following:
 * defines a Brainvisa process
-    - the parameters of a process (Signature),
-    - the parameters initialization
-    - the linked parameters
+    - the signature of the inputs/ouputs,
+    - the initialization (by default) of the inputs,
+    - the interlinkages between inputs/outputs.
 * this process executes the command 'constelRemoveInternalConnections.py'.
 
 Main dependencies: Axon python API, Soma-base, constel
 
-Author: sandrine.lefranc@cea.fr
+Author: Sandrine Lefranc, 2015
 """
 
 #----------------------------Imports-------------------------------------------
@@ -65,11 +65,12 @@ signature = Signature(
                             "thresholded": "No",
                             "averaged": "No",
                             "intersubject": "No"}),
-    "ROIs_segmentation", ReadDiskItem("ROI Texture", "Aims texture formats",
-                                 requiredAttributes={"side": "both",
-                                                     "vertex_corr": "Yes"}),
-    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
-    "ROI", String(),
+    "cortical_parcellation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+    "cortical_regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File"),
+    "cortical_region", String(),
 
     # --outputs--
     "normed_individual_profile", WriteDiskItem(
@@ -86,23 +87,26 @@ signature = Signature(
 
 
 def initialization(self):
-    """Provides default values and link of parameters
+    """Provides default values and link of parameters.
     """
     # default value
     self.keep_internal_connections = False
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+    self.cortical_regions_nomenclature = self.signature[
+        "cortical_regions_nomenclature"].findValue(
+        {"atlasname": "desikan_freesurfer"})
 
-    def link_matrix2ROI(self, dummy):
+    def link_matrix2label(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
-        signature 'ROI'.
+        signature 'cortical_region'.
         """
         if self.mean_individual_profile is not None:
             s = str(self.mean_individual_profile.get("gyrus"))
-            name = self.signature["ROI"].findValue(s)
+            name = self.signature["cortical_region"].findValue(s)
         return name
 
     # link of parameters for autocompletion
-    self.linkParameters("ROI", "mean_individual_profile", link_matrix2ROI)
+    self.linkParameters(
+        "cortical_region", "mean_individual_profile", link_matrix2label)
     self.linkParameters(
         "normed_individual_profile", "mean_individual_profile")
 
@@ -111,13 +115,15 @@ def initialization(self):
 
 
 def execution(self, context):
-    """
+    """Run the command 'constelRemoveInternalConnections.py'.
+
     STEP 1/2: Remove internals connections of patch.
     STEP 2/2: The profile is normalized.
     """
-    # selects the ROI label corresponding to ROI name
-    ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
-    
+    # selects the label number corresponding to label name
+    label_number = select_ROI_number(
+        self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
+
     if not self.keep_internal_connections:
         arg = "-q"
     else:
@@ -125,8 +131,8 @@ def execution(self, context):
 
     context.system(sys.executable,
                    find_in_path("constelRemoveInternalConnections.py"),
-                   ROIlabel,
+                   label_number,
                    self.mean_individual_profile,
-                   self.ROIs_segmentation,
+                   self.cortical_parcellation,
                    self.normed_individual_profile,
                    arg)
