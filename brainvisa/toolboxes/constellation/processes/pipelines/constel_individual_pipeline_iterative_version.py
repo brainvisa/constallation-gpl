@@ -10,12 +10,12 @@
 """
 This script does the following:
 * defines a BrainVisa pipeline
-    - the parameters of a pipeline (Signature),
-    - the parameters initialization...
+    - the signature of the inputs/ouputs,
+    - the interlinkages between inputs/outputs.
 * iterative version (it is necessary if we are to iterate on all gyri at the
   same time as subjects)
 
-Main dependencies:
+Main dependencies: axon python API, soma, constel
 
 Author: Sandrine Lefranc, 2016
 """
@@ -24,8 +24,8 @@ Author: Sandrine Lefranc, 2016
 
 
 # Axon python API modules
-from brainvisa.processes import Signature, String, Choice, ReadDiskItem, \
-    Float, OpenChoice, neuroHierarchy, ListOf, ParallelExecutionNode, \
+from brainvisa.processes import Signature, Choice, ReadDiskItem, Float, \
+    OpenChoice, neuroHierarchy, ListOf, ParallelExecutionNode, \
     mapValuesToChildrenParameters, ExecutionNode
 
 # soma module
@@ -51,11 +51,12 @@ signature = Signature(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
     "study_name", OpenChoice(),
     "outputs_database", Choice(),
-    "format_fiber_tracts", Choice("bundles", "trk"),
-    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
-    "ROI", OpenChoice(),
-    "dirsubject", ListOf(ReadDiskItem("subject", "directory")),
-    "ROIs_segmentation", ListOf(ReadDiskItem(
+    "fiber_tracts_format", Choice("bundles", "trk"),
+    "cortical_regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File"),
+    "cortical_region", OpenChoice(),
+    "subject_directory", ListOf(ReadDiskItem("subject", "directory")),
+    "cortical_parcellation", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"})),
     "white_mesh", ListOf(ReadDiskItem(
@@ -73,37 +74,39 @@ def afterChildAddedCallback(self, parent, key, child):
     """
     """
     # remove link of the sub process
-    child.removeLink("white_mesh", "dirsubject")
-    child.removeLink("ROIs_segmentation",
-                     ["study_name", "dirsubject", "method"])
+    child.removeLink("white_mesh", "subject_directory")
+    child.removeLink("cortical_parcellation",
+                     ["study_name", "subject_directory", "method"])
 
     # Set default values
     child.study_name = parent.study_name
     child.outputs_database = parent.outputs_database
-    child.format_fiber_tracts = parent.format_fiber_tracts
+    child.fiber_tracts_format = parent.fiber_tracts_format
     child.method = parent.method
-    child.ROIs_nomenclature = parent.ROIs_nomenclature
-    child.ROI = parent.ROI
+    child.cortical_regions_nomenclature = parent.cortical_regions_nomenclature
+    child.cortical_region = parent.cortical_region
     child.smoothing = parent.smoothing
 
     # Add link between eNode.ListOf_Input_3dImage and pNode.Input_3dImage
     parent.addDoubleLink(key + ".study_name", "study_name")
     parent.addDoubleLink(key + ".outputs_database", "outputs_database")
-    parent.addDoubleLink(key + ".format_fiber_tracts", "format_fiber_tracts")
+    parent.addDoubleLink(key + ".fiber_tracts_format", "fiber_tracts_format")
     parent.addDoubleLink(key + ".method", "method")
-    parent.addDoubleLink(key + ".ROIs_nomenclature", "ROIs_nomenclature")
-    parent.addDoubleLink(key + ".ROI", "ROI")
+    parent.addDoubleLink(key + ".cortical_regions_nomenclature",
+                         "cortical_regions_nomenclature")
+    parent.addDoubleLink(key + ".cortical_region", "cortical_region")
     parent.addDoubleLink(key + ".smoothing", "smoothing")
 
 
 def beforeChildRemovedCallback(self, parent, key, child):
     parent.removeDoubleLink(key + ".study_name", "study_name")
     parent.removeDoubleLink(key + ".outputs_database", "outputs_database")
-    parent.removeDoubleLink(
-        key + ".format_fiber_tracts", "format_fiber_tracts")
+    parent.removeDoubleLink(key + ".fiber_tracts_format",
+                            "fiber_tracts_format")
     parent.removeDoubleLink(key + ".method", "method")
-    parent.removeDoubleLink(key + ".ROIs_nomenclature", "ROIs_nomenclature")
-    parent.removeDoubleLink(key + ".ROI", "ROI")
+    parent.removeDoubleLink(key + ".cortical_regions_nomenclature",
+                            "cortical_regions_nomenclature")
+    parent.removeDoubleLink(key + ".cortical_region", "cortical_region")
     parent.removeDoubleLink(key + ".smoothing", "smoothing")
 
 
@@ -123,10 +126,13 @@ def initialization(self):
 
     # default value
     self.smoothing = 3.0
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue(
+    self.cortical_regions_nomenclature = self.signature[
+        "cortical_regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
     def fill_study_choice(self, dummy=None):
+        """
+        """
         choices = set()
         if self.outputs_database is not None:
             database = neuroHierarchy.databases.database(self.outputs_database)
@@ -140,29 +146,32 @@ def initialization(self):
                 and self.study_name not in choices:
             self.setValue('study_name', list(choices)[0], True)
 
-    def reset_roi(self, dummy):
-        """ This callback reads the ROIs nomenclature and proposes them in the
-        signature 'ROI' of process.
-        It also resets the ROI paramter to default state after
+    def reset_cortical_region(self, dummy):
+        """ This callback reads the cortical regions nomenclature and proposes
+        them in the signature 'cortical_region' of process.
+        It also resets the cortical_region paramter to default state after
         the nomenclature changes.
         """
-        current = self.ROI
-        self.setValue('ROI', current, True)
-        if self.ROIs_nomenclature is not None:
-            s = [("Select a ROI in this list", None)]
+        current = self.cortical_region
+        self.setValue('cortical_region', current, True)
+        if self.cortical_regions_nomenclature is not None:
+            s = [("Select a cortical_region in this list", None)]
             # temporarily set a value which will remain valid
-            self.ROI = s[0][1]
-            s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
-            self.signature["ROI"].setChoices(*s)
-            if isinstance(self.signature["ROI"], OpenChoice):
-                self.signature["ROI"] = Choice(*s)
+            self.cortical_region = s[0][1]
+            s += read_file(
+                self.cortical_regions_nomenclature.fullPath(), mode=2)
+            self.signature["cortical_region"].setChoices(*s)
+            if isinstance(self.signature["cortical_region"], OpenChoice):
+                self.signature["cortical_region"] = Choice(*s)
                 self.changeSignature(self.signature)
             if current not in s:
-                self.setValue('ROI', s[0][1], True)
+                self.setValue('cortical_region', s[0][1], True)
             else:
-                self.setValue('ROI', current, True)
+                self.setValue('cortical_region', current, True)
 
     def method_changed(self, dummy):
+        """
+        """
         signature = self.signature
         if self.method == "avg":
             item_type = ReadDiskItem(
@@ -174,47 +183,43 @@ def initialization(self):
                 "ROI Texture", "Aims texture formats",
                 requiredAttributes={"side": "both", "vertex_corr": "Yes",
                                     "averaged": "No"})
-        signature["ROIs_segmentation"] = ListOf(item_type)
+        signature["cortical_parcellation"] = ListOf(item_type)
         self.changeSignature(signature)
-        self.setValue("ROIs_segmentation", link_roi(self), True)
+        self.setValue(
+            "cortical_parcellation", link_cortical_region(self), True)
         fill_study_choice(self)
 
-    #def linkMesh(self, dummy):
-        #item_type = self.signature["white_mesh"]
-        #if self.method == "avg":
-            #return [item_type.findValue(roi_seg)
-                    #for roi_seg in self.ROIs_segmentation]
-        #else:
-            #return [item_type.findValue({"subject": dirsubject.get("subject")})
-                    #for dirsubject in self.dirsubject]
-
-    def link_roi(self, dummy=None):
+    def link_cortical_region(self, dummy=None):
+        """
+        """
         if self.method == "avg" and self.study_name:
             # just in case study_name corresponds to subjects group...
-            res = self.signature["ROIs_segmentation"].findValue(
+            res = self.signature["cortical_parcellation"].findValue(
                 {"freesurfer_group_of_subjects": self.study_name})
             if res is None:
-                res = self.signature["ROIs_segmentation"].findValue(
+                res = self.signature["cortical_parcellation"].findValue(
                     {"group_of_subjects": self.study_name})
             if res is not None:
                 return [res] * len(self.executionNode().childrenNames())
-        elif self.method == "concat" and self.dirsubject is not None:
-            item_type = self.signature["ROIs_segmentation"].contentType
-            res = [item_type.findValue(dirsubject)
-                   for dirsubject in self.dirsubject]
-            if res == [None] * len(self.dirsubject):
-                res = [item_type.findValue(dirsubject,
-                          requiredAttributes={"_type": "BothResampledGyri"})
-                       for dirsubject in self.dirsubject]
+        elif self.method == "concat" and self.subject_directory is not None:
+            item_type = self.signature["cortical_parcellation"].contentType
+            res = [item_type.findValue(subject_directory)
+                   for subject_directory in self.subject_directory]
+            if res == [None] * len(self.subject_directory):
+                res = [item_type.findValue(subject_directory,
+                       requiredAttributes={"_type": "BothResampledGyri"})
+                       for subject_directory in self.subject_directory]
             return res
 
     # link of parameters for autocompletion
-    self.linkParameters(None, "ROIs_nomenclature", reset_roi)
+    self.linkParameters(None, "cortical_regions_nomenclature",
+                        reset_cortical_region)
     self.linkParameters(None, "method", method_changed)
-    self.linkParameters("white_mesh", "dirsubject")
+    self.linkParameters("white_mesh", "subject_directory")
     self.linkParameters(None, "outputs_database", fill_study_choice)
-    self.linkParameters("ROIs_segmentation",
-                        ["study_name", "dirsubject", "method"], link_roi)
+    self.linkParameters("cortical_parcellation",
+                        ["study_name", "subject_directory", "method"],
+                        link_cortical_region)
 
     # define the main node of the pipeline
     eNode = ParallelExecutionNode(
@@ -231,10 +236,10 @@ def initialization(self):
 
     # Add links to refresh child nodes when main lists are modified
     eNode.addLink(
-        None, "dirsubject",
+        None, "subject_directory",
         partial(mapValuesToChildrenParameters, eNode,
-                eNode, "dirsubject",
-                "dirsubject",
+                eNode, "subject_directory",
+                "subject_directory",
                 defaultProcess="constel_individual_pipeline",
                 name="constel_individual_pipeline"))
 
@@ -247,10 +252,10 @@ def initialization(self):
                 name="constel_individual_pipeline"))
 
     eNode.addLink(
-        None, "ROIs_segmentation",
+        None, "cortical_parcellation",
         partial(mapValuesToChildrenParameters, eNode,
-                eNode, "ROIs_segmentation",
-                "ROIs_segmentation",
+                eNode, "cortical_parcellation",
+                "cortical_parcellation",
                 defaultProcess="constel_individual_pipeline",
                 name="constel_individual_pipeline"))
 

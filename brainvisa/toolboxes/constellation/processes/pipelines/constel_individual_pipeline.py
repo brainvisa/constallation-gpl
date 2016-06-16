@@ -10,9 +10,9 @@
 """
 This script does the following:
 * defines a Brainvisa pipeline
-    - the parameters of a pipeline (Signature),
-    - the parameters initialization
-    - the linked parameters between processes
+    - the signature of the inputs/ouputs,
+    - the initialization (by default) of the inputs,
+    - the interlinkages between inputs/outputs.
 
 Main dependencies: axon python API, constel
 
@@ -22,10 +22,15 @@ Author: Sandrine Lefranc, 2015
 #----------------------------Imports-------------------------------------------
 
 
-# Axon python API modules
-from brainvisa.processes import Signature, String, Choice, ReadDiskItem, \
-    Float, OpenChoice, neuroHierarchy, SerialExecutionNode, \
-    ProcessExecutionNode, WriteDiskItem
+# axon python API modules
+from brainvisa.processes import Float
+from brainvisa.processes import Choice
+from brainvisa.processes import Signature
+from brainvisa.processes import OpenChoice
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import neuroHierarchy
+from brainvisa.processes import SerialExecutionNode
+from brainvisa.processes import ProcessExecutionNode
 
 # constel module
 try:
@@ -41,16 +46,17 @@ name = "Constellation Individual Pipeline"
 userLevel = 0
 
 signature = Signature(
-    #inputs
+    #--inputs--
     "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
     "outputs_database", Choice(),
     "study_name", OpenChoice(),
-    "format_fiber_tracts", Choice("bundles", "trk"),
-    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
-    "ROI", OpenChoice(),
-    "dirsubject", ReadDiskItem("subject", "directory"),
-    "ROIs_segmentation", ReadDiskItem(
+    "fiber_tracts_format", Choice("bundles", "trk"),
+    "cortical_regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File"),
+    "cortical_region", OpenChoice(),
+    "subject_directory", ReadDiskItem("subject", "directory"),
+    "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     "white_mesh", ReadDiskItem(
@@ -65,9 +71,8 @@ signature = Signature(
 
 
 def initialization(self):
-    """Provides default values and link of parameters
+    """Provides default values and link of parameters.
     """
-
     # list of possible databases, while respecting the ontology
     # ontology: brainvisa-3.2.0
     databases = [h.name for h in neuroHierarchy.hierarchies()
@@ -80,78 +85,88 @@ def initialization(self):
 
     # default value
     self.smoothing = 3.0
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue(
+    self.cortical_regions_nomenclature = self.signature[
+        "cortical_regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
     def fill_study_choice(self, dummy=None):
+        """
+        """
         choices = set()
         if self.outputs_database is not None:
             database = neuroHierarchy.databases.database(self.outputs_database)
             sel = {"study": self.method}
             choices.update(
                 [x[0] for x in database.findAttributes(
-                    ['texture'], selection=sel,
-                    _type='Filtered Fascicles Bundles')])
-        self.signature['study_name'].setChoices(*sorted(choices))
-        if len(choices) != 0 and self.isDefault('study_name') \
+                    ["texture"], selection=sel,
+                    _type="Filtered Fascicles Bundles")])
+        self.signature["study_name"].setChoices(*sorted(choices))
+        if len(choices) != 0 and self.isDefault("study_name") \
                 and self.study_name not in choices:
-            self.setValue('study_name', list(choices)[0], True)
+            self.setValue("study_name", list(choices)[0], True)
 
-    def reset_roi(self, dummy):
-        """ This callback reads the ROIs nomenclature and proposes them in the
-        signature 'ROI' of process.
-        It also resets the ROI paramter to default state after
+    def reset_label(self, dummy):
+        """This callback reads the labels nomenclature and proposes them in the
+        signature 'cortical_region' of process.
+        It also resets the cortical_region parameter to default state after
         the nomenclature changes.
         """
-        current = self.ROI
-        self.setValue('ROI', current, True)
-        if self.ROIs_nomenclature is not None:
-            s = [("Select a ROI in this list", None)]
+        current = self.cortical_region
+        self.setValue("cortical_region", current, True)
+        if self.cortical_regions_nomenclature is not None:
+            s = [("Select a cortical_region in this list", None)]
             # temporarily set a value which will remain valid
-            self.ROI = s[0][1]
-            s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
-            self.signature["ROI"].setChoices(*s)
-            if isinstance(self.signature["ROI"], OpenChoice):
-                self.signature["ROI"] = Choice(*s)
+            self.cortical_region = s[0][1]
+            s += read_file(
+                self.cortical_regions_nomenclature.fullPath(), mode=2)
+            self.signature["cortical_region"].setChoices(*s)
+            if isinstance(self.signature["cortical_region"], OpenChoice):
+                self.signature["cortical_region"] = Choice(*s)
                 self.changeSignature(self.signature)
             if current not in s:
-                self.setValue('ROI', s[0][1], True)
+                self.setValue("cortical_region", s[0][1], True)
             else:
-                self.setValue('ROI', current, True)
+                self.setValue("cortical_region", current, True)
 
     def method_changed(self, dummy):
+        """
+        """
         signature = self.signature
         if self.method == "avg":
-            signature["ROIs_segmentation"] = ReadDiskItem(
+            signature["cortical_parcellation"] = ReadDiskItem(
                 "ROI Texture", "Aims texture formats",
                 requiredAttributes={"side": "both", "vertex_corr": "Yes",
                                     "averaged": "Yes"})
             self.changeSignature(signature)
-            self.setValue("ROIs_segmentation",
-                          signature["ROIs_segmentation"].findValue(
-                              self.dirsubject), True)
+            self.setValue("cortical_parcellation",
+                          signature["cortical_parcellation"].findValue(
+                              self.subject_directory), True)
         else:
-            signature["ROIs_segmentation"] = ReadDiskItem(
+            signature["cortical_parcellation"] = ReadDiskItem(
                 "ROI Texture", "Aims texture formats",
                 requiredAttributes={"side": "both", "vertex_corr": "Yes",
                                     "averaged": "No"})
             self.changeSignature(signature)
-            self.setValue("ROIs_segmentation", link_roi(self), True)
+            self.setValue("cortical_parcellation", link_label(self), True)
         fill_study_choice(self)
 
     def linkMesh(self, dummy):
+        """
+        """
         if self.method == "avg":
-            if self.ROIs_segmentation is not None:
+            if self.cortical_parcellation is not None:
                 return self.signature["white_mesh"].findValue(
-                    self.ROIs_segmentation)
+                    self.cortical_parcellation)
             return None
         else:
-            if self.dirsubject is not None:
-                atts = {"subject": self.dirsubject.get("subject")}
+            if self.subject_directory is not None:
+                atts = {"subject": self.subject_directory.get("subject")}
                 return self.signature["white_mesh"].findValue(atts)
 
-    def link_roi(self, dummy=None):
-        roi_type = self.signature["ROIs_segmentation"]
+    def link_label(self, dummy=None):
+        """
+        """
+        roi_type = self.signature["cortical_parcellation"]
         if self.method == "avg" and self.study_name:
             # just in case study_name corresponds to subjects group...
             res = roi_type.findValue(
@@ -160,24 +175,24 @@ def initialization(self):
                 res = roi_type.findValue(
                     {"group_of_subjects": self.study_name})
             return res
-        elif self.method == "concat" and self.dirsubject is not None:
+        elif self.method == "concat" and self.subject_directory is not None:
             res = roi_type.findValue(
-                self.dirsubject)
+                self.subject_directory)
             if res is None:
                 res = roi_type.findValue(
-                    self.dirsubject,
+                    self.subject_directory,
                     requiredAttributes={"_type": "BothResampledGyri"})
             return res
 
     # link of parameters for autocompletion
-    self.linkParameters(None, "ROIs_nomenclature", reset_roi)
+    self.linkParameters(None, "cortical_regions_nomenclature", reset_label)
     self.linkParameters(None, "method", method_changed)
-    self.linkParameters("white_mesh", "dirsubject") #, "method",
-                                       #"ROIs_segmentation"], linkMesh)
+    self.linkParameters("white_mesh", "subject_directory")
     method_changed(self, self.method)
     self.linkParameters(None, "outputs_database", fill_study_choice)
-    self.linkParameters("ROIs_segmentation",
-                        ["study_name", "dirsubject", "method"], link_roi)
+    self.linkParameters("cortical_parcellation",
+                        ["study_name", "subject_directory", "method"],
+                        link_label)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
@@ -191,13 +206,15 @@ def initialization(self):
                                        optional=1))
 
     eNode.addDoubleLink("filter.outputs_database", "outputs_database")
-    eNode.addDoubleLink("filter.format_fiber_tracts", "format_fiber_tracts")
+    eNode.addDoubleLink("filter.fiber_tracts_format", "fiber_tracts_format")
     eNode.addDoubleLink("filter.method", "method")
-    eNode.addDoubleLink("filter.ROI", "ROI")
-    eNode.addDoubleLink("filter.ROIs_nomenclature", "ROIs_nomenclature")
+    eNode.addDoubleLink("filter.cortical_region", "cortical_region")
+    eNode.addDoubleLink("filter.cortical_regions_nomenclature",
+                        "cortical_regions_nomenclature")
     eNode.addDoubleLink("filter.study_name", "study_name")
-    eNode.addDoubleLink("filter.dirsubject", "dirsubject")
-    eNode.addDoubleLink("filter.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("filter.subject_directory", "subject_directory")
+    eNode.addDoubleLink("filter.cortical_parcellation",
+                        "cortical_parcellation")
     eNode.addDoubleLink("filter.white_mesh", "white_mesh")
 
     ###########################################################################
@@ -221,15 +238,15 @@ def initialization(self):
 
     eNode.addDoubleLink("ConnectivityMatrix.oversampled_semilabeled_fibers",
                         "oversampler.oversampled_semilabeled_fibers")
-    eNode.addDoubleLink(
-        "ConnectivityMatrix.labeled_fibers", "filter.labeled_fibers")
-    eNode.addDoubleLink(
-        "ConnectivityMatrix.ROIs_nomenclature", "ROIs_nomenclature")
-    eNode.addDoubleLink("ConnectivityMatrix.ROI", "ROI")
-    eNode.addDoubleLink(
-        "ConnectivityMatrix.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("ConnectivityMatrix.labeled_fibers",
+                        "filter.labeled_fibers")
+    eNode.addDoubleLink("ConnectivityMatrix.cortical_regions_nomenclature",
+                        "cortical_regions_nomenclature")
+    eNode.addDoubleLink("ConnectivityMatrix.cortical_region",
+                        "cortical_region")
+    eNode.addDoubleLink("ConnectivityMatrix.cortical_parcellation",
+                        "cortical_parcellation")
     eNode.addDoubleLink("ConnectivityMatrix.white_mesh", "white_mesh")
-    #eNode.filter.removeLink("dw_to_t1", "labeled_fibers")
     eNode.addDoubleLink("ConnectivityMatrix.dw_to_t1", "filter.dw_to_t1")
 
     ###########################################################################
@@ -243,11 +260,13 @@ def initialization(self):
                         "ConnectivityMatrix.matrix_labeled_fibers")
     eNode.addDoubleLink("smoothing.matrix_semilabeled_fibers",
                         "ConnectivityMatrix.matrix_semilabeled_fibers")
-    eNode.addDoubleLink(
-        "smoothing.ROIs_nomenclature", "ConnectivityMatrix.ROIs_nomenclature")
-    eNode.addDoubleLink("smoothing.ROI", "ConnectivityMatrix.ROI")
+    eNode.addDoubleLink("smoothing.cortical_regions_nomenclature",
+                        "ConnectivityMatrix.cortical_regions_nomenclature")
+    eNode.addDoubleLink("smoothing.cortical_region",
+                        "ConnectivityMatrix.cortical_region")
     eNode.addDoubleLink("smoothing.white_mesh", "white_mesh")
-    eNode.addDoubleLink("smoothing.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("smoothing.cortical_parcellation",
+                        "cortical_parcellation")
     eNode.addDoubleLink("smoothing.smoothing", "smoothing")
 
     ###########################################################################
@@ -260,10 +279,12 @@ def initialization(self):
 
     eNode.addDoubleLink("MeanProfile.complete_individual_matrix",
                         "smoothing.complete_individual_matrix")
-    eNode.addDoubleLink(
-        "MeanProfile.ROIs_nomenclature", "smoothing.ROIs_nomenclature")
-    eNode.addDoubleLink("MeanProfile.ROI", "smoothing.ROI")
-    eNode.addDoubleLink("MeanProfile.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("MeanProfile.cortical_regions_nomenclature",
+                        "smoothing.cortical_regions_nomenclature")
+    eNode.addDoubleLink("MeanProfile.cortical_region",
+                        "smoothing.cortical_region")
+    eNode.addDoubleLink("MeanProfile.cortical_parcellation",
+                        "cortical_parcellation")
 
     ###########################################################################
     #    link of parameters with the process: "Remove Internal Connections"   #
@@ -275,11 +296,12 @@ def initialization(self):
 
     eNode.addDoubleLink("InternalConnections.mean_individual_profile",
                         "MeanProfile.mean_individual_profile")
-    eNode.addDoubleLink("InternalConnections.ROIs_nomenclature",
-                        "MeanProfile.ROIs_nomenclature")
-    eNode.addDoubleLink("InternalConnections.ROI", "MeanProfile.ROI")
-    eNode.addDoubleLink(
-        "InternalConnections.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("InternalConnections.cortical_regions_nomenclature",
+                        "MeanProfile.cortical_regions_nomenclature")
+    eNode.addDoubleLink("InternalConnections.cortical_region",
+                        "MeanProfile.cortical_region")
+    eNode.addDoubleLink("InternalConnections.cortical_parcellation",
+                        "cortical_parcellation")
 
     ###########################################################################
     #        link of parameters with the process: "Watershed"                 #
@@ -306,11 +328,12 @@ def initialization(self):
                         "Watershed.reduced_individual_profile")
     eNode.addDoubleLink("FilteringWatershed.complete_individual_matrix",
                         "MeanProfile.complete_individual_matrix")
-    eNode.addDoubleLink("FilteringWatershed.ROIs_nomenclature",
-                        "MeanProfile.ROIs_nomenclature")
-    eNode.addDoubleLink("FilteringWatershed.ROI", "MeanProfile.ROI")
-    eNode.addDoubleLink(
-        "FilteringWatershed.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("FilteringWatershed.cortical_regions_nomenclature",
+                        "MeanProfile.cortical_regions_nomenclature")
+    eNode.addDoubleLink("FilteringWatershed.cortical_region",
+                        "MeanProfile.cortical_region")
+    eNode.addDoubleLink("FilteringWatershed.cortical_parcellation",
+                        "cortical_parcellation")
     eNode.addDoubleLink("FilteringWatershed.white_mesh", "white_mesh")
 
     ###########################################################################
@@ -323,10 +346,12 @@ def initialization(self):
 
     eNode.addDoubleLink("ReducedMatrix.complete_individual_matrix",
                         "FilteringWatershed.complete_individual_matrix")
-    eNode.addDoubleLink("ReducedMatrix.ROIs_nomenclature",
-                        "FilteringWatershed.ROIs_nomenclature")
-    eNode.addDoubleLink("ReducedMatrix.ROI", "FilteringWatershed.ROI")
-    eNode.addDoubleLink("ReducedMatrix.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("ReducedMatrix.cortical_regions_nomenclature",
+                        "FilteringWatershed.cortical_regions_nomenclature")
+    eNode.addDoubleLink("ReducedMatrix.cortical_region",
+                        "FilteringWatershed.cortical_region")
+    eNode.addDoubleLink("ReducedMatrix.cortical_parcellation",
+                        "cortical_parcellation")
     eNode.addDoubleLink("ReducedMatrix.white_mesh", "white_mesh")
 
     ###########################################################################
@@ -337,18 +362,20 @@ def initialization(self):
                    ProcessExecutionNode("constel_individual_clustering",
                                         optional=1, selected=False))
 
-    eNode.ClusteringIntraSubjects.removeLink("ROIs_segmentation", "white_mesh")
+    eNode.ClusteringIntraSubjects.removeLink("cortical_parcellation",
+                                             "white_mesh")
     eNode.addDoubleLink("ClusteringIntraSubjects.reduced_individual_matrix",
                         "ReducedMatrix.reduced_individual_matrix")
-    eNode.addDoubleLink("ClusteringIntraSubjects.ROIs_nomenclature",
-                        "ReducedMatrix.ROIs_nomenclature")
-    eNode.addDoubleLink("ClusteringIntraSubjects.ROI", "ReducedMatrix.ROI")
-    eNode.addDoubleLink(
-        "ClusteringIntraSubjects.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("ClusteringIntraSubjects.cortical_regions_nomenclature",
+                        "ReducedMatrix.cortical_regions_nomenclature")
+    eNode.addDoubleLink("ClusteringIntraSubjects.cortical_region",
+                        "ReducedMatrix.cortical_region")
+    eNode.addDoubleLink("ClusteringIntraSubjects.cortical_parcellation",
+                        "cortical_parcellation")
     eNode.addDoubleLink("ClusteringIntraSubjects.white_mesh", "white_mesh")
 
     self.setExecutionNode(eNode)
 
     fill_study_choice(self)
-    if len(self.signature['study_name'].values) != 0:
-        self.study_name = self.signature['study_name'].values[0][0]
+    if len(self.signature["study_name"].values) != 0:
+        self.study_name = self.signature["study_name"].values[0][0]
