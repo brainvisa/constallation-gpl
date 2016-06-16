@@ -10,12 +10,11 @@
 """
 This script does the following:
 * defines a Brainvisa process
-    - the parameters of a process (Signature),
-    - the parameters initialization
-    - the linked parameters
+    - the signature of the inputs/ouputs,
+    - the interlinkages between inputs/outputs.
 * executes the command 'AimsMeshWatershed'
 
-Main dependencies: axon python API, soma-base
+Main dependencies: axon python API, soma
 
 Author: Sandrine Lefranc, 2015
 """
@@ -23,14 +22,14 @@ Author: Sandrine Lefranc, 2015
 #----------------------------Imports-------------------------------------------
 
 
-#python system
+# python system
 import sys
 
-# Axon python API module
+# axon python API module
 from brainvisa.processes import ValidationError, Signature, ReadDiskItem, \
     WriteDiskItem
 
-# soma-base module
+# soma module
 from soma.path import find_in_path
 
 
@@ -54,10 +53,11 @@ signature = Signature(
     "normed_individual_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"normed": "Yes"}),
-    "white_mesh", ReadDiskItem("White Mesh", "Aims mesh formats",
-                               requiredAttributes={"side": "both",
-                                                   "vertex_corr": "Yes",
-                                                   "averaged": "No"}),
+    "white_mesh", ReadDiskItem(
+        "White Mesh", "Aims mesh formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes",
+                            "averaged": "No"}),
 
     # outputs
     "reduced_individual_profile", WriteDiskItem(
@@ -84,7 +84,9 @@ def initialization(self):
 
 
 def execution(self, context):
-    """ Watershed is computed providing a set of target regions
+    """Run the command 'AimsMeshWatershed'.
+
+    Watershed is computed providing a set of target regions.
     """
     commandMeshWatershedProcessing = [
         sys.executable, find_in_path("AimsMeshWatershed.py"),
