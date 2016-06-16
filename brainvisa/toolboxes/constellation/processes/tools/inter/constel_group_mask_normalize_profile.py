@@ -10,14 +10,15 @@
 """
 This script does the following:
 * defines a Brainvisa process
-    - the parameters of a process (Signature),
-    - the parameters initialization
-    - the linked parameters
-* this process executes the command 'constelNormProfile'
+    - the signature of the inputs/ouputs,
+    - the initialization (by default) of the inputs,
+    - the interlinkages between inputs/outputs.
+* this process executes the command 'constelNormProfile': normalize the mean
+  profile.
 
-Main dependencies: Axon python API, Soma-base, constel
+Main dependencies: axon python API, soma, constel
 
-Author: sandrine.lefranc@cea.fr
+Author: Sandrine Lefranc, 2015
 """
 
 #----------------------------Imports-------------------------------------------
@@ -30,7 +31,7 @@ import sys
 from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
     ValidationError
 
-# soma-base module
+# soma module
 from soma.path import find_in_path
 
 
@@ -76,7 +77,8 @@ def initialization(self):
             atts = dict()
             atts["_database"] = self.group_profile.get("_database")
             atts["center"] = self.group_profile.get("center")
-            atts["group_of_subjects"] = self.group_profile.get("group_of_subjects")
+            atts["group_of_subjects"] = self.group_profile.get(
+                "group_of_subjects")
             atts["texture"] = self.group_profile.get("texture")
             atts["study"] = self.group_profile.get("study")
             atts["smoothing"] = self.group_profile.get("smoothing")
@@ -90,16 +92,18 @@ def initialization(self):
             atts["thresholded"] = "Yes"
             return self.signature["normed_group_profile"].findValue(atts)
 
-
     self.linkParameters("group_profile", "group_mask")
-    self.linkParameters("normed_group_profile", "group_profile", link_normprofile)
+    self.linkParameters("normed_group_profile", "group_profile",
+                        link_normprofile)
 
 
 #----------------------------Main program--------------------------------------
 
 
 def execution(self, context):
-    """Execute the command to create a group profile normed.
+    """Execute the command 'constelNormProfile'.
+
+    Create a group profile normed.
     """
     context.system(sys.executable,
                    find_in_path("constelNormProfile.py"),

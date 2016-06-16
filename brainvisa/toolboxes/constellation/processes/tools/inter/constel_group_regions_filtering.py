@@ -14,7 +14,8 @@ This script does the following:
     - the parameters initialization
     - the linked parameters
 * this process executes the command 'AimsMeshWatershed.py' and
-  'constelFilteringWatershed.py'
+  'constelFilteringWatershed.py': the ROI profile is computede from the mean
+   profile.
 
 Main dependencies: Axon python API, Soma-base, constel
 
@@ -32,7 +33,6 @@ from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
     ValidationError
 
 # soma-base module
-from soma import aims
 from soma.path import find_in_path
 
 # constel module
@@ -97,7 +97,8 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters"""
     self.linkParameters("reduced_group_profile", "normed_group_profile")
-    self.linkParameters("filtered_reduced_group_profile", "normed_group_profile")
+    self.linkParameters("filtered_reduced_group_profile",
+                        "normed_group_profile")
 
 
 #----------------------------Main program--------------------------------------

@@ -10,12 +10,13 @@
 """
 This script does the following:
 * defines a Brainvisa process
-    - the parameters of a process (Signature),
-    - the parameters initialization
-    - the linked parameters
-* this process executes the command 'constelAvgConnectivityProfile'
+    - the signature of the inputs/ouputs,
+    - the initialization (by default) of the inputs,
+    - the interlinkages between inputs/outputs.
+* this process executes the command 'constelAvgConnectivityProfile': the mean
+  group profile is computed.
 
-Main dependencies: Axon python API, Soma-base, constel
+Main dependencies: axon python API, soma, constel
 
 Author: sandrine.lefranc@cea.fr
 """
@@ -28,11 +29,11 @@ Author: sandrine.lefranc@cea.fr
 import os
 import sys
 
-# Axon python API module
+# axon python API module
 from brainvisa.processes import Signature, ListOf, ReadDiskItem, String, \
     WriteDiskItem, ValidationError
 
-# soma-base module
+# soma module
 from soma.path import find_in_path
 
 
@@ -120,7 +121,9 @@ def initialization(self):
 
 
 def execution(self, context):
-    """ A connectivity profile is determinated on a range of subjects
+    """Run the command 'constelAvgConnectivityProfile'.
+
+    A connectivity profile is determinated on a range of subjects
     (for a group of subjects)
     """
     context.write(self.normed_individual_profiles)

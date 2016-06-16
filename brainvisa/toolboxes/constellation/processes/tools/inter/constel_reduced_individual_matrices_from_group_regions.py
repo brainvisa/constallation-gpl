@@ -9,7 +9,10 @@
 
 """
 This script does the following:
-*
+*defines a Brainvisa process
+    - the parameters of a process (Signature),
+    - the parameters initialization
+    - the linked parameters
 *
 
 Main dependencies:
@@ -59,8 +62,9 @@ signature = Signature(
                             "step_time": "No"}),
     "subjects_group", ReadDiskItem("Group definition", "XML"),
     "study_name", String(),
-    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
-    "ROI", String(),
+    "cortical_regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File"),
+    "cortical_region", String(),
     "complete_individual_matrices", ListOf(ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "mixed",
@@ -72,7 +76,7 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
                             "averaged": "Yes"}),
-    "ROIs_segmentation", ListOf(ReadDiskItem(
+    "cortical_parcellation", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"})),
@@ -86,59 +90,59 @@ signature = Signature(
                             "intersubject": "Yes"})),
     "normalize", Boolean(),
 )
-                            
 
 
 #----------------------------Functions-----------------------------------------
 
 
 def afterChildAddedCallback(self, parent, key, child):
+    """
+    """
     # Set default values
     child.removeLink(
         "filtered_reduced_individual_profile", "complete_individual_matrix")
     child.removeLink(
         "reduced_individual_matrix", "filtered_reduced_individual_profile")
-    child.removeLink("ROI", "complete_individual_matrix")
-
+    child.removeLink("cortical_region", "complete_individual_matrix")
     child.signature["filtered_reduced_individual_profile"] = parent.signature[
         "filtered_reduced_group_profile"]
     child.signature["white_mesh"] = parent.signature["average_mesh"]
-    child.signature["reduced_individual_matrix"] = \
-        parent.signature["intersubject_reduced_matrices"].contentType
-    
+    child.signature["reduced_individual_matrix"] = parent.signature[
+        "intersubject_reduced_matrices"].contentType
 
     child.filtered_reduced_individual_profile = \
         parent.filtered_reduced_group_profile
     child.white_mesh = parent.average_mesh
-    child.ROIs_nomenclature = parent.ROIs_nomenclature
-    child.ROI = parent.ROI
+    child.cortical_regions_nomenclature = parent.cortical_regions_nomenclature
+    child.cortical_region = parent.cortical_region
     child.normalize = parent.normalize
 
     # Add link between eNode.ListOf_Input_3dImage and pNode.Input_3dImage
     parent.addDoubleLink(key + ".filtered_reduced_individual_profile",
                          "filtered_reduced_group_profile")
     parent.addDoubleLink(key + ".white_mesh", "average_mesh")
-    parent.addDoubleLink(key + ".ROIs_nomenclature", "ROIs_nomenclature")
-    parent.addDoubleLink(key + ".ROI", "ROI")
-    parent.addDoubleLink(
-        key + ".normalize", "normalize")
+    parent.addDoubleLink(key + ".cortical_regions_nomenclature",
+                         "cortical_regions_nomenclature")
+    parent.addDoubleLink(key + ".cortical_region", "cortical_region")
+    parent.addDoubleLink(key + ".normalize", "normalize")
 
 
 def beforeChildRemovedCallback(self, parent, key, child):
     parent.removeDoubleLink(key + ".filtered_reduced_individual_profile",
                             "filtered_reduced_group_profile")
     parent.removeDoubleLink(key + ".white_mesh", "average_mesh")
-    parent.removeDoubleLink(key + ".ROIs_nomenclature", "ROIs_nomenclature")
-    parent.removeDoubleLink(key + ".ROI", "ROI")
-    parent.removeDoubleLink(
-        key + ".normalize", "normalize")
+    parent.removeDoubleLink(key + ".cortical_regions_nomenclature",
+                            "cortical_regions_nomenclature")
+    parent.removeDoubleLink(key + ".cortical_region", "cortical_region")
+    parent.removeDoubleLink(key + ".normalize", "normalize")
 
 
 def initialization(self):
     """Provides default values and link of parameters.
     """
 
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue(
+    self.cortical_regions_nomenclature = self.signature[
+        "cortical_regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
     def link_watershed(self, dummy):
@@ -198,13 +202,16 @@ def initialization(self):
                     matrices.append(matrix)
             return matrices
 
-    def link_roi(self, dummy):
+    def link_label(self, dummy):
+        """
+        """
         if self.filtered_reduced_group_profile is not None:
             s = str(self.filtered_reduced_group_profile.get("gyrus"))
             return s
 
     # link of parameters for autocompletion
-    self.linkParameters("ROI", "filtered_reduced_group_profile", link_roi)
+    self.linkParameters(
+        "cortical_region", "filtered_reduced_group_profile", link_label)
     self.linkParameters(
         "complete_individual_matrices",
         ("filtered_reduced_group_profile", "subjects_group", "study_name"),
@@ -245,9 +252,9 @@ def initialization(self):
                 name="constel_individual_reduced_matrix"))
 
     eNode.addLink(
-        None, "ROIs_segmentation",
+        None, "cortical_parcellation",
         partial(mapValuesToChildrenParameters, eNode,
-                eNode, "ROIs_segmentation",
-                "ROIs_segmentation",
+                eNode, "cortical_parcellation",
+                "cortical_parcellation",
                 defaultProcess="constel_individual_reduced_matrix",
                 name="constel_individual_reduced_matrix"))
