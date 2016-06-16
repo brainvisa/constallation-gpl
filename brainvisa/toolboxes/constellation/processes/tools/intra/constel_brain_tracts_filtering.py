@@ -10,10 +10,10 @@
 """
 This script does the following:
 * defines a Brainvisa process
-    - the parameters of a process (Signature),
-    - the parameters initialization
-    - the linked parameters
-* executes the command 'constelBundlesFiltering' to filter the fiber tracts
+    - the signature of the inputs/ouputs,
+    - the initialization (by default) of the inputs,
+    - the interlinkages between inputs/outputs.
+* executes the command 'constelBundlesFiltering': the fiber tracts are filtered
   according to length.
 
 Main dependencies: axon python API, soma-base, constel
@@ -31,7 +31,7 @@ import os
 from brainvisa.processes import Signature, String, Choice, Float, \
     ReadDiskItem, WriteDiskItem, ValidationError, neuroHierarchy, OpenChoice
 
-# soma-base module
+# soma module
 from soma.path import find_in_path
 
 # constel modules
@@ -48,7 +48,7 @@ def validation():
     """
     if not find_in_path("constelBundlesFiltering"):  # checks command (C++)
         raise ValidationError(
-            "constelBundlesFiltering is not contained in PATH environnement "
+            "'constelBundlesFiltering' is not contained in PATH environnement "
             "variable. Please make sure that constellation is installed.")
 
 
@@ -62,13 +62,14 @@ signature = Signature(
     # --inputs--
     "study_name", String(),
     "outputs_database", Choice(),
-    "format_fiber_tracts", Choice("bundles", "trk"),
+    "fiber_tracts_format", Choice("bundles", "trk"),
     "method", Choice(("averaged approach", "avg"),
                      ("concatenated approach", "concat")),
-    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
-    "ROI", OpenChoice(),
-    "dirsubject", ReadDiskItem("subject", "directory"),
-    "ROIs_segmentation", ReadDiskItem(
+    "cortical_regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File"),
+    "cortical_region", OpenChoice(),
+    "subject_directory", ReadDiskItem("subject", "directory"),
+    "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     "white_mesh", ReadDiskItem(
@@ -95,17 +96,18 @@ signature = Signature(
 
 
 def initialization(self):
-    """Provides default values and link of parameters
+    """Provides default values and links between parameters.
     """
-    # default values
+    # Define the default values
     self.minlength_labeled_fibers = 30.
     self.maxlength_labeled_fibers = 500.
     self.minlength_semilabeled_fibers = 20.
     self.maxlength_semilabeled_fibers = 500.
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({
-        "atlasname": "desikan_freesurfer"})
+    self.cortical_regions_nomenclature = self.signature[
+        "cortical_regions_nomenclature"].findValue(
+        {"atlasname": "desikan_freesurfer"})
 
-    # list of possible databases, while respecting the ontology
+    # Get a list of possible databases, while respecting the ontology
     databases = [h.name for h in neuroHierarchy.hierarchies()
                  if h.fso.name == "brainvisa-3.2.0"]
     self.signature["outputs_database"].setChoices(*databases)
@@ -114,57 +116,65 @@ def initialization(self):
     else:
         self.signature["outputs_database"] = OpenChoice()
 
-    def reset_roi(self, dummy):
-        """ This callback reads the ROIs nomenclature and proposes them in the
-        signature 'ROI' of process.
-        It also resets the ROI paramter to default state after
-        the nomenclature changes.
+    def reset_cortical_region(self, dummy):
+        """Read and/or reset the cortical_region parameter.
+
+        This callback reads the labels nomenclature and proposes the labels
+        nomenclature in the signature 'cortical_region' of process. It also
+        resets the cortical_region parameter to default state after the
+        nomenclature changes.
         """
-        current = self.ROI
-        self.setValue('ROI', current, True)
-        if self.ROIs_nomenclature is not None:
-            s = [("Select a ROI in this list", None)]
-            # temporarily set a value which will remain valid
-            self.ROI = s[0][1]
-            s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
-            self.signature["ROI"].setChoices(*s)
-            if isinstance(self.signature["ROI"], OpenChoice):
-                self.signature["ROI"] = Choice(*s)
+        current = self.cortical_region
+        self.setValue('cortical_region', current, True)
+        if self.cortical_regions_nomenclature is not None:
+            s = [("Select a cortical_region in this list", None)]
+            # Temporarily set a value which will remain valid
+            self.cortical_region = s[0][1]
+            s += read_file(
+                self.cortical_regions_nomenclature.fullPath(), mode=2)
+            self.signature["cortical_region"].setChoices(*s)
+            if isinstance(self.signature["cortical_region"], OpenChoice):
+                self.signature["cortical_region"] = Choice(*s)
                 self.changeSignature(self.signature)
             if current not in s:
-                self.setValue('ROI', s[0][1], True)
+                self.setValue('cortical_region', s[0][1], True)
             else:
-                self.setValue('ROI', current, True)
+                self.setValue('cortical_region', current, True)
 
     def link_filtered_bundles(self, dummy):
-        """Defines all attributs of 'abeled_fibers' in order to
-        allow autocompletion.
+        """Defines all attributs of 'labeled_fibers' and return a filename.
+
+        This function automatically creates the signature of 'labeled_fibers'.
         """
-        if (self.outputs_database and self.study_name and self.dirsubject
-                and self.ROI) is not None:
+        if (self.outputs_database and self.study_name and self.cortical_region
+                and self.subject_directory) is not None:
             attrs = dict()
             attrs["_database"] = self.outputs_database
             attrs["study"] = self.method
             attrs["texture"] = self.study_name
-            attrs["subject"] = os.path.basename(self.dirsubject.fullPath())
-            attrs["gyrus"] = str(self.ROI)
+            attrs["subject"] = os.path.basename(
+                self.subject_directory.fullPath())
+            attrs["gyrus"] = str(self.cortical_region)
             attrs["smallerlength1"] = str(int(self.minlength_labeled_fibers))
             attrs["greaterlength1"] = str(int(self.maxlength_labeled_fibers))
             filename = self.signature["labeled_fibers"].findValue(attrs)
             return filename
 
     def link_between_filtered_bundles(self, dummy):
-        """Defines all attributs of 'semilabeled_fibers' in order to
-        allow autocompletion.
+        """Defines all attributs of 'semilabeled_fibers' and return a filename.
+
+        This function automatically creates the signature of
+        'semilabeled_fibers'.
         """
-        if (self.outputs_database and self.study_name and self.dirsubject
-                and self.ROI) is not None:
+        if (self.outputs_database and self.study_name and self.cortical_region
+                and self.subject_directory) is not None:
             attrs = dict()
             attrs["_database"] = self.outputs_database
             attrs["study"] = self.method
             attrs["texture"] = self.study_name
-            attrs["subject"] = os.path.basename(self.dirsubject.fullPath())
-            attrs["gyrus"] = str(self.ROI)
+            attrs["subject"] = os.path.basename(
+                self.subject_directory.fullPath())
+            attrs["gyrus"] = str(self.cortical_region)
             attrs["smallerlength2"] = str(
                 int(self.minlength_semilabeled_fibers))
             attrs["greaterlength2"] = str(
@@ -172,26 +182,31 @@ def initialization(self):
             filename = self.signature["semilabeled_fibers"].findValue(attrs)
             return filename
 
-    # link of parameters for autocompletion
-    self.linkParameters(None, "ROIs_nomenclature", reset_roi)
-    self.linkParameters("dw_to_t1", "dirsubject")
-    self.linkParameters("labeled_fibers", (
-        "outputs_database", "dirsubject", "method", "study_name", "ROI",
-        "minlength_labeled_fibers",
-        "maxlength_labeled_fibers"), link_filtered_bundles)
+    # Link of parameters for autocompletion
+    self.linkParameters(
+        None, "cortical_regions_nomenclature", reset_cortical_region)
+    self.linkParameters("dw_to_t1", "subject_directory")
+    self.linkParameters(
+        "labeled_fibers", (
+            "outputs_database", "subject_directory", "method", "study_name",
+            "cortical_region", "minlength_labeled_fibers",
+            "maxlength_labeled_fibers"),
+        link_filtered_bundles)
     self.linkParameters(
         "semilabeled_fibers", (
-            "outputs_database", "dirsubject", "method", "study_name", "ROI",
-            "minlength_semilabeled_fibers",
-            "maxlength_semilabeled_fibers"), link_between_filtered_bundles)
+            "outputs_database", "subject_directory", "method", "study_name",
+            "cortical_region", "minlength_semilabeled_fibers",
+            "maxlength_semilabeled_fibers"),
+        link_between_filtered_bundles)
 
 
 #----------------------------Main program--------------------------------------
 
 
 def execution(self, context):
-    """Run the command 'constelBundlesFiltering' to filter the fiber tracts
-    according to length.
+    """Run the command 'constelBundlesFiltering'.
+
+    This command filters the fiber tracts according to length.
 
     Two type of fiber tracts files are to be considered in this process:
         - the fibers near cortex are defined as having both ends attached to
@@ -199,35 +214,37 @@ def execution(self, context):
         - the distant fibers are defined as having only one end attached to the
           mesh (the other being not identified)
     """
-    # selects all fiber tracts of the given subject
+    # Select all fiber tracts of the given subject
     list_fiber_tracts = load_fiber_tracts(
-        self.dirsubject.fullPath(), self.format_fiber_tracts)
+        self.subject_directory.fullPath(), self.fiber_tracts_format)
 
-    # selects the ROI label corresponding to ROI name
-    ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
+    # Select the region number corresponding to region name
+    region_number = select_ROI_number(
+        self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
 
-    # name of the command (C++)
+    # Give the name of the command (C++)
     cmd = ["constelBundlesFiltering"]
 
-    # options of the command
+    # Give the options of the command
     for fiber_tract in list_fiber_tracts:
         cmd += ["-i", fiber_tract]
     cmd += [
         "-o", self.labeled_fibers,
         "-n", self.semilabeled_fibers,
         "--mesh", self.white_mesh,
-        "--tex", self.ROIs_segmentation,
+        "--tex", self.cortical_parcellation,
         "--trs", self.dw_to_t1,
         "--mode", "Name1_Name2orNotInMesh",
-        "--names", "^" + str(ROIlabel) + "_[0-9]+$",
-        "--names", "^[0-9]+_" + str(ROIlabel) + "$",
-        "-g", ROIlabel,
+        "--names", "^" + str(region_number) + "_[0-9]+$",
+        "--names", "^[0-9]+_" + str(region_number) + "$",
+        "-g", region_number,
         "-r",
         "-l", self.minlength_labeled_fibers,
         "-L", self.maxlength_labeled_fibers,
         "--nimlmin", self.minlength_semilabeled_fibers,
         "--nimlmax", self.maxlength_semilabeled_fibers,
+        "--verbose"
     ]
 
-    # executes the command
+    # Execute the command
     context.system(*cmd)
