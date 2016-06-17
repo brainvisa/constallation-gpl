@@ -10,14 +10,15 @@
 """
 This script does the following:
 * defines a Brainvisa process
-    - the parameters of a process (Signature),
-    - the parameters initialization
-    - the linked parameters
-* this process executes the command 'constelConnectivityProfileOverlapMask'
+    - the signature of the inputs/ouputs,
+    - the initialization (by default) of the inputs,
+    - the interlinkages between inputs/outputs.
+* executes the command 'constelConnectivityProfileOverlapMask': the mask of the
+  all individual profiles is computed.
 
-Main dependencies: Axon python API, Soma-base, constel
+Main dependencies: axon python API, soma, constel
 
-Author: sandrine.lefranc@cea.fr
+Author: Sandrine Lefranc, 2015
 """
 
 #----------------------------Imports-------------------------------------------
@@ -31,7 +32,7 @@ import sys
 from brainvisa.processes import Signature, ListOf, ReadDiskItem, String, \
     WriteDiskItem, ValidationError
 
-# soma-base module
+# soma module
 from soma.path import find_in_path
 
 
@@ -51,7 +52,7 @@ name = "Group Connectivity Mask"
 userLevel = 2
 
 signature = Signature(
-    # inputs
+    # --inputs--
     "mean_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
                      requiredAttributes={"normed": "No",
@@ -61,7 +62,7 @@ signature = Signature(
     "subjects_group", ReadDiskItem("Group definition", "XML"),
     "new_study_name", String(),
 
-    # outputs
+    # --outputs--
     "group_mask", WriteDiskItem(
         "Mask Texture", "Aims texture formats"), )
 
@@ -90,15 +91,18 @@ def initialization(self):
             return self.signature["group_mask"].findValue(atts)
 
     # link of parameters for autocompletion
-    self.linkParameters("group_mask", ("mean_individual_profiles", "subjects_group", "new_study_name"),
-                        link_mask)
+    self.linkParameters(
+        "group_mask",
+        ("mean_individual_profiles", "subjects_group", "new_study_name"),
+        link_mask)
 
 
 #----------------------------Main program--------------------------------------
 
 
 def execution(self, context):
-    # execute the command
+    """Run the command 'constelConnectivityProfileOverlapMask'.
+    """
     context.system(sys.executable,
                    find_in_path("constelConnectivityProfileOverlapMask.py"),
                    self.mean_individual_profiles,

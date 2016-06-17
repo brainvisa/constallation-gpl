@@ -10,10 +10,10 @@
 """
 This script does the following:
 * defines a Brainvisa process
-    - the parameters of a process (Signature),
-    - the parameters initialization
-    - the linked parameters
-* this process executes the commands 'constelCalculateGroupMatrix' and
+    - the signature of the inputs/ouputs,
+    - the initialization (by default) of the inputs,
+    - the interlinkages between inputs/outputs.
+* executes the commands 'constelCalculateGroupMatrix' and
   'constelInterSubjectClustering'.
 
 Main dependencies: Axon python API, Soma-base, constel
@@ -32,7 +32,6 @@ from brainvisa.processes import Signature, ListOf, Choice, Integer, String, \
 
 # soma-base module
 from soma.path import find_in_path
-from soma import aims
 
 # constel module
 try:
@@ -66,10 +65,11 @@ signature = Signature(
                             "intersubject": "Yes"})),
     "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
-    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
-    "ROI", String(),
+    "cortical_regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File"),
+    "cortical_region", String(),
     "subjects_group", ReadDiskItem("Group definition", "XML"),
-    "ROIs_segmentation", ListOf(ReadDiskItem(
+    "cortical_parcellation", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"})),
     "average_mesh", ReadDiskItem(
@@ -78,10 +78,12 @@ signature = Signature(
                             "vertex_corr": "Yes",
                             "averaged": "Yes"}),
     "nb_clusters", Integer(),
+    "clustering_algorithms", Choice(
+        ("K-medoids clustering", "kmedoids"), ("Ward's method", "ward")),
 
     # --outputs--
     "reduced_group_matrix", WriteDiskItem(
-        "Connectivity Matrix", "Aims matrix formats",
+        "Connectivity Matrix", "Gis image",
         requiredAttributes={"ends_labelled": "mixed",
                             "reduced": "No",
                             "dense": "No",
@@ -104,16 +106,17 @@ def initialization(self):
 
     # default value
     self.nb_clusters = 12
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue(
+    self.cortical_regions_nomenclature = self.signature[
+        "cortical_regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
-    def link_matrix2ROI(self, dummy):
+    def link_matrix2label(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
-        signature 'ROI'.
+        signature 'cortical_region'.
         """
         if self.intersubject_reduced_matrices:
             s = self.intersubject_reduced_matrices[0].get("gyrus")
-            name = self.signature["ROI"].findValue(s)
+            name = self.signature["cortical_region"].findValue(s)
             return name
 
     def link_matrices(self, dummy):
@@ -166,7 +169,7 @@ def initialization(self):
 
     # link of parameters for autocompletion
     self.linkParameters(
-        "ROI", "intersubject_reduced_matrices", link_matrix2ROI)
+        "cortical_region", "intersubject_reduced_matrices", link_matrix2label)
     self.linkParameters(
         "reduced_group_matrix",
         ("subjects_group", "intersubject_reduced_matrices", "method"),
@@ -181,15 +184,16 @@ def initialization(self):
 
 
 def execution(self, context):
-    """
+    """Run the command 'constelInterSubjectClustering'.
+
     The gyrus vertices connectivity profiles of all the subjects are
     concatenated into a big matrix. The clustering is performed with the
     classical kmedoids algorithm and the Euclidean distance between profiles
     as dissimilarity measure.
     """
-    # selects the ROI label corresponding to ROI name
-    ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
-    context.write(ROIlabel)
+    # selects the label number corresponding to label name
+    label_number = select_ROI_number(
+        self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
 
     args = []
     for x in self.intersubject_reduced_matrices:
@@ -198,16 +202,14 @@ def execution(self, context):
     args += ["-o", self.reduced_group_matrix, "-s", self.method]
     context.system("python", find_in_path("constelCalculateGroupMatrix.py"),
                    *args)
-    ma = aims.read(self.reduced_group_matrix.fullPath())
-    context.write(ma.header())
 
     cmd_args = []
     for t in self.ROI_clustering:
         cmd_args += ["-p", t]
-    for y in self.ROIs_segmentation:
+    for y in self.cortical_parcellation:
         cmd_args += ["-t", y]
     cmd_args += ["-m", self.average_mesh,
-                 "-l", str(ROIlabel),
+                 "-l", str(label_number),
                  "-s", self.method,
                  "-g", self.reduced_group_matrix,
                  "-a", self.nb_clusters]
