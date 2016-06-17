@@ -7,94 +7,108 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-from brainvisa.processes import *
-try :
-  import constel.lib.clustervalidity as cv
-except :
-  pass
+"""
+This script does the following:
+* defines a Brainvisa process
+    - the signature of the inputs/ouputs,
+    - the interlinkages between inputs/outputs.
+* executes the command "constel_calculate_asw.py": calculate the average
+  silhouette width in order to obtain the optimal number of clusters.
 
-import constel.lib.plot as p
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
-import numpy as np
-import pylab
+Main dependencies: axon python API, soma-base, constel
+
+Author: Sandrine Lefranc, 2015
+"""
+
+#----------------------------Imports-------------------------------------------
+
+
+# system module
 import os
-import re
-name = 'Average Silhouette Width'
+import sys
+
+# axon python API module
+from brainvisa.processes import ListOf
+from brainvisa.processes import Boolean
+from brainvisa.processes import Integer
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import getAllFormats
+from brainvisa.processes import ValidationError
+
+# soma module
+from soma.path import find_in_path
+
+
+def validate(self):
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
+    """
+    if not find_in_path("constel_calculate_asw.py"):
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
+
+
+#----------------------------Header--------------------------------------------
+
+
+name = "Average Silhouette Width"
 userLevel = 2
 
 signature = Signature(
-    "output_name_directory", String(),
-    'connectivity_matrix_reduced', ListOf(
-        ReadDiskItem('Connectivity Matrix', 'GIS image',
-        requiredAttributes={"ends_labelled":"mixed",
-                            "reduced":"No",
-                            "dense":"No",
-                            "intersubject":"Yes"})),
-    'kmax', Integer(),
+    #--inputs
+    "reduced_matrices", ListOf(
+        ReadDiskItem("Connectivity Matrix", "GIS image",
+                     requiredAttributes={"ends_labelled": "mixed",
+                                         "reduced": "No",
+                                         "dense": "No",
+                                         "intersubject": "Yes"})),
+    "kmax", Integer(),
+
+    #--outputs--
+    "outpdffile", WriteDiskItem("Any Type", getAllFormats()),
+    "autoscale_y", Boolean(),
 )
 
-class MatplotlibFig(object):
-    def __init__(self, fig):
-        self._fig = fig
-    def __del__(self):
-        mainThreadActions().call(pylab.close, self._fig)
 
-def validate( self ):
-  import constel.lib.clustervalidity as cv
-  
+#----------------------------Functions-----------------------------------------
+
+
 def initialization(self):
+    """
+    """
     self.kmax = 12
+    self.autoscale_y = True
+
+    def link_outdir(self, dummy):
+        """
+        """
+        if self.reduced_matrices:
+            for matrix in self.reduced_matrices:
+                name = os.path.dirname(os.path.dirname(
+                                       os.path.dirname(matrix.fullPath())))
+                print name
+            filename = os.path.join(name, "asw.pdf")
+            return filename
+
+    self.linkParameters("outpdffile", "reduced_matrices", link_outdir)
 
 
-def create_page(name_matrix, matrix, kmax):
+#----------------------------Main program--------------------------------------
+
+
+def execution(self, context):
+    """Run the command 'constel_calculate_asw.py'.
     """
-    """
-    title = {23: "left postcentral gyrus",
-             25: "left precentral gyrus",
-             27: "left rostral anterieur cingulate gyrus",
-             59: "right postcentral gyrus",
-             61: "right precentral gyrus",
-             63: "right rostral anterieur cingulate gyrus",
-             1315: "left orbitofrontal cortex",
-             4951: "right orbitofrontal cortex"}
-    patch = re.findall("G[0-9]+", os.path.basename(str(name_matrix)))[0]
-    patch_nb = int(re.findall("[0-9]+", patch)[0])
-    fig = plt.figure()
-    fig.suptitle(os.path.basename(str(name_matrix)), fontsize=14, fontweight="bold", color="blue")
-    ax = plt.subplot(121)
-    fig.subplots_adjust(top=0.85)
-    left = 0.
-    bottom = 1.
-    b = 0
-    asw = []
-    for k in range(2, kmax + 1):
-        s = cv.silhouette_score(matrix, k)
-        asw.append(s)
-        ax.text(left, bottom - b, "for K = " + str(k) + ", ASW is " + str(round(s, 4)))
-        b += 0.05
-    aswOpt = max(asw)
-    ax.text(0.5, 0., "The larger Average Silhouette Width is " + str(aswOpt), color="red")
-    ax.axis("off")
-    plt.subplot(222)
-    
-    list_k = range(kmax+1)
-    list_k = [x for x in list_k if x != 0 and x != 1]
-    
-    plt.plot(list_k, asw, 'k')
-    plt.title(title[patch_nb], fontsize=13)
-    plt.ylabel("ASW", fontsize=11)
-    plt.xlabel("Clusters", fontsize=11)
-    
-        
-    
+    if not self.autoscale_y:
+        arg = "-q"
+    else:
+        arg = "-c"
 
-def execution (self, context):
-    pp = PdfPages(self.output_name_directory)
-
-    for matrix in self.connectivity_matrix_reduced:
-        reduced_matrix = aims.read(matrix.fullPath())
-        reduced_matrix = np.asarray(reduced_matrix)[:, :, 0, 0]
-        create_page(matrix, reduced_matrix, self.kmax)
-        pp.savefig()
-    pp.close()
+    context.system(sys.executable,
+                   find_in_path("constel_calculate_asw.py"),
+                   self.reduced_matrices,
+                   self.kmax,
+                   self.outpdffile,
+                   arg)
