@@ -3,19 +3,37 @@
 <d>
   <d name="fr">
     <xhtml name="short">les fibres sont échantillonnées pour attacher leur extrémité à la surface corticale.</xhtml>
-    <xhtml name="long"/>
+    <xhtml name="long">Les fibres sont rééchantillonnées afin de les associer au maillage.
+<br/>
+Exemple inputs/outputs:
+<br/>
+<pre>semilabeled_fibers:              /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
+                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
+                                 001_studyA_lh.postcentral_outsideFibersOfCortex_20to500mm.bundles  </pre>
+<pre>oversampled_semilabeled_fibers:              /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
+                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
+                                 001_studyA_lh.postcentral_outsideFibersOfCortex_20to500mm_oversampled.bundles  </pre></xhtml>
     <d name="parameters">
       <xhtml name="semilabeled_fibers">Ensemble des fibres ayant qu'une seule extrémité associée à un point du maillage</xhtml>
       <xhtml name="oversampled_semilabeled_fibers">Ensemble des fibres suréchantillonnée à partir des fibres ayant qu'une seule extrémité associée à un point du maillage</xhtml>
     </d>
   </d>
   <d name="en">
-    <xhtml name="short">Fibers tracts are oversampled to attach its end with the cortical surface.</xhtml>
+    <xhtml name="short"><img SRC="../../images/constellation/fiber_oversampler.png" ALT="" height="400" width="1000"/></xhtml>
     <d name="parameters">
       <xhtml name="semilabeled_fibers">All the fibers having one end identified on the mesh.</xhtml>
       <xhtml name="oversampled_semilabeled_fibers">All the fibers having one end identified on the mesh and oversampled.</xhtml>
     </d>
-    <xhtml name="long"/>
+    <xhtml name="long">Fibers tracts are oversampled to attach its end with the cortical surface.<br/>
+<br/>
+Example inputs/outputs:
+<br/>
+<pre>semilabeled_fibers:              /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
+                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
+                                 001_studyA_lh.postcentral_outsideFibersOfCortex_20to500mm.bundles  </pre>
+<pre>oversampled_semilabeled_fibers:  /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
+                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
+                                 001_studyA_lh.postcentral_outsideFibersOfCortex_20to500mm_oversampled.bundles  </pre></xhtml>
   </d>
 </d>
 </minf>

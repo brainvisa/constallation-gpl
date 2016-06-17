@@ -10,12 +10,13 @@
 """
 This script does the following:
 * defines a Brainvisa process
-    - the parameters of a process (Signature),
-    - the parameters initialization
-    - the linked parameters
-*
+    - the signature of the inputs/ouputs,
+    - the initialization (by default) of the inputs,
+    - the interlinkages between inputs/outputs.
+* executes the command 'constelConnectionDensityTexture': the reduced
+  connectivity matrix is computed (normalized or not).
 
-Main dependencies: axon python API, soma-base, constel
+Main dependencies: axon python API, soma, constel
 
 Author: Sandrine Lefranc, 2015
 """
@@ -30,10 +31,11 @@ from soma.path import find_in_path
 
 # constel modules
 try:
-    from constel.lib.utils.files import read_file, select_ROI_number
+    from constel.lib.utils.files import select_ROI_number
     from constel.lib.connmatrix.connmatrixtools import save_normalization
 except:
     pass
+
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
@@ -56,33 +58,34 @@ signature = Signature(
     # inputs
     "complete_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
-        requiredAttributes={"ends_labelled":"mixed",
-                            "reduced":"No",
-                            "dense":"No",
-                            "intersubject":"No"}),
+        requiredAttributes={"ends_labelled": "mixed",
+                            "reduced": "No",
+                            "dense": "No",
+                            "intersubject": "No"}),
     "filtered_reduced_individual_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect":"Yes",
-                            "roi_filtered":"Yes",
-                            "averaged":"No",
-                            "intersubject":"No",
-                            "step_time":"No"}),
-    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
-    "ROI", String(),
+        requiredAttributes={"roi_autodetect": "Yes",
+                            "roi_filtered": "Yes",
+                            "averaged": "No",
+                            "intersubject": "No",
+                            "step_time": "No"}),
+    "cortical_regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File"),
+    "cortical_region", String(),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
-    "ROIs_segmentation", ReadDiskItem(
+    "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
 
     #outputs
     "reduced_individual_matrix", WriteDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
-        requiredAttributes={"ends_labelled":"mixed",
-                            "reduced":"Yes",
-                            "dense":"No",
-                            "intersubject":"No"}),
+        requiredAttributes={"ends_labelled": "mixed",
+                            "reduced": "Yes",
+                            "dense": "No",
+                            "intersubject": "No"}),
     "normalize", Boolean(),
 )
 
@@ -93,23 +96,27 @@ signature = Signature(
 def initialization(self):
     """Provides default value and link of parameters"""
     # default value
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+    self.cortical_regions_nomenclature = self.signature[
+        "cortical_regions_nomenclature"].findValue(
+        {"atlasname": "desikan_freesurfer"})
     self.normalize = True
 
-    def link_matrix2ROI(self, dummy):
+    def link_matrix2label(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
-        signature 'ROI'.
+        signature 'cortical_region'.
         """
         if self.complete_individual_matrix is not None:
             s = str(self.complete_individual_matrix.get("gyrus"))
             return s
 
     # link of parameters for autocompletion
-    self.linkParameters(
-        "filtered_reduced_individual_profile", "complete_individual_matrix")
-    self.linkParameters("ROI", "complete_individual_matrix", link_matrix2ROI)
-    self.linkParameters(
-        "reduced_individual_matrix", "filtered_reduced_individual_profile")
+    self.linkParameters("filtered_reduced_individual_profile",
+                        "complete_individual_matrix")
+    self.linkParameters("cortical_region",
+                        "complete_individual_matrix",
+                        link_matrix2label)
+    self.linkParameters("reduced_individual_matrix",
+                        "filtered_reduced_individual_profile")
 
 
 #----------------------------Main program--------------------------------------
@@ -119,7 +126,8 @@ def execution(self, context):
     """ Compute reduced connectivity matrix M(target regions, patch vertices)
     """
     # selects the ROI label corresponding to ROI name
-    ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
+    label_number = select_ROI_number(
+        self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
 
     # normalization of the reduced matrix
     if self.normalize:
@@ -128,22 +136,19 @@ def execution(self, context):
         norm = 0
 
     # M(target regions, patch vertices)
-    context.system("constelConnectionDensityTexture",
-                   "-mesh", self.white_mesh,
-                   "-connmatrixfile", self.complete_individual_matrix,
-                   "-targetregionstex", self.filtered_reduced_individual_profile,
-                   "-seedregionstex", str(self.ROIs_segmentation),
-                   "-seedlabel", ROIlabel,
-                   "-type", "seedVertex_to_targets",
-                   "-connmatrix", self.reduced_individual_matrix,
-                   "-normalize", norm,
-                   "-verbose", 1)
+    context.system(
+        "constelConnectionDensityTexture",
+        "-mesh", self.white_mesh,
+        "-connmatrixfile", self.complete_individual_matrix,
+        "-targetregionstex", self.filtered_reduced_individual_profile,
+        "-seedregionstex", str(self.cortical_parcellation),
+        "-seedlabel", label_number,
+        "-type", "seedVertex_to_targets",
+        "-connmatrix", self.reduced_individual_matrix,
+        "-normalize", norm,
+        "-verbose", 1
+        )
 
     # save the normalization values
     if not self.normalize:
         save_normalization(self.reduced_individual_matrix.fullPath())
-    
-    
-    
-    
-    

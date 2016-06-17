@@ -10,12 +10,15 @@
 """
 This script does the following:
 * defines a Brainvisa process
-    - the parameters of a process (Signature),
-    - the parameters initialization
-    - the linked parameters
-* this process
+    - the signature of the inputs/ouputs,
+    - the initialization (by default) of the inputs,
+    - the interlinkages between inputs/outputs.
+* execute the command 'AimsSumSparseMatrix': sum sparse matrices
+* execute the command 'AimsSparseMatrixSmoothing':sparse matrix smoothing using
+  heat diffusion, with the geometry of a mesh. Smoothing is applied for each
+  line, each line is a texture for the mesh.
 
-Main dependencies: Axon python API, Soma-base, constel
+Main dependencies: axon python API, soma, constel
 
 Author: Sandrine Lefranc, 2015
 """
@@ -27,7 +30,7 @@ Author: Sandrine Lefranc, 2015
 from brainvisa.processes import Signature, ReadDiskItem, Float, String, \
     WriteDiskItem, ValidationError
 
-# soma-base module
+# soma module
 from soma.path import find_in_path
 
 # constel module
@@ -69,9 +72,10 @@ signature = Signature(
                             "reduced": "No",
                             "dense": "No",
                             "intersubject": "No"}),
-    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
-    "ROI", String(),
-    "ROIs_segmentation", ReadDiskItem(
+    "cortical_regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File"),
+    "cortical_region", String(),
+    "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     "white_mesh", ReadDiskItem(
@@ -97,15 +101,17 @@ def initialization(self):
 
     # default values
     self.smoothing = 3.0
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({})
+    self.cortical_regions_nomenclature = self.signature[
+        "cortical_regions_nomenclature"].findValue(
+        {"atlasname": "desikan_freesurfer"})
 
-    def link_matrix2ROI(self, dummy):
+    def link_matrix2label(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
-        signature 'ROI'.
+        signature 'cortical_region'.
         """
         if self.matrix_labeled_fibers is not None:
             s = str(self.matrix_labeled_fibers.get("gyrus"))
-            name = self.signature["ROI"].findValue(s)
+            name = self.signature["cortical_region"].findValue(s)
         return name
 
     def link_smooth(self, dummy):
@@ -114,25 +120,33 @@ def initialization(self):
         if (self.matrix_semilabeled_fibers and self.smoothing) is not None:
             attrs = dict(self.matrix_semilabeled_fibers.hierarchyAttributes())
             attrs["smoothing"] = str(self.smoothing)
-            attrs["smallerlength2"] = self.matrix_semilabeled_fibers.get("smallerlength1")
-            attrs["greaterlength2"] = self.matrix_semilabeled_fibers.get("smallerlength1")
+            attrs["smallerlength2"] = self.matrix_semilabeled_fibers.get(
+                "smallerlength1")
+            attrs["greaterlength2"] = self.matrix_semilabeled_fibers.get(
+                "smallerlength1")
             filename = self.signature[
                 "complete_individual_matrix"].findValue(attrs)
             return filename
 
     # link of parameters for autocompletion
-    self.linkParameters("ROI", "matrix_labeled_fibers", link_matrix2ROI)
+    self.linkParameters("cortical_region",
+                        "matrix_labeled_fibers",
+                        link_matrix2label)
     self.linkParameters("complete_individual_matrix",
-                        ("matrix_semilabeled_fibers", "smoothing"), link_smooth)
+                        ("matrix_semilabeled_fibers", "smoothing"),
+                        link_smooth)
 
 
 #----------------------------Main program--------------------------------------
 
 
 def execution(self, context):
-    """Sum of two matrices and smoothing"""
-    # selects the ROI label corresponding to ROI name
-    ROIlabel = select_ROI_number(self.ROIs_nomenclature.fullPath(), self.ROI)
+    """Run the commands 'AimsSumSparseMatrix' and 'AimsSparseMatrixSmoothing'.
+
+    Sum of two matrices and smoothing"""
+    # selects the label number corresponding to label name
+    label_number = select_ROI_number(
+        self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
 
     # sum matrix
     context.system("AimsSumSparseMatrix",
@@ -140,11 +154,11 @@ def execution(self, context):
                    "-i", self.matrix_labeled_fibers,
                    "-o", self.complete_individual_matrix)
 
-    # smoothing matrix: -s in millimetres
+    # matrix smoothing: -s in millimetres
     context.system("AimsSparseMatrixSmoothing",
                    "-i", self.complete_individual_matrix,
                    "-m", self.white_mesh,
                    "-o", self.complete_individual_matrix,
                    "-s", self.smoothing,
-                   "-l", self.ROIs_segmentation,
-                   "-p", ROIlabel)
+                   "-l", self.cortical_parcellation,
+                   "-p", label_number)
