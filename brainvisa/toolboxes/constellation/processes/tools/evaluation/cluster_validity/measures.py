@@ -34,6 +34,7 @@ from brainvisa.processes import Boolean
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import ValidationError
 
 # soma module
 from soma.path import find_in_path
@@ -93,13 +94,14 @@ def execution(self, context):
     if self.clustering_1.get("subject") == "avgSubject":
         group1 = self.clustering_1.get("group_of_subjects")
         group2 = self.clustering_2.get("group_of_subjects")
-        title = cortical_region + "_" + group1 + "_" + group2 + "_" + "avgSubject" 
+        title = (cortical_region + "_" + group1 + "_" + group2 + "_"
+                 + "avgSubject")
     else:
         subject1 = self.clustering_1.get("subject")
         subject2 = self.clustering_2.get("subject")
         group = self.clustering_1.get("group_of_subjects")
         title = cortical_region + "_" + group + "_" + subject1 + "_" + subject2
-    
+
     cmd = [sys.executable, find_in_path("constel_calculate_scores.py"),
            self.clustering_1,
            self.clustering_2,
@@ -107,12 +109,11 @@ def execution(self, context):
            self.output_dir,
            title,
            cortical_region]
-    
+
     if self.ybound:
         cmd += ["-s", self.ybound]
-    
+
     if self.ignore_Kopt2:
         cmd += ["-r"]
 
     context.system(*cmd)
-

@@ -111,7 +111,7 @@ def execution(self, context):
 
     if self.ybound:
         cmd += ["-s", self.ybound]
-    
+
     if self.ignore_Kopt2:
         cmd += ["-r"]
 
