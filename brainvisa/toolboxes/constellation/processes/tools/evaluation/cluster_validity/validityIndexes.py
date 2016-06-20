@@ -7,51 +7,82 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-# BrainVisa module
-from brainvisa.processes import *
+"""
+This script does the following:
+* defines a Brainvisa process
+    - the signature of the inputs/ouputs,
+    - the interlinkages between inputs/outputs.
+* executes the command "constel_calculate_asw.py": calculate the average
+  silhouette width in order to obtain the optimal number of clusters.
+
+Main dependencies: axon python API, soma-base, constel
+
+Author: Sandrine Lefranc, 2015
+"""
+
+#----------------------------Imports-------------------------------------------
+
+
+# system module
+import os
+import sys
+
+# axon python API module
+from brainvisa.processes import Integer
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+
+# soma module
 from soma.path import find_in_path
 
-import constel.lib.plot as p
-import pylab
+def validate(self):
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
+    """
+    if not find_in_path("constelGettingValidityIndexes.py"):
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
-name = 'Validity Indexes'
+
+#----------------------------Header--------------------------------------------
+
+
+name = "Validity Indexes"
 userLevel = 2
 
 signature = Signature(
-    'matrix', ReadDiskItem('Connectivity Matrix', 'GIS image',
-                           requiredAttributes={"ends_labelled":"mixed",
-                                               "reduced":"No",
-                                               "dense":"No",
-                                               "intersubject":"Yes"}),
-    'kmax', Integer(),
-    'nbIter', Integer(),
-    'indexFile', WriteDiskItem('Text File', ['Text File', 'CSV file']),)
+    "matrix", ReadDiskItem(
+        "Connectivity Matrix", "GIS image",
+        requiredAttributes={"ends_labelled": "mixed",
+                            "reduced": "No",
+                            "dense": "No",
+                            "intersubject": "Yes"}),
+    "kmax", Integer(),
+    "nbIter", Integer(),
+    "indexFile", WriteDiskItem("Any Type", getAllFormats()))
 
 
-class MatplotlibFig(object):
-    def __init__(self, fig):
-        self._fig = fig
-
-    def __del__(self):
-        mainThreadActions().call(pylab.close, self._fig)
+#----------------------------Functions-----------------------------------------
 
 
 def initialization(self):
+    """
+    """
     self.kmax = 12
     self.nbIter = 100
-    self.indexFile = '/tmp/validityindexes.txt'
+    self.indexFile = "/tmp/validityindexes.txt"
 
 
 def execution(self, context):
-    context.system('python', find_in_path('constelGettingValidityIndexes.py'),
-                   '-m', self.matrix,
-                   '-n', str(self.nbIter),
-                   '-k', str(self.kmax),
-                   '-f', self.indexFile)
-    context.write('OK')
+    """
+    """
+    cortical_region = self.matrix.get("gyrus")
 
-    fileR = open(str(self.indexFile), 'w')
-    fileR.close()
+    context.system(sys.executable, find_in_path("constelGettingValidityIndexes.py"),
+                   self.matrix,
+                   cortical_region,
+                   self.nbIter,
+                   self.kmax,
+                   self.indexFile)
 
-#    fig = mainThreadActions().call(p.validity_indexes_plot)
-#    return MatplotlibFig(fig)
