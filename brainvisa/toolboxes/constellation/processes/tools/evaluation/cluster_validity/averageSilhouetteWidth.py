@@ -88,7 +88,6 @@ def initialization(self):
             for matrix in self.reduced_matrices:
                 name = os.path.dirname(os.path.dirname(
                                        os.path.dirname(matrix.fullPath())))
-                print name
             filename = os.path.join(name, "asw.pdf")
             return filename
 
