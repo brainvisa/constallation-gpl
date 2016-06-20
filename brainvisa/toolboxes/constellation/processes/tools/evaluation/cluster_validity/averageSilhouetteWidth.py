@@ -28,6 +28,7 @@ import os
 import sys
 
 # axon python API module
+from brainvisa.processes import Float
 from brainvisa.processes import ListOf
 from brainvisa.processes import Boolean
 from brainvisa.processes import Integer
@@ -68,7 +69,8 @@ signature = Signature(
 
     #--outputs--
     "outpdffile", WriteDiskItem("Any Type", getAllFormats()),
-    "autoscale_y", Boolean(),
+    "ybound", ListOf(Float()),
+    "ignore_Kopt2",  Boolean(),
 )
 
 
@@ -79,7 +81,8 @@ def initialization(self):
     """
     """
     self.kmax = 12
-    self.autoscale_y = True
+    self.setOptional("ybound")
+    self.ignore_Kopt2 = False
 
     def link_outdir(self, dummy):
         """
@@ -100,14 +103,16 @@ def initialization(self):
 def execution(self, context):
     """Run the command 'constel_calculate_asw.py'.
     """
-    if not self.autoscale_y:
-        arg = "-q"
-    else:
-        arg = "-c"
+    cmd = [sys.executable,
+           find_in_path("constel_calculate_asw.py"),
+           self.reduced_matrices,
+           self.kmax,
+           self.outpdffile]
 
-    context.system(sys.executable,
-                   find_in_path("constel_calculate_asw.py"),
-                   self.reduced_matrices,
-                   self.kmax,
-                   self.outpdffile,
-                   arg)
+    if self.ybound:
+        cmd += ["-s", self.ybound]
+    
+    if self.ignore_Kopt2:
+        cmd += ["-r"]
+
+    context.system(*cmd)
