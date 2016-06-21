@@ -32,6 +32,7 @@ from brainvisa.processes import Integer
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
+from brainvisa.data.neuroDiskItems import getAllFormats
 
 # soma module
 from soma.path import find_in_path
