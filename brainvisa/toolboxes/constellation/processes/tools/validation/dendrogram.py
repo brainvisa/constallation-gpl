@@ -7,80 +7,119 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-from brainvisa.processes import *
-import numpy as np
+"""
+This script does the following:
+* defines a Brainvisa process
+    - the signature of the inputs/ouputs,
+    - the interlinkages between inputs/outputs.
+* executes the command "":
+
+Main dependencies: axon python API, soma-base, constel
+
+Author: Sandrine Lefranc, 2015
+"""
+
+#----------------------------Imports-------------------------------------------
+
+
+# system module
+import numpy
 import pylab
-import scipy.cluster.hierarchy as sch
-import constel.lib.connmatrix.connmatrixtools as cm
+
+# scipy library
+from scipy.spatial.distance import pdist
+from scipy.spatial.distance import squareform
+from scipy.cluster.hierarchy import linkage
+from scipy.cluster.hierarchy import dendrogram
+
+# axon python API module
+from brainvisa.processes import Choice
+from brainvisa.processes import Boolean
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+
+# soma module
 from soma import aims
 
-name = 'Dendrogram'
+
+#----------------------------Header--------------------------------------------
+
+
+name = "Dendrogram"
 userLevel = 2
 
 signature = Signature(
-    'connectivity_matrix', ReadDiskItem(
-        'Connectivity Matrix', 'GIS image',
-        requiredAttributes={"ends_labelled":"mixed",
-                            "reduced":"No",
-                            "dense":"No",
-                            "intersubject":"Yes"}),
-    'transpose', Boolean(),
-    'method_1', Choice('single', 'complete', 'average', 'weighted',
-                       'centroid', 'median', 'ward'),
-    'method_2', Choice('single', 'complete', 'average', 'weighted',
-                       'centroid', 'median', 'ward'),
-    'directory', ReadDiskItem('Directory', 'Directory'))
+    #--inputs--
+    "connectivity_matrix", ReadDiskItem(
+        "Connectivity Matrix", "GIS image",
+        requiredAttributes={"ends_labelled": "mixed",
+                            "reduced": "No",
+                            "dense": "No",
+                            "intersubject": "Yes"}),
+    "transpose", Boolean(),
+    "linkage_method_X", Choice("single", "complete", "average", "weighted",
+                               "centroid", "median", "ward"),
+    "linkage_method_Y", Choice("single", "complete", "average", "weighted",
+                               "centroid", "median", "ward"),
+    "outdir", ReadDiskItem("Directory", "Directory"))
+
+
+#----------------------------Functions-----------------------------------------
+
 
 def initialization(self):
-    self.distance = 'Euclidean'
-    self.method_1 = 'centroid'
-    self.method_2 = 'average'
-    self.linkParameters('directory', 'connectivity_matrix')
+    """
+    """
+    self.distance = "Euclidean"
+    self.method_1 = "centroid"
+    self.method_2 = "average"
+    self.linkParameters("outdir", "connectivity_matrix")
+
+
+#----------------------------Main program--------------------------------------
+
 
 def execution(self, context):
+    """
+    """
     # Load connectivity matrix
-    matrixFile = str(self.connectivity_matrix)
-    vects = aims.read(matrixFile)
-    if not self.transpose:
-        matrix = np.asarray(vects)[:, :, 0, 0]
+    redmat = aims.read(self.connectivity_matrix.fullPath())
+    if self.transpose:
+        matrix = numpy.asarray(redmat)[:, :, 0, 0].T
     else:
-        matrix = np.asarray(vects)[:, :, 0, 0].transpose()
-        print 'Transpose of a matrix.'
-
-    Nsample = matrix.shape[0]
-    Ndim = matrix.shape[1]
+        matrix = numpy.asarray(redmat)[:, :, 0, 0]
 
     # Calculate distance matrix
-    distMat = cm.euclidianDistanceMatrix(matrix)
-   
-    # Compute and plot first dendrogram 
+    dmat = squareform(pdist(matrix))
+
+    # Compute and plot first dendrogram
     fig = pylab.figure()
     axdendro1 = fig.add_axes([0.09, 0.1, 0.2, 0.6])
-    Y = sch.linkage(distMat, method=str(self.method_1))
-    Z1 = sch.dendrogram(Y, orientation='right')
+    Y = linkage(dmat, method=str(self.linkage_method_X))
+    Z1 = dendrogram(Y, orientation="right")
     axdendro1.set_xticks([])
     axdendro1.set_yticks([])
-    
+
     # Compute and plot second dendrogram.
     axdendro2 = fig.add_axes([0.3, 0.71, 0.6, 0.2])
-    Y = sch.linkage(distMat, method=str(self.method_2))
-    Z2 = sch.dendrogram(Y)
+    Y = linkage(dmat, method=str(self.linkage_method_Y))
+    Z2 = dendrogram(Y)
     axdendro2.set_xticks([])
     axdendro2.set_yticks([])
-      
+
     # Plot distance matrix.
     axmatrix = fig.add_axes([0.3, 0.1, 0.6, 0.6])
-    index1 = Z1['leaves']
-    index2 = Z2['leaves']
-    distMat = distMat[index1, :]
-    distMat = distMat[:, index2]
-    im = axmatrix.matshow(distMat, aspect='auto', origin='lower')
+    index1 = Z1["leaves"]
+    index2 = Z2["leaves"]
+    dmat = dmat[index1, :]
+    dmat = dmat[:, index2]
+    im = axmatrix.matshow(dmat, aspect="auto", origin="lower")
     axmatrix.set_xticks([])
     axmatrix.set_yticks([])
-    
+
     # Plot colorbar.
-    axcolor = fig.add_axes([0.91, 0.1, 0.02, 0.8])
-    pylab.colorbar(im, cax = axcolor)
-   
-    # Save figure.
-    fig.savefig(str(self.directory) + '/dendrogram.png')
+    axcolor = fig.add_axes([0.91, 0.1, 0.02, 0.6])
+    pylab.colorbar(im, cax=axcolor)
+
+    # Save figure
+    fig.savefig(self.outdir.fullPath() + "/dendrogram.png")

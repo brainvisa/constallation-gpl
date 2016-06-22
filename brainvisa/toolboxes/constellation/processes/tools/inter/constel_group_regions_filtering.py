@@ -37,7 +37,7 @@ from soma.path import find_in_path
 
 # constel module
 try:
-    from constel.lib.texturetools import remove_labels
+    from constel.lib.utils.texturetools import remove_labels
 except:
     pass
 

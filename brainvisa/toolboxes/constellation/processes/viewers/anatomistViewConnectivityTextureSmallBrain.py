@@ -23,8 +23,8 @@ from soma import aims
 # constel module
 try:
     import constel
-    import constel.lib.connmatrix.connmatrixtools as clcmt
-    from constel.lib.texturetools import geodesic_gravity_center
+    import constel.lib.utils.matrixtools as clcmt
+    from constel.lib.utils.texturetools import geodesic_gravity_center
 except:
     pass
 
@@ -35,7 +35,7 @@ def validation():
     It checks some conditions for the process to be available.
     """
     try:
-        import constel.lib.connmatrix.connmatrixtools as clcmt
+        import constel.lib.utils.matrixtools as clcmt
     except:
         raise ValidationError("Please make sure that constel module"
                               "is installed")
@@ -233,7 +233,7 @@ def execution_mainthread(self, context):
         texture_max = numpy.max(basins_texture[0].arraydata())
         global_max = max((texture_max, global_max))
         a.setObjectPalette(objects=textures,
-                           palette="green_yellow_red",
+                           palette="Blue-Red-fusion",
                            minVal=-0.05,
                            maxVal=float(global_max),
                            absoluteMode=True)
@@ -270,7 +270,7 @@ def execution_mainthread(self, context):
     # view object
     wgroup = a.createWindowsBlock(nbCols=2)
     win1 = a.createWindow("3D", block=wgroup)
-    win2 = a.createWindow("3D", block=wgroup)
+    #win2 = a.createWindow("3D", block=wgroup)
     win1.addObjects(major_textured_mesh)
     win1.addObjects(graph_list)
 
@@ -278,10 +278,10 @@ def execution_mainthread(self, context):
     a.execute("SetControl", windows=[win1], control="SmallBrainsControl")
     action = win1.view().controlSwitch().getAction(
         "SmallBrainSelectionAction")
-    action.secondaryView = win2
+    #action.secondaryView = win2
 
     return [ana_mesh, graph_list, ana_clusters,
-            major_textured_mesh, win1, win2]
+            major_textured_mesh, win1]#, win2]
 
 
 def execution(self, context):

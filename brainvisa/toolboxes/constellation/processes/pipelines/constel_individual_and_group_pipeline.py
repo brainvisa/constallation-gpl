@@ -22,13 +22,21 @@ Author: Sandrine Lefranc, 2015
 #----------------------------Imports-------------------------------------------
 
 
-from brainvisa.processes import Signature, String, Choice, ReadDiskItem, \
-    Float, SerialExecutionNode, ProcessExecutionNode, neuroHierarchy, \
-    ValidationError, OpenChoice
+# axon python API modules
+from brainvisa.processes import Float
+from brainvisa.processes import String
+from brainvisa.processes import Choice
+from brainvisa.processes import Signature
+from brainvisa.processes import OpenChoice
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import neuroHierarchy
+from brainvisa.processes import ValidationError
+from brainvisa.processes import SerialExecutionNode
+from brainvisa.processes import ProcessExecutionNode
 
 # constel module
 try:
-    from constel.lib.utils.files import read_file
+    from constel.lib.utils.filetools import read_file
 except:
     raise ValidationError("Please make sure that constel module is installed.")
 
@@ -43,20 +51,21 @@ signature = Signature(
     # inputs
     "study_name", String(),
     "outputs_database", Choice(),
-    "format_fiber_tracts", Choice("bundles", "trk"),
+    "fiber_tracts_format", Choice("bundles", "trk"),
     "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
-    "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
-    "ROI", OpenChoice(),
-    "dirsubject", ReadDiskItem("subject", "directory"),
-    "ROIs_segmentation", ReadDiskItem(
+    "cortical_regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File"),
+    "cortical_region", OpenChoice(),
+    "subject_directory", ReadDiskItem("subject", "directory"),
+    "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     "smoothing", Float(),
-    "subjects_group", ReadDiskItem("Group definition", "XML"),
+    "constellation_subjects_group", ReadDiskItem("Group definition", "XML"),
     "new_study_name", String(),
     "average_mesh", ReadDiskItem("White Mesh", "Aims mesh formats",
                                  requiredAttributes={"side": "both",
@@ -86,23 +95,27 @@ def initialization(self):
 
     # default value
     self.smoothing = 3.0
-    self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue(
+    self.cortical_regions_nomenclature = self.signature[
+        "cortical_regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
     def link_roi(self, dummy):
         """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
         of process.
         """
-        if self.ROIs_nomenclature is not None:
-            s = ["Select a ROI in this list"]
-            s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
-            self.signature["ROI"].setChoices(*s)
-            if isinstance(self.signature["ROI"], OpenChoice):
-                self.signature["ROI"] = Choice(*s)
+        if self.cortical_regions_nomenclature is not None:
+            s = ["Select a cortical_region in this list"]
+            s += read_file(
+                self.cortical_regions_nomenclature.fullPath(), mode=2)
+            self.signature["cortical_region"].setChoices(*s)
+            if isinstance(self.signature["cortical_region"], OpenChoice):
+                self.signature["cortical_region"] = Choice(*s)
                 self.changeSignature(self.signature)
 
     # link of parameters for autocompletion
-    self.linkParameters("ROI", "ROIs_nomenclature", link_roi)
+    self.linkParameters(
+        "cortical_region", "cortical_regions_nomenclature", link_label)
+
     eNode = SerialExecutionNode(self.name, parameterized=self)
 
     ###########################################################################
@@ -113,17 +126,20 @@ def initialization(self):
         "pipelineIntra", ProcessExecutionNode("constel_individual_pipeline",
                                               optional=1))
 
-    eNode.pipelineIntra.removeLink("ROI", "ROIs_nomenclature")
+    eNode.pipelineIntra.removeLink("cortical_region",
+                                   "cortical_regions_nomenclature")
 
     eNode.addDoubleLink("pipelineIntra.study_name", "study_name")
     eNode.addDoubleLink("pipelineIntra.outputs_database", "outputs_database")
-    eNode.addDoubleLink(
-        "pipelineIntra.format_fiber_tracts", "format_fiber_tracts")
+    eNode.addDoubleLink("pipelineIntra.fiber_tracts_format",
+                        "fiber_tracts_format")
     eNode.addDoubleLink("pipelineIntra.method", "method")
-    eNode.addDoubleLink("pipelineIntra.ROIs_nomenclature", "ROIs_nomenclature")
-    eNode.addDoubleLink("pipelineIntra.ROI", "ROI")
-    eNode.addDoubleLink("pipelineIntra.dirsubject", "dirsubject")
-    eNode.addDoubleLink("pipelineIntra.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("pipelineIntra.cortical_regions_nomenclature",
+                        "cortical_regions_nomenclature")
+    eNode.addDoubleLink("pipelineIntra.cortical_region", "cortical_region")
+    eNode.addDoubleLink("pipelineIntra.subject_directory", "subject_directory")
+    eNode.addDoubleLink("pipelineIntra.cortical_parcellation",
+                        "cortical_parcellation")
     eNode.addDoubleLink("pipelineIntra.white_mesh", "white_mesh")
     eNode.addDoubleLink("pipelineIntra.smoothing", "smoothing")
 
@@ -135,17 +151,20 @@ def initialization(self):
         "pipelineInter", ProcessExecutionNode("constel_group_pipeline",
                                               optional=1))
 
-    eNode.pipelineInter.removeLink("ROI", "ROIs_nomenclature")
-    eNode.pipelineInter.removeLink("average_mesh", "ROIs_nomenclature")
+    eNode.pipelineInter.removeLink("cortical_region",
+                                   "cortical_regions_nomenclature")
+    eNode.pipelineInter.removeLink("average_mesh",
+                                   "cortical_regions_nomenclature")
 
     eNode.addDoubleLink("pipelineInter.method", "method")
-    eNode.addDoubleLink("pipelineInter.ROIs_nomenclature", "ROIs_nomenclature")
-    eNode.addDoubleLink("pipelineInter.ROI", "ROI")
+    eNode.addDoubleLink("pipelineInter.cortical_regions_nomenclature",
+                        "cortical_regions_nomenclature")
+    eNode.addDoubleLink("pipelineInter.cortical_region", "cortical_region")
     eNode.addDoubleLink("pipelineInter.study_name", "study_name")
     eNode.addDoubleLink("pipelineInter.new_study_name", "new_study_name")
     eNode.addDoubleLink("pipelineInter.smoothing", "smoothing")
-    eNode.addDoubleLink("pipelineInter.subjects_group", "subjects_group")
-    #eNode.addDoubleLink("pipelineInter.ROIs_segmentation", "ROIs_segmentation")
+    eNode.addDoubleLink("pipelineInter.constellation_subjects_group",
+                        "constellation_subjects_group")
     eNode.addDoubleLink("pipelineInter.average_mesh", "average_mesh")
 
     self.setExecutionNode(eNode)
