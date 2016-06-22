@@ -34,7 +34,7 @@ from soma.minf.api import registerClass, readMinf
 
 # constel module
 try:
-    from constel.lib.utils.files import read_file
+    from constel.lib.utils.filetools import read_file
 except:
     raise ValidationError("Please make sure that constel module is installed.")
 

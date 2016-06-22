@@ -14,7 +14,7 @@ from collections import defaultdict
 import numpy
 
 # constel import
-from constel.lib.texturetools import create_relationship_region2neighbors
+from constel.lib.utils.texturetools import create_relationship_region2neighbors
 from constel.lib.utils.four_color_theorem import build_rules, get_best
 
 # Anatomist

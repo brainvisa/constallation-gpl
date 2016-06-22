@@ -29,17 +29,19 @@ Author: Sandrine Lefranc, 2015
 import numpy
 
 # axon python API modules
-from brainvisa.processes import Signature, ReadDiskItem, Integer, String
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import Integer, String
 
 # soma module
 from soma import aims
 
 # constel modules
 try:
-    from constel.lib.connmatrix.connmatrixtools import \
+    from constel.lib.utils.matrixtools import \
         compute_mclusters_by_nbasins_matrix
-    from constel.lib.connmatrix.connmatrixtools import write_matrix2csv
-    from constel.lib.statistical_tools import calculate_percentage
+    from constel.lib.utils.matrixtools import write_matrix2csv
+    from constel.lib.utils.matrixtools import calculate_percentage
 except:
     pass
 

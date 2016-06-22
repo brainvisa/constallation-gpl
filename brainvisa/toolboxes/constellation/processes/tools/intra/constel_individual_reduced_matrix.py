@@ -31,8 +31,8 @@ from soma.path import find_in_path
 
 # constel modules
 try:
-    from constel.lib.utils.files import select_ROI_number
-    from constel.lib.connmatrix.connmatrixtools import save_normalization
+    from constel.lib.utils.filetools import select_ROI_number
+    from constel.lib.utils.matrixtools import save_normalization
 except:
     pass
 

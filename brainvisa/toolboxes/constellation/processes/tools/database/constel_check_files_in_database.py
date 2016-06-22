@@ -32,7 +32,7 @@ from brainvisa.processes import Signature, ReadDiskItem, ListOf, Choice, \
     
 # constel modules
 try:
-    from constel.lib.utils.files import read_file
+    from constel.lib.utils.filetools import read_file
 except:
     pass
 

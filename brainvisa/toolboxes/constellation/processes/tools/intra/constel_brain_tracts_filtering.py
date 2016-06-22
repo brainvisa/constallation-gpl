@@ -36,8 +36,8 @@ from soma.path import find_in_path
 
 # constel modules
 try:
-    from constel.lib.utils.files import read_file, select_ROI_number
-    from constel.lib.bundles.bundles_tools import load_fiber_tracts
+    from constel.lib.utils.filetools import read_file, select_ROI_number
+    from constel.lib.utils.fibertools import load_fiber_tracts
 except:
     pass
 

@@ -9,7 +9,7 @@ Created on Mon Oct 20 09:35:29 2014
 from brainvisa.processes import *
 from soma.path import find_in_path
 
-from constel.lib.mesh_tools import transform_mesh_to_volume
+from constel.lib.utils.meshtools import transform_mesh_to_volume
 import numpy
 
 # Plot connectomist module

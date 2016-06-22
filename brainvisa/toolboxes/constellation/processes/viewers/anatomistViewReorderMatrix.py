@@ -34,13 +34,13 @@ from soma import aims
 
 # constel module
 try:
-    import constel.lib.connmatrix.connmatrixtools as CM
+    import constel.lib.utils.matrixtools as CM
 except:
     pass
 
 def validation():
   try:
-      import constel.lib.connmatrix.connmatrixtools as CM
+      import constel.lib.utils.matrixtools as CM
   except:
       raise ValidationError("constel module is not available")
 

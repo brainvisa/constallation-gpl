@@ -34,7 +34,7 @@ from brainvisa.processes import ProcessExecutionNode
 
 # constel module
 try:
-    from constel.lib.utils.files import read_file
+    from constel.lib.utils.filetools import read_file
 except:
     pass
 

@@ -36,8 +36,8 @@ from soma import aims
 
 # constel module
 try:
-    import constel.lib.texturetools as tt
-    from constel.lib.utils.files import read_file, select_ROI_number
+    import constel.lib.utils.texturetools as tt
+    from constel.lib.utils.filetools import read_file, select_ROI_number
 except:
     pass
 

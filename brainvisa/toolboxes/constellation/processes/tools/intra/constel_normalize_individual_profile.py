@@ -35,7 +35,7 @@ from soma.path import find_in_path
 
 # constel module
 try:
-    from constel.lib.utils.files import select_ROI_number
+    from constel.lib.utils.filetools import select_ROI_number
 except:
     pass
 
