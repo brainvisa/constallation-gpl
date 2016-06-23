@@ -32,8 +32,8 @@ Par exemple, vous pouvez utilser l'atlas Desikan-Killiany ou l'atlas Destrieux i
 <span style="text-decoration:underline">Incidences du choix de la méthode sur le paramètre "ROIs_nomenclature":</span><br/>
 <i><b>(1) "averaged approach" </b></i>, dans le cadre de cette approche le paramètre "ROIs_nomenclature" doit être un fichier représentant la segmentation moyenne du groupe de sujets <br/>
 <i><b>(2) "concatenated approach"</b></i>, le paramètre "ROIs_nomenclature" est une segmentation individuelle. <br/></xhtml>
-      <xhtml name="outputs_database">Une base de données BrainVisa est obligatoire pour l'autocomplétion et l'écriture des fichiers de ce process. Sans celle-ci, aucune donnée pourra être générée. (voir la documentation pour ajouter une base de données dans la configuration de BrainVisa). Ce paramètre récupère l'ensemble des bases de données ayant une ontologie brainvisa présente dans votre configuration, vous n'avez plus qu'à choisir celle qui vous convient pour écrire les fichiers générés.</xhtml>
-      <xhtml name="white_mesh">Maillage de la surface corticale, définie comme étant l'interface entre la substance blanche et la substance grise (également appelé interface gris/blanc).</xhtml>
+      <xhtml name="outputs_database">Une base de donnée BrainVisa est obligatoire pour l'autocomplétion et l'écriture des fichiers de ce process. Sans celle-ci, aucune donnée pourra être générer. (voir la documentation pour ajouter une base de données dans la configuration de BrainVisa). Ce paramètre récupère l'ensemble des bases de données ayant une ontologie brainvisa présente dans votre configuration, vous n'avez plus qu'à choisir celle qui vous convient pour écrire les fichiers générés.</xhtml>
+      <xhtml name="white_mesh">Maillage individuel de la surface corticale, définie comme étant l'interface entre la substance blanche et la substance grise (également appelé interface gris/blanc).</xhtml>
     </d>
     <xhtml name="long"/>
   </d>
@@ -72,7 +72,7 @@ You must choose a region. The study will be done on this region.</xhtml>
       <xhtml name="outputs_database">A BrainVisa database is mandatory for autocompletion and writing files in this process. Without it, no data will be generated. (see the documentation to add a database in the BrainVisa configuration). This parameter retrieves all databases with brainvisa ontology present in your configuration, you just have to pick the right one to write the generated files.</xhtml>
       <xhtml name="white_mesh">Individual white mesh of the entire cortical surface (white/gray interface).</xhtml>
     </d>
-    <xhtml name="long">A complete pipeline: an intra_subject chain which builds the individual connectivity matrices. The preprocessings are done using FreeSurfer for the anatomical data, and Connectomist for the diffusion data.</xhtml>
+    <xhtml name="long"/>
   </d>
 </d>
 </minf>

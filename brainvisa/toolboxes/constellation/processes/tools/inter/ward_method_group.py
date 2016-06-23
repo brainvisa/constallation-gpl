@@ -1,14 +1,30 @@
-############################################################################
-#  This software and supporting documentation are distributed by
-#      CEA/NeuroSpin, Batiment 145,
-#      91191 Gif-sur-Yvette cedex
-#      France
-# This software is governed by the CeCILL license version 2 under
-# French law and abiding by the rules of distribution of free software.
-# You can  use, modify and/or redistribute the software under the
-# terms of the CeCILL license version 2 as circulated by CEA, CNRS
-# and INRIA at the following URL "http://www.cecill.info".
-############################################################################
+###############################################################################
+# This software and supporting documentation are distributed by CEA/NeuroSpin,
+# Batiment 145, 91191 Gif-sur-Yvette cedex, France. This software is governed
+# by the CeCILL license version 2 under French law and abiding by the rules of
+# distribution of free software. You can  use, modify and/or redistribute the
+# software under the terms of the CeCILL license version 2 as circulated by
+# CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+###############################################################################
+
+"""
+This script does the following:
+* defines a Brainvisa process
+    - the parameters of a process (Signature),
+    - the parameters initialization
+    - the linked parameters
+* this process executes the command 'AimsMeshWatershed.py' and
+  'constelFilteringWatershed.py': the ROI profile is computede from the mean
+   profile.
+
+Main dependencies: Axon python API, Soma-base, constel
+
+Author: Sandrine Lefranc
+"""
+
+
+#----------------------------Imports-------------------------------------------
+
 
 # Axon python API module
 from brainvisa.processes import *
@@ -18,7 +34,8 @@ from soma.path import find_in_path
 
 
 def validation():
-    """This function is executed at BrainVisa startup when the process is loaded.
+    """This function is executed at BrainVisa startup when the process is
+    loaded.
 
     It checks some conditions for the process to be available.
     """
@@ -51,12 +68,20 @@ signature = Signature(
 )
 
 
+#----------------------------Header--------------------------------------------
+
+
 def initialization(self):
-    self.kmax = 12
+   '''Declare the default value.
+   '''
+   # Default value
+   self.kmax = 12
 
 
 def execution(self, context):
-    """Run a Ward's hierarchical clustering method.
+    """Run th command "constelClusteringWard".
+    
+    Run a Ward's hierarchical clustering method.
     """
     args = [sys.executable, find_in_path("constelClusteringWard.py")]
     for x in self.gyri_texture:

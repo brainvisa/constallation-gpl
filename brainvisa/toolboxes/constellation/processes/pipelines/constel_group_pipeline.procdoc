@@ -5,44 +5,62 @@
     <xhtml name="short"/>
     <d name="parameters">
       <xhtml name="mean_individual_profiles"/>
-      <xhtml name="ROI"/>
       <xhtml name="normed_individual_profiles"/>
       <xhtml name="average_mesh"/>
+      <xhtml name="cortical_regions_nomenclature">Ce paramètre est un fichier texte. Il définit les relations entre le nom et le numéro de chaque région présent dans la parcellisation du cortex, paramètre 'cortical parcellation'. Ce fichier doit être construit comme ceci (l'ordre des noms ou des numéros n'a pas d'importance) : <br/>
+<br/>
+<pre>1              nomA</pre>
+<pre>2              nomB</pre>
+<pre>3              nomC</pre>
+<pre>4              nomD</pre>
+<pre>5              nomE</pre>
+<pre>..             .....   </pre>
+<br/>
+ 
+Par exemple, vous pouvez utilser l'atlas Desikan-Killiany ou l'atlas Destrieux issus de FreeSurfer.</xhtml>
       <xhtml name="new_study_name"/>
       <xhtml name="study_name"/>
-      <xhtml name="smoothing"/>
-      <xhtml name="ROIs_nomenclature"/>
-      <xhtml name="subjects_group"/>
+      <xhtml name="smoothing">Degré du smoothing en millimètre.</xhtml>
+      <xhtml name="cortical_region">La liste des noms de labels présents dans le fichier texte 'labels_nomenclature' est proposée. Vous devez choisir une région à étudier.</xhtml>
+      <xhtml name="constellation_subjects_group">The XML file corresponding the study group.</xhtml>
+      <xhtml name="cortical_parcellation"/>
       <xhtml name="method"/>
-      <xhtml name="ROIs_segmentation"/>
     </d>
     <xhtml name="long"/>
   </d>
   <d name="en">
-    <xhtml name="short"/>
+    <xhtml name="short"><img SRC="../../images/constellation/schema_group_concat.png" ALT="" height="300" width="900"/><br/>
+<img SRC="../../images/constellation/schema_group_avg.png" ALT="" height="300" width="900"/></xhtml>
     <d name="parameters">
-      <xhtml name="mean_individual_profiles"/>
-      <xhtml name="ROI">Due to the correspondence table imported in the "ROIs nomenclature", all names starting regions is recovered, you have to choose the region to study.</xhtml>
-      <xhtml name="normed_individual_profiles"/>
-      <xhtml name="average_mesh"/>
-      <xhtml name="new_study_name"/>
+      <xhtml name="mean_individual_profiles">List of the all individual mean profiles for a group of subjects.</xhtml>
+      <xhtml name="normed_individual_profiles">List of the all individual normed profiles for a group of subjects.</xhtml>
+      <xhtml name="average_mesh">Both average white mesh (from a group of subject)</xhtml>
+      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed like that (The order of labels is not relevant.): <br/>
+<br/>
+<pre>1              nameA</pre>
+<pre>2              nameB</pre>
+<pre>3              nameC</pre>
+<pre>4              nameD</pre>
+<pre>5              nameE</pre>
+<pre>..             .....   </pre>
+<br/>
+For example, you can use the Desikan-Killiany Atlas or the Destrieux Atlas of the FreeSurfer software.</xhtml>
+      <xhtml name="new_study_name">In the group pipeline, you want to change the study name. In this case, the outputs will be written in the new study name directory.</xhtml>
       <xhtml name="study_name">This mandatory parameter is free and allows to give a name to the pipeline. The value of "study_name" will be integrated into each output file name as well as the directory of the database that retrieves the output files.</xhtml>
-      <xhtml name="smoothing"/>
-      <xhtml name="ROIs_nomenclature">Correspondence table between the names of the starting regions and their associated label. This is a text file organized as following:
-<ul>
-<li><b><i> first column: </i> </b>number of the region</li> 
-<li><b><i> second column: </i> </b>name of the region</li> 
-</ul>
-A correspondence table is the default gyri representing the atlas and Desikan Killiany.</xhtml>
-      <xhtml name="subjects_group">We are here in the group pipeline, and a group has to be defined before starting. To build the group, please use the process <a href="bvproces:://createGroup">Creation of a group of subjects</a>. This group is defined in the Constellation database, and the user normally should not use a FreeSurfer group. Subjects in this group should all have undergone the individual pipeline, and contain connectivity profile data.</xhtml>
+      <xhtml name="smoothing">Degree of smoothing (in millimetres)</xhtml>
+      <xhtml name="cortical_region">The list oflregion names, present in the text file 'cortical_regions_nomenclature' is proposed. <br/>
+You must choose a region. The study will be done on this region.</xhtml>
+      <xhtml name="constellation_subjects_group">The XML file corresponding the study group.</xhtml>
+      <xhtml name="cortical_parcellation">Parcellation of the cortical surface into anatomical region (lobes, gyri...). For example, FreeSurfer provides a cortical parcellation into gyri.<br/>
+A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
       <xhtml name="method">Two methods are proposed: <br/>
 <i><b>(1) "averaged approach" </b></i> to obtain a single result group. <br/>
 <i><b>(2) "concatenated approach"</b></i> to obtain individual results across the group.  <br/>
 <br/>
-<span style="text-decoration:underline">Implications of the choice of method on the parameter "ROIs_nomenclature":</span><br/>
-<i><b>(1) "averaged approach" </b></i>, in the context of this approach the "ROIs_nomenclature" parameter must be a file representing the average segmentation group of subjects <br/>
-<i><b>(2) "concatenated approach"</b></i>, the "ROIs_nomenclature" parameter is an individual segmentation. <br/>entation</xhtml>
-      <xhtml name="ROIs_segmentation">Segmentation by starting regions. (for example, the gyri segmentation of FreeSufer: Desikan-Killiany atlas) . A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
+<img SRC="../../images/constellation/panneau_attention.jpg" ALT="" height="20" width="20"/>
+<span style="color:red;">Implications of the choice of method on the parameter "cortical_parcellation":</span><br/>
+<i><b>(1) "averaged approach" </b></i>, for this method, the parameter "cortical_parcellation" must be a file representing the average parcellation of a subjects group. <br/>
+<i><b>(2) "concatenated approach"</b></i>, the parameter "cortical_parcellation" is an individual parcellation. <br/></xhtml>
     </d>
     <xhtml name="long"/>
   </d>

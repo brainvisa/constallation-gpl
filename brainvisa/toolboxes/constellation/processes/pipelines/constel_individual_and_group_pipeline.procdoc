@@ -4,55 +4,81 @@
   <d name="fr">
     <xhtml name="short"/>
     <d name="parameters">
-      <xhtml name="ROI">Grâce à la table de correspondance importé dans l'onglet "ROIs_nomenclature", l'ensemble des noms des régions de départ est récupéré, vous n'avez plus qu'à choisir la région à étudier.</xhtml>
-      <xhtml name="white_mesh">Maillage de la surface corticale, définie comme étant l'interface entre la substance blanche et la substance grise (également appelé interface gris/blanc).</xhtml>
-      <xhtml name="smoothing"/>
+      <xhtml name="fiber_tracts_format">Différents formats de faisceaux de fibres sont pris en charge. Les formats acceptés sont les suivants.<br/>
+
+<i>(1)</i> <b>Format de fichier TrackVis</b> avec .trk comme extension de nom de fichier. <br/>
+<i>(2)</i> <b>Format de fichiers Connectomist</b> avec .bundles comme extension de nom de fichier. <br/></xhtml>
+      <xhtml name="average_mesh">Maillage moyen de la surface corticale, définie comme étant l'interface entre la substance blanche et la substance grise (également appelé interface gris/blanc).</xhtml>
+      <xhtml name="cortical_regions_nomenclature">Ce paramètre est un fichier texte. Il définit les relations entre le nom et le numéro de chaque région présent dans la parcellisation du cortex, paramètre 'cortical parcellation'. Ce fichier doit être construit comme ceci (l'ordre des noms ou des numéros n'a pas d'importance) : <br/>
+<br/>
+<pre>1              nomA</pre>
+<pre>2              nomB</pre>
+<pre>3              nomC</pre>
+<pre>4              nomD</pre>
+<pre>5              nomE</pre>
+<pre>..             .....   </pre>
+<br/>
+ 
+Par exemple, vous pouvez utilser l'atlas Desikan-Killiany ou l'atlas Destrieux issus de FreeSurfer.</xhtml>
+      <xhtml name="new_study_name"/>
+      <xhtml name="subject_directory">Répertoire où se trouve les fichiers de tractographie du sujet.</xhtml>
       <xhtml name="study_name">Ce paramètre obligatoire est libre et permet de donner un nom au pipeline. La valeur de "study_name" sera intégrée à chaque nom de fichier de sortie ainsi qu'à l'arborescence de la base de données qui récupère les fichiers de sortie. </xhtml>
-      <xhtml name="dirsubject">Ce paramètre a une double utilité. Il donne à la fois le chemin pour récupérer les fichiers de fibres et le nom du sujet. Avec le paramètre "format_fiber_tracts", les fichiers de l'extension voulu sont récupérés.</xhtml>
-      <xhtml name="ROIs_nomenclature">Table de correspondance entre les noms des régions de départ et leur label associé. Il s'agit d'un fichier texte organisé comme ceci: 
-<ul>
-<li><b><i> 1ère colonne : </i> </b>numéro de la région</li> 
-<li><b><i> 2e colonne : </i> </b>nom de la région</li> 
-</ul>
-Une table de correspondence est proposée par défaut représentant les gyri de l'atlas de Desikan et Killiany.</xhtml>
-      <xhtml name="format_fiber_tracts">Actuellement, seules les fichiers de fibres issues de Connectomist-2.0 (.bundles) ou de TrackVis (.trk) sont acceptés. Ce paramètre permet de filtrer les fichiers en fonction de leur extension.</xhtml>
+      <xhtml name="cortical_parcellation">Parcellisation de la surface corticale en régions anatomiques (lobes, gyri...). Par exemple, FreeSurfer propose une parcellisation corticale en gyri.</xhtml>
+      <xhtml name="constellation_subjects_group">The XML file corresponding the study group.</xhtml>
+      <xhtml name="cortical_region">La liste des noms de labels présents dans le fichier texte 'labels_nomenclature' est proposée. Vous devez choisir une région à étudier.</xhtml>
+      <xhtml name="smoothing">Degré du smoothing en millimètre.</xhtml>
       <xhtml name="method">Deux méthodes sont proposées: <br/>
 <i><b>(1) "averaged approach" </b></i> pour obtenir un unique résultat de groupe. <br/>
 <i><b>(2) "concatenated approach"</b></i> pour obtenir des résultats individuels à l'échelle du groupe.  <br/>
 <br/>
+<img SRC="../../images/constellation/panneau_attention.jpg" ALT="" height="20" width="20"/>
 <span style="text-decoration:underline">Incidences du choix de la méthode sur le paramètre "ROIs_nomenclature":</span><br/>
 <i><b>(1) "averaged approach" </b></i>, dans le cadre de cette approche le paramètre "ROIs_nomenclature" doit être un fichier représentant la segmentation moyenne du groupe de sujets <br/>
 <i><b>(2) "concatenated approach"</b></i>, le paramètre "ROIs_nomenclature" est une segmentation individuelle. <br/></xhtml>
       <xhtml name="outputs_database">Une base de donnée BrainVisa est obligatoire pour l'autocomplétion et l'écriture des fichiers de ce process. Sans celle-ci, aucune donnée pourra être générer. (voir la documentation pour ajouter une base de données dans la configuration de BrainVisa). Ce paramètre récupère l'ensemble des bases de données ayant une ontologie brainvisa présente dans votre configuration, vous n'avez plus qu'à choisir celle qui vous convient pour écrire les fichiers générés.</xhtml>
-      <xhtml name="ROIs_segmentation">Segmentation en régions de départ. Par exemple, la parcellisation en gyri de FreeSufer (atlas de Desikan et Killiany).
-Une correspondance point-à-point entre les sujets est obligatoire afin de permettre une analyse des résultats de groupe (une région anatomique chez un sujet correspond à la même région anatomique chez un autre sujet).</xhtml>
+      <xhtml name="white_mesh">Maillage individuel de la surface corticale, définie comme étant l'interface entre la substance blanche et la substance grise (également appelé interface gris/blanc).</xhtml>
     </d>
     <xhtml name="long"/>
   </d>
   <d name="en">
-    <xhtml name="short"/>
+    <xhtml name="short"><img SRC="../../images/constellation/schema_ind.png" ALT="" height="300" width="900"/><br/>
+<img SRC="../../images/constellation/schema_group_concat.png" ALT="" height="300" width="900"/><br/>
+<img SRC="../../images/constellation/schema_group_avg.png" ALT="" height="300" width="900"/></xhtml>
     <d name="parameters">
-      <xhtml name="ROI">Due to the correspondence table imported in the "ROIs nomenclature", all names starting regions is recovered, you have to choose the region to study.</xhtml>
-      <xhtml name="white_mesh">Indivdual both brain mesh</xhtml>
-      <xhtml name="smoothing"/>
+      <xhtml name="fiber_tracts_format">Different fiber tracts formats are supported. Selectable formats are as follows:<br/>
+
+<i>(1)</i> <b>TrackVis file format </b> with .trk as filename extension. <br/>
+<i>(2)</i> <b>Connectomist file format</b> with .bundles as filename extension. <br/></xhtml>
+      <xhtml name="average_mesh">Average white mesh of the entire cortical surface (white/gray interface).</xhtml>
+      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed like that (The order of labels is not relevant.): <br/>
+<br/>
+<pre>1              nameA</pre>
+<pre>2              nameB</pre>
+<pre>3              nameC</pre>
+<pre>4              nameD</pre>
+<pre>5              nameE</pre>
+<pre>..             .....   </pre>
+<br/>
+For example, you can use the Desikan-Killiany Atlas or the Destrieux Atlas of the FreeSurfer software.</xhtml>
+      <xhtml name="new_study_name">In the group pipeline, you want to change the study name. In this case, the outputs will be written in the new study name directory.</xhtml>
+      <xhtml name="subject_directory">Tractography directory of the subject.</xhtml>
       <xhtml name="study_name">This mandatory parameter is free and allows to give a name to the pipeline. The value of "study_name" will be integrated into each output file name as well as the directory of the database that retrieves the output files.</xhtml>
-      <xhtml name="dirsubject">This parameter is useful in two ways. It gives both the path to recover files fibers and the name of the subject. With the "format_fiber_tracts" parameter, the desired file extension are recovered.</xhtml>
-      <xhtml name="ROIs_nomenclature">Correspondence table between the names of the starting regions and their associated label. This is a text file organized as following:
-<ul>
-<li><b><i> first column: </i> </b>number of the region</li> 
-<li><b><i> second column: </i> </b>name of the region</li> 
-</ul>
-A correspondence table is the default gyri representing the atlas and Desikan Killiany.</xhtml>
-      <xhtml name="format_fiber_tracts">Currently, only files of fibers from Connectomist-2.0 (.bundles) or TrackVis (.trk) softwares are accepted. This parameter allows to filter files based on their extension.</xhtml>
+      <xhtml name="cortical_parcellation">Parcellation of the cortical surface into anatomical region (lobes, gyri...). For example, FreeSurfer provides a cortical parcellation into gyri.<br/>
+A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
+      <xhtml name="constellation_subjects_group">The XML file corresponding the study group.</xhtml>
+      <xhtml name="cortical_region">The list oflregion names, present in the text file 'cortical_regions_nomenclature' is proposed. <br/>
+You must choose a region. The study will be done on this region.</xhtml>
+      <xhtml name="smoothing">Degree of smoothing (in millimetres)</xhtml>
       <xhtml name="method">Two methods are proposed: <br/>
 <i><b>(1) "averaged approach" </b></i> to obtain a single result group. <br/>
 <i><b>(2) "concatenated approach"</b></i> to obtain individual results across the group.  <br/>
 <br/>
-<span style="text-decoration:underline">Implications of the choice of method on the parameter "ROIs_nomenclature":</span><br/>
-<i><b>(1) "averaged approach" </b></i>, in the context of this approach the "ROIs_nomenclature" parameter must be a file representing the average segmentation group of subjects <br/>
-<i><b>(2) "concatenated approach"</b></i>, the "ROIs_nomenclature" parameter is an individual segmentation. <br/>entation</xhtml>
+<img SRC="../../images/constellation/panneau_attention.jpg" ALT="" height="20" width="20"/>
+<span style="color:red;">Implications of the choice of method on the parameter "cortical_parcellation":</span><br/>
+<i><b>(1) "averaged approach" </b></i>, for this method, the parameter "cortical_parcellation" must be a file representing the average parcellation of a subjects group. <br/>
+<i><b>(2) "concatenated approach"</b></i>, the parameter "cortical_parcellation" is an individual parcellation. <br/></xhtml>
       <xhtml name="outputs_database">A BrainVisa database is mandatory for autocompletion and writing files in this process. Without it, no data will be generated. (see the documentation to add a database in the BrainVisa configuration). This parameter retrieves all databases with brainvisa ontology present in your configuration, you just have to pick the right one to write the generated files.</xhtml>
-      <xhtml name="ROIs_segmentation">Segmentation by starting regions. (for example, the gyri segmentation of FreeSufer: Desikan-Killiany atlas) . A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
+      <xhtml name="white_mesh">Individual white mesh of the entire cortical surface (white/gray interface).</xhtml>
     </d>
     <xhtml name="long"/>
   </d>
