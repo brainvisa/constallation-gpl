@@ -25,11 +25,24 @@ Author: Sandrine Lefranc
 # system module
 import numpy
 
-from brainvisa.processes import ValidationError, Signature, ReadDiskItem, \
-    WriteDiskItem, String, ListOf, Integer, WriteDiskItem
+# axon python API module
+from brainvisa.processes import String
+from brainvisa.processes import ListOf
+from brainvisa.processes import Integer
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import ValidationError
 
 # soma module
 from soma import aims
+
+# constel module
+from constel.lib.utils.texturetools import concatenate_texture
+
+
+#----------------------------Header--------------------------------------------
+
 
 name = 'Concatenate the ROI segmentations on the same mesh'
 userLevel = 2
@@ -59,27 +72,12 @@ def initialization(self):
     pass
 
 
+#----------------------------Main Program--------------------------------------
+
+
 def execution(self, context):
     """
     """
-    for idx, filename in enumerate(self.ROI_clustering):
-        roiseg = aims.read(filename.fullPath())
-        rseg = numpy.array(roiseg[self.time_step[idx]].arraydata())
-        if idx == 0:
-            tmp_rseg = rseg
-            max_time_step = max(rseg)
-        else:
-            l = numpy.unique(rseg)
-            if l[0] == 0:
-                labels = l.nonzero()[0][::-1]
-            else:
-                labels = l[::-1]
-            for label in labels:
-                rseg[rseg == label] = label + max_time_step
-            temp = tmp_rseg[:]
-            tmp_rseg = [x + y for x, y in zip(temp, rseg)]
-            max_time_step = max(rseg)
-    final_rseg = aims.TimeTexture_S16()
-    final_rseg[0].assign(tmp_rseg)
+    final_rseg = concatenate_texture(self.ROI_clustering, self.time_step)
     aims.write(final_rseg, self.concatenated_ROIseg.fullPath())
 

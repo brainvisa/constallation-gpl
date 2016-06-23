@@ -22,15 +22,24 @@ Author: Sandrine Lefranc
 #----------------------------Imports-------------------------------------------
 
 
-# python system module
-from brainvisa.processes import ValidationError, Signature, ReadDiskItem, \
-    WriteDiskItem
+# axon python API module
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import ValidationError
+    
+# soma module
 from soma.path import find_in_path
 
 
 def validation():
+    """
+    """
     if not find_in_path('constelGyriTextureCleaningIsolatedVertices.py'):
         raise ValidationError('constel module is not here.')
+
+
+#----------------------------Header--------------------------------------------
 
 
 name = 'Cleaning Isolated Vertices'
@@ -38,12 +47,15 @@ userLevel = 2
 
 
 signature = Signature(
+    #--inputs--
     'gyri_texture', ReadDiskItem(
         'ROI Texture', 'Aims texture formats',
-        requiredAttributes={"side":"both", "vertex_corr":"Yes"}),
+        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     'mesh', ReadDiskItem(
         'White Mesh', 'Aims mesh formats',
-        requiredAttributes={"side":"both", "vertex_corr":"Yes"}),
+        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+
+    #--outputs--
     'clean_gyri_texture', WriteDiskItem(
         'ROI Texture', 'Aims texture formats',
         requiredAttributes={"side":"both", "vertex_corr":"Yes"}),)
@@ -53,13 +65,21 @@ signature = Signature(
 
 
 def initialization(self):
+    """
+    """
     self.linkParameters('mesh', 'gyri_texture')
     self.linkParameters('clean_gyri_texture', 'gyri_texture')
 
 
+#----------------------------Main Program--------------------------------------
+
+
 def execution(self, context):
+    """
+    """
     context.system('python', find_in_path(
                    'constelGyriTextureCleaningIsolatedVertices.py'),
                    self.gyri_texture,
                    self.mesh,
                    self.clean_gyri_texture)
+
