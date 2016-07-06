@@ -131,15 +131,17 @@ def execution_mainthread(self, context):
                 'mesh, texture and bundles')
         viewing_objects.append(connectivity)
         # remove brain mesh in node "other"
-        other_nodes = [node for node in connectivity.graph().vertices() \
-            if node.has_key('name') and node['name'] == 'others']
-        if len(other_nodes) != 0:
-            aobj = other_nodes[0]['ana_object']
-            aobj.eraseObject(other_nodes[0]['roi_mesh_ana'])
-            del other_nodes[0]['roi_mesh_ana']
-            del other_nodes[0]['roi_mesh']
-            del other_nodes[0]['ana_object']
-            connectivity.eraseObject(aobj)
+        other_nodes = [node for node in connectivity.graph().vertices()
+                       if node.has_key('name') and node['name'] == 'others']
+        #if len(other_nodes) != 0:
+            #print 'aobj keys:', other_nodes[0].keys()
+            #if 'ana_object' in other_nodes[0]:
+                #aobj = other_nodes[0]['ana_object']
+                #aobj.eraseObject(other_nodes[0]['roi_mesh_ana'])
+                #del other_nodes[0]['roi_mesh_ana']
+                #del other_nodes[0]['roi_mesh']
+                #del other_nodes[0]['ana_object']
+                #connectivity.eraseObject(aobj)
 
     # load object
     ana_major_texture = a.loadObject(self.major_texture)
@@ -165,7 +167,8 @@ def execution_mainthread(self, context):
     win2 = a.createWindow("3D", block=wgroup)
     win1.addObjects(viewing_objects)
     win1.addObjects(major_textured_mesh)
-    
+    win1.setReferential(mesh.getReferential())
+
     # control on objects
     a.execute("SetControl", windows = [win1], control="SmallBrainsControl")
     action = win1.view().controlSwitch().getAction(
