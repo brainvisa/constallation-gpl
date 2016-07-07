@@ -10,10 +10,14 @@
 include("diffusion")
 
 
+insertFirst("{center}/{subject}/nomenclature",
+
+     "nomenclature_{atlasname}", SetType("Nomenclature ROIs File"),
+)
+
 ###############################################################################
 #                                  Individual part                            #
 ###############################################################################
-
 
 insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}",
 
