@@ -17,16 +17,17 @@ from brainvisa import anatomist as ana
 
 name = 'Anatomist view mozaic visualization of fibers'
 userLevel = 0
-roles = ('viewer', )
+#roles = ('viewer', )
 
 
 signature = Signature(
     'bundles', ListOf(ReadDiskItem('Fascicles bundles', 'Aims bundles')),
-    'dw_to_t1', ReadDiskItem('Transformation matrix', 
+    'dw_to_t1', ReadDiskItem('Transform T2 Diffusion MR to Raw T1 MRI',
                              'Transformation matrix'),
     'white_mesh', ReadDiskItem('White Mesh', 'anatomist mesh formats',
-                               requiredAttributes={"side":"both",
-                                                   "vertex_corr":"Yes"}),
+                               requiredAttributes={"side": "both",
+                                                   "vertex_corr": "Yes",
+                                                   "inflated": "No"}),
     'clustering_texture', ListOf(
         ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
                      requiredAttributes={"roi_autodetect":"No",
@@ -34,14 +35,21 @@ signature = Signature(
                                          "averaged":"No",
                                          "intersubject":"Yes",
                                          "step_time":"Yes"})),
-    'major_texture', ReadDiskItem('Label Texture', 'anatomist texture formats'),
+    'major_texture', ReadDiskItem('Label Texture',
+                                  'anatomist texture formats'),
     'max_number_of_fibers', Integer(),
     'clustering_texture_timestep', ListOf(Integer()),
 )
 
 
 def initialization( self ):
+    def link_trans(self, dummy):
+        if len(self.bundles) != 0:
+            return self.bundles[0]
+
     self.linkParameters('bundles', 'clustering_texture')
+    self.linkParameters('dw_to_t1', 'bundles', link_trans)
+    self.linkParameters('white_mesh', 'dw_to_t1')
     self.max_number_of_fibers = 10000
     self.clustering_texture_timestep = []
 
@@ -123,15 +131,17 @@ def execution_mainthread(self, context):
                 'mesh, texture and bundles')
         viewing_objects.append(connectivity)
         # remove brain mesh in node "other"
-        other_nodes = [node for node in connectivity.graph().vertices() \
-            if node.has_key('name') and node['name'] == 'others']
-        if len(other_nodes) != 0:
-            aobj = other_nodes[0]['ana_object']
-            aobj.eraseObject(other_nodes[0]['roi_mesh_ana'])
-            del other_nodes[0]['roi_mesh_ana']
-            del other_nodes[0]['roi_mesh']
-            del other_nodes[0]['ana_object']
-            connectivity.eraseObject(aobj)
+        other_nodes = [node for node in connectivity.graph().vertices()
+                       if node.has_key('name') and node['name'] == 'others']
+        #if len(other_nodes) != 0:
+            #print 'aobj keys:', other_nodes[0].keys()
+            #if 'ana_object' in other_nodes[0]:
+                #aobj = other_nodes[0]['ana_object']
+                #aobj.eraseObject(other_nodes[0]['roi_mesh_ana'])
+                #del other_nodes[0]['roi_mesh_ana']
+                #del other_nodes[0]['roi_mesh']
+                #del other_nodes[0]['ana_object']
+                #connectivity.eraseObject(aobj)
 
     # load object
     ana_major_texture = a.loadObject(self.major_texture)
@@ -157,7 +167,8 @@ def execution_mainthread(self, context):
     win2 = a.createWindow("3D", block=wgroup)
     win1.addObjects(viewing_objects)
     win1.addObjects(major_textured_mesh)
-    
+    win1.setReferential(mesh.getReferential())
+
     # control on objects
     a.execute("SetControl", windows = [win1], control="SmallBrainsControl")
     action = win1.view().controlSwitch().getAction(

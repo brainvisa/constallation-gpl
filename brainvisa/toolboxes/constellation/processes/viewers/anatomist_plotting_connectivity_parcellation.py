@@ -20,12 +20,13 @@ Author: Sandrine Lefranc, 2015
 
 #----------------------------Imports-------------------------------------------
 
+import math
 # module PyGt4
 from PyQt4 import QtGui
 
 # axon python API module
 from brainvisa.processes import Signature, ListOf, ReadDiskItem, Integer, \
-    mainThreadActions, ValidationError
+    mainThreadActions, ValidationError, Boolean
 
 try:
     from brainvisa import anatomist as ana
@@ -50,9 +51,11 @@ userLevel = 0
 signature = Signature(
     "connectivity_based_parcellation", ListOf(
         ReadDiskItem("Connectivity ROI Texture", "anatomist texture formats")),
-    "white_mesh", ListOf(ReadDiskItem("White Mesh", "Aims mesh formats")),
+    "white_mesh", ListOf(ReadDiskItem("White Mesh", "Aims mesh formats",
+                                      requiredAttributes={"side": "both"})),
     "min_width", Integer(),
     "min_height", Integer(),
+    "prefer_inflated_meshes", Boolean(),
 )
 
 
@@ -62,9 +65,45 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters"""
 
+    def link_meshes(self, dummy):
+        meshes = []
+        if self.prefer_inflated_meshes:
+            infl1 = 'Yes'
+            infl2 = 'No'
+        else:
+            infl1 = 'No'
+            infl2 = 'Yes'
+        mesh_type = self.signature["white_mesh"].contentType
+        for parc in self.connectivity_based_parcellation:
+            atts = dict(parc.hierarchyAttributes())
+            print 'subject:', parc.get("subject")
+            if parc.get("subject") is not None \
+                    and parc.get("acquisition") is not None:
+                if parc.get("group_of_subjects"):
+                    del atts["group_of_subjects"]
+            else:
+                group = parc.get("group_of_subjects")
+                if group is not None:
+                    atts["freesurfer_group_of_subjects"] = group
+                    print 'group', group
+                    print 'atts:', atts
+            mesh = mesh_type.findValue(
+                atts,
+                requiredAttributes={"inflated": infl1})
+            if mesh is None:
+                mesh = mesh_type.findValue(
+                    atts,
+                    requiredAttributes={"inflated": infl2})
+            meshes.append(mesh)
+        return meshes
+
     # optional value
     self.setOptional("min_width")
     self.setOptional("min_height")
+    self.linkParameters("white_mesh",
+                        ["connectivity_based_parcellation",
+                         "prefer_inflated_meshes"],
+                        link_meshes)
 
 
 def get_screen_config():
@@ -123,12 +162,18 @@ def execution(self, context):
 
     # define the number of cases in the block
     nb_blocks = nb_rows*nb_columns
+    if nb_blocks > nb_files:
+        # if fewer objects than the max possible number on screen: resize
+        nb_columns = int(nb_columns / math.sqrt(float(nb_blocks) / nb_files))
+        if nb_columns == 0:
+            nb_columns = 1
+        nb_rows = int(math.ceil(float(nb_files) / nb_columns))
 
     # generate the widgets
     blocklist = []
     for element in range(14):
         blocklist.append(
-            a.createWindowsBlock(nbRows=nb_columns, nbCols=nb_rows))
+            a.createWindowsBlock(nbRows=nb_rows, nbCols=nb_columns))
 
     # empty list to add the windows
     w = []
@@ -140,7 +185,7 @@ def execution(self, context):
     c = 0
     for i in xrange(nb_files):
         # load an object from a file (mesh, texture)
-        mesh = a.loadObject(self.white_mesh[i])
+        mesh = a.loadObject(self.white_mesh[min(i, nb_files - 1)])
         roi_clustering = a.loadObject(self.connectivity_based_parcellation[i])
 
         # assign a palette to object
@@ -158,7 +203,8 @@ def execution(self, context):
         if i < (nb_blocks):
             # create a new window and opens it
             win = a.createWindow(
-                "Sagittal", block=blocklist[0], no_decoration=True)
+                "3D", block=blocklist[0], no_decoration=True)
+            win.camera(view_quaternion=[0.5, 0.5, 0.5, 0.5])
 
             # add objects in windows
             win.addObjects(textured_mesh)
@@ -174,7 +220,8 @@ def execution(self, context):
                 count * (nb_blocks) <= i < (count+1) * (nb_blocks)):
             c += 1
             win2 = a.createWindow(
-                "Sagittal", block=blocklist[count], no_decoration=True)
+                "3D", block=blocklist[count], no_decoration=True)
+            win2.camera(view_quaternion=[0.5, 0.5, 0.5, 0.5])
             win2.addObjects(textured_mesh)
             w.append(win2)
             t.append(textured_mesh)

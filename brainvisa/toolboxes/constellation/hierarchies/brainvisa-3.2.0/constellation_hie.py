@@ -10,6 +10,11 @@
 include("diffusion")
 
 
+insertFirst("{center}/{subject}/nomenclature",
+
+     "nomenclature_{atlasname}", SetType("Nomenclature ROIs File"),
+)
+
 ###############################################################################
 #                                  Individual part                            #
 ###############################################################################
@@ -67,7 +72,7 @@ insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}
                     "both_ends_labelled", "Yes"),
 
     "<subject>_<texture>_<gyrus>_connectivityMatrix_outsideFibersOfCortex_{smallerlength2}to{greaterlength2}mm",
-        SetType("Connectivity Matrix"),
+        SetType("Reduced Connectivity Matrix"),
         SetWeakAttr("ends_labelled", "single",
                     "reduced", "No",
                     "dense", "No",
@@ -148,7 +153,7 @@ insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}
                     "step_time", "No"),
 
     "<subject>_<texture>_<gyrus>_reducedConnectivityMatrix",
-        SetType("Connectivity Matrix"),
+        SetType("Reduced Connectivity Matrix"),
         SetWeakAttr("ends_labelled", "mixed",
                     "reduced", "Yes",
                     "dense", "No",
@@ -232,7 +237,7 @@ insert("{center}/group_analysis/{group_of_subjects}",
 "{subject}", SetContent(
 
     "<group_of_subjects>_<study>_<texture>_<gyrus>_<subject>_reducedMatrix",
-        SetType("Connectivity Matrix"),
+        SetType("Reduced Connectivity Matrix"),
         SetWeakAttr("ends_labelled", "mixed",
                     "reduced", "Yes",
                     "dense", "No",

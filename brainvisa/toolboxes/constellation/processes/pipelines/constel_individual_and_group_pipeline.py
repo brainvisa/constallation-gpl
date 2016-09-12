@@ -99,9 +99,9 @@ def initialization(self):
         "cortical_regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
-    def link_roi(self, dummy):
-        """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
-        of process.
+    def link_label(self, dummy):
+        """Reads the ROIs nomenclature and proposes them in the signature
+        'cortical_region' of process.
         """
         if self.cortical_regions_nomenclature is not None:
             s = ["Select a cortical_region in this list"]
