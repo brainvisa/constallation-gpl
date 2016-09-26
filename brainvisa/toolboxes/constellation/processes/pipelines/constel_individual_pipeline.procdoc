@@ -3,6 +3,7 @@
 <d>
   <d name="fr">
     <xhtml name="short"/>
+    <xhtml name="long"/>
     <d name="parameters">
       <xhtml name="fiber_tracts_format">Différents formats de faisceaux de fibres sont pris en charge. Les formats acceptés sont les suivants.<br/>
 
@@ -35,7 +36,6 @@ Par exemple, vous pouvez utilser l'atlas Desikan-Killiany ou l'atlas Destrieux i
       <xhtml name="outputs_database">Une base de données BrainVisa est obligatoire pour l'autocomplétion et l'écriture des fichiers de ce process. Sans celle-ci, aucune donnée pourra être générée. (voir la documentation pour ajouter une base de données dans la configuration de BrainVisa). Ce paramètre récupère l'ensemble des bases de données ayant une ontologie brainvisa présente dans votre configuration, vous n'avez plus qu'à choisir celle qui vous convient pour écrire les fichiers générés.</xhtml>
       <xhtml name="white_mesh">Maillage de la surface corticale, définie comme étant l'interface entre la substance blanche et la substance grise (également appelé interface gris/blanc).</xhtml>
     </d>
-    <xhtml name="long"/>
   </d>
   <d name="en">
     <xhtml name="short"><img SRC="../../images/constellation/schema_ind.png" ALT="" height="300" width="900"/></xhtml>
@@ -44,7 +44,7 @@ Par exemple, vous pouvez utilser l'atlas Desikan-Killiany ou l'atlas Destrieux i
 
 <i>(1)</i> <b>TrackVis file format </b> with .trk as filename extension. <br/>
 <i>(2)</i> <b>Connectomist file format</b> with .bundles as filename extension. <br/></xhtml>
-      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed like that (The order of labels is not relevant.): <br/>
+      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed as follows (The order of labels is not relevant.): <br/>
 <br/>
 <pre>1              nameA</pre>
 <pre>2              nameB</pre>
@@ -72,7 +72,10 @@ You must choose a region. The study will be done on this region.</xhtml>
       <xhtml name="outputs_database">A BrainVisa database is mandatory for autocompletion and writing files in this process. Without it, no data will be generated. (see the documentation to add a database in the BrainVisa configuration). This parameter retrieves all databases with brainvisa ontology present in your configuration, you just have to pick the right one to write the generated files.</xhtml>
       <xhtml name="white_mesh">Individual white mesh of the entire cortical surface (white/gray interface).</xhtml>
     </d>
-    <xhtml name="long">A complete pipeline: an intra_subject chain which builds the individual connectivity matrices. The preprocessings are done using FreeSurfer for the anatomical data, and Connectomist for the diffusion data.</xhtml>
+    <xhtml name="long"><p>A complete pipeline: an intra_subject chain which builds the individual connectivity matrices. The preprocessings are done using FreeSurfer for the anatomical data, and Connectomist for the diffusion data.</p>
+<p>The method implemented here is described in:</p>
+<p>S. Lefranc, P. Roca, M. Perrot, C. Poupon, D. Le Bihan, J.-F. Mangin, and D. Rivière. <b>Groupwise connectivity-based parcellation of the whole human cortical surface using watershed-driven dimension reduction.</b> <em>Medical Image Analysis</em>, 30:11-29, 2016. <a href="http://brainvisa.info/biblio/lnao/en/Year/2016.complete.html#Lefranc16">[bibtex-entry]</a>
+</p></xhtml>
   </d>
 </d>
 </minf>

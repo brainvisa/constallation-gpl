@@ -5,14 +5,14 @@
     <xhtml name="short"/>
     <d name="parameters">
       <xhtml name="filtered_reduced_individual_profile"/>
+      <xhtml name="cortical_regions_nomenclature"/>
       <xhtml name="complete_individual_matrix"/>
       <xhtml name="cortical_parcellation"/>
-      <xhtml name="label_name"/>
       <xhtml name="reduced_individual_profile"/>
-      <xhtml name="labels_nomenclature"/>
+      <xhtml name="cortical_region"/>
       <xhtml name="sum_vertices_patch"/>
       <xhtml name="duplication_value_patch"/>
-      <xhtml name="white_mesh">Indivdual both brain mesh</xhtml>
+      <xhtml name="white_mesh">Indivdual both hemispheres brain mesh</xhtml>
     </d>
     <xhtml name="long"><br/>
 Example inputs/outputs:

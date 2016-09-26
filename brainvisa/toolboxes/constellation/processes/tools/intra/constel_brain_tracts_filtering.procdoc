@@ -4,8 +4,8 @@
   <d name="fr">
     <xhtml name="short">Filtrages des fibres individuelles appartenant à une région d'étude.<br/>
 <br/>
-<img SRC="../../images/labeled_fibers.jpg" ALT=""/>
-<img SRC="../../images/semilabeled_fibers.jpg" ALT=""/><br/></xhtml>
+<img SRC="../../images/constellation/labeled_fibers.jpg" ALT=""/>
+<img SRC="../../images/constellation/semilabeled_fibers.jpg" ALT=""/><br/></xhtml>
     <d name="parameters">
       <xhtml name="fiber_tracts_format">Différents formats de faisceaux de fibres sont pris en charge. Les formats acceptés sont les suivants.<br/>
 
@@ -99,7 +99,7 @@ Exemple inputs/outputs:
 
 <i>(1)</i> <b>TrackVis file format </b> with .trk as filename extension. <br/>
 <i>(2)</i> <b>Connectomist file format</b> with .bundles as filename extension. <br/></xhtml>
-      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed like that (The order of labels is not relevant.): <br/>
+      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed as in the following (The order of labels is not relevant.): <br/>
 <br/>
 <pre>1              nameA</pre>
 <pre>2              nameB</pre>
@@ -110,20 +110,20 @@ Exemple inputs/outputs:
 <br/>
 For example, you can use the Desikan-Killiany Atlas or the Destrieux Atlas of the FreeSurfer software.</xhtml>
       <xhtml name="dw_to_t1">Transformation from t2 to anat</xhtml>
-      <xhtml name="subject_directory">Tractography directory of the subject.</xhtml>
+      <xhtml name="subject_directory">Tractography directory of the subject. It thus should belong to a database organized according to the tractography model (Connectomist).</xhtml>
       <xhtml name="study_name">This mandatory parameter is free and allows to give a name to the pipeline. The value of "study_name" will be integrated into each output file name as well as the directory of the database that retrieves the output files.</xhtml>
       <xhtml name="maxlength_semilabeled_fibers">Maximum length (in mm) accepted for fibers having one end identified in the mesh (semi-labelled). The fibers longer than this threshold will not be kept.</xhtml>
-      <xhtml name="cortical_parcellation">Parcellation of the cortical surface into anatomical region (lobes, gyri...). For example, FreeSurfer provides a cortical parcellation into gyri.<br/>
+      <xhtml name="cortical_parcellation">Parcellation of the cortical surface into anatomical regions (lobes, gyri...). For example, FreeSurfer provides a cortical parcellation into gyri.<br/>
 A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
-      <xhtml name="cortical_region">The list oflregion names, present in the text file 'cortical_regions_nomenclature' is proposed. <br/>
+      <xhtml name="cortical_region">The list of region names, present in the text file 'cortical_regions_nomenclature' is proposed. <br/>
 You must choose a region. The study will be done on this region.</xhtml>
       <xhtml name="minlength_labeled_fibers">Minimum length (in mm) accepted for fibers having their two ends identified on the mesh (labelled). Shorter fibers than this threshold will not be retained.</xhtml>
       <xhtml name="semilabeled_fibers">All the fibers having one end identified on the mesh and  corresponding to the various criteria of this process are merged into one output file.</xhtml>
       <xhtml name="maxlength_labeled_fibers">Maximum length (in mm) accepted for fibers having their two ends identified on the mesh (labelled). The fibers longer than this threshold will not be kept.</xhtml>
       <xhtml name="labeled_fibers">All the fibers having their ends identified on the mesh and corresponding to the various criteria in this process are merged into one output file.</xhtml>
-      <xhtml name="minlength_semilabeled_fibers">Minimum length (in mm) accepted for fibers having one end identified in the mesh (semi-labelled). Shorter fibers than this threshold will not be retained.</xhtml>
+      <xhtml name="minlength_semilabeled_fibers">Minimum length (in mm) accepted for fibers having one end identified in the mesh (semi-labelled). Fibers shorter than this threshold will not be retained.</xhtml>
       <xhtml name="method">Two methods are proposed: <br/>
-<i><b>(1) "averaged approach" </b></i> to obtain a single result group. <br/>
+<i><b>(1) "averaged approach" </b></i> to obtain a single group result. <br/>
 <i><b>(2) "concatenated approach"</b></i> to obtain individual results across the group.  <br/>
 <br/>
 <img SRC="../../images/constellation/panneau_attention.jpg" ALT="" height="20" width="20"/>
@@ -149,7 +149,7 @@ This filtering is organized as follow:<br/>
 <li><b><i>merge the files:</i></b> creating a single file output by fiber type (see below)<br/></li>
 </ul>
 <br/>
-Two types of fiber tracts vbhave to be taken into  consideration in this process:<br/>
+Two types of fiber tracts have to be taken into  consideration in this process:<br/>
 <ul>
 <li><b><i>labeled fibers</i> </b> are defined as having both ends attached to the mesh (and are consequently labelled) </li>
 <li><b><i>semilabeled fibers</i></b> are defined as having only one end attached to the mesh (the other being not identified) </li>

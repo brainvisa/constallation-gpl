@@ -19,7 +19,6 @@ insertFirst("{center}/{subject}/nomenclature",
 #                                  Individual part                            #
 ###############################################################################
 
-
 insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}",
 
 "connectivity_parcellation", SetContent(

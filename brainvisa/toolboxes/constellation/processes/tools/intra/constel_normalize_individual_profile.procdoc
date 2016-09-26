@@ -3,6 +3,7 @@
 <d>
   <d name="fr">
     <xhtml name="short"/>
+    <xhtml name="long"/>
     <d name="parameters">
       <xhtml name="cortical_regions_nomenclature">Ce paramètre est un fichier texte. Il définit les relations entre le nom et le numéro de chaque région présent dans la parcellisation du cortex, paramètre 'cortical parcellation'. Ce fichier doit être construit comme ceci (l'ordre des noms ou des numéros n'a pas d'importance) : <br/>
 <br/>
@@ -21,12 +22,11 @@ Par exemple, vous pouvez utilser l'atlas Desikan-Killiany ou l'atlas Destrieux i
       <xhtml name="cortical_region">La liste des noms de labels présents dans le fichier texte 'labels_nomenclature' est proposée. Vous devez choisir une région à étudier.</xhtml>
       <xhtml name="normed_individual_profile">Le profil de connectivité individuel moyennée et normée.</xhtml>
     </d>
-    <xhtml name="long"/>
   </d>
   <d name="en">
     <xhtml name="short"><img SRC="../../images/constellation/norm_profile.png" ALT="" height="400" width="900"/></xhtml>
     <d name="parameters">
-      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed like that (The order of labels is not relevant.): <br/>
+      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed as follows (The order of labels is not relevant.): <br/>
 <br/>
 <pre>1              nameA</pre>
 <pre>2              nameB</pre>
@@ -44,7 +44,7 @@ A point-to-point correspondence between subjects is mandatory to allow an analys
 You must choose a region. The study will be done on this region.</xhtml>
       <xhtml name="normed_individual_profile">The individual profile normed.</xhtml>
     </d>
-    <xhtml name="long">Remove internals connection of the cortical region and normalization of profile. Normalization of connectivity profile by its total number of connections (the number of tracts reaching the label).<br/>
+    <xhtml name="long">Remove internal connections of the cortical region and normalization of profile. This process also performs normalization of connectivity profiles by the total number of connections (the number of tracts reaching the label).<br/>
 <br/>
 Example inputs/outputs:
 <br/>
