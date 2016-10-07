@@ -25,6 +25,7 @@ Author: Sandrine Lefranc, 2015
 # axon python API modules
 from brainvisa.processes import Float
 from brainvisa.processes import Choice
+from brainvisa.processes import ListOf
 from brainvisa.processes import Signature
 from brainvisa.processes import OpenChoice
 from brainvisa.processes import ReadDiskItem
@@ -63,6 +64,7 @@ signature = Signature(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes",
                             "inflated": "No", "averaged": "No"}),
+    "keep_regions", OpenChoice(),
     "smoothing", Float(),
 )
 
@@ -88,6 +90,16 @@ def initialization(self):
     self.cortical_regions_nomenclature = self.signature[
         "cortical_regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
+
+    def link_keep_regions(self, dummy):
+        """
+        """
+        if self.cortical_regions_nomenclature is not None:
+            s = []
+            s += read_file(
+                self.cortical_regions_nomenclature.fullPath(), mode=2)
+            self.signature["keep_regions"] = ListOf(Choice(*s))
+            self.changeSignature(self.signature)
 
     def fill_study_choice(self, dummy=None):
         """
@@ -193,6 +205,9 @@ def initialization(self):
     self.linkParameters("cortical_parcellation",
                         ["study_name", "subject_directory", "method"],
                         link_label)
+    self.linkParameters(
+        "keep_regions", "cortical_regions_nomenclature",
+        link_keep_regions)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
@@ -302,6 +317,8 @@ def initialization(self):
                         "MeanProfile.cortical_region")
     eNode.addDoubleLink("InternalConnections.cortical_parcellation",
                         "cortical_parcellation")
+    eNode.addDoubleLink("InternalConnections.keep_regions",
+                        "keep_regions")
 
     ###########################################################################
     #        link of parameters with the process: "Watershed"                 #
