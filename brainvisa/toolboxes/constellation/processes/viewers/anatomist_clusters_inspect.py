@@ -26,10 +26,12 @@ import numpy as np
 
 
 name = 'Anatomist clusters inspect tool'
+userLevel = 0
 
 signature = Signature(
     'clusters', ReadDiskItem('Connectivity ROI texture',
-                             'aims texture formats'),
+                             'aims texture formats', 
+                             requiredAttributes={'step_time': 'Yes'}),
     'mesh', ReadDiskItem('White Mesh', 'aims mesh formats'),
     #'clusters_measurements', ReadDiskItem('?'),
     'seed_gyri', ReadDiskItem('ROI texture', 'aims texture formats'),
@@ -44,28 +46,25 @@ def initialization(self):
     self.linkParameters('reduced_matrix', 'clusters')
 
 
-def inlineGUI(self, values, process_view, dummy, externalRunButton=True):
-    widget = QtGui.QWidget()
-    layout = QtGui.QVBoxLayout()
-    widget.setLayout(layout)
-    hlay = QtGui.QHBoxLayout()
-    layout.addLayout(hlay)
-    hlay.addStretch()
-    btn = QtGui.QPushButton('Run')
-    btn.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-    hlay.addWidget(btn)
-    #btn.clicked.connect(process_view._runButton)
-    btn.connect(btn, QtCore.SIGNAL('clicked()'), process_view._runButton)
-    self.gui = widget
-    te = process_view.findChild(QtGui.QTextEdit)
-    te.hide()
-
-    return widget
-
-
 def exec_main_thread(self, context, meshes, clusters, measurements,
         seed_gyri, matrix):
-    print('exec_main_thread')
+    if hasattr(self, 'gui'):
+        gui = self.gui
+        parent = gui.parentWidget()
+        gui.setParent(None)
+        del self.gui
+    else:
+        te = context.findChild(QtGui.QTextEdit)
+        parent = te.parentWidget()
+        #parent.removeWidget(te)
+        #te.setParent(None)
+        te.hide()
+    gui = QtGui.QWidget()
+    gui.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+    parent.insertWidget(1, gui)
+    layout = QtGui.QVBoxLayout()
+    gui.setLayout(layout)
+    self.gui = gui
     layout = self.gui.layout()
     while layout.count() > 1:
         old_item = layout.itemAt(1)
@@ -82,7 +81,6 @@ def exec_main_thread(self, context, meshes, clusters, measurements,
 
 
 def execution(self, context):
-    print('exec.')
     meshes, clusters, measurements, seed_gyri, matrix \
         = load_clusters_instpector_files([self.mesh.fullPath()],
                                          [self.clusters.fullPath()],
