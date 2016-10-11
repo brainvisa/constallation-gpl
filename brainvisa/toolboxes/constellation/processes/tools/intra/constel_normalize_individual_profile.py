@@ -29,7 +29,6 @@ from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
 from brainvisa.processes import OpenChoice
-from brainvisa.processes import Boolean
 from brainvisa.processes import Choice
 from brainvisa.processes import String
 from brainvisa.processes import ListOf
