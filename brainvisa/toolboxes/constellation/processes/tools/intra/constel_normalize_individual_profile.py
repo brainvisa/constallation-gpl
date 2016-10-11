@@ -29,7 +29,6 @@ from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
 from brainvisa.processes import OpenChoice
-from brainvisa.processes import Boolean
 from brainvisa.processes import Choice
 from brainvisa.processes import String
 from brainvisa.processes import ListOf
@@ -82,7 +81,6 @@ signature = Signature(
                             "averaged": "No",
                             "intersubject": "No"}),
     "keep_regions", OpenChoice(),
-    "keep_only_internal_connections", Boolean(),
 )
 
 
@@ -93,7 +91,6 @@ def initialization(self):
     """Provides default values and link of parameters.
     """
     # default value
-    self.keep_only_internal_connections = False
     self.cortical_regions_nomenclature = self.signature[
         "cortical_regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -157,7 +154,3 @@ def execution(self, context):
         cmd += [label]
     context.write(cmd)
     context.pythonSystem(*cmd)
-        cmd += "-c"
-
-    context.system(*cmd)
-
