@@ -35,7 +35,7 @@ from soma.path import find_in_path
 def validation():
     """
     """
-    if not find_in_path('constelGyriTextureCleaningIsolatedVertices.py'):
+    if not find_in_path('AimsGyriTextureCleaningIsolatedVertices.py'):
         raise ValidationError('constel module is not here.')
 
 
@@ -77,9 +77,8 @@ def initialization(self):
 def execution(self, context):
     """
     """
-    context.system('python', find_in_path(
-                   'constelGyriTextureCleaningIsolatedVertices.py'),
-                   self.gyri_texture,
-                   self.mesh,
-                   self.clean_gyri_texture)
+    context.pythonSystem('AimsGyriTextureCleaningIsolatedVertices.py',
+                         self.gyri_texture,
+                         self.mesh,
+                         self.clean_gyri_texture)
 
