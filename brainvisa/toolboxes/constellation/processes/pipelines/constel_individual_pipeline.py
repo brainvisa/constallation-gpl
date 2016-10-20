@@ -65,7 +65,7 @@ signature = Signature(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes",
                             "inflated": "No", "averaged": "No"}),
-    "keep_regions", OpenChoice(),
+    "keep_regions", ListOf(OpenChoice()),
     "smoothing", Float(),
     "minlength_labeled_fibers", Float(),
     "maxlength_labeled_fibers", Float(),

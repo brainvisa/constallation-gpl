@@ -80,7 +80,7 @@ signature = Signature(
                             "thresholded": "Yes",
                             "averaged": "No",
                             "intersubject": "No"}),
-    "keep_regions", OpenChoice(),
+    "keep_regions", ListOf(OpenChoice()),
 )
 
 
