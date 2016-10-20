@@ -26,6 +26,7 @@ Author: Sandrine Lefranc, 2015
 from brainvisa.processes import Float
 from brainvisa.processes import Choice
 from brainvisa.processes import ListOf
+from brainvisa.processes import Boolean
 from brainvisa.processes import Signature
 from brainvisa.processes import OpenChoice
 from brainvisa.processes import ReadDiskItem
@@ -66,6 +67,11 @@ signature = Signature(
                             "inflated": "No", "averaged": "No"}),
     "keep_regions", OpenChoice(),
     "smoothing", Float(),
+    "minlength_labeled_fibers", Float(),
+    "maxlength_labeled_fibers", Float(),
+    "minlength_semilabeled_fibers", Float(),
+    "maxlength_semilabeled_fibers", Float(),
+    "normalize", Boolean(),
 )
 
 
@@ -87,6 +93,11 @@ def initialization(self):
 
     # default value
     self.smoothing = 3.0
+    self.minlength_labeled_fibers = 30.
+    self.maxlength_labeled_fibers = 500.
+    self.minlength_semilabeled_fibers = 20.
+    self.maxlength_semilabeled_fibers = 500.
+    self.normalize = True
     self.cortical_regions_nomenclature = self.signature[
         "cortical_regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -231,6 +242,14 @@ def initialization(self):
     eNode.addDoubleLink("filter.cortical_parcellation",
                         "cortical_parcellation")
     eNode.addDoubleLink("filter.white_mesh", "white_mesh")
+    eNode.addDoubleLink("filter.minlength_labeled_fibers",
+                        "minlength_labeled_fibers")
+    eNode.addDoubleLink("filter.maxlength_labeled_fibers",
+                        "maxlength_labeled_fibers")
+    eNode.addDoubleLink("filter.minlength_semilabeled_fibers",
+                        "minlength_semilabeled_fibers")
+    eNode.addDoubleLink("filter.maxlength_semilabeled_fibers",
+                        "maxlength_semilabeled_fibers")
 
     ###########################################################################
     #        link of parameters with the process: "Fiber Oversampler"         #
@@ -370,6 +389,7 @@ def initialization(self):
     eNode.addDoubleLink("ReducedMatrix.cortical_parcellation",
                         "cortical_parcellation")
     eNode.addDoubleLink("ReducedMatrix.white_mesh", "white_mesh")
+    eNode.addDoubleLink("ReducedMatrix.normalize", "normalize")
 
     ###########################################################################
     #        link of parameters with the process: "Clustering"                #
