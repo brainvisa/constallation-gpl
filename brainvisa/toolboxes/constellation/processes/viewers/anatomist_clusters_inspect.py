@@ -16,12 +16,16 @@ from soma import aims
 from brainvisa import anatomist
 from soma.qt_gui.qt_backend import QtGui, QtCore
 
-# constellation module
-from constel.anatomist.clusters_inspect import ClustersInspectorWidget, \
-    load_clusters_instpector_files
+try:
+    # constellation module
+    from constel.anatomist.clusters_inspect import ClustersInspectorWidget, \
+                                                   load_clusters_instpector_files
 
-# temp
-import pandas
+    # temp
+    import pandas
+    
+except:
+    pass
 import numpy as np
 
 
@@ -39,7 +43,9 @@ signature = Signature(
                                    'aims matrix formats'),
 )
 
-
+def validation(self):
+    import pandas
+    
 def initialization(self):
     self.linkParameters('mesh', 'clusters')
     self.linkParameters('seed_gyri', 'mesh')
