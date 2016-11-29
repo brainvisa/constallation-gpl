@@ -62,13 +62,13 @@ signature = Signature(
     # --inputs--
     "mean_individual_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "No",
-                            "thresholded": "No",
-                            "averaged": "No",
-                            "intersubject": "No"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "normed": "no",
+                            "intersubject": "no"}),
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "cortical_regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "cortical_region", String(),
@@ -76,10 +76,9 @@ signature = Signature(
     # --outputs--
     "normed_individual_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "Yes",
-                            "thresholded": "Yes",
-                            "averaged": "No",
-                            "intersubject": "No"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "normed": "yes",
+                            "intersubject": "no"}),
     "keep_regions", ListOf(OpenChoice()),
 )
 

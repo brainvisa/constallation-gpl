@@ -35,6 +35,7 @@ from soma.path import find_in_path
 # constel module
 try:
     from constel.lib.utils.filetools import select_ROI_number
+    from constel.lib.utils.texturetools import management_internal_connections
 except:
     pass
 
@@ -58,10 +59,10 @@ signature = Signature(
     # --inputs--
     "complete_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "No",
-                            "dense": "No",
-                            "intersubject": "No"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "intersubject": "no",
+                            "individual": "yes"}),
     "cortical_regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "cortical_region", String(),
@@ -71,10 +72,9 @@ signature = Signature(
     # --ouputs--
     "mean_individual_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "No",
-                            "thresholded": "No",
-                            "averaged": "No",
-                            "intersubject": "No"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "normed": "No",
+                            "intersubject": "no"}),
 )
 
 
@@ -104,7 +104,6 @@ def initialization(self):
     self.linkParameters("mean_individual_profile",
                         "complete_individual_matrix")
 
-
 #----------------------------Main program--------------------------------------
 
 
@@ -126,3 +125,4 @@ def execution(self, context):
                    "-type", "seed_mean_connectivity_profile",
                    "-normalize", 0,
                    "-verbose", 1)
+

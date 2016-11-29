@@ -55,9 +55,8 @@ signature = Signature(
     # --inputs--
     "mean_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
-                     requiredAttributes={"normed": "No",
-                                         "thresholded": "No",
-                                         "averaged": "No",
+                     requiredAttributes={"ends_labelled": "all",
+                                         "normed": "No",
                                          "intersubject": "No"})),
     "subjects_group", ReadDiskItem("Group definition", "XML"),
     "new_study_name", String(),
@@ -84,10 +83,10 @@ def initialization(self):
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.subjects_group.fullPath()))
             if self.new_study_name:
-                atts["texture"] = self.new_study_name
+                atts["studyname"] = self.new_study_name
             else:
-                atts["texture"] = \
-                    self.mean_individual_profiles[0].get("texture")
+                atts["studyname"] = \
+                    self.mean_individual_profiles[0].get("studyname")
             return self.signature["group_mask"].findValue(atts)
 
     # link of parameters for autocompletion

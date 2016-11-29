@@ -29,11 +29,10 @@ Author: Sandrine Lefranc
 import sys
 
 # axon python API module
-from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
-    ValidationError
-
-# soma-base module
-from soma.path import find_in_path
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import ValidationError
 
 # constel module
 try:
@@ -63,10 +62,9 @@ signature = Signature(
     # --inputs--
     "normed_group_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "Yes",
-                            "thresholded": "Yes",
-                            "averaged": "Yes",
-                            "intersubject": "Yes"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "normed": "yes",
+                            "intersubject": "yes"}),
     "average_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
@@ -76,18 +74,18 @@ signature = Signature(
     # --outputs--
     "reduced_group_profile", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "Yes",
-                            "roi_filtered": "No",
-                            "averaged": "Yes",
-                            "intersubject": "Yes",
-                            "step_time": "No"}),
+        requiredAttributes={"roi_autodetect": "yes",
+                            "roi_filtered": "no",
+                            "intersubject": "yes",
+                            "step_time": "no",
+                            "measure": "no"}),
     "filtered_reduced_group_profile", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "Yes",
-                            "roi_filtered": "Yes",
-                            "averaged": "Yes",
-                            "intersubject": "Yes",
-                            "step_time": "No"}),
+        requiredAttributes={"roi_autodetect": "yes",
+                            "roi_filtered": "yes",
+                            "intersubject": "yes",
+                            "step_time": "no",
+                            "measure": "no"}),
 )
 
 
@@ -111,15 +109,14 @@ def execution(self, context):
     depth and area. This set of T regions will be called target regions.
     A watershed is performed to obtain different patches of interest.
     """
-    context.system("AimsMeshWatershed.py",
-                   self.normed_group_profile,
-                   self.average_mesh,
-                   self.reduced_group_profile,
-                   "--threshold", 0.05,
-                   "--mode", "or")
+    context.pythonSystem("AimsMeshWatershed.py",
+                         self.normed_group_profile,
+                         self.average_mesh,
+                         self.reduced_group_profile,
+                         "--threshold", 0.05,
+                         "--mode", "or")
 
     # execute the command
-    context.system(sys.executable,
-                   find_in_path("constelFilteringWatershed.py"),
-                   self.reduced_group_profile,
-                   self.filtered_reduced_group_profile)
+    context.pythonSystem("constelFilteringWatershed.py",
+                         self.reduced_group_profile,
+                         self.filtered_reduced_group_profile)

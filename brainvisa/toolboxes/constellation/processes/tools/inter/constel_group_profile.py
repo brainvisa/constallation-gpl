@@ -56,20 +56,18 @@ signature = Signature(
     # --inputs--
     "normed_individual_profiles", ListOf(ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "Yes",
-                            "thresholded": "Yes",
-                            "averaged": "No",
-                            "intersubject": "No"})),
+        requiredAttributes={"ends_labelled": "all",
+                            "normed": "yes",
+                            "intersubject": "no"})),
     "subjects_group", ReadDiskItem("Group definition", "XML"),
     "new_study_name", String(),
 
     # --outputs--
     "group_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "No",
-                            "thresholded": "No",
-                            "averaged": "Yes",
-                            "intersubject": "Yes"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "normed": "no",
+                            "intersubject": "yes"}),
 )
 
 
@@ -93,21 +91,19 @@ def initialization(self):
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.subjects_group.fullPath()))
             if self.new_study_name is None:
-                atts["texture"] = self.normed_individual_profiles[0].get(
-                    "texture")
+                atts["studyname"] = self.normed_individual_profiles[0].get(
+                    "studyname")
             else:
-                atts["texture"] = self.new_study_name
-            atts["study"] = self.normed_individual_profiles[0].get("study")
+                atts["studyname"] = self.new_study_name
+            atts["method"] = self.normed_individual_profiles[0].get("method")
             atts["smoothing"] = self.normed_individual_profiles[0].get(
                 "smoothing")
             atts["gyrus"] = self.normed_individual_profiles[0].get("gyrus")
-            atts['acquisition'] = ''
-            atts['analysis'] = ''
-            atts['tracking_session'] = ''
-            atts["intersubject"] = "Yes"
-            atts["averaged"] = "Yes"
-            atts["normed"] = "No"
-            atts["thresholded"] = "No"
+            atts['acquisition'] = ""
+            atts['analysis'] = ""
+            atts['tracking_session'] = ""
+            atts["intersubject"] = "yes"
+            atts["normed"] = "no"
             return self.signature["group_profile"].findValue(atts)
 
     # link of parameters for autocompletion

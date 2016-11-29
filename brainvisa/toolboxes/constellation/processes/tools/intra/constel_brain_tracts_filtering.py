@@ -28,15 +28,23 @@ Author: Sandrine Lefranc, 2015
 import os
 
 # axon python API module
-from brainvisa.processes import Signature, String, Choice, Float, \
-    ReadDiskItem, WriteDiskItem, ValidationError, neuroHierarchy, OpenChoice
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import ValidationError
+from brainvisa.processes import neuroHierarchy
+from brainvisa.processes import String
+from brainvisa.processes import Choice
+from brainvisa.processes import Float
+from brainvisa.processes import OpenChoice
 
 # soma module
 from soma.path import find_in_path
 
 # constel modules
 try:
-    from constel.lib.utils.filetools import read_file, select_ROI_number
+    from constel.lib.utils.filetools import read_file
+    from constel.lib.utils.filetools import select_ROI_number
     from constel.lib.utils.fibertools import load_fiber_tracts
 except:
     pass
@@ -60,23 +68,25 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "study_name", String(),
-    "outputs_database", Choice(),
-    "fiber_tracts_format", Choice("bundles", "trk"),
     "method", Choice(("averaged approach", "avg"),
                      ("concatenated approach", "concat")),
+    "outputs_database", Choice(),
+    "study_name", OpenChoice(),
+    "fiber_tracts_format", Choice("bundles", "trk"),
     "cortical_regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "cortical_region", OpenChoice(),
     "subject_directory", ReadDiskItem("subject", "directory"),
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
-    "dw_to_t1", ReadDiskItem("Transform T2 Diffusion MR to Raw T1 MRI",
-                             "Transformation matrix"),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
+    "dw_to_t1", ReadDiskItem(
+        "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix"),
     "minlength_labeled_fibers", Float(),
     "maxlength_labeled_fibers", Float(),
     "minlength_semilabeled_fibers", Float(),
@@ -85,10 +95,12 @@ signature = Signature(
     # --outputs--
     "labeled_fibers", WriteDiskItem(
         "Filtered Fascicles Bundles", "Aims writable bundles formats",
-        requiredAttributes={"both_ends_labelled": "Yes", "oversampled": "No"}),
+        requiredAttributes={"ends_labelled": "both",
+                            "oversampled": "no"}),
     "semilabeled_fibers", WriteDiskItem(
         "Filtered Fascicles Bundles", "Aims writable bundles formats",
-        requiredAttributes={"both_ends_labelled": "No", "oversampled": "No"}),
+        requiredAttributes={"ends_labelled": "one",
+                            "oversampled": "no"}),
 )
 
 
@@ -116,13 +128,29 @@ def initialization(self):
     else:
         self.signature["outputs_database"] = OpenChoice()
 
+    def fill_study_choice(self, dummy=None):
+        """
+        """
+        choices = set()
+        if self.outputs_database is not None:
+            database = neuroHierarchy.databases.database(self.outputs_database)
+            sel = {"method": self.method}
+            choices.update(
+                [x[0] for x in database.findAttributes(
+                    ["studyname"], selection=sel,
+                    _type="Filtered Fascicles Bundles")])
+        self.signature["study_name"].setChoices(*sorted(choices))
+        if len(choices) != 0 and self.isDefault("study_name") \
+                and self.study_name not in choices:
+            self.setValue("study_name", list(choices)[0], True)
+
     def reset_cortical_region(self, dummy):
         """Read and/or reset the cortical_region parameter.
 
-        This callback reads the labels nomenclature and proposes the labels
-        nomenclature in the signature 'cortical_region' of process. It also
-        resets the cortical_region parameter to default state after the
-        nomenclature changes.
+        This callback reads the labels nomenclature and proposes them in the
+        signature 'cortical_region' of process.
+        It also resets the cortical_region parameter to default state after
+        the nomenclature changes.
         """
         current = self.cortical_region
         self.setValue('cortical_region', current, True)
@@ -150,8 +178,8 @@ def initialization(self):
                 and self.subject_directory) is not None:
             attrs = dict()
             attrs["_database"] = self.outputs_database
-            attrs["study"] = self.method
-            attrs["texture"] = self.study_name
+            attrs["method"] = self.method
+            attrs["studyname"] = self.study_name
             attrs["subject"] = os.path.basename(
                 self.subject_directory.fullPath())
             attrs["gyrus"] = str(self.cortical_region)
@@ -170,8 +198,8 @@ def initialization(self):
                 and self.subject_directory) is not None:
             attrs = dict()
             attrs["_database"] = self.outputs_database
-            attrs["study"] = self.method
-            attrs["texture"] = self.study_name
+            attrs["method"] = self.method
+            attrs["studyname"] = self.study_name
             attrs["subject"] = os.path.basename(
                 self.subject_directory.fullPath())
             attrs["gyrus"] = str(self.cortical_region)
@@ -185,6 +213,7 @@ def initialization(self):
     # Link of parameters for autocompletion
     self.linkParameters(
         None, "cortical_regions_nomenclature", reset_cortical_region)
+    self.linkParameters(None, "outputs_database", fill_study_choice)
     self.linkParameters("dw_to_t1", "subject_directory")
     self.linkParameters(
         "labeled_fibers", (
@@ -198,6 +227,8 @@ def initialization(self):
             "cortical_region", "minlength_semilabeled_fibers",
             "maxlength_semilabeled_fibers"),
         link_between_filtered_bundles)
+
+    fill_study_choice(self)
 
 
 #----------------------------Main program--------------------------------------

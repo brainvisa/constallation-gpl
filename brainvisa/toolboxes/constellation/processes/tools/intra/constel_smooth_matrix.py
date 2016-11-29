@@ -36,6 +36,7 @@ from soma.path import find_in_path
 # constel module
 try:
     from constel.lib.utils.filetools import select_ROI_number
+    from constel.lib.utils.matrixtools import replace_negative_values
 except:
     pass
 
@@ -63,33 +64,32 @@ signature = Signature(
     "matrix_labeled_fibers", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "both",
-                            "reduced": "No",
-                            "dense": "No",
-                            "intersubject": "No"}),
+                            "reduced": "no",
+                            "intersubject": "no"}),
     "matrix_semilabeled_fibers", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
-        requiredAttributes={"ends_labelled": "single",
-                            "reduced": "No",
-                            "dense": "No",
-                            "intersubject": "No"}),
+        requiredAttributes={"ends_labelled": "one",
+                            "reduced": "no",
+                            "intersubject": "no"}),
     "cortical_regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "cortical_region", String(),
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "smoothing", Float(),
 
     # --outputs--
     "complete_individual_matrix", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "No",
-                            "dense": "No",
-                            "intersubject": "No"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "intersubject": "no"}),
 )
 
 
@@ -162,3 +162,6 @@ def execution(self, context):
                    "-s", self.smoothing,
                    "-l", self.cortical_parcellation,
                    "-p", label_number)
+
+    replace_negative_values(self.complete_individual_matrix.fullPath())
+    

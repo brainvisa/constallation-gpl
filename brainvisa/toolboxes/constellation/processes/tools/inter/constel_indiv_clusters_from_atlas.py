@@ -52,33 +52,31 @@ signature = Signature(
     # --inputs--
     "individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "Yes",
-                            "dense": "No",
-                            "intersubject": "Yes"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "yes",
+                            "intersubject": "yes"}),
     "atlas_matrix", ReadDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "Yes",
-                            "dense": "No",
-                            "intersubject": "Yes"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "yes",
+                            "intersubject": "yes"}),
     "group_clustering", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "No",
-                            "roi_filtered": "No",
-                            "averaged": "No",
-                            "intersubject": "Yes",
-                            "step_time": "Yes"}),
+        requiredAttributes={"roi_autodetect": "no",
+                            "roi_filtered": "no",
+                            "intersubject": "yes",
+                            "step_time": "yes",
+                            "measure": "no"}),
 
 
     # --outputs--
     "individual_clustering", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "No",
-                            "roi_filtered": "No",
-                            "averaged": "No",
-                            "intersubject": "Yes",
-                            "step_time": "Yes"}),
+        requiredAttributes={"roi_autodetect": "no",
+                            "roi_filtered": "no",
+                            "intersubject": "yes",
+                            "step_time": "yes",
+                            "measure": "no"}),
 )
 
 

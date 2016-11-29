@@ -63,41 +63,51 @@ signature = Signature(
     # --inputs--
     "complete_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "No",
-                            "dense": "No",
-                            "intersubject": "No"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "intersubject": "no",
+                            "individual": "yes"}),
     "reduced_individual_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "Yes",
-                            "roi_filtered": "No",
-                            "averaged": "No",
-                            "intersubject": "No",
-                            "step_time": "No"}),
+        requiredAttributes={"roi_autodetect": "yes",
+                            "roi_filtered": "no",
+                            "intersubject": "no",
+                            "step_time": "no",
+                            "measure": "no"}),
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "cortical_regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "cortical_region", OpenChoice(),
 
     # --outputs--
     "sum_vertices_patch", WriteDiskItem(
-        "Measures Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"measure": "sum"}),
+        "Connectivity ROI Texture", "Aims texture formats",
+        requiredAttributes={"roi_autodetect": "no",
+                            "roi_filtered": "no",
+                            "intersubject": "no",
+                            "step_time": "no",
+                            "measure": "sum"}),
     "duplication_value_patch", WriteDiskItem(
-        "Measures Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"measure": "spread"}),
+        "Connectivity ROI Texture", "Aims texture formats",
+        requiredAttributes={"roi_autodetect": "no",
+                            "roi_filtered": "no",
+                            "intersubject": "no",
+                            "step_time": "no",
+                            "measure": "spread"}),
     "filtered_reduced_individual_profile", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "Yes",
-                            "roi_filtered": "Yes",
-                            "averaged": "No",
-                            "intersubject": "No",
-                            "step_time": "No"}),
+        requiredAttributes={"roi_autodetect": "yes",
+                            "roi_filtered": "yes",
+                            "intersubject": "no",
+                            "step_time": "no",
+                            "measure": "no"}),
 )
 
 

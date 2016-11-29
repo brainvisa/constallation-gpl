@@ -55,10 +55,10 @@ userLevel = 2
 signature = Signature(
     "matrix", ReadDiskItem(
         "Connectivity Matrix", "GIS image",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "No",
-                            "dense": "No",
-                            "intersubject": "Yes"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "intersubject": "yes",
+                            "individual": "yes"}),
     "kmax", Integer(),
     "nbIter", Integer(),
     "indexFile", WriteDiskItem("Any Type", getAllFormats()))
@@ -72,7 +72,7 @@ def initialization(self):
     """
     self.kmax = 12
     self.nbIter = 100
-    self.indexFile = "/tmp/validityindexes.txt"
+    self.indexFile = "/tmp/validityindexes.pdf"
 
 
 def execution(self, context):

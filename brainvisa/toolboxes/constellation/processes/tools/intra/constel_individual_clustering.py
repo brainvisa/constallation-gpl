@@ -59,29 +59,31 @@ signature = Signature(
     # inputs
     "reduced_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "Yes",
-                            "dense": "No",
-                            "intersubject": "No"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "yes",
+                            "intersubject": "no",
+                            "individual": "yes"}),
     "cortical_regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "cortical_region", String(),
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "kmax", Integer(),
 
     # outputs
     "individual_ROI_clustering", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "No",
-                            "roi_filtered": "No",
-                            "averaged": "No",
-                            "intersubject": "No",
-                            "step_time": "Yes"}),
+        requiredAttributes={"roi_autodetect": "no",
+                            "roi_filtered": "no",
+                            "intersubject": "no",
+                            "step_time": "yes",
+                            "measure": "no"}),
 )
 
 
@@ -126,11 +128,10 @@ def execution(self, context):
     label_number = select_ROI_number(
         self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
 
-    context.system("python",
-                   find_in_path("constelIntraSubjectClustering.py"),
-                   "matrix", self.reduced_individual_matrix,
-                   "patch", label_number,
-                   "gyri_segmentation", self.cortical_parcellation,
-                   "mesh", self.white_mesh,
-                   "kmax", self.kmax,
-                   "clustering_time", self.individual_ROI_clustering)
+    context.pythonSystem("constelIntraSubjectClustering.py",
+                         "matrix", self.reduced_individual_matrix,
+                         "patch", label_number,
+                         "gyri_segmentation", self.cortical_parcellation,
+                         "mesh", self.white_mesh,
+                         "kmax", self.kmax,
+                         "clustering_time", self.individual_ROI_clustering)

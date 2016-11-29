@@ -55,11 +55,11 @@ signature = Signature(
     # --inputs--
     "filtered_reduced_group_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "Yes",
-                            "roi_filtered": "Yes",
-                            "averaged": "Yes",
-                            "intersubject": "Yes",
-                            "step_time": "No"}),
+        requiredAttributes={"roi_autodetect": "yes",
+                            "roi_filtered": "yes",
+                            "intersubject": "yes",
+                            "step_time": "no",
+                            "individual": "no"}),
     "subjects_group", ReadDiskItem("Group definition", "XML"),
     "study_name", String(),
     "cortical_regions_nomenclature", ReadDiskItem(
@@ -67,10 +67,9 @@ signature = Signature(
     "cortical_region", String(),
     "complete_individual_matrices", ListOf(ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "No",
-                            "dense": "No",
-                            "intersubject": "No"})),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "intersubject": "no"})),
     "average_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
@@ -84,10 +83,9 @@ signature = Signature(
     # --outputs--
     "intersubject_reduced_matrices", ListOf(WriteDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "Yes",
-                            "dense": "No",
-                            "intersubject": "Yes"})),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "yes",
+                            "intersubject": "yes"})),
     "normalize", Boolean(),
 )
 
@@ -160,17 +158,16 @@ def initialization(self):
                     "_database")
                 atts["center"] = self.filtered_reduced_group_profile.get(
                     "center")
-                atts["texture"] = self.study_name
-                atts["study"] = self.filtered_reduced_group_profile.get(
-                    "study")
+                atts["studyname"] = self.study_name
+                atts["method"] = self.filtered_reduced_group_profile.get(
+                    "method")
                 atts["gyrus"] = self.filtered_reduced_group_profile.get(
                     "gyrus")
                 atts["smoothing"] = self.filtered_reduced_group_profile.get(
                     "smoothing")
-                atts["ends_labelled"] = "mixed",
-                atts["reduced"] = "No",
-                atts["dense"] = "No",
-                atts["intersubject"] = "No"
+                atts["ends_labelled"] = "all",
+                atts["reduced"] = "no",
+                atts["intersubject"] = "no"
                 matrix = self.signature[
                     "complete_individual_matrices"].contentType.findValue(
                     atts, subject.attributes())
@@ -190,8 +187,8 @@ def initialization(self):
                 atts["group_of_subjects"] = \
                     self.filtered_reduced_group_profile.get(
                         "group_of_subjects")
-                atts["texture"] = self.filtered_reduced_group_profile.get(
-                    "texture")
+                atts["studyname"] = self.filtered_reduced_group_profile.get(
+                    "studyname")
                 atts["tracking_session"] = None
                 atts["acquisition"] = None
                 atts["analysis"] = None

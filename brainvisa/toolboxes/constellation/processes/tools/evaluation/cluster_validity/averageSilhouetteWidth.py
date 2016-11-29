@@ -25,7 +25,6 @@ Author: Sandrine Lefranc, 2015
 
 # system module
 import os
-import sys
 
 # axon python API module
 from brainvisa.processes import Float
@@ -61,16 +60,17 @@ signature = Signature(
     #--inputs
     "reduced_matrices", ListOf(
         ReadDiskItem("Connectivity Matrix", "GIS image",
-                     requiredAttributes={"ends_labelled": "mixed",
-                                         "reduced": "No",
-                                         "dense": "No",
-                                         "intersubject": "Yes"})),
+                     requiredAttributes={"ends_labelled": "all",
+                                         "reduced": "yes",
+                                         "intersubject": "yes",
+                                         "individual": "yes"})),
     "kmax", Integer(),
 
     #--outputs--
     "outpdffile", WriteDiskItem("Any Type", getAllFormats()),
     "ybound", ListOf(Float()),
     "ignore_Kopt2",  Boolean(),
+    "save_asw_values", Boolean()
 )
 
 
@@ -83,6 +83,7 @@ def initialization(self):
     self.kmax = 12
     self.setOptional("ybound")
     self.ignore_Kopt2 = False
+    self.save_asw_values = False
 
     def link_outdir(self, dummy):
         """
@@ -103,8 +104,7 @@ def initialization(self):
 def execution(self, context):
     """Run the command 'constel_calculate_asw.py'.
     """
-    cmd = [sys.executable,
-           find_in_path("constel_calculate_asw.py"),
+    cmd = ["constel_calculate_asw.py",
            self.reduced_matrices,
            self.kmax,
            self.outpdffile]
@@ -115,4 +115,7 @@ def execution(self, context):
     if self.ignore_Kopt2:
         cmd += ["-r"]
 
-    context.system(*cmd)
+    if self.save_asw_values:
+        cmd += ["-c"]
+
+    context.pythonSystem(*cmd)

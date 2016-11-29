@@ -58,18 +58,18 @@ userLevel = 2
 signature = Signature(
     "clustering_1", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "No",
-                            "roi_filtered": "No",
-                            "averaged": "No",
-                            "intersubject": "Yes",
-                            "step_time": "Yes"}),
+        requiredAttributes={"roi_autodetect": "no",
+                            "roi_filtered": "no",
+                            "intersubject": "yes",
+                            "step_time": "yes",
+                            "measure": "no"}),
     "clustering_2", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "No",
-                            "roi_filtered": "No",
-                            "averaged": "No",
-                            "intersubject": "Yes",
-                            "step_time": "Yes"}),
+        requiredAttributes={"roi_autodetect": "no",
+                            "roi_filtered": "no",
+                            "intersubject": "yes",
+                            "step_time": "yes",
+                            "measure": "no"}),
     "time_step_max", Integer(),
     "output_dir", WriteDiskItem("Directory", "Directory"),
     "ybound", ListOf(Float()),
@@ -100,7 +100,11 @@ def execution(self, context):
         subject1 = self.clustering_1.get("subject")
         subject2 = self.clustering_2.get("subject")
         group = self.clustering_1.get("group_of_subjects")
-        title = cortical_region + "_" + group + "_" + subject1 + "_" + subject2
+        print cortical_region
+        print group
+        print subject1
+        print subject2
+        title = str(cortical_region) + "_" + str(group) + "_" + str(subject1) + "_" + str(subject2)
 
     cmd = [sys.executable, find_in_path("constel_calculate_scores.py"),
            self.clustering_1,
