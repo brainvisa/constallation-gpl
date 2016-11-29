@@ -73,8 +73,8 @@ insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}
     "<subject>_<studyname>_<gyrus>_meanConnectivityProfile_fibersNearCortex_{smallerlength1}to{greaterlength1}mm",
         SetType("Connectivity Profile Texture"),
         SetWeakAttr("ends_labelled", "both",
-                    "normed", "No",
-                    "intersubject", "No"),
+                    "normed", "no",
+                    "intersubject", "no"),
 
     "<subject>_<studyname>_<gyrus>_connectivityMatrix_outsideFibersOfCortex_{smallerlength2}to{greaterlength2}mm",
         SetType("Connectivity Matrix"),
