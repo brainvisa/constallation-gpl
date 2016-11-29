@@ -83,12 +83,14 @@ signature = Signature(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "one",
                             "reduced": "no",
-                            "intersubject": "no"}),
+                            "intersubject": "no",
+                            "individual": "yes"}),
     "matrix_labeled_fibers", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "both",
                             "reduced": "no",
-                            "intersubject": "no"}),
+                            "intersubject": "no",
+                            "individual": "yes"}),
     "profile_semilabeled_fibers", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "one",
