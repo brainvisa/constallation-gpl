@@ -50,7 +50,8 @@ userLevel = 0
 signature = Signature(
     #--inputs--
     "method", Choice(
-        ("averaged approach", "avg"), ("concatenated approach", "concat")),
+        ("averaged approach", "avg"),
+        ("concatenated approach", "concat")),
     "outputs_database", Choice(),
     "study_name", OpenChoice(),
     "fiber_tracts_format", Choice("bundles", "trk"),
@@ -60,11 +61,14 @@ signature = Signature(
     "subject_directory", ReadDiskItem("subject", "directory"),
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes",
-                            "inflated": "No", "averaged": "No"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes",
+                            "inflated": "No",
+                            "averaged": "No"}),
     "keep_regions", ListOf(OpenChoice()),
     "smoothing", Float(),
     "minlength_labeled_fibers", Float(),
@@ -118,10 +122,10 @@ def initialization(self):
         choices = set()
         if self.outputs_database is not None:
             database = neuroHierarchy.databases.database(self.outputs_database)
-            sel = {"study": self.method}
+            sel = {"method": self.method}
             choices.update(
                 [x[0] for x in database.findAttributes(
-                    ["texture"], selection=sel,
+                    ["studyname"], selection=sel,
                     _type="Filtered Fascicles Bundles")])
         self.signature["study_name"].setChoices(*sorted(choices))
         if len(choices) != 0 and self.isDefault("study_name") \
@@ -129,7 +133,9 @@ def initialization(self):
             self.setValue("study_name", list(choices)[0], True)
 
     def reset_label(self, dummy):
-        """This callback reads the labels nomenclature and proposes them in the
+        """Read and/or reset the cortical_region parameter.
+
+        This callback reads the labels nomenclature and proposes them in the
         signature 'cortical_region' of process.
         It also resets the cortical_region parameter to default state after
         the nomenclature changes.

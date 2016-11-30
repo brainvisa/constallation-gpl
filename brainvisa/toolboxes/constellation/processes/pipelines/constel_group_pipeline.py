@@ -76,31 +76,31 @@ if neuroConfig.gui:
 
 signature = Signature(
     "method", Choice(
-        ("averaged approach", "avg"), ("concatenated approach", "concat")),
+        ("averaged approach", "avg"),
+        ("concatenated approach", "concat")),
     "cortical_regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "cortical_region", OpenChoice(),
     "study_name", OpenChoice(),
     "new_study_name", String(),
     "smoothing", Float(),
-    "constellation_subjects_group", ReadDiskItem("Group definition", "XML",
-                                                 exactType=True),
+    "constellation_subjects_group", ReadDiskItem(
+        "Group definition", "XML", exactType=True),
     "mean_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
-                     requiredAttributes={"normed": "No",
-                                         "thresholded": "No",
-                                         "averaged": "No",
-                                         "intersubject": "No"})),
+                     requiredAttributes={"ends_labelled": "all",
+                                         "normed": "no",
+                                         "intersubject": "no"})),
     "normed_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
-                     requiredAttributes={"normed": "Yes",
-                                         "thresholded": "Yes",
-                                         "averaged": "No",
-                                         "intersubject": "No"})),
-    "average_mesh", ReadDiskItem("White Mesh", "Aims mesh formats",
-                                 requiredAttributes={"side": "both",
-                                                     "vertex_corr": "Yes",
-                                                     "averaged": "Yes"}),
+                     requiredAttributes={"ends_labelled": "all",
+                                         "normed": "yes",
+                                         "intersubject": "no"})),
+    "average_mesh", ReadDiskItem(
+        "White Mesh", "Aims mesh formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes",
+                            "averaged": "Yes"}),
     "cortical_parcellation", ListOf(
         ReadDiskItem("ROI Texture", "Aims texture formats",
                      requiredAttributes={"side": "both",
@@ -151,10 +151,10 @@ def initialization(self):
         choices = set()
         for db_name in databases:
             database = neuroHierarchy.databases.database(db_name)
-            sel = {"study": self.method}
+            sel = {"method": self.method}
             choices.update(
                 [x[0] for x in database.findAttributes(
-                    ["texture"], selection=sel,
+                    ["studyname"], selection=sel,
                     _type="Filtered Fascicles Bundles")])
         self.signature['study_name'].setChoices(*sorted(choices))
         if len(choices) != 0 and self.isDefault("study_name") \
@@ -204,10 +204,10 @@ def initialization(self):
             profiles = []
             for subject in groupOfSubjects:
                 atts = {}
-                atts["study"] = self.method
+                atts["method"] = self.method
                 atts["gyrus"] = str(self.cortical_region)
                 atts["smoothing"] = str(self.smoothing)
-                atts["texture"] = self.study_name
+                atts["studyname"] = self.study_name
                 atts["_database"] \
                     = self.constellation_subjects_group.get("_database")
                 atts.update(subject.attributes())
