@@ -73,7 +73,7 @@ signature = Signature(
     "mean_individual_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
-                            "normed": "No",
+                            "normed": "no",
                             "intersubject": "no"}),
 )
 

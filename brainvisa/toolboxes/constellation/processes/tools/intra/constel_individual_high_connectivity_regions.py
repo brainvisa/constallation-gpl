@@ -54,7 +54,7 @@ signature = Signature(
     # inputs
     "normed_individual_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"ends_labelled ": "all",
+        requiredAttributes={"ends_labelled": "all",
                             "normed": "yes",
                             "intersubject": "no"}),
     "white_mesh", ReadDiskItem(
