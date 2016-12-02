@@ -132,12 +132,16 @@ def initialization(self):
         """
         choices = set()
         if self.outputs_database is not None:
-            database = neuroHierarchy.databases.database(self.outputs_database)
-            sel = {"method": self.method}
-            choices.update(
-                [x[0] for x in database.findAttributes(
-                    ["studyname"], selection=sel,
-                    _type="Filtered Fascicles Bundles")])
+            if neuroHierarchy.databases.hasDatabase(self.outputs_database):
+                database = neuroHierarchy.databases.database(
+                    self.outputs_database)
+                sel = {"method": self.method}
+                choices.update(
+                    [x[0] for x in database.findAttributes(
+                        ["studyname"], selection=sel,
+                        _type="Filtered Fascicles Bundles")])
+            else:
+                choices = []
         self.signature["study_name"].setChoices(*sorted(choices))
         if len(choices) != 0 and self.isDefault("study_name") \
                 and self.study_name not in choices:
