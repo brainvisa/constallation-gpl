@@ -33,7 +33,6 @@ from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
 from brainvisa.processes import neuroHierarchy
-from brainvisa.processes import String
 from brainvisa.processes import Choice
 from brainvisa.processes import Float
 from brainvisa.processes import OpenChoice
@@ -266,8 +265,8 @@ def execution(self, context):
         "--tex", self.cortical_parcellation,
         "--trs", self.dw_to_t1,
         "--mode", "Name1_Name2orNotInMesh",
-        "--names", "^" + str(region_number) + "_[0-9]+$",
-        "--names", "^[0-9]+_" + str(region_number) + "$",
+        "--names", "^" + str(region_number) + "_[+-]?[0-9]+$",
+        "--names", "^[+-]?[0-9]+_" + str(region_number) + "$",
         "-g", region_number,
         "-r",
         "-l", self.minlength_labeled_fibers,
