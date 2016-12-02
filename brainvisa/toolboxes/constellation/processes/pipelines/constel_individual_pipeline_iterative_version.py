@@ -24,9 +24,16 @@ Author: Sandrine Lefranc, 2016
 
 
 # Axon python API modules
-from brainvisa.processes import Signature, Choice, ReadDiskItem, Float, \
-    OpenChoice, neuroHierarchy, ListOf, ParallelExecutionNode, \
-    mapValuesToChildrenParameters, ExecutionNode
+from brainvisa.processes import Signature
+from brainvisa.processes import Choice
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import Float
+from brainvisa.processes import OpenChoice
+from brainvisa.processes import neuroHierarchy
+from brainvisa.processes import ListOf
+from brainvisa.processes import ParallelExecutionNode
+from brainvisa.processes import mapValuesToChildrenParameters
+from brainvisa.processes import ExecutionNode
 
 # soma module
 from soma.functiontools import partial
@@ -49,8 +56,8 @@ signature = Signature(
     #inputs
     "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
+    "outputs_database", Choice(),    
     "study_name", OpenChoice(),
-    "outputs_database", Choice(),
     "fiber_tracts_format", Choice("bundles", "trk"),
     "cortical_regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
@@ -58,11 +65,14 @@ signature = Signature(
     "subject_directory", ListOf(ReadDiskItem("subject", "directory")),
     "cortical_parcellation", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"})),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"})),
     "white_mesh", ListOf(ReadDiskItem(
         "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes",
                             "inflated": "No"})),
+    "keep_regions", OpenChoice(),    
     "smoothing", Float(),
 )
 
@@ -130,17 +140,30 @@ def initialization(self):
         "cortical_regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
+    def link_keep_regions(self, dummy):
+        """
+        """
+        if self.cortical_regions_nomenclature is not None:
+            s = []
+            s += read_file(
+                self.cortical_regions_nomenclature.fullPath(), mode=2)
+            self.signature["keep_regions"] = ListOf(Choice(*s))
+            self.changeSignature(self.signature)
+
     def fill_study_choice(self, dummy=None):
         """
         """
         choices = set()
         if self.outputs_database is not None:
-            database = neuroHierarchy.databases.database(self.outputs_database)
-            sel = {"study": self.method}
-            choices.update(
-                [x[0] for x in database.findAttributes(
-                    ['texture'], selection=sel,
-                    _type='Filtered Fascicles Bundles')])
+            if neuroHierarchy.databases.hasDatabase(self.outputs_database):
+                database = neuroHierarchy.databases.database(self.outputs_database)
+                sel = {"study": self.method}
+                choices.update(
+                    [x[0] for x in database.findAttributes(
+                        ['texture'], selection=sel,
+                        _type='Filtered Fascicles Bundles')])
+            else:
+                choices = []
         self.signature['study_name'].setChoices(*sorted(choices))
         if len(choices) != 0 and self.isDefault('study_name') \
                 and self.study_name not in choices:
@@ -220,6 +243,9 @@ def initialization(self):
     self.linkParameters("cortical_parcellation",
                         ["study_name", "subject_directory", "method"],
                         link_cortical_region)
+    self.linkParameters(
+        "keep_regions", "cortical_regions_nomenclature",
+        link_keep_regions)
 
     # define the main node of the pipeline
     eNode = ParallelExecutionNode(
