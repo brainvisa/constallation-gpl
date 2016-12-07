@@ -59,7 +59,7 @@ signature = Signature(
                             "roi_filtered": "yes",
                             "intersubject": "yes",
                             "step_time": "no",
-                            "individual": "no"}),
+                            "measure": "no"}),
     "subjects_group", ReadDiskItem("Group definition", "XML"),
     "study_name", String(),
     "cortical_regions_nomenclature", ReadDiskItem(
@@ -69,7 +69,8 @@ signature = Signature(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
-                            "intersubject": "no"})),
+                            "intersubject": "no",
+                            "individual": "yes"})),
     "average_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
@@ -85,7 +86,8 @@ signature = Signature(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
-                            "intersubject": "yes"})),
+                            "intersubject": "yes",
+                            "individual": "yes"})),
     "normalize", Boolean(),
 )
 
@@ -96,12 +98,16 @@ signature = Signature(
 def afterChildAddedCallback(self, parent, key, child):
     """
     """
-    # Set default values
-    child.removeLink(
-        "filtered_reduced_individual_profile", "complete_individual_matrix")
-    child.removeLink(
-        "reduced_individual_matrix", "filtered_reduced_individual_profile")
-    child.removeLink("cortical_region", "complete_individual_matrix")
+    # Removes a link added with addLink() function.
+    # (destination, source)
+    child.removeLink("filtered_reduced_individual_profile",
+                     "complete_individual_matrix")
+    child.removeLink("cortical_region",
+                     "complete_individual_matrix")
+    child.removeLink("reduced_individual_matrix",
+                     "filtered_reduced_individual_profile")
+
+    # Define the parent signatures.
     child.signature["filtered_reduced_individual_profile"] = parent.signature[
         "filtered_reduced_group_profile"]
     child.signature["white_mesh"] = parent.signature["average_mesh"]
@@ -116,6 +122,7 @@ def afterChildAddedCallback(self, parent, key, child):
     child.normalize = parent.normalize
 
     # Add link between eNode.ListOf_Input_3dImage and pNode.Input_3dImage
+    # Creates a double link source -> destination and destination -> source.
     parent.addDoubleLink(key + ".filtered_reduced_individual_profile",
                          "filtered_reduced_group_profile")
     parent.addDoubleLink(key + ".white_mesh", "average_mesh")
@@ -126,6 +133,8 @@ def afterChildAddedCallback(self, parent, key, child):
 
 
 def beforeChildRemovedCallback(self, parent, key, child):
+    """
+    """
     parent.removeDoubleLink(key + ".filtered_reduced_individual_profile",
                             "filtered_reduced_group_profile")
     parent.removeDoubleLink(key + ".white_mesh", "average_mesh")
@@ -167,6 +176,7 @@ def initialization(self):
                     "smoothing")
                 atts["ends_labelled"] = "all",
                 atts["reduced"] = "no",
+                atts["individual"] = "yes",
                 atts["intersubject"] = "no"
                 matrix = self.signature[
                     "complete_individual_matrices"].contentType.findValue(
@@ -179,19 +189,32 @@ def initialization(self):
         """Function of link between the complete matrices and
         the reduced matrices.
         """
-        if self.subjects_group and self.complete_individual_matrices and \
-                self.filtered_reduced_group_profile:
+        if self.subjects_group and self.filtered_reduced_group_profile:
             matrices = []
-            for matrix in self.complete_individual_matrices:
-                atts = dict(matrix.hierarchyAttributes())
+            registerClass("minf_2.0", Subject, "Subject")
+            groupOfSubjects = readMinf(self.subjects_group.fullPath())
+            matrices = []
+            for subject in groupOfSubjects:
+                atts = dict()
+                atts["_database"] = self.filtered_reduced_group_profile.get(
+                    "_database")
+                atts["center"] = self.filtered_reduced_group_profile.get(
+                    "center")
                 atts["group_of_subjects"] = \
                     self.filtered_reduced_group_profile.get(
                         "group_of_subjects")
-                atts["studyname"] = self.filtered_reduced_group_profile.get(
-                    "studyname")
-                atts["tracking_session"] = None
-                atts["acquisition"] = None
-                atts["analysis"] = None
+                atts["studyname"] = self.study_name
+                atts["method"] = self.filtered_reduced_group_profile.get(
+                    "method")
+                atts["gyrus"] = self.filtered_reduced_group_profile.get(
+                    "gyrus")
+                atts["smoothing"] = self.filtered_reduced_group_profile.get(
+                    "smoothing")
+                atts["sid"] = subject.attributes().get("subject")
+                atts["ends_labelled"] = "all"
+                atts["reduced"] = "yes"
+                atts["individual"] = "yes"
+                atts["intersubject"] = "yes"
                 matrix = self.signature[
                     "intersubject_reduced_matrices"].contentType.findValue(
                     atts)
@@ -215,8 +238,7 @@ def initialization(self):
         link_watershed)
     self.linkParameters(
         "intersubject_reduced_matrices",
-        ("complete_individual_matrices", "subjects_group",
-         "filtered_reduced_group_profile"), link_matrices)
+        ("subjects_group", "filtered_reduced_group_profile"), link_matrices)
 
     # define the main node of the pipeline
     eNode = ParallelExecutionNode(
