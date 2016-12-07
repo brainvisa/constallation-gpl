@@ -102,7 +102,6 @@ def initialization(self):
 def execution(self, context):
     """Run the command 'constelConnectivityProfileOverlapMask'.
     """
-    context.system(sys.executable,
-                   find_in_path("constelConnectivityProfileOverlapMask.py"),
-                   self.mean_individual_profiles,
-                   self.group_mask)
+    context.pythonSystem("constelConnectivityProfileOverlapMask.py",
+                         self.mean_individual_profiles,
+                         self.group_mask)
