@@ -122,8 +122,6 @@ def execution(self, context):
     A connectivity profile is determinated on a range of subjects
     (for a group of subjects)
     """
-    context.write(self.normed_individual_profiles)
-    context.system(sys.executable,
-                   find_in_path("constelAvgConnectivityProfile.py"),
+    context.pythonSystem("constelAvgConnectivityProfile.py",
                    self.normed_individual_profiles,
                    self.group_profile)

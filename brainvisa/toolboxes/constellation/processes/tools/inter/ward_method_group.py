@@ -85,11 +85,11 @@ def execution(self, context):
     
     Run a Ward's hierarchical clustering method.
     """
-    args = [sys.executable, find_in_path("constelClusteringWard.py")]
+    args = ["constelClusteringWard.py"]
     for x in self.gyri_texture:
         args += ["-g", x]
     for t in self.tex_time:
         args += ["-t", t]
     args += ["-k", self.kmax, "-l", self.patch, "-x", self.group_matrix,
              "-c", self.distance_matrix_file, "-m", self.average_mesh]
-    context.system(*args)
+    context.pythonSystem(*args)

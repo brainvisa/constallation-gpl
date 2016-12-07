@@ -101,8 +101,7 @@ def execution(self, context):
 
     Create a group profile normed.
     """
-    context.system(sys.executable,
-                   find_in_path("constelNormProfile.py"),
+    context.pythonSystem("constelNormProfile.py",
                    self.group_mask,
                    self.group_profile,
                    self.normed_group_profile)
