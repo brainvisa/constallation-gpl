@@ -228,14 +228,14 @@ insert("{center}/group_analysis/{group_of_subjects}",
 
 #----------------------------------Individual Result---------------------------
 
-    "<group_of_subjects>_<method>_<studyname>_<gyrus>_<subject>_reduced_matrix",
+    "<group_of_subjects>_<method>_<studyname>_<gyrus>_{sid}_reduced_matrix",
         SetType("Connectivity Matrix"),
         SetWeakAttr("ends_labelled", "all",
                     "reduced", "yes",
                     "intersubject", "yes",
                     "individual", "yes"),
 
-    "<group_of_subjects>_<method>_<studyname>_<gyrus>_<subject>_clustering",
+    "<group_of_subjects>_<method>_<studyname>_<gyrus>_{sid}_clustering",
         SetType("Connectivity ROI Texture"),
         SetWeakAttr("roi_autodetect", "no",
                     "roi_filtered", "no",
