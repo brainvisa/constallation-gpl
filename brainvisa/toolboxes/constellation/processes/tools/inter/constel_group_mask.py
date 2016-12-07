@@ -56,8 +56,8 @@ signature = Signature(
     "mean_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
                      requiredAttributes={"ends_labelled": "all",
-                                         "normed": "No",
-                                         "intersubject": "No"})),
+                                         "normed": "no",
+                                         "intersubject": "no"})),
     "subjects_group", ReadDiskItem("Group definition", "XML"),
     "new_study_name", String(),
 
