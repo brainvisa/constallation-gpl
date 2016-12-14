@@ -31,7 +31,7 @@ from brainvisa.processes import ValidationError
 # soma module
 from soma.path import find_in_path
 
-from constel.lib.utils.processtools import write_filelog
+#from constel.lib.utils.processtools import write_filelog
 
 
 def validation():
@@ -79,7 +79,7 @@ def initialization(self):
 def execution(self, context):
     """
     """
-    write_filelog()
+    #write_filelog()
     context.pythonSystem('AimsGyriTextureCleaningIsolatedVertices.py',
                          self.gyri_texture,
                          self.mesh,
