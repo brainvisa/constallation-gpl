@@ -51,11 +51,11 @@ userLevel = 2
 signature = Signature(
     "ROI_clustering", ListOf(ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "No",
-                            "roi_filtered": "No",
-                            "averaged": "No",
-                            "intersubject": "Yes",
-                            "step_time": "Yes"})),
+        requiredAttributes={"roi_autodetect": "no",
+                            "roi_filtered": "no",
+                            "averaged": "no",
+                            "intersubject": "yes",
+                            "step_time": "yes"})),
     "time_step", ListOf(Integer()),
     "mesh", ReadDiskItem("White Mesh", "Aims mesh formats"),
     "concatenated_ROIseg", WriteDiskItem(
@@ -78,6 +78,7 @@ def initialization(self):
 def execution(self, context):
     """
     """
+    context.write(self.ROI_clustering)
     final_rseg = concatenate_texture(self.ROI_clustering, self.time_step)
     aims.write(final_rseg, self.concatenated_ROIseg.fullPath())
 
