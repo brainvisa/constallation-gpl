@@ -31,12 +31,13 @@ userLevel = 0
 signature = Signature(
     'clusters', ReadDiskItem('Connectivity ROI texture',
                              'aims texture formats', 
-                             requiredAttributes={'step_time': 'Yes'}),
+                             requiredAttributes={'step_time': 'yes'}),
     'mesh', ReadDiskItem('White Mesh', 'aims mesh formats'),
     #'clusters_measurements', ReadDiskItem('?'),
     'seed_gyri', ReadDiskItem('ROI texture', 'aims texture formats'),
     'reduced_matrix', ReadDiskItem('Connectivity matrix',
-                                   'aims matrix formats'),
+                                   'aims matrix formats',
+                                   requiredAttributes={"reduced": "yes"}),
 )
 
 

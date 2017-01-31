@@ -55,12 +55,12 @@ userLevel = 0
 
 signature = Signature(
     "connectivity_matrix", ReadDiskItem(
-        "Reduced connectivity matrix",
+        "Connectivity matrix",
         getFormats("aims matrix formats").data + ['Sparse Matrix'],
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "Yes",
-                            "dense": "No",
-                            "intersubject": "Yes"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "yes",
+                            "intersubject": "yes",
+                            "individual": "no"}),
     "white_mesh", ReadDiskItem("White Mesh", "anatomist mesh formats",
                                requiredAttributes={"side": "both",
                                                    "vertex_corr": "Yes"}),
