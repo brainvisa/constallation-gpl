@@ -228,6 +228,14 @@ insert("{center}/group_analysis/{group_of_subjects}",
 
 #----------------------------------Individual Result---------------------------
 
+    "<group_of_subjects>_<method>_<studyname>_{sid}_reduced_connectome",
+        SetType("Connectivity Matrix"),
+        SetWeakAttr("ends_labelled", "all",
+                    "reduced", "yes",
+                    "intersubject", "yes",
+                    "individual", "yes",
+                    "connectome", "yes"),
+
     "<group_of_subjects>_<method>_<studyname>_<gyrus>_{sid}_reduced_matrix",
         SetType("Connectivity Matrix"),
         SetWeakAttr("ends_labelled", "all",
