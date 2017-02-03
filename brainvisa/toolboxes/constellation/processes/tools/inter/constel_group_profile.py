@@ -13,7 +13,7 @@ This script does the following:
     - the signature of the inputs/ouputs,
     - the initialization (by default) of the inputs,
     - the interlinkages between inputs/outputs.
-* this process executes the command 'constelAvgConnectivityProfile': the mean
+* this process executes the command 'constel_avg_connectivity_profile': the mean
   group profile is computed.
 
 Main dependencies: axon python API, soma, constel
@@ -41,7 +41,7 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("constelAvgConnectivityProfile.py"):
+    if not find_in_path("constel_avg_connectivity_profile.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
@@ -117,11 +117,11 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Run the command 'constelAvgConnectivityProfile'.
+    """Run the command 'constel_avg_connectivity_profile'.
 
     A connectivity profile is determinated on a range of subjects
     (for a group of subjects)
     """
-    context.pythonSystem("constelAvgConnectivityProfile.py",
+    context.pythonSystem("constel_avg_connectivity_profile.py",
                    self.normed_individual_profiles,
                    self.group_profile)

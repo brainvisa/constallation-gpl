@@ -13,8 +13,8 @@ This script does the following:
     - the signature of the inputs/ouputs,
     - the initialization (by default) of the inputs,
     - the interlinkages between inputs/outputs.
-* executes the commands 'constelCalculateGroupMatrix' and
-  'constelInterSubjectClustering'.
+* executes the commands 'constel_calculate_group_matrix' and
+  'constel_inter_subject_clustering'.
 
 Main dependencies: Axon python API, Soma-base, constel
 
@@ -50,7 +50,7 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("constelInterSubjectClustering.py"):
+    if not find_in_path("constel_inter_subject_clustering.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
@@ -159,7 +159,7 @@ def initialization(self):
                 atts = dict(
                     self.intersubject_reduced_matrices[0].hierarchyAttributes()
                     )
-                atts["subject"] = "avgSubject"
+                atts["sid"] = "avgSubject"
                 atts["method"] = "avg"
                 atts["tracking_session"] = None
                 filename = self.signature[
@@ -196,7 +196,7 @@ def initialization(self):
 def execution(self, context):
     """Compute the clustering of the ROI.
 
-    Execute 'constelInterSubjectClustering' and 'constelCalculateGroupMatrix'.
+    Execute 'constel_inter_subject_clustering' and 'constel_calculate_group_matrix'.
 
     The gyrus vertices connectivity profiles of all the subjects are
     concatenated into a big matrix. The clustering is performed with the
@@ -212,7 +212,7 @@ def execution(self, context):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
     # Declare the constel command
-    args = ["constelCalculateGroupMatrix.py"]
+    args = ["constel_calculate_group_matrix.py"]
 
     # Define the arguments
     for x in self.intersubject_reduced_matrices:
@@ -227,7 +227,7 @@ def execution(self, context):
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
     # Declare the constel command
-    cmd_args = ["constelInterSubjectClustering.py"]
+    cmd_args = ["constel_inter_subject_clustering.py"]
 
     # Define the arguments
     for t in self.ROI_clustering:
@@ -241,4 +241,4 @@ def execution(self, context):
                  "-a", self.nb_clusters]
 
     # Execute the command
-    context.pythonSystem(*cmd_args)
+    #context.pythonSystem(*cmd_args)

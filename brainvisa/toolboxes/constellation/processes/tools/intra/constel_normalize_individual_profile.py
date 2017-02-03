@@ -13,7 +13,7 @@ This script does the following:
     - the signature of the inputs/ouputs,
     - the initialization (by default) of the inputs,
     - the interlinkages between inputs/outputs.
-* this process executes the command 'constelRemoveInternalConnections.py'.
+* this process executes the command 'constel_remove_internal_connections.py'.
 
 Main dependencies: Axon python API, Soma-base, constel
 
@@ -127,7 +127,7 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Run the command 'constelRemoveInternalConnections.py'.
+    """Run the command 'constel_remove_internal_connections.py'.
 
     STEP 1/2: Remove internals connections of patch.
     STEP 2/2: The profile is normalized.
@@ -136,7 +136,7 @@ def execution(self, context):
     label_number = select_ROI_number(
         self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
 
-    cmd = ["constelRemoveInternalConnections.py",
+    cmd = ["constel_remove_internal_connections.py",
            label_number,
            self.mean_individual_profile,
            self.cortical_parcellation,

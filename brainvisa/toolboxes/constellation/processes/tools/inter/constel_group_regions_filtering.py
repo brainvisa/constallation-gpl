@@ -14,7 +14,7 @@ This script does the following:
     - the parameters initialization
     - the linked parameters
 * this process executes the command 'AimsMeshWatershed.py' and
-  'constelFilteringWatershed.py': the ROI profile is computede from the mean
+  'constel_filtering_watershed.py': the ROI profile is computede from the mean
    profile.
 
 Main dependencies: Axon python API, Soma-base, constel
@@ -113,10 +113,10 @@ def execution(self, context):
                          self.normed_group_profile,
                          self.average_mesh,
                          self.reduced_group_profile,
-                         "--threshold", 0.05,
+                         "--threshold", 0.02, # update the parameter
                          "--mode", "or")
 
     # execute the command
-    context.pythonSystem("constelFilteringWatershed.py",
+    context.pythonSystem("constel_filtering_watershed.py",
                          self.reduced_group_profile,
                          self.filtered_reduced_group_profile)

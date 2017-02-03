@@ -13,7 +13,7 @@ This script does the following:
     - the signature of the inputs/ouputs,
     - the initialization (by default) of the inputs,
     - the interlinkages between inputs/outputs.
-* this process executes the command 'constelNormProfile': normalize the mean
+* this process executes the command 'constel_norm_profile': normalize the mean
   profile.
 
 Main dependencies: axon python API, soma, constel
@@ -43,7 +43,7 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("constelNormProfile.py"):
+    if not find_in_path("constel_norm_profile.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
@@ -97,11 +97,11 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Execute the command 'constelNormProfile'.
+    """Execute the command 'constel_norm_profile'.
 
     Create a group profile normed.
     """
-    context.pythonSystem("constelNormProfile.py",
+    context.pythonSystem("constel_norm_profile.py",
                    self.group_mask,
                    self.group_profile,
                    self.normed_group_profile)

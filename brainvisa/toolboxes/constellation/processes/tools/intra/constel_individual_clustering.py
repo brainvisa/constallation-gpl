@@ -13,7 +13,7 @@ This script does the following:
     - the signature of the inputs/ouputs,
     - the initialization (by default) of the inputs,
     - the interlinkages between inputs/outputs.
-* this process execute the command 'constelIntraSubjectClustering': a cortical
+* this process execute the command 'constel_intra_subject_clustering': a cortical
   parcellation is computed for a label from a group connectivity matrix.
 
 Main dependencies: axon python API, soma, constel
@@ -42,9 +42,9 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("constelIntraSubjectClustering.py"):
+    if not find_in_path("constel_intra_subject_clustering.py"):
         raise ValidationError(
-            "constelIntraSubjectClustering is not contained in PATH "
+            "constel_intra_subject_clustering is not contained in PATH "
             "environnement variable or please make sure that constellation "
             "is installed.")
 
@@ -120,7 +120,7 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Run the command 'constelIntraSubjectClustering'.
+    """Run the command 'constel_intra_subject_clustering'.
 
     Reduced connectivity matrix is clustered using the kmedoids algorithm.
     """
@@ -128,7 +128,7 @@ def execution(self, context):
     label_number = select_ROI_number(
         self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
 
-    context.pythonSystem("constelIntraSubjectClustering.py",
+    context.pythonSystem("constel_intra_subject_clustering.py",
                          "matrix", self.reduced_individual_matrix,
                          "patch", label_number,
                          "gyri_segmentation", self.cortical_parcellation,
