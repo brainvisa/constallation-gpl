@@ -241,4 +241,4 @@ def execution(self, context):
                  "-a", self.nb_clusters]
 
     # Execute the command
-    #context.pythonSystem(*cmd_args)
+    context.pythonSystem(*cmd_args)
