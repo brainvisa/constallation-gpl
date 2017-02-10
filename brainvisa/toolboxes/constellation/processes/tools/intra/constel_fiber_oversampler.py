@@ -52,12 +52,14 @@ signature = Signature(
     # --input--
     "semilabeled_fibers", ReadDiskItem(
         "Filtered Fascicles bundles", "Aims readable bundles formats",
-        requiredAttributes={"both_ends_labelled": "No", "oversampled": "No"}),
+        requiredAttributes={"ends_labelled": "one",
+                            "oversampled": "no"}),
 
     # --output--
     "oversampled_semilabeled_fibers", WriteDiskItem(
-        "Fascicles bundles", "Aims writable bundles formats",
-        requiredAttributes={"both_ends_labelled": "No", "oversampled": "Yes"}),
+        "Filtered Fascicles bundles", "Aims writable bundles formats",
+        requiredAttributes={"ends_labelled": "one",
+                            "oversampled": "yes"}),
 )
 
 

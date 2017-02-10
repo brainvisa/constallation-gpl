@@ -58,49 +58,49 @@ signature = Signature(
     # --inputs--
     "oversampled_semilabeled_fibers", ReadDiskItem(
         "Filtered Fascicles Bundles", "Aims readable bundles formats",
-        requiredAttributes={"both_ends_labelled": "No", "oversampled": "Yes"}),
+        requiredAttributes={"ends_labelled": "one",
+                            "oversampled": "yes"}),
     "labeled_fibers", ReadDiskItem(
         "Filtered Fascicles Bundles", "Aims readable bundles formats",
-        requiredAttributes={"both_ends_labelled": "Yes", "oversampled": "No"}),
+        requiredAttributes={"ends_labelled": "both",
+                            "oversampled": "no"}),
     "cortical_regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "cortical_region", String(),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
-    "dw_to_t1", ReadDiskItem("Transform T2 Diffusion MR to Raw T1 MRI",
-                             "Transformation matrix"),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
+    "dw_to_t1", ReadDiskItem(
+        "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix"),
 
     # --ouputs--
     "matrix_semilabeled_fibers", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
-        requiredAttributes={"ends_labelled": "single",
-                            "reduced": "No",
-                            "dense": "No",
-                            "intersubject": "No"}),
+        requiredAttributes={"ends_labelled": "one",
+                            "reduced": "no",
+                            "intersubject": "no",
+                            "individual": "yes"}),
     "matrix_labeled_fibers", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "both",
-                            "reduced": "No",
-                            "dense": "No",
-                            "intersubject": "No"}),
+                            "reduced": "no",
+                            "intersubject": "no",
+                            "individual": "yes"}),
     "profile_semilabeled_fibers", WriteDiskItem(
-        "Filtered Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "No",
-                            "thresholded": "Yes",
-                            "averaged": "No",
-                            "intersubject": "No",
-                            "both_ends_labelled": "No"}),
+        "Connectivity Profile Texture", "Aims texture formats",
+        requiredAttributes={"ends_labelled": "one",
+                            "normed": "no",
+                            "intersubject": "no"}),
     "profile_labeled_fibers", WriteDiskItem(
-        "Filtered Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "No",
-                            "thresholded": "Yes",
-                            "averaged": "No",
-                            "intersubject": "No",
-                            "both_ends_labelled": "Yes"}),
+        "Connectivity Profile Texture", "Aims texture formats",
+        requiredAttributes={"ends_labelled": "both",
+                            "normed": "no",
+                            "intersubject": "no"}),
 )
 
 

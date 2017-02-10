@@ -58,34 +58,36 @@ signature = Signature(
     # inputs
     "complete_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "No",
-                            "dense": "No",
-                            "intersubject": "No"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "intersubject": "no",
+                            "individual": "yes"}),
     "filtered_reduced_individual_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "Yes",
-                            "roi_filtered": "Yes",
-                            "averaged": "No",
-                            "intersubject": "No",
-                            "step_time": "No"}),
+        requiredAttributes={"roi_autodetect": "yes",
+                            "roi_filtered": "yes",
+                            "intersubject": "no",
+                            "step_time": "no",
+                            "measure": "no"}),
     "cortical_regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "cortical_region", String(),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
 
     #outputs
     "reduced_individual_matrix", WriteDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "Yes",
-                            "dense": "No",
-                            "intersubject": "No"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "yes",
+                            "intersubject": "no",
+                            "individual": "yes"}),
     "normalize", Boolean(),
 )
 

@@ -26,8 +26,10 @@ Author: Sandrine Lefranc, 2015
 import sys
 
 # axon python API module
-from brainvisa.processes import ValidationError, Signature, ReadDiskItem, \
-    WriteDiskItem
+from brainvisa.processes import ValidationError
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
 
 # soma module
 from soma.path import find_in_path
@@ -52,7 +54,9 @@ signature = Signature(
     # inputs
     "normed_individual_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "Yes"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "normed": "yes",
+                            "intersubject": "no"}),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
@@ -62,11 +66,11 @@ signature = Signature(
     # outputs
     "reduced_individual_profile", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "Yes",
-                            "roi_filtered": "No",
-                            "averaged": "No",
-                            "intersubject": "No",
-                            "step_time": "No"}),
+        requiredAttributes={"roi_autodetect": "yes",
+                            "roi_filtered": "no",
+                            "intersubject": "no",
+                            "step_time": "no",
+                            "measure": "no"}),
 )
 
 
@@ -88,9 +92,10 @@ def execution(self, context):
 
     Watershed is computed providing a set of target regions.
     """
-    commandMeshWatershedProcessing = [
-        sys.executable, find_in_path("AimsMeshWatershed.py"),
-        self.normed_individual_profile,
-        self.white_mesh,
-        self.reduced_individual_profile]
-    context.system(*commandMeshWatershedProcessing)
+    context.pythonSystem("AimsMeshWatershed.py",
+                         self.normed_individual_profile,
+                         self.white_mesh,
+                         self.reduced_individual_profile,
+                         "--threshold", 0.05,
+                         "--mode", "or")
+

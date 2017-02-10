@@ -13,7 +13,7 @@ This script does the following:
     - the signature of the inputs/ouputs,
     - the initialization (by default) of the inputs,
     - the interlinkages between inputs/outputs.
-* this process executes the command 'constelRemoveInternalConnections.py'.
+* this process executes the command 'constel_remove_internal_connections.py'.
 
 Main dependencies: Axon python API, Soma-base, constel
 
@@ -62,13 +62,13 @@ signature = Signature(
     # --inputs--
     "mean_individual_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "No",
-                            "thresholded": "No",
-                            "averaged": "No",
-                            "intersubject": "No"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "normed": "no",
+                            "intersubject": "no"}),
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "cortical_regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "cortical_region", String(),
@@ -76,11 +76,10 @@ signature = Signature(
     # --outputs--
     "normed_individual_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "Yes",
-                            "thresholded": "Yes",
-                            "averaged": "No",
-                            "intersubject": "No"}),
-    "keep_regions", OpenChoice(),
+        requiredAttributes={"ends_labelled": "all",
+                            "normed": "yes",
+                            "intersubject": "no"}),
+    "keep_regions", ListOf(OpenChoice()),
 )
 
 
@@ -128,7 +127,7 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Run the command 'constelRemoveInternalConnections.py'.
+    """Run the command 'constel_remove_internal_connections.py'.
 
     STEP 1/2: Remove internals connections of patch.
     STEP 2/2: The profile is normalized.
@@ -137,7 +136,7 @@ def execution(self, context):
     label_number = select_ROI_number(
         self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
 
-    cmd = ["constelRemoveInternalConnections.py",
+    cmd = ["constel_remove_internal_connections.py",
            label_number,
            self.mean_individual_profile,
            self.cortical_parcellation,
