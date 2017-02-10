@@ -13,7 +13,7 @@ This script does the following:
     - the signature of the inputs/ouputs,
     - the initialization (by default) of the inputs,
     - the interlinkages between inputs/outputs.
-* this process executes the command 'constelNormProfile': normalize the mean
+* this process executes the command 'constel_norm_profile': normalize the mean
   profile.
 
 Main dependencies: axon python API, soma, constel
@@ -43,7 +43,7 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("constelNormProfile.py"):
+    if not find_in_path("constel_norm_profile.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
@@ -55,16 +55,14 @@ signature = Signature(
     "group_mask", ReadDiskItem("Mask Texture", "Aims texture formats"),
     "group_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "No",
-                            "thresholded": "No",
-                            "averaged": "Yes",
-                            "intersubject": "Yes"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "normed": "no",
+                            "intersubject": "yes"}),
     "normed_group_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "Yes",
-                            "thresholded": "Yes",
-                            "averaged": "Yes",
-                            "intersubject": "Yes"}),)
+        requiredAttributes={"ends_labelled": "all",
+                            "normed": "yes",
+                            "intersubject": "yes"}),)
 
 
 def initialization(self):
@@ -79,17 +77,15 @@ def initialization(self):
             atts["center"] = self.group_profile.get("center")
             atts["group_of_subjects"] = self.group_profile.get(
                 "group_of_subjects")
-            atts["texture"] = self.group_profile.get("texture")
-            atts["study"] = self.group_profile.get("study")
+            atts["studyname"] = self.group_profile.get("studyname")
+            atts["method"] = self.group_profile.get("method")
             atts["smoothing"] = self.group_profile.get("smoothing")
             atts["gyrus"] = self.group_profile.get("gyrus")
-            atts['acquisition'] = ''
-            atts['analysis'] = ''
-            atts['tracking_session'] = ''
-            atts["intersubject"] = "Yes"
-            atts["averaged"] = "Yes"
-            atts["normed"] = "Yes"
-            atts["thresholded"] = "Yes"
+            atts['acquisition'] = ""
+            atts['analysis'] = ""
+            atts['tracking_session'] = ""
+            atts["intersubject"] = "yes"
+            atts["normed"] = "yes"
             return self.signature["normed_group_profile"].findValue(atts)
 
     self.linkParameters("group_profile", "group_mask")
@@ -101,12 +97,11 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Execute the command 'constelNormProfile'.
+    """Execute the command 'constel_norm_profile'.
 
     Create a group profile normed.
     """
-    context.system(sys.executable,
-                   find_in_path("constelNormProfile.py"),
+    context.pythonSystem("constel_norm_profile.py",
                    self.group_mask,
                    self.group_profile,
                    self.normed_group_profile)

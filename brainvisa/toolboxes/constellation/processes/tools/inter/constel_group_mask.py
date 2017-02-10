@@ -13,7 +13,7 @@ This script does the following:
     - the signature of the inputs/ouputs,
     - the initialization (by default) of the inputs,
     - the interlinkages between inputs/outputs.
-* executes the command 'constelConnectivityProfileOverlapMask': the mask of the
+* executes the command 'constel_connectivity_profile_overlap_mask': the mask of the
   all individual profiles is computed.
 
 Main dependencies: axon python API, soma, constel
@@ -40,7 +40,7 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("constelConnectivityProfileOverlapMask.py"):
+    if not find_in_path("constel_connectivity_profile_overlap_mask.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
@@ -55,10 +55,9 @@ signature = Signature(
     # --inputs--
     "mean_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
-                     requiredAttributes={"normed": "No",
-                                         "thresholded": "No",
-                                         "averaged": "No",
-                                         "intersubject": "No"})),
+                     requiredAttributes={"ends_labelled": "all",
+                                         "normed": "no",
+                                         "intersubject": "no"})),
     "subjects_group", ReadDiskItem("Group definition", "XML"),
     "new_study_name", String(),
 
@@ -84,10 +83,10 @@ def initialization(self):
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.subjects_group.fullPath()))
             if self.new_study_name:
-                atts["texture"] = self.new_study_name
+                atts["studyname"] = self.new_study_name
             else:
-                atts["texture"] = \
-                    self.mean_individual_profiles[0].get("texture")
+                atts["studyname"] = \
+                    self.mean_individual_profiles[0].get("studyname")
             return self.signature["group_mask"].findValue(atts)
 
     # link of parameters for autocompletion
@@ -101,9 +100,8 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Run the command 'constelConnectivityProfileOverlapMask'.
+    """Run the command 'constel_connectivity_profile_overlap_mask'.
     """
-    context.system(sys.executable,
-                   find_in_path("constelConnectivityProfileOverlapMask.py"),
-                   self.mean_individual_profiles,
-                   self.group_mask)
+    context.pythonSystem("constel_connectivity_profile_overlap_mask.py",
+                         self.mean_individual_profiles,
+                         self.group_mask)

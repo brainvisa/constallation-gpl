@@ -13,7 +13,7 @@ This script does the following:
     - the signature of the inputs/ouputs,
     - the initialization (by default) of the inputs,
     - the interlinkages between inputs/outputs.
-* this process executes the command 'constelAvgConnectivityProfile': the mean
+* this process executes the command 'constel_avg_connectivity_profile': the mean
   group profile is computed.
 
 Main dependencies: axon python API, soma, constel
@@ -41,7 +41,7 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("constelAvgConnectivityProfile.py"):
+    if not find_in_path("constel_avg_connectivity_profile.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
@@ -56,20 +56,18 @@ signature = Signature(
     # --inputs--
     "normed_individual_profiles", ListOf(ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "Yes",
-                            "thresholded": "Yes",
-                            "averaged": "No",
-                            "intersubject": "No"})),
+        requiredAttributes={"ends_labelled": "all",
+                            "normed": "yes",
+                            "intersubject": "no"})),
     "subjects_group", ReadDiskItem("Group definition", "XML"),
     "new_study_name", String(),
 
     # --outputs--
     "group_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
-        requiredAttributes={"normed": "No",
-                            "thresholded": "No",
-                            "averaged": "Yes",
-                            "intersubject": "Yes"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "normed": "no",
+                            "intersubject": "yes"}),
 )
 
 
@@ -93,21 +91,19 @@ def initialization(self):
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.subjects_group.fullPath()))
             if self.new_study_name is None:
-                atts["texture"] = self.normed_individual_profiles[0].get(
-                    "texture")
+                atts["studyname"] = self.normed_individual_profiles[0].get(
+                    "studyname")
             else:
-                atts["texture"] = self.new_study_name
-            atts["study"] = self.normed_individual_profiles[0].get("study")
+                atts["studyname"] = self.new_study_name
+            atts["method"] = self.normed_individual_profiles[0].get("method")
             atts["smoothing"] = self.normed_individual_profiles[0].get(
                 "smoothing")
             atts["gyrus"] = self.normed_individual_profiles[0].get("gyrus")
-            atts['acquisition'] = ''
-            atts['analysis'] = ''
-            atts['tracking_session'] = ''
-            atts["intersubject"] = "Yes"
-            atts["averaged"] = "Yes"
-            atts["normed"] = "No"
-            atts["thresholded"] = "No"
+            atts['acquisition'] = ""
+            atts['analysis'] = ""
+            atts['tracking_session'] = ""
+            atts["intersubject"] = "yes"
+            atts["normed"] = "no"
             return self.signature["group_profile"].findValue(atts)
 
     # link of parameters for autocompletion
@@ -121,13 +117,11 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Run the command 'constelAvgConnectivityProfile'.
+    """Run the command 'constel_avg_connectivity_profile'.
 
     A connectivity profile is determinated on a range of subjects
     (for a group of subjects)
     """
-    context.write(self.normed_individual_profiles)
-    context.system(sys.executable,
-                   find_in_path("constelAvgConnectivityProfile.py"),
+    context.pythonSystem("constel_avg_connectivity_profile.py",
                    self.normed_individual_profiles,
                    self.group_profile)

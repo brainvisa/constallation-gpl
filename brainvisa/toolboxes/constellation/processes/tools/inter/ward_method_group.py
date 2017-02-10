@@ -14,7 +14,7 @@ This script does the following:
     - the parameters initialization
     - the linked parameters
 * this process executes the command 'AimsMeshWatershed.py' and
-  'constelFilteringWatershed.py': the ROI profile is computede from the mean
+  'constel_filtering_watershed.py': the ROI profile is computede from the mean
    profile.
 
 Main dependencies: Axon python API, Soma-base, constel
@@ -51,20 +51,22 @@ signature = Signature(
     "patch", Integer(), # TODO: to put a label to a name?
     "group_matrix", String(), # TODO: to define a type
     "distance_matrix_file", String(), # TODO: to define a type
-    "average_mesh", ReadDiskItem("White Mesh", "Aims mesh formats",
-                                 requiredAttributes={"side":"both",
-                                                     "vertex_corr":"Yes",
-                                                     "averaged":"Yes"}),
+    "average_mesh", ReadDiskItem(
+        "White Mesh", "Aims mesh formats",
+        requiredAttributes={"side":"both",
+                            "vertex_corr":"Yes",
+                            "averaged":"Yes"}),
     "gyri_texture", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side":"both", "vertex_corr":"Yes"})),
+        requiredAttributes={"side":"both",
+                            "vertex_corr":"Yes"})),
     "tex_time", ListOf(
         WriteDiskItem("Connectivity ROI Texture", "Aims texture formats",
-                      requiredAttributes={"roi_autodetect":"No",
-                                          "roi_filtered":"No",
-                                          "averaged":"No",
-                                          "intersubject":"Yes",
-                                          "step_time":"Yes"})),
+                      requiredAttributes={"roi_autodetect":"no",
+                                          "roi_filtered":"no",
+                                          "intersubject":"yes",
+                                          "step_time":"yes",
+                                          "individual": "no"})),
 )
 
 
@@ -79,15 +81,15 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Run th command "constelClusteringWard".
+    """Run th command "constel_clustering_ward".
     
     Run a Ward's hierarchical clustering method.
     """
-    args = [sys.executable, find_in_path("constelClusteringWard.py")]
+    args = ["constel_clustering_ward.py"]
     for x in self.gyri_texture:
         args += ["-g", x]
     for t in self.tex_time:
         args += ["-t", t]
     args += ["-k", self.kmax, "-l", self.patch, "-x", self.group_matrix,
              "-c", self.distance_matrix_file, "-m", self.average_mesh]
-    context.system(*args)
+    context.pythonSystem(*args)

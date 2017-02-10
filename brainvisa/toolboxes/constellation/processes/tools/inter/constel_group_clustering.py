@@ -13,8 +13,8 @@ This script does the following:
     - the signature of the inputs/ouputs,
     - the initialization (by default) of the inputs,
     - the interlinkages between inputs/outputs.
-* executes the commands 'constelCalculateGroupMatrix' and
-  'constelInterSubjectClustering'.
+* executes the commands 'constel_calculate_group_matrix' and
+  'constel_inter_subject_clustering'.
 
 Main dependencies: Axon python API, Soma-base, constel
 
@@ -27,8 +27,14 @@ Author: Sandrine Lefranc, 2015
 import os
 
 # axon python API modules
-from brainvisa.processes import Signature, ListOf, Choice, Integer, String, \
-    ReadDiskItem, WriteDiskItem, ValidationError
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import ValidationError
+from brainvisa.processes import ListOf
+from brainvisa.processes import Choice
+from brainvisa.processes import String
+from brainvisa.processes import Integer
 
 # soma-base module
 from soma.path import find_in_path
@@ -44,7 +50,7 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("constelInterSubjectClustering.py"):
+    if not find_in_path("constel_inter_subject_clustering.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
@@ -59,19 +65,22 @@ signature = Signature(
     # --inputs--
     "intersubject_reduced_matrices", ListOf(ReadDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "Yes",
-                            "dense": "No",
-                            "intersubject": "Yes"})),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "yes",
+                            "intersubject": "yes",
+                            "individual": "yes"})),
     "method", Choice(
-        ("averaged approach", "avg"), ("concatenated approach", "concat")),
+        ("averaged approach", "avg"),
+        ("concatenated approach", "concat")),
     "cortical_regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "cortical_region", String(),
-    "subjects_group", ReadDiskItem("Group definition", "XML"),
+    "subjects_group", ReadDiskItem(
+         "Group definition", "XML"),
     "cortical_parcellation", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"})),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"})),
     "average_mesh", ReadDiskItem(
         "White Mesh", "BrainVISA mesh formats",
         requiredAttributes={"side": "both",
@@ -79,22 +88,23 @@ signature = Signature(
                             "averaged": "Yes"}),
     "nb_clusters", Integer(),
     "clustering_algorithms", Choice(
-        ("K-medoids clustering", "kmedoids"), ("Ward's method", "ward")),
+        ("K-medoids clustering", "kmedoids"),
+        ("Ward's method", "ward")),
 
     # --outputs--
     "reduced_group_matrix", WriteDiskItem(
         "Connectivity Matrix", "Gis image",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "No",
-                            "dense": "No",
-                            "intersubject": "Yes"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "yes",
+                            "intersubject": "yes",
+                            "individual": "no"}),
     "ROI_clustering", ListOf(WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "No",
-                            "roi_filtered": "No",
-                            "averaged": "No",
-                            "intersubject": "Yes",
-                            "step_time": "Yes"})),
+        requiredAttributes={"roi_autodetect": "no",
+                            "roi_filtered": "no",
+                            "intersubject": "yes",
+                            "step_time": "yes",
+                            "measure": "no"})),
 )
 
 
@@ -135,9 +145,9 @@ def initialization(self):
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.subjects_group.fullPath()))
             if self.method == "avg":
-                atts["study"] = "avg"
+                atts["method"] = "avg"
             else:
-                atts["study"] = "concat"
+                atts["method"] = "concat"
             return self.signature["reduced_group_matrix"].findValue(atts)
 
     def link_clustering(self, dummy):
@@ -149,8 +159,8 @@ def initialization(self):
                 atts = dict(
                     self.intersubject_reduced_matrices[0].hierarchyAttributes()
                     )
-                atts["subject"] = "avgSubject"
-                atts["study"] = "avg"
+                atts["sid"] = "avgSubject"
+                atts["method"] = "avg"
                 atts["tracking_session"] = None
                 filename = self.signature[
                     "ROI_clustering"].contentType.findValue(atts)
@@ -159,7 +169,7 @@ def initialization(self):
                 profiles = []
                 for matrix in self.intersubject_reduced_matrices:
                     atts = dict(matrix.hierarchyAttributes())
-                    atts["study"] = "concat"
+                    atts["method"] = "concat"
                     atts["tracking_session"] = None
                     profile = self.signature[
                         'ROI_clustering'].contentType.findValue(atts)
@@ -184,7 +194,9 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Run the command 'constelInterSubjectClustering'.
+    """Compute the clustering of the ROI.
+
+    Execute 'constel_inter_subject_clustering' and 'constel_calculate_group_matrix'.
 
     The gyrus vertices connectivity profiles of all the subjects are
     concatenated into a big matrix. The clustering is performed with the
@@ -195,15 +207,29 @@ def execution(self, context):
     label_number = select_ROI_number(
         self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
 
-    args = []
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # Compute the group matrix
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+    # Declare the constel command
+    args = ["constel_calculate_group_matrix.py"]
+
+    # Define the arguments
     for x in self.intersubject_reduced_matrices:
         args += ["-m", x]
-
     args += ["-o", self.reduced_group_matrix, "-s", self.method]
-    context.system("python", find_in_path("constelCalculateGroupMatrix.py"),
-                   *args)
 
-    cmd_args = []
+    # Execute the command
+    context.pythonSystem(*args)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # Compute the clustering of the group matrix
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+    # Declare the constel command
+    cmd_args = ["constel_inter_subject_clustering.py"]
+
+    # Define the arguments
     for t in self.ROI_clustering:
         cmd_args += ["-p", t]
     for y in self.cortical_parcellation:
@@ -213,5 +239,6 @@ def execution(self, context):
                  "-s", self.method,
                  "-g", self.reduced_group_matrix,
                  "-a", self.nb_clusters]
-    context.system("python", find_in_path("constelInterSubjectClustering.py"),
-                   *cmd_args)
+
+    # Execute the command
+    context.pythonSystem(*cmd_args)
