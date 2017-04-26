@@ -18,7 +18,7 @@ from soma.qt_gui.qt_backend import QtGui, QtCore
 
 # constellation module
 from constel.anatomist.clusters_inspect import ClustersInspectorWidget, \
-    load_clusters_instpector_files
+    load_clusters_inspector_files
 
 # temp
 import pandas
@@ -84,12 +84,12 @@ def exec_main_thread(self, context, meshes, clusters, measurements,
 def execution(self, context):
     from constel.anatomist import clusters_inspect
     reload(clusters_inspect)
-    global ClustersInspectorWidget, load_clusters_instpector_files
+    global ClustersInspectorWidget, load_clusters_inspector_files
     ClustersInspectorWidget = clusters_inspect.ClustersInspectorWidget
-    load_clusters_instpector_files = clusters_inspect.load_clusters_instpector_files
+    load_clusters_inspector_files = clusters_inspect.load_clusters_inspector_files
 
     meshes, clusters, measurements, seed_gyri, matrix \
-        = load_clusters_instpector_files(
+        = load_clusters_inspector_files(
             [self.mesh.fullPath()],
             [self.clusters.fullPath()],
             [self.clusters_measurements.fullPath()],
