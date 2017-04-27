@@ -17,12 +17,23 @@ from brainvisa import anatomist
 from soma.qt_gui.qt_backend import QtGui, QtCore
 
 # constellation module
-from constel.anatomist.clusters_inspect import ClustersInspectorWidget, \
-    load_clusters_inspector_files
+try:
+    anatomist.validation()
+    from constel.anatomist.clusters_inspect import ClustersInspectorWidget, \
+        load_clusters_inspector_files
+except:
+    pass # anatomist invalid
 
 # temp
 import pandas
 import numpy as np
+
+def validation():
+    try:
+        from brainvisa import anatomist as ana
+    except:
+        raise ValidationError(_t_("Anatomist not available"))
+    ana.validation()
 
 
 name = 'Anatomist clusters inspect tool'
