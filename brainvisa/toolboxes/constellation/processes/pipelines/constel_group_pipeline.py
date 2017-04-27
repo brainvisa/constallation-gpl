@@ -47,7 +47,7 @@ userLevel = 0
 
 if neuroConfig.gui:
     import types
-    from PyQt4 import QtGui, QtCore
+    from soma.qt_gui.qt_backend import QtGui, QtCore
     from brainvisa.data.qt4gui.readdiskitemGUI import DiskItemEditor
     from brainvisa.processing.qt4gui.neuroProcessesGUI import showProcess
     from soma.wip.application.api import findIconFile
