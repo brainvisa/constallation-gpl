@@ -21,11 +21,12 @@ try:
     anatomist.validation()
     from constel.anatomist.clusters_inspect import ClustersInspectorWidget, \
         load_clusters_inspector_files
+
+    # temp
+    import pandas
 except:
     pass # anatomist invalid
 
-# temp
-import pandas
 import numpy as np
 
 def validation():
@@ -34,6 +35,10 @@ def validation():
     except:
         raise ValidationError(_t_("Anatomist not available"))
     ana.validation()
+    try:
+        import pandas
+    except:
+        raise ValidationError(_t_("pandas not available"))
 
 
 name = 'Anatomist clusters inspect tool'
