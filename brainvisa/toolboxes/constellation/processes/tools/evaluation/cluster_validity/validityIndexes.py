@@ -41,7 +41,7 @@ def validate(self):
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("constelGettingValidityIndexes.py"):
+    if not find_in_path("constel_getting_validity_indexes.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
@@ -55,10 +55,10 @@ userLevel = 2
 signature = Signature(
     "matrix", ReadDiskItem(
         "Connectivity Matrix", "GIS image",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "No",
-                            "dense": "No",
-                            "intersubject": "Yes"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "intersubject": "yes",
+                            "individual": "yes"}),
     "kmax", Integer(),
     "nbIter", Integer(),
     "indexFile", WriteDiskItem("Any Type", getAllFormats()))
@@ -72,7 +72,7 @@ def initialization(self):
     """
     self.kmax = 12
     self.nbIter = 100
-    self.indexFile = "/tmp/validityindexes.txt"
+    self.indexFile = "/tmp/validityindexes.pdf"
 
 
 def execution(self, context):
@@ -80,7 +80,7 @@ def execution(self, context):
     """
     cortical_region = self.matrix.get("gyrus")
 
-    context.system(sys.executable, find_in_path("constelGettingValidityIndexes.py"),
+    context.system(sys.executable, find_in_path("constel_getting_validity_indexes.py"),
                    self.matrix,
                    cortical_region,
                    self.nbIter,

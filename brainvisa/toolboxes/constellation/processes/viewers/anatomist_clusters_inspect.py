@@ -18,15 +18,27 @@ from soma.qt_gui.qt_backend import QtGui, QtCore
 
 try:
     # constellation module
+    anatomist.validation()
     from constel.anatomist.clusters_inspect import ClustersInspectorWidget, \
-                                                   load_clusters_instpector_files
+                                                   load_clusters_inspector_files
 
     # temp
     import pandas
-    
 except:
-    pass
+    pass # anatomist invalid
+
 import numpy as np
+
+def validation():
+    try:
+        from brainvisa import anatomist as ana
+    except:
+        raise ValidationError(_t_("Anatomist not available"))
+    ana.validation()
+    try:
+        import pandas
+    except:
+        raise ValidationError(_t_("pandas not available"))
 
 
 name = 'Anatomist clusters inspect tool'
@@ -35,17 +47,16 @@ userLevel = 0
 signature = Signature(
     'clusters', ReadDiskItem('Connectivity ROI texture',
                              'aims texture formats', 
-                             requiredAttributes={'step_time': 'Yes'}),
+                             requiredAttributes={'step_time': 'yes'}),
     'mesh', ReadDiskItem('White Mesh', 'aims mesh formats'),
-    #'clusters_measurements', ReadDiskItem('?'),
+    'clusters_measurements', ReadDiskItem('CSV file', 'CSV file'),
     'seed_gyri', ReadDiskItem('ROI texture', 'aims texture formats'),
     'reduced_matrix', ReadDiskItem('Connectivity matrix',
-                                   'aims matrix formats'),
+                                   'aims matrix formats',
+                                   requiredAttributes={"reduced": "yes"}),
 )
 
-def validation(self):
-    import pandas
-    
+
 def initialization(self):
     self.linkParameters('mesh', 'clusters')
     self.linkParameters('seed_gyri', 'mesh')
@@ -87,18 +98,27 @@ def exec_main_thread(self, context, meshes, clusters, measurements,
 
 
 def execution(self, context):
+    from constel.anatomist import clusters_inspect
+    reload(clusters_inspect)
+    global ClustersInspectorWidget, load_clusters_inspector_files
+    ClustersInspectorWidget = clusters_inspect.ClustersInspectorWidget
+    load_clusters_inspector_files = clusters_inspect.load_clusters_inspector_files
+
     meshes, clusters, measurements, seed_gyri, matrix \
-        = load_clusters_instpector_files([self.mesh.fullPath()],
-                                         [self.clusters.fullPath()],
-                                         None,
-                                         [self.seed_gyri.fullPath()],
-                                         self.reduced_matrix.fullPath())
+        = load_clusters_inspector_files(
+            [self.mesh.fullPath()],
+            [self.clusters.fullPath()],
+            [self.clusters_measurements.fullPath()],
+            [self.seed_gyri.fullPath()],
+            self.reduced_matrix.fullPath())
     # temp
-    measurements = dict(
-        (i, pandas.DataFrame(np.random.ranf((i + 2, 4)),
-                             columns=('size', 'homogeneity', 'conn_density',
-                                      'other')))
-        for i in range(max([len(clusters_tex) for clusters_tex in clusters])))
+    #measurements = dict(
+        #(i, pandas.DataFrame(np.random.ranf((i + 2, 4)),
+                             #columns=('size', 'homogeneity', 'conn_density',
+                                      #'other')))
+        #for i in range(max([len(clusters_tex) for clusters_tex in clusters])))
+    #print('artificial measuremenst:')
+    #print(measurements)
 
     return mainThreadActions().call(
         self.exec_main_thread, context, meshes, clusters, measurements,

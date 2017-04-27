@@ -67,7 +67,7 @@ signature = Signature(
                             "averaged": "No",
                             "intersubject": "Yes",
                             "step_time": "Yes"}),
-    "timestep", Integer(),
+    "number_of_clusters", Integer(),
 
     # outputs
     "csv_file", String(),
@@ -79,7 +79,7 @@ signature = Signature(
 def initialization(self):
     """
     """
-    self.timestep = 1
+    self.number_of_clusters = 5
 
 #----------------------------Main program--------------------------------------
 
@@ -93,11 +93,11 @@ def execution(self, context):
 
     # read the clusters texture by converting it into numpy array
     clusters_aims = aims.read(self.clustering.fullPath())
-    clusters = clusters_aims[0].arraydata()
+    clusters = clusters_aims[self.number_of_clusters - 2].arraydata()
 
     # give the matrix of size M(clusters, basins)
     clusters_matrix = compute_mclusters_by_nbasins_matrix(
-        matrix, clusters, self.timestep, mode="mean")
+        matrix, clusters, mode="mean")
 
     # give the same matrix with the values relative to the total number of
     # connections (per rows, in percent)

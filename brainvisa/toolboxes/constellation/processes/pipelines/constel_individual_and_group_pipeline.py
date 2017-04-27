@@ -53,17 +53,20 @@ signature = Signature(
     "outputs_database", Choice(),
     "fiber_tracts_format", Choice("bundles", "trk"),
     "method", Choice(
-        ("averaged approach", "avg"), ("concatenated approach", "concat")),
+        ("averaged approach", "avg"),
+        ("concatenated approach", "concat")),
     "cortical_regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "cortical_region", OpenChoice(),
     "subject_directory", ReadDiskItem("subject", "directory"),
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "smoothing", Float(),
     "constellation_subjects_group", ReadDiskItem("Group definition", "XML"),
     "new_study_name", String(),

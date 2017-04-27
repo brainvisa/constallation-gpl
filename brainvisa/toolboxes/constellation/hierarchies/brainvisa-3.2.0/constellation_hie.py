@@ -7,6 +7,14 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
+"""
+Four different types:
+  * Filtered Fascicles Bundles
+  * Connectivity Matrix
+  * Connectivity Profile Texture
+  * Connectivity ROI Texture
+"""
+
 include("diffusion")
 
 
@@ -22,8 +30,8 @@ insertFirst("{center}/{subject}/nomenclature",
 insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}",
 
 "connectivity_parcellation", SetContent(
-"{study}", SetContent(
-"{texture}", SetContent(
+"{method}", SetContent(
+"{studyname}", SetContent(
 
 
 #----------------------------------filteredTracts------------------------------
@@ -32,20 +40,20 @@ insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}
 "{gyrus}", SetContent(
 "filteredTracts", SetContent(
 
-    "<subject>_<texture>_<gyrus>_outsideFibersOfCortex_{smallerlength2}to{greaterlength2}mm_oversampled",
+    "<subject>_<studyname>_<gyrus>_oversampled_semilabelled_fibers_{smallerlength2}to{greaterlength2}mm",
         SetType("Filtered Fascicles Bundles"),
-        SetWeakAttr("both_ends_labelled", "No",
-                    "oversampled", "Yes"),
+        SetWeakAttr("ends_labelled", "one",
+                    "oversampled", "yes"),
 
-    "<subject>_<texture>_<gyrus>_fibersNearCortex_{smallerlength1}to{greaterlength1}mm",
+    "<subject>_<studyname>_<gyrus>_labelled_fibers_{smallerlength1}to{greaterlength1}mm",
         SetType("Filtered Fascicles Bundles"),
-        SetWeakAttr("both_ends_labelled", "Yes",
-                    "oversampled", "No"),
+        SetWeakAttr("ends_labelled", "both",
+                    "oversampled", "no"),
 
-    "<subject>_<texture>_<gyrus>_outsideFibersOfCortex_{smallerlength2}to{greaterlength2}mm",
+    "<subject>_<studyname>_<gyrus>_semilabelled_fibers_{smallerlength2}to{greaterlength2}mm",
         SetType("Filtered Fascicles Bundles"),
-        SetWeakAttr("both_ends_labelled", "No",
-                    "oversampled", "No"),
+        SetWeakAttr("ends_labelled", "one",
+                    "oversampled", "no"),
 
 ), # end filteredTracts
 
@@ -55,49 +63,38 @@ insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}
 
 "matrix", SetContent(
 
-    "<subject>_<texture>_<gyrus>_connectivityMatrix_fibersNearCortex_{smallerlength1}to{greaterlength1}mm",
+    "<subject>_<studyname>_<gyrus>_labelled_fibers_matrix_{smallerlength1}to{greaterlength1}mm",
         SetType("Connectivity Matrix"),
         SetWeakAttr("ends_labelled", "both",
-                    "reduced", "No",
-                    "dense", "No",
-                    "intersubject", "No"),
+                    "reduced", "no",
+                    "intersubject", "no",
+                    "individual", "yes"),
 
-    "<subject>_<texture>_<gyrus>_meanConnectivityProfile_fibersNearCortex_{smallerlength1}to{greaterlength1}mm",
-        SetType("Filtered Connectivity Profile Texture"),
-        SetWeakAttr("normed", "No",
-                    "thresholded", "Yes",
-                    "averaged", "No",
-                    "intersubject", "No",
-                    "both_ends_labelled", "Yes"),
+    "<subject>_<studyname>_<gyrus>_labelled_fibers_mean_profile_{smallerlength1}to{greaterlength1}mm",
+        SetType("Connectivity Profile Texture"),
+        SetWeakAttr("ends_labelled", "both",
+                    "normed", "no",
+                    "intersubject", "no"),
 
-    "<subject>_<texture>_<gyrus>_connectivityMatrix_outsideFibersOfCortex_{smallerlength2}to{greaterlength2}mm",
-        SetType("Reduced Connectivity Matrix"),
-        SetWeakAttr("ends_labelled", "single",
-                    "reduced", "No",
-                    "dense", "No",
-                    "intersubject", "No"),
-
-    "<subject>_<texture>_<gyrus>_meanConnectivityProfile_outsideFibersOfCortex_{smallerlength2}to{greaterlength2}mm",
-        SetType("Filtered Connectivity Profile Texture"),
-        SetWeakAttr("normed", "No",
-                    "thresholded", "Yes",
-                    "averaged", "No",
-                    "intersubject", "No",
-                    "both_ends_labelled", "No"),
-
-    "<subject>_<texture>_<gyrus>_connectivityMatrixSmooth{smoothing}",
+    "<subject>_<studyname>_<gyrus>_semilabelled_fibers_matrix_{smallerlength2}to{greaterlength2}mm",
         SetType("Connectivity Matrix"),
-        SetWeakAttr("ends_labelled", "mixed",
-                    "reduced", "No",
-                    "dense", "No",
-                    "intersubject", "No"),
+        SetWeakAttr("ends_labelled", "one",
+                    "reduced", "no",
+                    "intersubject", "no",
+                    "individual", "yes"),
 
-    "<subject>_<texture>_<gyrus>_patchConnectivityMatrix",
+    "<subject>_<studyname>_<gyrus>_semilabelled_fibers_mean_profile_{smallerlength2}to{greaterlength2}mm",
+        SetType("Connectivity Profile Texture"),
+        SetWeakAttr("ends_labelled", "one",
+                    "normed", "no",
+                    "intersubject", "no"),
+
+    "<subject>_<studyname>_<gyrus>_complete_matrix_smooth{smoothing}",
         SetType("Connectivity Matrix"),
-        SetWeakAttr("ends_labelled", "mixed",
-                    "reduced", "No",
-                    "dense", "Yes",
-                    "intersubject", "No"),
+        SetWeakAttr("ends_labelled", "all",
+                    "reduced", "no",
+                    "intersubject", "no",
+                    "individual", "yes"),
 
 ), # end matrix
 
@@ -106,71 +103,70 @@ insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}
 "clustering", SetContent(
 "smooth{smoothing}", SetContent(
 
-    "<subject>_<texture>_<gyrus>_meanConnectivityProfile",
+    "<subject>_<studyname>_<gyrus>_mean_profile",
         SetType("Connectivity Profile Texture"),
-        SetWeakAttr("normed", "No",
-                    "thresholded", "No",
-                    "averaged", "No",
-                    "intersubject", "No"),
+        SetWeakAttr("ends_labelled", "all",
+                    "normed", "no",
+                    "intersubject", "no"),
 
-    "<subject>_<texture>_<gyrus>_thresholdedMeanConnectivityProfile",
+    "<subject>_<studyname>_<gyrus>_normed_mean_profile",
         SetType("Connectivity Profile Texture"),
-        SetWeakAttr("normed", "No",
-                    "thresholded", "Yes",
-                    "averaged", "No",
-                    "intersubject", "No"),
+        SetWeakAttr("ends_labelled", "all",
+                    "normed", "yes",
+                    "intersubject", "no"),
 
-    "<subject>_<texture>_<gyrus>_normedMeanConnectivityProfile",
-        SetType("Connectivity Profile Texture"),
-        SetWeakAttr("normed", "Yes",
-                    "thresholded", "Yes",
-                    "averaged", "No",
-                    "intersubject", "No"),
-
-    "<subject>_<texture>_<gyrus>_sumValuesFromRegion",
-        SetType("Measures Connectivity ROI Texture"),
-        SetWeakAttr("measure", "sum"),
-
-    "<subject>_<texture>_<gyrus>_spreadValueOnRegion",
-        SetType("Measures Connectivity ROI Texture"),
-        SetWeakAttr("measure", "spread"),
-
-    "<subject>_<texture>_<gyrus>_watershed",
+    "<subject>_<studyname>_<gyrus>_sum_values_from_region",
         SetType("Connectivity ROI Texture"),
-        SetWeakAttr("roi_autodetect", "Yes",
-                    "roi_filtered", "No",
-                    "averaged", "No",
-                    "intersubject", "No",
-                    "step_time", "No"),
+        SetWeakAttr("roi_autodetect", "no",
+                    "roi_filtered", "no",
+                    "intersubject", "no",
+                    "step_time", "no",
+                    "measure", "sum"),
 
-    "<subject>_<texture>_<gyrus>_filteredWatershed",
+    "<subject>_<studyname>_<gyrus>_spread_value_on_region",
         SetType("Connectivity ROI Texture"),
-        SetWeakAttr("roi_autodetect", "Yes",
-                    "roi_filtered", "Yes",
-                    "averaged", "No",
-                    "intersubject", "No",
-                    "step_time", "No"),
+        SetWeakAttr("roi_autodetect", "no",
+                    "roi_filtered", "no",
+                    "intersubject", "no",
+                    "step_time", "no",
+                    "measure", "spread"),
 
-    "<subject>_<texture>_<gyrus>_reducedConnectivityMatrix",
-        SetType("Reduced Connectivity Matrix"),
-        SetWeakAttr("ends_labelled", "mixed",
-                    "reduced", "Yes",
-                    "dense", "No",
-                    "intersubject", "No"),
-
-    "<subject>_<texture>_<gyrus>_clusteringTime",
+    "<subject>_<studyname>_<gyrus>_watershed",
         SetType("Connectivity ROI Texture"),
-        SetWeakAttr("roi_autodetect", "No",
-                    "roi_filtered", "No",
-                    "averaged", "No",
-                    "intersubject", "No",
-                    "step_time", "Yes"),
+        SetWeakAttr("roi_autodetect", "yes",
+                    "roi_filtered", "no",
+                    "intersubject", "no",
+                    "step_time", "no",
+                    "measure", "no"),
+
+    "<subject>_<studyname>_<gyrus>_filtered_watershed",
+        SetType("Connectivity ROI Texture"),
+        SetWeakAttr("roi_autodetect", "yes",
+                    "roi_filtered", "yes",
+                    "intersubject", "no",
+                    "step_time", "no",
+                    "measure", "no"),
+
+    "<subject>_<studyname>_<gyrus>_reduced_matrix",
+        SetType("Connectivity Matrix"),
+        SetWeakAttr("ends_labelled", "all",
+                    "reduced", "yes",
+                    "intersubject", "no",
+                    "individual", "yes"),
+
+    "<subject>_<studyname>_<gyrus>_clustering",
+        SetType("Connectivity ROI Texture"),
+        SetWeakAttr("roi_autodetect", "no",
+                    "roi_filtered", "no",
+                    "intersubject", "no",
+                    "step_time", "yes",
+                    "measure", "no"),
 
 ), # end smoothing
 ), # end clustering
 ), # end gyrus
-), # end texture
-), # end study
+), # end studyname
+), # end method
 ), # end connectivity_parcellation
 ) # end
 
@@ -182,8 +178,8 @@ insert("{center}/{subject}/diffusion/{acquisition}/{analysis}/{tracking_session}
 insert("{center}/group_analysis/{group_of_subjects}",
 
     "connectivity_clustering", SetContent(
-    "{study}", SetContent(
-    "{texture}", SetContent(
+    "{method}", SetContent(
+    "{studyname}", SetContent(
 
 
 #----------------------------------Group result--------------------------------
@@ -191,70 +187,74 @@ insert("{center}/group_analysis/{group_of_subjects}",
 "{gyrus}", SetContent(
 "smooth{smoothing}", SetContent(
 
-    "<group_of_subjects>_<study>_<texture>_<gyrus>_mask",
+    "<group_of_subjects>_<method>_<studyname>_<gyrus>_mask",
         SetType("Mask Texture"),
 
-    "<group_of_subjects>_<study>_<texture>_<gyrus>_meanConnectivityProfile",
+    "<group_of_subjects>_<method>_<studyname>_<gyrus>_mean_profile",
         SetType("Connectivity Profile Texture"),
-        SetWeakAttr("normed", "No",
-                    "thresholded", "No",
-                    "averaged", "Yes",
-                    "intersubject", "Yes"),
+        SetWeakAttr("ends_labelled", "all",
+                    "normed", "no",
+                    "intersubject", "yes"),
 
-    "<group_of_subjects>_<study>_<texture>_<gyrus>_normedMeanConnectivityProfile",
+    "<group_of_subjects>_<method>_<studyname>_<gyrus>_normed_mean_profile",
         SetType("Connectivity Profile Texture"),
-        SetWeakAttr("normed", "Yes",
-                    "thresholded", "Yes",
-                    "averaged", "Yes",
-                    "intersubject", "Yes"),
+        SetWeakAttr("ends_labelled", "all",
+                    "normed", "yes",
+                    "intersubject", "yes"),
 
-    "<group_of_subjects>_<study>_<texture>_<gyrus>_filteredWatershed",
+    "<group_of_subjects>_<method>_<studyname>_<gyrus>_filtered_watershed",
         SetType("Connectivity ROI Texture"),
-        SetWeakAttr("roi_autodetect", "Yes",
-                    "roi_filtered", "Yes",
-                    "averaged", "Yes",
-                    "intersubject", "Yes",
-                    "step_time", "No"),
+        SetWeakAttr("roi_autodetect", "yes",
+                    "roi_filtered", "yes",
+                    "intersubject", "yes",
+                    "step_time", "no",
+                    "measure", "no"),
 
-    "<group_of_subjects>_<study>_<texture>_<gyrus>_watershed",
+    "<group_of_subjects>_<method>_<studyname>_<gyrus>_watershed",
         SetType("Connectivity ROI Texture"),
-        SetWeakAttr("roi_autodetect", "Yes",
-                    "roi_filtered", "No",
-                    "averaged", "Yes",
-                    "intersubject", "Yes",
-                    "step_time", "No"),
+        SetWeakAttr("roi_autodetect", "yes",
+                    "roi_filtered", "no",
+                    "averaged", "yes",
+                    "intersubject", "yes",
+                    "step_time", "no",
+                    "measure", "no"),
 
-    "<group_of_subjects>_<study>_<texture>_<gyrus>_matrix",
+    "<group_of_subjects>_<method>_<studyname>_<gyrus>_group_reduced_matrix",
         SetType("Connectivity Matrix"),
-        SetWeakAttr("ends_labelled", "mixed",
-                    "reduced", "No",
-                    "dense", "No",
-                    "intersubject", "Yes"),
+        SetWeakAttr("ends_labelled", "all",
+                    "reduced", "yes",
+                    "intersubject", "yes",
+                    "individual", "no"),
 
 #----------------------------------Individual Result---------------------------
 
-"{subject}", SetContent(
+    "<group_of_subjects>_<method>_<studyname>_{sid}_reduced_connectome",
+        SetType("Connectivity Matrix"),
+        SetWeakAttr("ends_labelled", "all",
+                    "reduced", "yes",
+                    "intersubject", "yes",
+                    "individual", "yes",
+                    "connectome", "yes"),
 
-    "<group_of_subjects>_<study>_<texture>_<gyrus>_<subject>_reducedMatrix",
-        SetType("Reduced Connectivity Matrix"),
-        SetWeakAttr("ends_labelled", "mixed",
-                    "reduced", "Yes",
-                    "dense", "No",
-                    "intersubject", "Yes"),
+    "<group_of_subjects>_<method>_<studyname>_<gyrus>_{sid}_reduced_matrix",
+        SetType("Connectivity Matrix"),
+        SetWeakAttr("ends_labelled", "all",
+                    "reduced", "yes",
+                    "intersubject", "yes",
+                    "individual", "yes"),
 
-    "<group_of_subjects>_<study>_<texture>_<gyrus>_<subject>_clusteringTime",
+    "<group_of_subjects>_<method>_<studyname>_<gyrus>_{sid}_clustering",
         SetType("Connectivity ROI Texture"),
-        SetWeakAttr("roi_autodetect", "No",
-                    "roi_filtered", "No",
-                    "averaged", "No",
-                    "intersubject", "Yes",
-                    "step_time", "Yes"),
+        SetWeakAttr("roi_autodetect", "no",
+                    "roi_filtered", "no",
+                    "intersubject", "yes",
+                    "step_time", "yes",
+                    "measure", "no"),
 
-), # end subject
 ), # end smoothing
 ), # end gyrus
 ), # end texture
-), # end study
+), # end method
 ), # end connectivity_clustering
 ) # end
 

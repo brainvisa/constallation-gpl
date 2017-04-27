@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ###############################################################################
 # This software and supporting documentation are distributed by CEA/NeuroSpin,
 # Batiment 145, 91191 Gif-sur-Yvette cedex, France. This software is governed
@@ -9,58 +8,57 @@
 ###############################################################################
 
 """
-This script does the following:
-*
-*
-
-Main dependencies:
-
-Author: Sandrine Lefranc
 """
-
 
 #----------------------------Imports-------------------------------------------
 
 
+# system module
+import os
+
 # axon python API module
+from brainvisa.processes import Float
+from brainvisa.processes import ListOf
+from brainvisa.processes import Boolean
+from brainvisa.processes import Integer
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import getAllFormats
 from brainvisa.processes import ValidationError
-    
+
 # soma module
 from soma.path import find_in_path
 
-#from constel.lib.utils.processtools import write_filelog
 
-
-def validation():
+def validate(self):
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
     """
-    """
-    if not find_in_path('AimsGyriTextureCleaningIsolatedVertices.py'):
-        raise ValidationError('constel module is not here.')
+    pass
+    #if not find_in_path("constel_table_measurements.py"):
+    #    raise ValidationError(
+    #        "Please make sure that constel module is installed.")
 
 
 #----------------------------Header--------------------------------------------
 
 
-name = 'Cleaning Isolated Vertices'
+name = "Write a different measures in csv file."
 userLevel = 2
 
-
 signature = Signature(
-    #--inputs--
-    'gyri_texture', ReadDiskItem(
-        'ROI Texture', 'Aims texture formats',
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
-    'mesh', ReadDiskItem(
-        'White Mesh', 'Aims mesh formats',
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+    #--inputs
+    "clusters", ReadDiskItem(
+        "Connectivity ROI texture", "aims texture formats", 
+        requiredAttributes={'step_time': 'yes'}),
+
+    "white_mesh", ReadDiskItem('White Mesh', 'aims mesh formats'),
+    "number_of_clusters", Integer(),
 
     #--outputs--
-    'clean_gyri_texture', WriteDiskItem(
-        'ROI Texture', 'Aims texture formats',
-        requiredAttributes={"side":"both", "vertex_corr":"Yes"}),)
+    "csvfile", WriteDiskItem("Any Type", getAllFormats()),
+)
 
 
 #----------------------------Functions-----------------------------------------
@@ -69,19 +67,20 @@ signature = Signature(
 def initialization(self):
     """
     """
-    self.linkParameters('mesh', 'gyri_texture')
-    self.linkParameters('clean_gyri_texture', 'gyri_texture')
+    pass
 
 
-#----------------------------Main Program--------------------------------------
+#----------------------------Main program--------------------------------------
 
 
 def execution(self, context):
+    """Run the command 'constel_table_measurements.py'.
     """
-    """
-    #write_filelog()
-    context.pythonSystem('AimsGyriTextureCleaningIsolatedVertices.py',
-                         self.gyri_texture,
-                         self.mesh,
-                         self.clean_gyri_texture)
+    
+    cmd = ["constel_table_measurements.py",
+           self.clusters,
+           self.white_mesh,
+           self.number_of_clusters,
+           self.csvfile]
 
+    context.pythonSystem(*cmd)

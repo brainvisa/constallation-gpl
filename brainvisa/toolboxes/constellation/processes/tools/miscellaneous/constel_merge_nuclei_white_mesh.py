@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ###############################################################################
 # This software and supporting documentation are distributed by CEA/NeuroSpin,
 # Batiment 145, 91191 Gif-sur-Yvette cedex, France. This software is governed
@@ -9,57 +8,35 @@
 ###############################################################################
 
 """
-This script does the following:
-*
-*
-
-Main dependencies:
-
-Author: Sandrine Lefranc
+Compute the connectome of a given parcellation.
 """
 
 
 #----------------------------Imports-------------------------------------------
 
 
-# system module
-import numpy
-
 # axon python API module
 from brainvisa.processes import String
-from brainvisa.processes import ListOf
-from brainvisa.processes import Integer
+from brainvisa.processes import Boolean
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
-from brainvisa.processes import WriteDiskItem
-from brainvisa.processes import ValidationError
-
-# soma module
-from soma import aims
-
-# constel module
-from constel.lib.utils.texturetools import concatenate_texture
 
 
 #----------------------------Header--------------------------------------------
 
 
-name = 'Concatenate the ROI segmentations on the same mesh'
+name = 'Merge meshes'
 userLevel = 2
 
-
 signature = Signature(
-    "ROI_clustering", ListOf(ReadDiskItem(
-        "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect": "no",
-                            "roi_filtered": "no",
-                            "averaged": "no",
-                            "intersubject": "yes",
-                            "step_time": "yes"})),
-    "time_step", ListOf(Integer()),
-    "mesh", ReadDiskItem("White Mesh", "Aims mesh formats"),
-    "concatenated_ROIseg", WriteDiskItem(
-        "Connectivity ROI Texture", "Aims texture formats")
+    # --inputs--
+    "white_dir", String(),
+    "nuclei_dir", String(),
+    "texture_dir", String(),
+
+    # --ouput--
+    "out_tex_filename", String(),
+    "out_mesh_filename", String(),
 )
 
 
@@ -67,7 +44,7 @@ signature = Signature(
 
 
 def initialization(self):
-    """
+    """Provides default values and link of parameters
     """
     pass
 
@@ -78,7 +55,13 @@ def initialization(self):
 def execution(self, context):
     """
     """
-    context.write(self.ROI_clustering)
-    final_rseg = concatenate_texture(self.ROI_clustering, self.time_step)
-    aims.write(final_rseg, self.concatenated_ROIseg.fullPath())
+    # define the command parameters
+    cmd = ["constel_merge_nuclei_cortex.py",
+           self.white_dir,
+           self.nuclei_dir,
+           self.texture_dir,
+           self.out_tex_filename,
+           self.out_mesh_filename]
 
+    # execute the command
+    context.pythonSystem(*cmd)

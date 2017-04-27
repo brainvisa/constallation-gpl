@@ -26,6 +26,7 @@ Author: Sandrine Lefranc, 2015
 from brainvisa.processes import Float
 from brainvisa.processes import Choice
 from brainvisa.processes import ListOf
+from brainvisa.processes import Boolean
 from brainvisa.processes import Signature
 from brainvisa.processes import OpenChoice
 from brainvisa.processes import ReadDiskItem
@@ -49,7 +50,8 @@ userLevel = 0
 signature = Signature(
     #--inputs--
     "method", Choice(
-        ("averaged approach", "avg"), ("concatenated approach", "concat")),
+        ("averaged approach", "avg"),
+        ("concatenated approach", "concat")),
     "outputs_database", Choice(),
     "study_name", OpenChoice(),
     "fiber_tracts_format", Choice("bundles", "trk"),
@@ -59,13 +61,21 @@ signature = Signature(
     "subject_directory", ReadDiskItem("subject", "directory"),
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes",
-                            "inflated": "No", "averaged": "No"}),
-    "keep_regions", OpenChoice(),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes",
+                            "inflated": "No",
+                            "averaged": "No"}),
+    "keep_regions", ListOf(OpenChoice()),
     "smoothing", Float(),
+    "minlength_labeled_fibers", Float(),
+    "maxlength_labeled_fibers", Float(),
+    "minlength_semilabeled_fibers", Float(),
+    "maxlength_semilabeled_fibers", Float(),
+    "normalize", Boolean(),
 )
 
 
@@ -87,6 +97,11 @@ def initialization(self):
 
     # default value
     self.smoothing = 3.0
+    self.minlength_labeled_fibers = 30.
+    self.maxlength_labeled_fibers = 500.
+    self.minlength_semilabeled_fibers = 20.
+    self.maxlength_semilabeled_fibers = 500.
+    self.normalize = True
     self.cortical_regions_nomenclature = self.signature[
         "cortical_regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -106,19 +121,24 @@ def initialization(self):
         """
         choices = set()
         if self.outputs_database is not None:
-            database = neuroHierarchy.databases.database(self.outputs_database)
-            sel = {"study": self.method}
-            choices.update(
-                [x[0] for x in database.findAttributes(
-                    ["texture"], selection=sel,
-                    _type="Filtered Fascicles Bundles")])
+            if neuroHierarchy.databases.hasDatabase(self.outputs_database):
+                database = neuroHierarchy.databases.database(self.outputs_database)
+                sel = {"method": self.method}
+                choices.update(
+                    [x[0] for x in database.findAttributes(
+                        ["studyname"], selection=sel,
+                        _type="Filtered Fascicles Bundles")])
+            else:
+                choices = []
         self.signature["study_name"].setChoices(*sorted(choices))
         if len(choices) != 0 and self.isDefault("study_name") \
                 and self.study_name not in choices:
             self.setValue("study_name", list(choices)[0], True)
 
     def reset_label(self, dummy):
-        """This callback reads the labels nomenclature and proposes them in the
+        """Read and/or reset the cortical_region parameter.
+
+        This callback reads the labels nomenclature and proposes them in the
         signature 'cortical_region' of process.
         It also resets the cortical_region parameter to default state after
         the nomenclature changes.
@@ -231,6 +251,14 @@ def initialization(self):
     eNode.addDoubleLink("filter.cortical_parcellation",
                         "cortical_parcellation")
     eNode.addDoubleLink("filter.white_mesh", "white_mesh")
+    eNode.addDoubleLink("filter.minlength_labeled_fibers",
+                        "minlength_labeled_fibers")
+    eNode.addDoubleLink("filter.maxlength_labeled_fibers",
+                        "maxlength_labeled_fibers")
+    eNode.addDoubleLink("filter.minlength_semilabeled_fibers",
+                        "minlength_semilabeled_fibers")
+    eNode.addDoubleLink("filter.maxlength_semilabeled_fibers",
+                        "maxlength_semilabeled_fibers")
 
     ###########################################################################
     #        link of parameters with the process: "Fiber Oversampler"         #
@@ -370,6 +398,7 @@ def initialization(self):
     eNode.addDoubleLink("ReducedMatrix.cortical_parcellation",
                         "cortical_parcellation")
     eNode.addDoubleLink("ReducedMatrix.white_mesh", "white_mesh")
+    eNode.addDoubleLink("ReducedMatrix.normalize", "normalize")
 
     ###########################################################################
     #        link of parameters with the process: "Clustering"                #

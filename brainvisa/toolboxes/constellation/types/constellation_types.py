@@ -31,9 +31,6 @@ FileType("Matrix", "Any type")
 FileType("Connectivity Matrix", "Matrix",
          ["Sparse Matrix", "GIS image", "gz compressed NIFTI-1 image",
           "NIFTI-1 image"])
-FileType("Reduced Connectivity Matrix", "Connectivity Matrix",
-         ["Sparse Matrix", "GIS image", "gz compressed NIFTI-1 image",
-          "NIFTI-1 image"])
 
 
 #----------------------------Mask texture--------------------------------------
@@ -42,9 +39,7 @@ FileType("Mask Texture", "Label Texture")
 
 #----------------------------Connectivity profile texture----------------------
 FileType("Connectivity Profile Texture", "Texture")
-FileType("Filtered Connectivity Profile Texture", "Connectivity Profile Texture")
 
 
 #----------------------------Connectivity ROI texture--------------------------
 FileType("Connectivity ROI Texture", "ROI Texture")
-FileType("Measures Connectivity ROI Texture", "Connectivity ROI Texture")
