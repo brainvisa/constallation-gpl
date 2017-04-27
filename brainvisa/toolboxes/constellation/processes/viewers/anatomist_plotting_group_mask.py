@@ -13,7 +13,7 @@ This script does the following:
 * plotting the group masks
 * the possibility to use the mesh : inflated, not inflated, group or individual
 
-Main dependencies: PyQt4
+Main dependencies: PyQt
 
 Author: Sandrine Lefranc, 2015
 """
@@ -21,7 +21,7 @@ Author: Sandrine Lefranc, 2015
 #----------------------------Imports-------------------------------------------
 
 # module PyGt4
-from PyQt4 import QtGui
+from soma.qt_gui.qt_backend import QtGui
 
 # axon python API module
 from brainvisa.processes import Signature, ListOf, ReadDiskItem, Integer, \
