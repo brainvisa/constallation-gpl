@@ -59,7 +59,6 @@ def loadFilteredBundles(self, bundles_name):
     in it, which will be used (and actually read) by the fusion.
     Also counts fibers.
     '''
-    import connectomist.api as conn
     from soma import aims
     from soma.minf import api as minf
 
