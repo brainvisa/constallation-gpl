@@ -30,7 +30,9 @@ signature = Signature(
                             "averaged":"No"}),
     'clustering_texture', ReadDiskItem(
         'Connectivity ROI Texture', 'anatomist texture formats'),
-    'cluster_number', String(), 
+    #'watershed', ReadDiskItem(
+        #'Connectivity ROI Texture', 'anatomist texture formats'),
+    'cluster_number', Integer(), 
     'max_number_of_fibers', Integer(),
     'clustering_texture_timestep', Integer(),
     'inflated_mesh', Boolean(),
@@ -90,12 +92,15 @@ def loadFilteredBundles(self, bundles_name):
 
 
 def execution_mainthread(self, context):
+    """
+    """
     # instance of Anatomist
     a = anatomist.Anatomist()
 
     # load objects
     mesh = a.loadObject(self.white_mesh)
     clusters = a.loadObject(self.clustering_texture)
+    #wat = a.loadObject(self.watershed)
 
     # filtering fiber tracts
     clusters.attributed()['time_step'] \
@@ -145,8 +150,8 @@ def execution_mainthread(self, context):
                '3': [0.3, 0.3, 0.8, 1.], '4': [0.8, 0.8, 0.3, 1.],
                '5': [0.8, 0.3, 0.8, 1.], '6': [0.3, 0.8, 0.8, 1.]}
     patches[self.cluster_number] = [0.4, 0.6, 1., 1.]
-    basins = {'2': [0., 0., 1., 0.35], '4': [1., 0., 0., 0.35],
-              '5': [0., 1., 0., 0.35],}
+    basins = {'17': [0., 0., 1., 0.35], '14': [1., 0., 0., 0.35],
+              '15': [0., 1., 0., 0.35],}
               #'17': [0.5, 1., 1., 0.3],
               #'13': [1., 0., 0.5, 0.3]}
     basincolor = [0.9, 0.9, 0.9, 1.]

@@ -10,23 +10,23 @@
 """
 This script does the following:
 *
-*
 
 Main dependencies:
-
-Author: Sandrine Lefranc, 2015
 """
 
 #----------------------------Imports-------------------------------------------
-
 
 # pytohn modules
 import numpy
 import exceptions
 
 # axon python API module
-from brainvisa.processes import Signature, ValidationError, Integer, Boolean, \
-    ReadDiskItem
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import ValidationError
+from brainvisa.processes import Integer
+from brainvisa.processes import Boolean
+
 from brainvisa import anatomist as ana
 
 # soma module
@@ -34,19 +34,19 @@ from soma import aims
 
 # constel module
 try:
-    import constel.lib.utils.matrixtools as CM
+    from constel.lib.utils.matrixtools import order_data_matrix
+    from constel.lib.utils.matrixtools import euclidian_distance_matrix
 except:
     pass
 
 def validation():
   try:
-      import constel.lib.utils.matrixtools as CM
+      from constel.lib.utils.matrixtools import order_data_matrix
+      from constel.lib.utils.matrixtools import euclidian_distance_matrix
   except:
       raise ValidationError("constel module is not available")
 
-
 #----------------------------Header--------------------------------------------
-
 
 name = "Anatomist view reorder matrix from labeled texture"
 userLevel = 2
@@ -59,25 +59,24 @@ signature = Signature(
                             "reduced": "no",
                             "intersubject": "yes",
                             "individual": "yes"}),
-    "clustering_texture", ReadDiskItem("Connectivity ROI Texture", 
-                                       "anatomist texture formats"),
+    "clustering_texture", ReadDiskItem(
+        "Connectivity ROI Texture",  "anatomist texture formats"),
     "time_step", Integer(),
     "transpose", Boolean(),
 )
 
-
 #----------------------------Function------------------------------------------
 
-
 def initialization( self ):
+    """
+    """
     self.linkParameters("connectivity_matrix", "clustering_texture")
-
 
 #----------------------------Main program--------------------------------------
 
-
 def execution(self, context):
-    
+    """
+    """
     a = ana.Anatomist()
 
     # load a matrix of size (nb_basins, vertices_patch)
@@ -92,9 +91,9 @@ def execution(self, context):
     labels = clusters[self.time_step].arraydata()[
         clusters[self.time_step].arraydata() != 0]
     
-    order_mat, sortLabels = CM.orderDataMatrix(matrix, labels)
+    order_mat, sortLabels = order_data_matrix(matrix, labels)
     
-    dissmatrix = CM.euclidianDistanceMatrix(order_mat)
+    dissmatrix = euclidian_distance_matrix(order_mat)
 
     (n, p) = order_mat.shape
     (i, j) = dissmatrix.shape

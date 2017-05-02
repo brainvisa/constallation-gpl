@@ -55,6 +55,12 @@ signature = Signature(
 
     "white_mesh", ReadDiskItem('White Mesh', 'aims mesh formats'),
     "number_of_clusters", Integer(),
+    "matrix", ReadDiskItem(
+        "Connectivity Matrix", "Gis image",
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "yes",
+                            "intersubject": "yes",
+                            "individual": "no"}),
 
     #--outputs--
     "csvfile", WriteDiskItem("Any Type", getAllFormats()),
@@ -81,6 +87,7 @@ def execution(self, context):
            self.clusters,
            self.white_mesh,
            self.number_of_clusters,
+           self.matrix,
            self.csvfile]
 
     context.pythonSystem(*cmd)
