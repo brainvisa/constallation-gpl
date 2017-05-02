@@ -12,10 +12,10 @@ This script does the following:
 * defines a Brainvisa process
     - the signature of the inputs/ouputs,
     - the interlinkages between inputs/outputs.
-* executes the command 'comistFiberOversampler': the semilabeled fibers are
+* executes the command 'AimsFiberOversampler': the semilabeled fibers are
   oversampled.
 
-Main dependencies: axon python API, soma-base, comist
+Main dependencies: axon python API, soma-base, aims-free
 
 Author: Sandrine Lefranc, 2015
 """
@@ -35,10 +35,10 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("comistFiberOversampler"):  # checks command (C++)
+    if not find_in_path("AimsFiberOversampler"):  # checks command (C++)
         raise ValidationError(
-            "comistFiberOversampler is not contained in PATH environnement "
-            "variable. Please make sure that connectomist is installed.")
+            "AimsFiberOversampler is not contained in PATH environnement "
+            "variable. Please make sure that aims-free is installed.")
 
 
 #----------------------------Header--------------------------------------------
@@ -76,11 +76,11 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Run the command 'comistFiberOversampler'.
+    """Run the command 'AimsFiberOversampler'.
 
     The fiber tracts with only one end identified on the mesh are oversampled.
     """
-    context.system("comistFiberOversampler",
+    context.system("AimsFiberOversampler",
                    "-i", self.semilabeled_fibers,
                    "-o", self.oversampled_semilabeled_fibers,
                    "-points", 3,  # number of pts to intercalate between 2 pts

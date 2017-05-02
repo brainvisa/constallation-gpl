@@ -10,15 +10,16 @@ from brainvisa.processes import *
 from soma.path import find_in_path
 
 
-# Plot connectomist module
 def validation():
     """This function is executed at BrainVisa startup when the process is loaded.
 
     It checks some conditions for the process to be available.
     """
-    if not find_in_path("comistFiberOversampler"):
+    try:
+        from soma import aims
+    except ImportError:
         raise ValidationError(
-            "Please make sure that connectomist module is installed.")
+            "soma.aims module not found - Please make sure that aims-free is installed.")
 
 name = "Extract clusters"
 userLevel = 2
