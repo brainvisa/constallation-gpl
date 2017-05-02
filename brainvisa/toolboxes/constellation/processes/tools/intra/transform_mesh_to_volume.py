@@ -9,7 +9,10 @@ Created on Mon Oct 20 09:35:29 2014
 from brainvisa.processes import *
 from soma.path import find_in_path
 
-from constel.lib.utils.meshtools import transform_mesh_to_volume
+try:
+    from constel.lib.utils.meshtools import transform_mesh_to_volume
+except ImportError:
+    pass
 import numpy
 
 # Plot connectomist module
@@ -18,9 +21,11 @@ def validation():
 
     It checks some conditions for the process to be available.
     """
-    if not find_in_path("comistFiberOversampler"):
+    try:
+        from constel.lib.utils.meshtools import transform_mesh_to_volume
+    except ImportError:
         raise ValidationError(
-            "Please make sure that connectomist module is installed.")
+            "Please make sure that constel module is installed.")
 
 name = "Mesh to Volume"
 userLevel = 2
