@@ -130,7 +130,7 @@ def initialization(self):
 def execution(self, context):
     """Run the command 'AimsSparseMatrixSmoothing'.
 
-    Sum of two matrices and smoothing"""
+    Smoothing of the individual matrix."""
     # selects the label number corresponding to label name
     label_number = select_ROI_number(
         self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
