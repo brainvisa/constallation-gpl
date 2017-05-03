@@ -41,7 +41,7 @@ def validation():
 # ---------------------------Header--------------------------------------------
 
 
-name = "Smoothing of the Individual Matrix."
+name = "FSL Connectome."
 userLevel = 2
 
 signature = Signature(
