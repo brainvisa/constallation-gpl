@@ -9,31 +9,27 @@
 
 """
 This script does the following:
-* defines a Brainvisa process
-    - the signature of the inputs/ouputs,
-    - the initialization (by default) of the inputs,
-    - the interlinkages between inputs/outputs.
-* execute the command 'AimsSumSparseMatrix': sum sparse matrices
-* execute the command 'AimsSparseMatrixSmoothing':sparse matrix smoothing using
-  heat diffusion, with the geometry of a mesh. Smoothing is applied for each
-  line, each line is a texture for the mesh.
+* define a Brainvisa process.
+* execute the command 'AimsSparseMatrixSmoothing'.
 
 Main dependencies: axon python API, soma, constel
-
-Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # axon python API module
-from brainvisa.processes import Signature, ReadDiskItem, Float, String, \
-    WriteDiskItem, ValidationError
+from brainvisa.processes import Float
+from brainvisa.processes import String
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import ValidationError
 
-# soma module
+# soma.path module
 from soma.path import find_in_path
 
-# constel module
+# constel modules
 try:
     from constel.lib.utils.filetools import select_ROI_number
     from constel.lib.utils.matrixtools import replace_negative_values
@@ -45,30 +41,24 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("AimsSumSparseMatrix") \
-            or not find_in_path("AimsSparseMatrixSmoothing"):  # checks command
+    cmd_name = "AimsSparseMatrixSmoothing"
+    if not find_in_path(cmd_name):  # checks command
         raise ValidationError(
-            "AimsSumSparseMatrix or AimsSparseMatrixSmoothing is not contained"
-            "in PATH environnement variable."
-            "Please make sure that aims is installed.")
+            "'{0}' is not contained in PATH environnement variable. "
+            "Please make sure that aims is installed.".format(cmd_name))
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
-name = "Sum Sparse Individual Matrices and Smoothing"
+name = "Smoothing of the Individual Matrix."
 userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "matrix_labeled_fibers", ReadDiskItem(
+    "complete_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
-        requiredAttributes={"ends_labelled": "both",
-                            "reduced": "no",
-                            "intersubject": "no"}),
-    "matrix_semilabeled_fibers", ReadDiskItem(
-        "Connectivity Matrix", "Sparse Matrix",
-        requiredAttributes={"ends_labelled": "one",
+        requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
                             "intersubject": "no"}),
     "cortical_regions_nomenclature", ReadDiskItem(
@@ -85,7 +75,7 @@ signature = Signature(
     "smoothing", Float(),
 
     # --outputs--
-    "complete_individual_matrix", WriteDiskItem(
+    "complete_matrix_smoothed", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
@@ -93,7 +83,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
@@ -109,50 +99,41 @@ def initialization(self):
         """Define the attribut 'gyrus' from fibertracts pattern for the
         signature 'cortical_region'.
         """
-        if self.matrix_labeled_fibers is not None:
-            s = str(self.matrix_labeled_fibers.get("gyrus"))
+        if self.complete_individual_matrix is not None:
+            s = str(self.complete_individual_matrix.get("gyrus"))
             name = self.signature["cortical_region"].findValue(s)
         return name
 
-    def link_smooth(self, dummy):
+    def link_matrix(self, dummy):
+        """Define the attribut 'smoothing' from input parameter for the
+        signature 'complete_matrix_smoothed'.
         """
-        """
-        if (self.matrix_semilabeled_fibers and self.smoothing) is not None:
-            attrs = dict(self.matrix_semilabeled_fibers.hierarchyAttributes())
+        if self.complete_individual_matrix is not None:
+            attrs = dict(self.complete_individual_matrix.hierarchyAttributes())
             attrs["smoothing"] = str(self.smoothing)
-            attrs["smallerlength2"] = self.matrix_semilabeled_fibers.get(
-                "smallerlength1")
-            attrs["greaterlength2"] = self.matrix_semilabeled_fibers.get(
-                "smallerlength1")
-            filename = self.signature[
-                "complete_individual_matrix"].findValue(attrs)
-            return filename
+        filename = self.signature[
+                "complete_matrix_smoothed"].findValue(attrs)
+        return filename
 
     # link of parameters for autocompletion
     self.linkParameters("cortical_region",
-                        "matrix_labeled_fibers",
+                        "complete_individual_matrix",
                         link_matrix2label)
-    self.linkParameters("complete_individual_matrix",
-                        ("matrix_semilabeled_fibers", "smoothing"),
-                        link_smooth)
+    self.linkParameters("complete_matrix_smoothed",
+                        "complete_individual_matrix",
+                        link_matrix)
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):
-    """Run the commands 'AimsSumSparseMatrix' and 'AimsSparseMatrixSmoothing'.
+    """Run the command 'AimsSparseMatrixSmoothing'.
 
     Sum of two matrices and smoothing"""
     # selects the label number corresponding to label name
     label_number = select_ROI_number(
         self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
-
-    # sum matrix
-    context.system("AimsSumSparseMatrix",
-                   "-i", self.matrix_semilabeled_fibers,
-                   "-i", self.matrix_labeled_fibers,
-                   "-o", self.complete_individual_matrix)
 
     # matrix smoothing: -s in millimetres
     context.system("AimsSparseMatrixSmoothing",
@@ -164,4 +145,3 @@ def execution(self, context):
                    "-p", label_number)
 
     replace_negative_values(self.complete_individual_matrix.fullPath())
-    

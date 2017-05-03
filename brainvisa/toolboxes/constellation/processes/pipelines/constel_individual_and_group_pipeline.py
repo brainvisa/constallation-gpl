@@ -19,7 +19,7 @@ Main dependencies: axon python API, constel
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # axon python API modules
@@ -41,7 +41,7 @@ except:
     raise ValidationError("Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Constellation Individual And Group pipeline"
@@ -77,7 +77,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# --------------------------Functions-----------------------------------------
 
 
 def initialization(self):
