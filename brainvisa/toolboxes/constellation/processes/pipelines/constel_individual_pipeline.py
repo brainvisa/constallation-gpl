@@ -19,7 +19,7 @@ Main dependencies: axon python API, constel
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # axon python API modules
@@ -41,14 +41,14 @@ except:
     pass
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Constellation Individual Pipeline"
 userLevel = 0
 
 signature = Signature(
-    #--inputs--
+    # --inputs--
     "method", Choice(
         ("averaged approach", "avg"),
         ("concatenated approach", "concat")),
@@ -79,7 +79,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
@@ -122,7 +122,8 @@ def initialization(self):
         choices = set()
         if self.outputs_database is not None:
             if neuroHierarchy.databases.hasDatabase(self.outputs_database):
-                database = neuroHierarchy.databases.database(self.outputs_database)
+                database = neuroHierarchy.databases.database(
+                    self.outputs_database)
                 sel = {"method": self.method}
                 choices.update(
                     [x[0] for x in database.findAttributes(
@@ -299,10 +300,8 @@ def initialization(self):
     eNode.addChild(
         "smoothing", ProcessExecutionNode("constel_smooth_matrix", optional=1))
 
-    eNode.addDoubleLink("smoothing.matrix_labeled_fibers",
-                        "ConnectivityMatrix.matrix_labeled_fibers")
-    eNode.addDoubleLink("smoothing.matrix_semilabeled_fibers",
-                        "ConnectivityMatrix.matrix_semilabeled_fibers")
+    eNode.addDoubleLink("smoothing.complete_individual_matrix",
+                        "ConnectivityMatrix.complete_individual_matrix")
     eNode.addDoubleLink("smoothing.cortical_regions_nomenclature",
                         "ConnectivityMatrix.cortical_regions_nomenclature")
     eNode.addDoubleLink("smoothing.cortical_region",

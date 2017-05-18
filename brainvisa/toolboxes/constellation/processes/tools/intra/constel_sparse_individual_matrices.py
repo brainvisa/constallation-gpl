@@ -9,26 +9,25 @@
 
 """
 This script does the following:
-* defines a Brainvisa process
-    - the signature of the inputs/ouputs,
-    - the initialization (by default) of the inputs,
-    - the interlinkages between inputs/outputs.
-* executes the command 'constelConnectivityMatrix': the connectivity matrix is
-  computed  M(labelname vertices, cortical surface vertices)
+* define a Brainvisa process.
+* execute the command 'constelConnectivityMatrix'.
+* execute the command 'AimsSumSparseMatrix'.
 
 Main dependencies: axon python API, soma, constel
 
-Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # axon python API module
-from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
-    ValidationError, String
+from brainvisa.processes import String
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import ValidationError
 
-# soma module
+# soma.path module
 from soma.path import find_in_path
 
 # constel module
@@ -42,16 +41,17 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
+    cmd_name = "constelConnectivityMatrix"
     if not find_in_path("constelConnectivityMatrix"):  # checks command (C++)
         raise ValidationError(
-            "constelConnectivityMatrix is not contained in PATH environnement "
-            "variable or please make sure that constellation is installed.")
+            "'{0}' is not contained in PATH environnement variable. "
+            "Please make sure that constel is installed.".format(cmd_name))
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
-name = "Sparse Individual Matrices and Profiles From Tracts"
+name = "Sparse Individual Matrices and Profiles From Tracts."
 userLevel = 2
 
 signature = Signature(
@@ -101,10 +101,15 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "both",
                             "normed": "no",
                             "intersubject": "no"}),
+    "complete_individual_matrix", WriteDiskItem(
+        "Connectivity Matrix", "Sparse Matrix",
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "intersubject": "no"}),
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
@@ -123,27 +128,44 @@ def initialization(self):
             name = self.signature["cortical_region"].findValue(s)
         return name
 
+    def link_smooth(self, dummy):
+        """
+        """
+        if self.matrix_semilabeled_fibers is not None:
+            attrs = dict(self.matrix_semilabeled_fibers.hierarchyAttributes())
+            attrs["smoothing"] = str(0.0)
+            attrs["smallerlength2"] = self.matrix_semilabeled_fibers.get(
+                "smallerlength1")
+            attrs["greaterlength2"] = self.matrix_semilabeled_fibers.get(
+                "smallerlength1")
+            filename = self.signature[
+                "complete_individual_matrix"].findValue(attrs)
+            return filename
+
     # link of parameters for autocompletion
-    self.linkParameters(
-        "matrix_semilabeled_fibers", "oversampled_semilabeled_fibers")
-    self.linkParameters(
-        "cortical_region", "oversampled_semilabeled_fibers",
-        link_fibertracts2label)
-    self.linkParameters(
-        "matrix_labeled_fibers", "labeled_fibers")
-    self.linkParameters(
-        "profile_semilabeled_fibers", "matrix_semilabeled_fibers")
-    self.linkParameters(
-        "profile_labeled_fibers", "matrix_labeled_fibers")
+    self.linkParameters("matrix_semilabeled_fibers",
+                        "oversampled_semilabeled_fibers")
+    self.linkParameters("cortical_region",
+                        "oversampled_semilabeled_fibers",
+                        link_fibertracts2label)
+    self.linkParameters("matrix_labeled_fibers",
+                        "labeled_fibers")
+    self.linkParameters("profile_semilabeled_fibers",
+                        "matrix_semilabeled_fibers")
+    self.linkParameters("profile_labeled_fibers",
+                        "matrix_labeled_fibers")
+    self.linkParameters("complete_individual_matrix",
+                        "matrix_semilabeled_fibers",
+                        link_smooth)
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):
-    """Run the command 'constelConnectivityMatrix'.
+    """Run the commands 'constelConnectivityMatrix' and 'AimsSumSparseMatrix'.
 
-    Computes two connectivity matrices.
+    Computes two connectivity matrices and sum them.
     (labelname vertices, cortical surface vertices).
 
     (1) case 1: computes connectivity matrix for semilabeled fibers of cortex
@@ -186,3 +208,9 @@ def execution(self, context):
                    "-seedlabel", label_number,
                    "-normalize", 0,
                    "-verbose", 1)
+
+    # sum matrix (without smoothing)
+    context.system("AimsSumSparseMatrix",
+                   "-i", self.matrix_semilabeled_fibers,
+                   "-i", self.matrix_labeled_fibers,
+                   "-o", self.complete_individual_matrix)
