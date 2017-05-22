@@ -9,12 +9,8 @@
 
 """
 This script does the following:
-* defines a Brainvisa process
-    - the signature of the inputs/ouputs,
-    - the initialization (by default) of the inputs,
-    - the interlinkages between inputs/outputs.
-* this process executes the command 'constelMeanConnectivityProfileFromMatrix':
-  connection density textures are computed and write on the disk.
+* define a Brainvisa process
+* execute the command 'constelMeanConnectivityProfileFromMatrix'.
 
 Main dependencies: axon python API, soma, constel
 
@@ -22,12 +18,15 @@ Author: Sandrine Lefranc, 2015
 """
 
 
-#----------------------------Imports-------------------------------------------
+# --------------------------Imports-------------------------------------------
 
 
 # axon python API module
-from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
-    ValidationError, String
+from brainvisa.processes import String
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import ValidationError
 
 # soma module
 from soma.path import find_in_path
@@ -35,7 +34,6 @@ from soma.path import find_in_path
 # constel module
 try:
     from constel.lib.utils.filetools import select_ROI_number
-    from constel.lib.utils.texturetools import management_internal_connections
 except:
     pass
 
@@ -49,7 +47,7 @@ def validation():
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Mean Individual Profile From Smoothed Matrix"
@@ -57,7 +55,7 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "complete_individual_matrix", ReadDiskItem(
+    "complete_matrix_smoothed", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
@@ -78,7 +76,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
@@ -92,19 +90,20 @@ def initialization(self):
         """Define the attribut 'gyrus' from fibertracts pattern for the
         signature 'cortical_region'.
         """
-        if self.complete_individual_matrix is not None:
-            s = str(self.complete_individual_matrix.get("gyrus"))
+        if self.complete_matrix_smoothed is not None:
+            s = str(self.complete_matrix_smoothed.get("gyrus"))
             name = self.signature["cortical_region"].findValue(s)
         return name
 
     # link of parameters for autocompletion
     self.linkParameters("cortical_region",
-                        "complete_individual_matrix",
+                        "complete_matrix_smoothed",
                         link_matrix2label)
     self.linkParameters("mean_individual_profile",
-                        "complete_individual_matrix")
+                        "complete_matrix_smoothed")
 
-#----------------------------Main program--------------------------------------
+
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):
@@ -118,11 +117,10 @@ def execution(self, context):
 
     context.system("constelMeanConnectivityProfileFromMatrix",
                    "-connfmt", "binar_sparse",
-                   "-connmatrixfile", self.complete_individual_matrix,
+                   "-connmatrixfile", self.complete_matrix_smoothed,
                    "-outconntex", self.mean_individual_profile,
                    "-seedregionstex", self.cortical_parcellation,
                    "-seedlabel", label_number,
                    "-type", "seed_mean_connectivity_profile",
                    "-normalize", 0,
                    "-verbose", 1)
-

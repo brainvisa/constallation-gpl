@@ -139,7 +139,7 @@ def execution(self, context):
     context.system("AimsSparseMatrixSmoothing",
                    "-i", self.complete_individual_matrix,
                    "-m", self.white_mesh,
-                   "-o", self.complete_individual_matrix,
+                   "-o", self.complete_matrix_smoothed,
                    "-s", self.smoothing,
                    "-l", self.cortical_parcellation,
                    "-p", label_number)

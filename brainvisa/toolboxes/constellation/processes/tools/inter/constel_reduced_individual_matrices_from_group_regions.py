@@ -101,9 +101,9 @@ def afterChildAddedCallback(self, parent, key, child):
     # Removes a link added with addLink() function.
     # (destination, source)
     child.removeLink("filtered_reduced_individual_profile",
-                     "complete_individual_matrix")
+                     "complete_matrix_smoothed")
     child.removeLink("cortical_region",
-                     "complete_individual_matrix")
+                     "complete_matrix_smoothed")
     child.removeLink("reduced_individual_matrix",
                      "filtered_reduced_individual_profile")
 
@@ -257,7 +257,7 @@ def initialization(self):
     eNode.addLink(
         None, "complete_individual_matrices",
         partial(mapValuesToChildrenParameters, eNode,
-                eNode, "complete_individual_matrix",
+                eNode, "complete_matrix_smoothed",
                 "complete_individual_matrices",
                 defaultProcess="constel_individual_reduced_matrix",
                 name="constel_individual_reduced_matrix"))

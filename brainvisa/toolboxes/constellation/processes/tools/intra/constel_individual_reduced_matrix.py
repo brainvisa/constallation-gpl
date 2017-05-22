@@ -9,19 +9,15 @@
 
 """
 This script does the following:
-* defines a Brainvisa process
-    - the signature of the inputs/ouputs,
-    - the initialization (by default) of the inputs,
-    - the interlinkages between inputs/outputs.
-* executes the command 'constelConnectionDensityTexture': the reduced
-  connectivity matrix is computed (normalized or not).
+* define a Brainvisa process.
+* executes the command 'constelConnectionDensityTexture'.
 
 Main dependencies: axon python API, soma, constel
 
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # axon python API modules
@@ -48,15 +44,15 @@ def validation():
             "is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Reduced Individual Matrix From Filtered Reduced Profile"
 userLevel = 2
 
 signature = Signature(
-    # inputs
-    "complete_individual_matrix", ReadDiskItem(
+    # --inputs--
+    "complete_matrix_smoothed", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
@@ -81,7 +77,7 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"}),
 
-    #outputs
+    # --outputs--
     "reduced_individual_matrix", WriteDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
@@ -92,7 +88,7 @@ signature = Signature(
 )
 
 
-#----------------------------Function--------------------------------------
+# ---------------------------Function--------------------------------------
 
 
 def initialization(self):
@@ -107,21 +103,21 @@ def initialization(self):
         """Define the attribut 'gyrus' from fibertracts pattern for the
         signature 'cortical_region'.
         """
-        if self.complete_individual_matrix is not None:
-            s = str(self.complete_individual_matrix.get("gyrus"))
+        if self.complete_matrix_smoothed is not None:
+            s = str(self.complete_matrix_smoothed.get("gyrus"))
             return s
 
     # link of parameters for autocompletion
     self.linkParameters("filtered_reduced_individual_profile",
-                        "complete_individual_matrix")
+                        "complete_matrix_smoothed")
     self.linkParameters("cortical_region",
-                        "complete_individual_matrix",
+                        "complete_matrix_smoothed",
                         link_matrix2label)
     self.linkParameters("reduced_individual_matrix",
                         "filtered_reduced_individual_profile")
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):
@@ -141,7 +137,7 @@ def execution(self, context):
     context.system(
         "constelConnectionDensityTexture",
         "-mesh", self.white_mesh,
-        "-connmatrixfile", self.complete_individual_matrix,
+        "-connmatrixfile", self.complete_matrix_smoothed,
         "-targetregionstex", self.filtered_reduced_individual_profile,
         "-seedregionstex", str(self.cortical_parcellation),
         "-seedlabel", label_number,

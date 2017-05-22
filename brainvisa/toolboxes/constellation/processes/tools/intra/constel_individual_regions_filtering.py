@@ -9,19 +9,15 @@
 
 """
 This script does the following:
-* defines a Brainvisa process
-    - the signature of the inputs/ouputs,
-    - the initialization (by default) of the inputs,
-    - the interlinkages between inputs/outputs.
-* executes the command 'constelConnectionDensityTexture': the individual
-  regions profile is computed.
+* define a Brainvisa process
+* execute the command 'constelConnectionDensityTexture'.
 
 Main dependencies: axon python API, soma, constel
 
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 # python module
 import numpy
@@ -53,7 +49,7 @@ def validation():
             "is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Individual Regions Filtering"
@@ -61,7 +57,7 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "complete_individual_matrix", ReadDiskItem(
+    "complete_matrix_smoothed", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
@@ -111,7 +107,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
@@ -149,24 +145,24 @@ def initialization(self):
         """Define the attribut 'cortical_region' from fibertracts pattern for
         the signature 'cortical_region'.
         """
-        if self.complete_individual_matrix is not None:
-            s = str(self.complete_individual_matrix.get("gyrus"))
+        if self.complete_matrix_smoothed is not None:
+            s = str(self.complete_matrix_smoothed.get("gyrus"))
             name = self.signature["cortical_region"].findValue(s)
         return name
 
     self.linkParameters(None, "cortical_regions_nomenclature", reset_label)
-    self.linkParameters("cortical_region", "complete_individual_matrix",
+    self.linkParameters("cortical_region", "complete_matrix_smoothed",
                         link_matrix2ROI)
     self.linkParameters("reduced_individual_profile",
-                        "complete_individual_matrix")
-    self.linkParameters("sum_vertices_patch", "complete_individual_matrix")
+                        "complete_matrix_smoothed")
+    self.linkParameters("sum_vertices_patch", "complete_matrix_smoothed")
     self.linkParameters("duplication_value_patch",
-                        "complete_individual_matrix")
+                        "complete_matrix_smoothed")
     self.linkParameters("filtered_reduced_individual_profile",
-                        "complete_individual_matrix")
+                        "complete_matrix_smoothed")
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):
@@ -180,7 +176,7 @@ def execution(self, context):
 
     context.system("constelConnectionDensityTexture",
                    "-mesh", self.white_mesh,
-                   "-connmatrixfile", self.complete_individual_matrix,
+                   "-connmatrixfile", self.complete_matrix_smoothed,
                    "-targetregionstex", self.reduced_individual_profile,
                    "-seedregionstex", self.cortical_parcellation,
                    "-seedlabel", label_number,
