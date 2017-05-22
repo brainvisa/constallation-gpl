@@ -69,12 +69,12 @@ signature = Signature(
                             "vertex_corr": "Yes",
                             "inflated": "No",
                             "averaged": "No"}),
+    "dw_to_t1", ReadDiskItem(
+        "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix"),
     "keep_regions", ListOf(OpenChoice()),
     "smoothing", Float(),
-    "minlength_labeled_fibers", Float(),
-    "maxlength_labeled_fibers", Float(),
-    "minlength_semilabeled_fibers", Float(),
-    "maxlength_semilabeled_fibers", Float(),
+    "min_fibers_length", Float(),
+    "max_fibers_length", Float(),
     "normalize", Boolean(),
 )
 
@@ -97,10 +97,8 @@ def initialization(self):
 
     # default value
     self.smoothing = 3.0
-    self.minlength_labeled_fibers = 30.
-    self.maxlength_labeled_fibers = 500.
-    self.minlength_semilabeled_fibers = 20.
-    self.maxlength_semilabeled_fibers = 500.
+    self.min_fibers_length = 20.
+    self.max_fibers_length = 500.
     self.normalize = True
     self.cortical_regions_nomenclature = self.signature[
         "cortical_regions_nomenclature"].findValue(
@@ -252,14 +250,11 @@ def initialization(self):
     eNode.addDoubleLink("filter.cortical_parcellation",
                         "cortical_parcellation")
     eNode.addDoubleLink("filter.white_mesh", "white_mesh")
-    eNode.addDoubleLink("filter.minlength_labeled_fibers",
-                        "minlength_labeled_fibers")
-    eNode.addDoubleLink("filter.maxlength_labeled_fibers",
-                        "maxlength_labeled_fibers")
-    eNode.addDoubleLink("filter.minlength_semilabeled_fibers",
-                        "minlength_semilabeled_fibers")
-    eNode.addDoubleLink("filter.maxlength_semilabeled_fibers",
-                        "maxlength_semilabeled_fibers")
+    eNode.addDoubleLink("filter.dw_to_t1", "dw_to_t1")
+    eNode.addDoubleLink("filter.min_fibers_length",
+                        "min_fibers_length")
+    eNode.addDoubleLink("filter.max_fibers_length",
+                        "max_fibers_length")
 
     ###########################################################################
     #        link of parameters with the process: "Fiber Oversampler"         #
@@ -319,8 +314,8 @@ def initialization(self):
         "MeanProfile", ProcessExecutionNode("constel_mean_individual_profile",
                                             optional=1))
 
-    eNode.addDoubleLink("MeanProfile.complete_individual_matrix",
-                        "smoothing.complete_individual_matrix")
+    eNode.addDoubleLink("MeanProfile.complete_matrix_smoothed",
+                        "smoothing.complete_matrix_smoothed")
     eNode.addDoubleLink("MeanProfile.cortical_regions_nomenclature",
                         "smoothing.cortical_regions_nomenclature")
     eNode.addDoubleLink("MeanProfile.cortical_region",
@@ -370,8 +365,8 @@ def initialization(self):
 
     eNode.addDoubleLink("FilteringWatershed.reduced_individual_profile",
                         "Watershed.reduced_individual_profile")
-    eNode.addDoubleLink("FilteringWatershed.complete_individual_matrix",
-                        "MeanProfile.complete_individual_matrix")
+    eNode.addDoubleLink("FilteringWatershed.complete_matrix_smoothed",
+                        "MeanProfile.complete_matrix_smoothed")
     eNode.addDoubleLink("FilteringWatershed.cortical_regions_nomenclature",
                         "MeanProfile.cortical_regions_nomenclature")
     eNode.addDoubleLink("FilteringWatershed.cortical_region",
@@ -388,8 +383,8 @@ def initialization(self):
                    ProcessExecutionNode("constel_individual_reduced_matrix",
                                         optional=1, selected=False))
 
-    eNode.addDoubleLink("ReducedMatrix.complete_individual_matrix",
-                        "FilteringWatershed.complete_individual_matrix")
+    eNode.addDoubleLink("ReducedMatrix.complete_matrix_smoothed",
+                        "FilteringWatershed.complete_matrix_smoothed")
     eNode.addDoubleLink("ReducedMatrix.cortical_regions_nomenclature",
                         "FilteringWatershed.cortical_regions_nomenclature")
     eNode.addDoubleLink("ReducedMatrix.cortical_region",

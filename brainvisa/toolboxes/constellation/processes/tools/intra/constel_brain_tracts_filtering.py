@@ -9,33 +9,27 @@
 
 """
 This script does the following:
-* defines a Brainvisa process
-    - the signature of the inputs/ouputs,
-    - the initialization (by default) of the inputs,
-    - the interlinkages between inputs/outputs.
-* executes the command 'constelBundlesFiltering': the fiber tracts are filtered
-  according to length.
+* define a Brainvisa process.
+* execute the command 'constelBundlesFiltering'.
 
 Main dependencies: axon python API, soma-base, constel
-
-Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # python modules
 import os
 
 # axon python API module
+from brainvisa.processes import Float
+from brainvisa.processes import Choice
 from brainvisa.processes import Signature
+from brainvisa.processes import OpenChoice
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
-from brainvisa.processes import ValidationError
 from brainvisa.processes import neuroHierarchy
-from brainvisa.processes import Choice
-from brainvisa.processes import Float
-from brainvisa.processes import OpenChoice
+from brainvisa.processes import ValidationError
 
 # soma module
 from soma.path import find_in_path
@@ -53,13 +47,14 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("constelBundlesFiltering"):  # checks command (C++)
+    cmd_name = "constelBundlesFiltering"
+    if not find_in_path(cmd_name):  # checks command (C++)
         raise ValidationError(
-            "'constelBundlesFiltering' is not contained in PATH environnement "
-            "variable. Please make sure that constellation is installed.")
+            "'{0}' is not contained in PATH environnement variable. "
+            "Please make sure that constel is installed.".format(cmd_name))
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Brain Tracts Filtering"
@@ -86,10 +81,8 @@ signature = Signature(
                             "vertex_corr": "Yes"}),
     "dw_to_t1", ReadDiskItem(
         "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix"),
-    "minlength_labeled_fibers", Float(),
-    "maxlength_labeled_fibers", Float(),
-    "minlength_semilabeled_fibers", Float(),
-    "maxlength_semilabeled_fibers", Float(),
+    "min_fibers_length", Float(),
+    "max_fibers_length", Float(),
 
     # --outputs--
     "labeled_fibers", WriteDiskItem(
@@ -103,17 +96,15 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
     """Provides default values and links between parameters.
     """
     # Define the default values
-    self.minlength_labeled_fibers = 30.
-    self.maxlength_labeled_fibers = 500.
-    self.minlength_semilabeled_fibers = 20.
-    self.maxlength_semilabeled_fibers = 500.
+    self.min_fibers_length = 20.  # in mm
+    self.max_fibers_length = 500.  # in mm
     self.cortical_regions_nomenclature = self.signature[
         "cortical_regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -177,8 +168,8 @@ def initialization(self):
 
         This function automatically creates the signature of 'labeled_fibers'.
         """
-        if (self.outputs_database and self.study_name and self.cortical_region
-                and self.subject_directory) is not None:
+        if (self.outputs_database and self.study_name and
+                self.cortical_region and self.subject_directory) is not None:
             attrs = dict()
             attrs["_database"] = self.outputs_database
             attrs["method"] = self.method
@@ -186,8 +177,8 @@ def initialization(self):
             attrs["subject"] = os.path.basename(
                 self.subject_directory.fullPath())
             attrs["gyrus"] = str(self.cortical_region)
-            attrs["smallerlength1"] = str(int(self.minlength_labeled_fibers))
-            attrs["greaterlength1"] = str(int(self.maxlength_labeled_fibers))
+            attrs["smallerlength"] = str(int(self.min_fibers_length))
+            attrs["greaterlength"] = str(int(self.max_fibers_length))
             filename = self.signature["labeled_fibers"].findValue(attrs)
             return filename
 
@@ -197,8 +188,8 @@ def initialization(self):
         This function automatically creates the signature of
         'semilabeled_fibers'.
         """
-        if (self.outputs_database and self.study_name and self.cortical_region
-                and self.subject_directory) is not None:
+        if (self.outputs_database and self.study_name and
+                self.cortical_region and self.subject_directory) is not None:
             attrs = dict()
             attrs["_database"] = self.outputs_database
             attrs["method"] = self.method
@@ -206,10 +197,8 @@ def initialization(self):
             attrs["subject"] = os.path.basename(
                 self.subject_directory.fullPath())
             attrs["gyrus"] = str(self.cortical_region)
-            attrs["smallerlength2"] = str(
-                int(self.minlength_semilabeled_fibers))
-            attrs["greaterlength2"] = str(
-                int(self.maxlength_semilabeled_fibers))
+            attrs["smallerlength"] = str(int(self.min_fibers_length))
+            attrs["greaterlength"] = str(int(self.max_fibers_length))
             filename = self.signature["semilabeled_fibers"].findValue(attrs)
             return filename
 
@@ -221,20 +210,15 @@ def initialization(self):
     self.linkParameters(
         "labeled_fibers", (
             "outputs_database", "subject_directory", "method", "study_name",
-            "cortical_region", "minlength_labeled_fibers",
-            "maxlength_labeled_fibers"),
+            "cortical_region", "min_fibers_length", "max_fibers_length"),
         link_filtered_bundles)
     self.linkParameters(
-        "semilabeled_fibers", (
-            "outputs_database", "subject_directory", "method", "study_name",
-            "cortical_region", "minlength_semilabeled_fibers",
-            "maxlength_semilabeled_fibers"),
-        link_between_filtered_bundles)
+        "semilabeled_fibers", "labeled_fibers")
 
     fill_study_choice(self)
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):
@@ -248,18 +232,18 @@ def execution(self, context):
         - the distant fibers are defined as having only one end attached to the
           mesh (the other being not identified)
     """
-    # Select all fiber tracts of the given subject
+    # Select all fiber tracts of the given subject.
     list_fiber_tracts = load_fiber_tracts(
         self.subject_directory.fullPath(), self.fiber_tracts_format)
 
-    # Select the region number corresponding to region name
+    # Select the region number corresponding to region name.
     region_number = select_ROI_number(
         self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
 
-    # Give the name of the command (C++)
+    # Give the command name.
     cmd = ["constelBundlesFiltering"]
 
-    # Give the options of the command
+    # Give the command options.
     for fiber_tract in list_fiber_tracts:
         cmd += ["-i", fiber_tract]
     cmd += [
@@ -273,12 +257,12 @@ def execution(self, context):
         "--names", "^[+-]?[0-9]+_" + str(region_number) + "$",
         "-g", region_number,
         "-r",
-        "-l", self.minlength_labeled_fibers,
-        "-L", self.maxlength_labeled_fibers,
-        "--nimlmin", self.minlength_semilabeled_fibers,
-        "--nimlmax", self.maxlength_semilabeled_fibers,
+        "-l", self.min_fibers_length,
+        "-L", self.max_fibers_length,
+        "--nimlmin", self.min_fibers_length,
+        "--nimlmax", self.max_fibers_length,
         "--verbose"
     ]
 
-    # Execute the command
+    # Execute the command.
     context.system(*cmd)
