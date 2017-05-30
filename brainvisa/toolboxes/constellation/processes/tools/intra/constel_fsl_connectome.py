@@ -18,10 +18,11 @@ Main dependencies: axon python API, soma, constel
 # ---------------------------Imports-------------------------------------------
 
 # axon python API module
-from brainvisa.processes import String
+from brainvisa.processes import Integer
 from brainvisa.processes import Signature
-# from brainvisa.processes import ReadDiskItem
-# from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import getAllFormats
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
 
 # soma.path module
@@ -46,11 +47,13 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "vertex_labels", String(),
-    "fdt_matrix", String(),
+    "vertex_labels", ReadDiskItem("ROI Texture", "Aims texture formats"),
+    "fdt_matrix", ReadDiskItem("Any Type", getAllFormats()),
+    "coords", ReadDiskItem("Any Type", getAllFormats()),
+    "label", Integer(),
 
     # --outputs--
-    "outdir", String(),
+    "outdir", WriteDiskItem("directory", "directory"),
 )
 
 # ---------------------------Functions-----------------------------------------
@@ -73,4 +76,6 @@ def execution(self, context):
     context.pythonSystem("constel_reorganize_fsl_connectome.py",
                          self.vertex_labels,
                          self.fdt_matrix,
+                         self.coords,
+                         self.label,
                          self.outdir)
