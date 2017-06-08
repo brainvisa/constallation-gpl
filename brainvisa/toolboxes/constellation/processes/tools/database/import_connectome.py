@@ -219,6 +219,5 @@ def execution(self, context):
         os.makedirs(dstdir)
 
     dst = os.path.join(dstdir, matrix_name)
-    print dst
 
     shutil.copy2(src, dst)
