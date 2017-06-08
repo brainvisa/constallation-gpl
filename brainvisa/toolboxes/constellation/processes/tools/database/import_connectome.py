@@ -34,7 +34,6 @@ from soma.path import find_in_path
 # Package import
 try:
     from constel.lib.utils.filetools import read_file
-    from constel.lib.utils.filetools import select_ROI_number
 except:
     pass
 
@@ -194,15 +193,15 @@ def execution(self, context):
     """
     subject = os.path.basename(
         os.path.dirname(self.fsl_connectome.fullPath()))
-    label_name = select_ROI_number(self.regions_nomenclature.fullPath(),
-                                   self.region)
     src = self.fsl_connectome.fullPath()
     matrix_name = (subject +
                    "_" +
                    self.study_name +
                    "_" +
-                   label_name +
-                   "_complete_matrix_smooth0.0.imas")
+                   self.region +
+                   "_complete_matrix_smooth0.0_" +
+                   str(self.min_fibers_length) +
+                   "to500.0mm.imas")
 
     dstdir = os.path.join(self.outputs_database,
                           "subjects",
@@ -214,11 +213,12 @@ def execution(self, context):
                           "connectivity_parcellation",
                           self.method,
                           self.study_name,
-                          label_name,
+                          self.region,
                           "matrix")
     if not os.path.isdir(dstdir):
         os.makedirs(dstdir)
 
     dst = os.path.join(dstdir, matrix_name)
+    print dst
 
     shutil.copy2(src, dst)
