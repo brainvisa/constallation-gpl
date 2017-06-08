@@ -7,39 +7,38 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-"""
-This script does the following:
-* defines a Brainvisa pipeline
-    - the signature of the inputs/ouputs,
-    - the initialization (by default) of the inputs,
-    - the interlinkages between inputs/outputs.
 
-Main dependencies: axon python API, constel
-
-Author: Sandrine Lefranc, 2015
-"""
-
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
-# axon python API modules
-from brainvisa.processes import Signature, Choice, ReadDiskItem, OpenChoice, \
-    String, Float, ListOf, SerialExecutionNode, ProcessExecutionNode, \
-    ValidationError, neuroHierarchy
+# Axon python API modules
+
+from brainvisa.processes import Float
+from brainvisa.processes import String
+from brainvisa.processes import Choice
+from brainvisa.processes import ListOf
 from brainvisa.group_utils import Subject
+from brainvisa.processes import Signature
+from brainvisa.processes import OpenChoice
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import neuroHierarchy
 from brainvisa.configuration import neuroConfig
+from brainvisa.processes import ValidationError
+from brainvisa.processes import SerialExecutionNode
+from brainvisa.processes import ProcessExecutionNode
 
-# soma module
+
+# Soma module
 from soma.minf.api import registerClass, readMinf
 
-# constel module
+# Package import
 try:
     from constel.lib.utils.filetools import read_file
 except:
     raise ValidationError("Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Constellation Group Pipeline"
@@ -58,9 +57,9 @@ if neuroConfig.gui:
                      write=False, context=None):
             super(GroupCreatorEditor, self).__init__(parameter, parent, name,
                                                      write, context)
-            if not hasattr(GroupCreatorEditor, 'new_icon'):
+            if not hasattr(GroupCreatorEditor, "new_icon"):
                 GroupCreatorEditor.new_icon \
-                    = QtGui.QIcon(findIconFile('folder_new.png'))
+                    = QtGui.QIcon(findIconFile("folder_new.png"))
             create_btn = QtGui.QPushButton()
             create_btn.setIcon(GroupCreatorEditor.new_icon)
             create_btn.setIconSize(buttonIconSize)
@@ -71,17 +70,17 @@ if neuroConfig.gui:
             create_btn.clicked.connect(self.create_group)
 
         def create_group(self):
-            showProcess('createGroup')
+            showProcess("createGroup")
 
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File"),
+    "region", OpenChoice(),
+    "study_name", OpenChoice(),
     "method", Choice(
         ("averaged approach", "avg"),
         ("concatenated approach", "concat")),
-    "cortical_regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "cortical_region", OpenChoice(),
-    "study_name", OpenChoice(),
     "new_study_name", String(),
     "smoothing", Float(),
     "constellation_subjects_group", ReadDiskItem(
@@ -127,8 +126,8 @@ def initialization(self):
 
     # default value
     self.smoothing = 3.0
-    self.cortical_regions_nomenclature = self.signature[
-        "cortical_regions_nomenclature"].findValue(
+    self.regions_nomenclature = self.signature[
+        "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
     # optional value
@@ -163,26 +162,26 @@ def initialization(self):
 
     def reset_label(self, dummy):
         """ This callback reads the ROIs nomenclature and proposes them in the
-        signature 'cortical_region' of process.
-        It also resets the cortical_region paramter to default state after
+        signature 'region' of process.
+        It also resets the region paramter to default state after
         the nomenclature changes.
         """
-        current = self.cortical_region
-        self.setValue('cortical_region', current, True)
-        if self.cortical_regions_nomenclature is not None:
-            s = [("Select a cortical_region in this list", None)]
+        current = self.region
+        self.setValue('region', current, True)
+        if self.regions_nomenclature is not None:
+            s = [("Select a region in this list", None)]
             # temporarily set a value which will remain valid
-            self.cortical_region = s[0][1]
+            self.region = s[0][1]
             s += read_file(
-                self.cortical_regions_nomenclature.fullPath(), mode=2)
-            self.signature["cortical_region"].setChoices(*s)
-            if isinstance(self.signature["cortical_region"], OpenChoice):
-                self.signature["cortical_region"] = Choice(*s)
+                self.regions_nomenclature.fullPath(), mode=2)
+            self.signature["region"].setChoices(*s)
+            if isinstance(self.signature["region"], OpenChoice):
+                self.signature["region"] = Choice(*s)
                 self.changeSignature(self.signature)
             if current not in s:
-                self.setValue("cortical_region", s[0][1], True)
+                self.setValue("region", s[0][1], True)
             else:
-                self.setValue("cortical_region", current, True)
+                self.setValue("region", current, True)
 
     def method_changed(self, dummy):
         """
@@ -196,7 +195,7 @@ def initialization(self):
     def link_profiles(self, dummy):
         """Function of link to determine the connectivity profiles
         """
-        if (self.constellation_subjects_group and self.cortical_region
+        if (self.constellation_subjects_group and self.region
                 and self.method and self.smoothing and self.study_name):
             registerClass("minf_2.0", Subject, "Subject")
             groupOfSubjects \
@@ -205,7 +204,7 @@ def initialization(self):
             for subject in groupOfSubjects:
                 atts = {}
                 atts["method"] = self.method
-                atts["gyrus"] = str(self.cortical_region)
+                atts["gyrus"] = str(self.region)
                 atts["smoothing"] = str(self.smoothing)
                 atts["studyname"] = self.study_name
                 atts["_database"] \
@@ -268,10 +267,10 @@ def initialization(self):
         return mesh
 
     # link of parameters for autocompletion
-    self.linkParameters(None, "cortical_regions_nomenclature", reset_label)
+    self.linkParameters(None, "regions_nomenclature", reset_label)
     self.linkParameters(None, "method", method_changed)
     self.linkParameters("mean_individual_profiles",
-                        ("method", "cortical_region", "smoothing",
+                        ("method", "region", "smoothing",
                          "study_name", "constellation_subjects_group"),
                         link_profiles)
     self.linkParameters("normed_individual_profiles",

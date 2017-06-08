@@ -7,27 +7,17 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-"""
-This script does the following:
-* defines a Brainvisa process
-    - the signature of the inputs/ouputs,
-    - the interlinkages between inputs/outputs.
-* executes the command 'AimsFiberOversampler': the semilabeled fibers are
-  oversampled.
 
-Main dependencies: axon python API, soma-base, aims-free
-
-Author: Sandrine Lefranc, 2015
-"""
-
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
-# axon python API module
-from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
-    ValidationError
+# Axon python API module
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import ValidationError
 
-# soma module
+# Soma module
 from soma.path import find_in_path
 
 
@@ -35,13 +25,14 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    if not find_in_path("AimsFiberOversampler"):  # checks command (C++)
+    cmd = "AimsFiberOversampler"
+    if not find_in_path(cmd):
         raise ValidationError(
-            "AimsFiberOversampler is not contained in PATH environnement "
-            "variable. Please make sure that aims-free is installed.")
+            "'{0}' is not contained in PATH environnement variable. Please "
+            "make sure that AIMS library C++ is installed.".format(cmd))
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Fiber Oversampler"
@@ -63,16 +54,17 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
     """Provides link of parameters for autocompletion.
     """
-    self.linkParameters("oversampled_semilabeled_fibers", "semilabeled_fibers")
+    self.linkParameters("oversampled_semilabeled_fibers",
+                        "semilabeled_fibers")
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):

@@ -21,7 +21,7 @@ Main dependencies: Axon python API, Soma-base, constel
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 # python module
 import os
@@ -55,7 +55,7 @@ def validation():
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Clustering From Reduced Group Matrix"
@@ -108,7 +108,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
@@ -190,7 +190,7 @@ def initialization(self):
         link_clustering)
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):
@@ -207,9 +207,9 @@ def execution(self, context):
     label_number = select_ROI_number(
         self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     # Compute the group matrix
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
     # Declare the constel command
     args = ["constel_calculate_group_matrix.py"]
@@ -222,9 +222,9 @@ def execution(self, context):
     # Execute the command
     context.pythonSystem(*args)
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     # Compute the clustering of the group matrix
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
     # Declare the constel command
     cmd_args = ["constel_inter_subject_clustering.py"]

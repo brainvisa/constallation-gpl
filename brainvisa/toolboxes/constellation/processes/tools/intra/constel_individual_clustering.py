@@ -7,31 +7,22 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-"""
-This script does the following:
-* defines a Brainvisa process
-    - the signature of the inputs/ouputs,
-    - the initialization (by default) of the inputs,
-    - the interlinkages between inputs/outputs.
-* this process execute the command 'constel_intra_subject_clustering': a cortical
-  parcellation is computed for a label from a group connectivity matrix.
 
-Main dependencies: axon python API, soma, constel
-
-Author: Sandrine Lefranc, 2015
-"""
-
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # Axon python API module
-from brainvisa.processes import ValidationError, Signature, ReadDiskItem, \
-    Integer, WriteDiskItem, String
+from brainvisa.processes import String
+from brainvisa.processes import Integer
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import ValidationError
 
-# soma module
+# Soma module
 from soma.path import find_in_path
 
-# constel module
+# Package import
 try:
     from constel.lib.utils.filetools import select_ROI_number
 except:
@@ -49,7 +40,7 @@ def validation():
             "is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Clustering From Reduced Individual Matrix"
@@ -63,14 +54,14 @@ signature = Signature(
                             "reduced": "yes",
                             "intersubject": "no",
                             "individual": "yes"}),
-    "cortical_regions_nomenclature", ReadDiskItem(
+    "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
-    "cortical_region", String(),
-    "cortical_parcellation", ReadDiskItem(
+    "region", String(),
+    "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"}),
-    "white_mesh", ReadDiskItem(
+    "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"}),
@@ -87,36 +78,36 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
     """Provides default values and link of parameters
     """
     # default value
-    self.cortical_regions_nomenclature = self.signature[
-        "cortical_regions_nomenclature"].findValue(
+    self.regions_nomenclature = self.signature[
+        "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
     self.kmax = 12
 
     def link_matrix2label(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
-        signature 'cortical_region'.
+        signature 'region'.
         """
         if self.reduced_individual_matrix is not None:
             s = str(self.reduced_individual_matrix.get("gyrus"))
-            name = self.signature["cortical_region"].findValue(s)
+            name = self.signature["region"].findValue(s)
             return name
 
     # link of parameters for autocompletion
-    self.linkParameters("cortical_region", "reduced_individual_matrix",
+    self.linkParameters("region", "reduced_individual_matrix",
                         link_matrix2label)
     self.linkParameters("individual_ROI_clustering",
                         "reduced_individual_matrix")
-    self.linkParameters("cortical_parcellation", "white_mesh")
+    self.linkParameters("regions_parcellation", "individual_white_mesh")
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):
@@ -125,13 +116,13 @@ def execution(self, context):
     Reduced connectivity matrix is clustered using the kmedoids algorithm.
     """
     # selects the label number corresponding to label name
-    label_number = select_ROI_number(
-        self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
+    label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
+                                     self.region)
 
     context.pythonSystem("constel_intra_subject_clustering.py",
                          "matrix", self.reduced_individual_matrix,
                          "patch", label_number,
-                         "gyri_segmentation", self.cortical_parcellation,
-                         "mesh", self.white_mesh,
+                         "gyri_segmentation", self.regions_parcellation,
+                         "mesh", self.individual_white_mesh,
                          "kmax", self.kmax,
                          "clustering_time", self.individual_ROI_clustering)

@@ -7,30 +7,21 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-"""
-This script does the following:
-* define a Brainvisa process.
-* execute the command 'constelConnectivityMatrix'.
-* execute the command 'AimsSumSparseMatrix'.
-
-Main dependencies: axon python API, soma, constel
-
-"""
 
 # ---------------------------Imports-------------------------------------------
 
 
-# axon python API module
+# Axon python API module
 from brainvisa.processes import String
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
 
-# soma.path module
+# Soma module
 from soma.path import find_in_path
 
-# constel module
+# Package import
 try:
     from constel.lib.utils.filetools import select_ROI_number
 except:
@@ -41,11 +32,11 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    cmd_name = "constelConnectivityMatrix"
-    if not find_in_path("constelConnectivityMatrix"):  # checks command (C++)
+    cmd = "constelConnectivityMatrix"
+    if not find_in_path(cmd):
         raise ValidationError(
             "'{0}' is not contained in PATH environnement variable. "
-            "Please make sure that constel is installed.".format(cmd_name))
+            "Please make sure that constel package is installed.".format(cmd))
 
 
 # ---------------------------Functions-----------------------------------------
@@ -64,14 +55,14 @@ signature = Signature(
         "Filtered Fascicles Bundles", "Aims readable bundles formats",
         requiredAttributes={"ends_labelled": "both",
                             "oversampled": "no"}),
-    "cortical_regions_nomenclature", ReadDiskItem(
+    "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
-    "cortical_region", String(),
-    "white_mesh", ReadDiskItem(
+    "region", String(),
+    "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"}),
-    "cortical_parcellation", ReadDiskItem(
+    "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"}),
@@ -115,17 +106,17 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link between parameters"""
     # default value
-    self.cortical_regions_nomenclature = self.signature[
-        "cortical_regions_nomenclature"].findValue(
+    self.regions_nomenclature = self.signature[
+        "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
     def link_fibertracts2label(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
-        signature 'cortical_region'.
+        signature 'region'.
         """
         if self.oversampled_semilabeled_fibers is not None:
             s = str(self.oversampled_semilabeled_fibers.get("gyrus"))
-            name = self.signature["cortical_region"].findValue(s)
+            name = self.signature["region"].findValue(s)
         return name
 
     def link_smooth(self, dummy):
@@ -145,7 +136,7 @@ def initialization(self):
     # link of parameters for autocompletion
     self.linkParameters("matrix_semilabeled_fibers",
                         "oversampled_semilabeled_fibers")
-    self.linkParameters("cortical_region",
+    self.linkParameters("region",
                         "oversampled_semilabeled_fibers",
                         link_fibertracts2label)
     self.linkParameters("matrix_labeled_fibers",
@@ -174,8 +165,8 @@ def execution(self, context):
                both ends of fibers are well identified.
     """
     # selects the label number corresponding to label name
-    label_number = select_ROI_number(
-        self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
+    label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
+                                     self.region)
 
     # case 1
     # this command is mostly concerned with fibers leaving the brain stem
@@ -186,9 +177,9 @@ def execution(self, context):
                    "-dist", 0.0,  # no smoothing
                    "-wthresh", 0.001,
                    "-distmax", 5.0,
-                   "-seedregionstex", self.cortical_parcellation,
+                   "-seedregionstex", self.regions_parcellation,
                    "-outconntex", self.profile_semilabeled_fibers,
-                   "-mesh", self.white_mesh,
+                   "-mesh", self.individual_white_mesh,
                    "-type", "seed_mean_connectivity_profile",
                    "-trs", self.dw_to_t1,
                    "-seedlabel", label_number,
@@ -200,9 +191,9 @@ def execution(self, context):
                    "-bundles", self.labeled_fibers,
                    "-connmatrix", self.matrix_labeled_fibers,
                    "-dist", 0.0,  # no smoothing
-                   "-seedregionstex", self.cortical_parcellation,
+                   "-seedregionstex", self.regions_parcellation,
                    "-outconntex", self.profile_labeled_fibers,
-                   "-mesh", self.white_mesh,
+                   "-mesh", self.individual_white_mesh,
                    "-type", "seed_mean_connectivity_profile",
                    "-trs", self.dw_to_t1,
                    "-seedlabel", label_number,

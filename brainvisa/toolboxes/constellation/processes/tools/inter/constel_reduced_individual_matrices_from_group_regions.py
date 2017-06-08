@@ -21,7 +21,7 @@ Author: Sandrine Lefranc, 2015
 """
 
 
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # Axon python API module
@@ -45,7 +45,7 @@ def validation():
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Reduced Individual Matrices From Group Regions"
@@ -92,7 +92,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def afterChildAddedCallback(self, parent, key, child):
@@ -208,6 +208,10 @@ def initialization(self):
                     "method")
                 atts["gyrus"] = self.filtered_reduced_group_profile.get(
                     "gyrus")
+                atts["smallerlength"] = self.filtered_reduced_group_profile.get(
+                    "smallerlength")
+                atts["greaterlength"] = self.filtered_reduced_group_profile.get(
+                    "greaterlength")
                 atts["smoothing"] = self.filtered_reduced_group_profile.get(
                     "smoothing")
                 atts["sid"] = subject.attributes().get("subject")
