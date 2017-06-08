@@ -103,7 +103,7 @@ def initialization(self):
         """
         if (self.outputs_database is not None and
            self.study_name is not None and self.method is not None and
-           self.region is not None):
+           self.region is not None and self.fsl_connectome is not None):
             attrs = dict()
             attrs["_database"] = self.outputs_database
             attrs["center"] = "subjects"
