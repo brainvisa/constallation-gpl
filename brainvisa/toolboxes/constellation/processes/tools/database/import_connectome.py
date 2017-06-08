@@ -34,7 +34,7 @@ from soma.path import find_in_path
 # Package import
 try:
     from constel.lib.utils.filetools import read_file
-    from constel.lib.utils.filetools import select_ROI_name
+    from constel.lib.utils.filetools import select_ROI_number
 except:
     pass
 
@@ -192,9 +192,11 @@ def initialization(self):
 def execution(self, context):
     """
     """
-    subject = os.path.basename(os.path.dirname(self.fsl_connectome))
-    label_name = select_ROI_name(self.regions_nomenclature, self.region)
-    src = self.fsl_connectome
+    subject = os.path.basename(
+        os.path.dirname(self.fsl_connectome.fullPath()))
+    label_name = select_ROI_number(self.regions_nomenclature.fullPath(),
+                                   self.region)
+    src = self.fsl_connectome.fullPath()
     matrix_name = (subject +
                    "_" +
                    self.study_name +
@@ -202,18 +204,21 @@ def execution(self, context):
                    label_name +
                    "_complete_matrix_smooth0.0.imas")
 
-    dst = os.path.join(self.outputs_database,
-                       "subjects",
-                       subject,
-                       "diffusion",
-                       "default_acquisition",
-                       "default_analysis",
-                       "default_tracking_session",
-                       "connectivity_parcellation",
-                       self.method,
-                       self.study_name,
-                       label_name,
-                       "matrix",
-                       matrix_name)
+    dstdir = os.path.join(self.outputs_database,
+                          "subjects",
+                          subject,
+                          "diffusion",
+                          "default_acquisition",
+                          "default_analysis",
+                          "default_tracking_session",
+                          "connectivity_parcellation",
+                          self.method,
+                          self.study_name,
+                          label_name,
+                          "matrix")
+    if not os.path.isdir(dstdir):
+        os.makedirs(dstdir)
+
+    dst = os.path.join(dstdir, matrix_name)
 
     shutil.copy2(src, dst)
