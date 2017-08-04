@@ -100,7 +100,7 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
                             "averaged": "Yes"}),
-    "cortical_parcellation", ListOf(
+    "regions_parcellation", ListOf(
         ReadDiskItem("ROI Texture", "Aims texture formats",
                      requiredAttributes={"side": "both",
                                          "vertex_corr": "Yes"})),
@@ -216,10 +216,10 @@ def initialization(self):
                     profiles.append(profile)
             return profiles
 
-    def link_cortical_parcellation(self, dummy):
+    def link_regions_parcellation(self, dummy):
         if self.average_mesh is None:
             return []
-        roi_type = self.signature["cortical_parcellation"].contentType
+        roi_type = self.signature["regions_parcellation"].contentType
         if self.method == "avg":
             roi_seg = roi_type.findValue(self.average_mesh)
             if roi_seg is not None:
@@ -231,7 +231,7 @@ def initialization(self):
                 registerClass("minf_2.0", Subject, "Subject")
                 groupOfSubjects = readMinf(group.fullPath())
                 roi_seg = []
-                rdi = signature["cortical_parcellation"].contentType
+                rdi = signature["regions_parcellation"].contentType
                 for subject in groupOfSubjects:
                     req = {"averaged": "No", "subject": subject.subject}
                     req.update(rdi.requiredAttributes)
@@ -277,9 +277,9 @@ def initialization(self):
                         "mean_individual_profiles")
     self.linkParameters("average_mesh", "constellation_subjects_group",
                         link_mesh)
-    self.linkParameters("cortical_parcellation",
+    self.linkParameters("regions_parcellation",
                         ["average_mesh", "method"],
-                        link_cortical_parcellation)
+                        link_regions_parcellation)
 
     # visibility level for the user
     self.signature["mean_individual_profiles"].userLevel = 2
@@ -360,8 +360,8 @@ def initialization(self):
     eNode.addDoubleLink("ReducedGroupMatrix.study_name",
                         "study_name")
     eNode.addDoubleLink("ReducedGroupMatrix.average_mesh", "average_mesh")
-    eNode.addDoubleLink("ReducedGroupMatrix.cortical_parcellation",
-                        "cortical_parcellation")
+    eNode.addDoubleLink("ReducedGroupMatrix.regions_parcellation",
+                        "regions_parcellation")
     eNode.addDoubleLink("ReducedGroupMatrix.filtered_reduced_group_profile",
                         "GroupRegionsFiltering.filtered_reduced_group_profile")
 
@@ -377,8 +377,8 @@ def initialization(self):
                         "constellation_subjects_group")
     eNode.addDoubleLink("GroupClustering.method", "method")
     eNode.addDoubleLink("GroupClustering.average_mesh", "average_mesh")
-    eNode.addDoubleLink("GroupClustering.cortical_parcellation",
-                        "cortical_parcellation")
+    eNode.addDoubleLink("GroupClustering.regions_parcellation",
+                        "regions_parcellation")
     eNode.addDoubleLink("GroupClustering.intersubject_reduced_matrices",
                         "ReducedGroupMatrix.intersubject_reduced_matrices")
 

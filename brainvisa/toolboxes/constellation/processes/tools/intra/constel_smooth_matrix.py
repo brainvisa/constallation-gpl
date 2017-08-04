@@ -104,9 +104,9 @@ def initialization(self):
         if self.complete_individual_matrix is not None:
             attrs = dict(self.complete_individual_matrix.hierarchyAttributes())
             attrs["smoothing"] = str(self.smoothing)
-        filename = self.signature[
+            filename = self.signature[
                 "complete_matrix_smoothed"].findValue(attrs)
-        return filename
+            return filename
 
     # link of parameters for autocompletion
     self.linkParameters("region",

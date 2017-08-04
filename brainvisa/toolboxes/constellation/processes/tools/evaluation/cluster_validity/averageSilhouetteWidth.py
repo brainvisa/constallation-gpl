@@ -20,7 +20,7 @@ Main dependencies: axon python API, soma-base, constel
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # system module
@@ -50,14 +50,14 @@ def validate(self):
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Average Silhouette Width"
 userLevel = 2
 
 signature = Signature(
-    #--inputs
+    # --inputs
     "reduced_matrices", ListOf(
         ReadDiskItem("Connectivity Matrix", "GIS image",
                      requiredAttributes={"ends_labelled": "all",
@@ -66,7 +66,7 @@ signature = Signature(
                                          "individual": "yes"})),
     "kmax", Integer(),
 
-    #--outputs--
+    # --outputs--
     "outpdffile", WriteDiskItem("Any Type", getAllFormats()),
     "ybound", ListOf(Float()),
     "ignore_Kopt2",  Boolean(),
@@ -74,7 +74,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
@@ -98,7 +98,7 @@ def initialization(self):
     self.linkParameters("outpdffile", "reduced_matrices", link_outdir)
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):

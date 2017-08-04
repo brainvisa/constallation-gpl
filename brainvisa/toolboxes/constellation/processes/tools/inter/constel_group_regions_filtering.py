@@ -22,7 +22,7 @@ Main dependencies: Axon python API, Soma-base, constel
 Author: Sandrine Lefranc
 """
 
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # python module
@@ -52,7 +52,7 @@ def validation():
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Group Regions Filtering"
@@ -89,7 +89,7 @@ signature = Signature(
 )
 
 
-#----------------------------Function------------------------------------------
+# ---------------------------Function------------------------------------------
 
 
 def initialization(self):

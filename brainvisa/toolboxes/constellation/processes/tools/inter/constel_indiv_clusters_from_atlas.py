@@ -20,7 +20,7 @@ Main dependencies: axon python API, soma, constel
 Author: Sandrine Lefranc, 2016
 """
 
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # axon python API module
@@ -42,7 +42,7 @@ def validation():
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Individual clusters from atlas"
@@ -80,7 +80,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
@@ -88,7 +88,7 @@ def initialization(self):
     pass
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):

@@ -72,12 +72,12 @@ signature = Signature(
     "method", Choice(
         ("averaged approach", "avg"),
         ("concatenated approach", "concat")),
-    "cortical_regions_nomenclature", ReadDiskItem(
+    "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
-    "cortical_region", String(),
+    "region", String(),
     "subjects_group", ReadDiskItem(
          "Group definition", "XML"),
-    "cortical_parcellation", ListOf(ReadDiskItem(
+    "regions_parcellation", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"})),
@@ -116,17 +116,17 @@ def initialization(self):
 
     # default value
     self.nb_clusters = 12
-    self.cortical_regions_nomenclature = self.signature[
-        "cortical_regions_nomenclature"].findValue(
+    self.regions_nomenclature = self.signature[
+        "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
     def link_matrix2label(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
-        signature 'cortical_region'.
+        signature 'region'.
         """
         if self.intersubject_reduced_matrices:
             s = self.intersubject_reduced_matrices[0].get("gyrus")
-            name = self.signature["cortical_region"].findValue(s)
+            name = self.signature["region"].findValue(s)
             return name
 
     def link_matrices(self, dummy):
@@ -179,7 +179,7 @@ def initialization(self):
 
     # link of parameters for autocompletion
     self.linkParameters(
-        "cortical_region", "intersubject_reduced_matrices", link_matrix2label)
+        "region", "intersubject_reduced_matrices", link_matrix2label)
     self.linkParameters(
         "reduced_group_matrix",
         ("subjects_group", "intersubject_reduced_matrices", "method"),
@@ -205,7 +205,7 @@ def execution(self, context):
     """
     # selects the label number corresponding to label name
     label_number = select_ROI_number(
-        self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
+        self.regions_nomenclature.fullPath(), self.region)
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     # Compute the group matrix
@@ -232,7 +232,7 @@ def execution(self, context):
     # Define the arguments
     for t in self.ROI_clustering:
         cmd_args += ["-p", t]
-    for y in self.cortical_parcellation:
+    for y in self.regions_parcellation:
         cmd_args += ["-t", y]
     cmd_args += ["-m", self.average_mesh,
                  "-l", str(label_number),
