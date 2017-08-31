@@ -18,7 +18,6 @@ import shutil
 # Axon python API module
 from brainvisa.processes import Float
 from brainvisa.processes import Choice
-from brainvisa.processes import String
 from brainvisa.processes import Signature
 from brainvisa.processes import OpenChoice
 from brainvisa.processes import ReadDiskItem

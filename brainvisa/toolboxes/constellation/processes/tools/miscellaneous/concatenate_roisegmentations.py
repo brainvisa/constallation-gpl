@@ -19,7 +19,7 @@ Author: Sandrine Lefranc
 """
 
 
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # system module
@@ -41,7 +41,7 @@ from soma import aims
 from constel.lib.utils.texturetools import concatenate_texture
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = 'Concatenate the ROI segmentations on the same mesh'
@@ -53,7 +53,7 @@ signature = Signature(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "no",
                             "roi_filtered": "no",
-                            "averaged": "no",
+                            "measure": "no",
                             "intersubject": "yes",
                             "step_time": "yes"})),
     "time_step", ListOf(Integer()),
@@ -63,7 +63,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
@@ -72,13 +72,11 @@ def initialization(self):
     pass
 
 
-#----------------------------Main Program--------------------------------------
+# ---------------------------Main Program--------------------------------------
 
 
 def execution(self, context):
     """
     """
-    context.write(self.ROI_clustering)
     final_rseg = concatenate_texture(self.ROI_clustering, self.time_step)
     aims.write(final_rseg, self.concatenated_ROIseg.fullPath())
-

@@ -59,11 +59,11 @@ userLevel = 2
 signature = Signature(
     # --inputs
     "reduced_matrices", ListOf(
-        ReadDiskItem("Connectivity Matrix", "GIS image",
+        ReadDiskItem("Connectivity Matrix", "Aims matrix formats",
                      requiredAttributes={"ends_labelled": "all",
                                          "reduced": "yes",
                                          "intersubject": "yes",
-                                         "individual": "yes"})),
+                                         "individual": "no"})),
     "kmax", Integer(),
 
     # --outputs--

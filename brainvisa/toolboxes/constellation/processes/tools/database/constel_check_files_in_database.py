@@ -7,17 +7,8 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-"""
-This script does the following:
-*
-*
 
-Main dependencies:
-
-Author: Sandrine Lefranc, 2016
-"""
-
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # system module
@@ -27,14 +18,21 @@ import sys
 from soma.path import find_in_path
 
 # axon python API module
-from brainvisa.processes import Signature, ReadDiskItem, ListOf, Choice, \
-    WriteDiskItem, neuroHierarchy, OpenChoice, String, ValidationError
-    
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import Choice
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import neuroHierarchy
+from brainvisa.processes import OpenChoice
+from brainvisa.processes import String
+from brainvisa.processes import ValidationError
+
 # constel modules
 try:
     from constel.lib.utils.filetools import read_file
 except:
     pass
+
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
@@ -45,7 +43,7 @@ def validation():
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Check Constellation Files"
@@ -65,7 +63,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
@@ -74,7 +72,7 @@ def initialization(self):
     # default values
     self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({
         "atlasname": "desikan_freesurfer"})
-    
+
     def link_roi(self, dummy):
         """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
         of process.
@@ -86,7 +84,7 @@ def initialization(self):
             if isinstance(self.signature['ROI'], OpenChoice):
                 self.signature["ROI"] = Choice(*s)
                 self.changeSignature(self.signature)
-    
+
     def link_ofile(self, dummy):
         """
         """
@@ -94,7 +92,7 @@ def initialization(self):
             filename = self.database + "/datacheck/" + self.method + "_" + \
                 self.study_name + "_" + self.ROI + "_datacheck.txt"
             return filename
-    
+
     # list of possible databases, while respecting the ontology
     databases = [h.name for h in neuroHierarchy.hierarchies()
                  if h.fso.name == "brainvisa-3.2.0"]
@@ -110,7 +108,7 @@ def initialization(self):
         "result_in_textfile", ("ROI", "database", "method", "study_name"),
         link_ofile)
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):
