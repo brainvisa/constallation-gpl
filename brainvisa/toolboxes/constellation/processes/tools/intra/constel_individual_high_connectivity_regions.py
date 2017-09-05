@@ -7,31 +7,17 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-"""
-This script does the following:
-* defines a Brainvisa process
-    - the signature of the inputs/ouputs,
-    - the interlinkages between inputs/outputs.
-* executes the command 'AimsMeshWatershed'
 
-Main dependencies: axon python API, soma
-
-Author: Sandrine Lefranc, 2015
-"""
-
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
-# python system
-import sys
-
-# axon python API module
+# Axon python API module
 from brainvisa.processes import ValidationError
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 
-# soma module
+# Soma module
 from soma.path import find_in_path
 
 
@@ -44,7 +30,7 @@ def validation():
             "Please make sure that aims module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Individual High Connectivity Regions"
@@ -57,7 +43,7 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "all",
                             "normed": "yes",
                             "intersubject": "no"}),
-    "white_mesh", ReadDiskItem(
+    "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
@@ -74,7 +60,7 @@ signature = Signature(
 )
 
 
-#----------------------------Function------------------------------------------
+# ---------------------------Function------------------------------------------
 
 
 def initialization(self):
@@ -84,7 +70,7 @@ def initialization(self):
                         "normed_individual_profile")
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):
@@ -94,8 +80,7 @@ def execution(self, context):
     """
     context.pythonSystem("AimsMeshWatershed.py",
                          self.normed_individual_profile,
-                         self.white_mesh,
+                         self.individual_white_mesh,
                          self.reduced_individual_profile,
                          "--threshold", 0.05,
                          "--mode", "or")
-

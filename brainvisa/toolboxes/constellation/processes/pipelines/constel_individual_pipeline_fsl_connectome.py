@@ -34,7 +34,7 @@ except:
 # ---------------------------Header--------------------------------------------
 
 
-name = "Constellation Individual Pipeline -  Connectomist"
+name = "Constellation Individual Pipeline - FSL connectome"
 userLevel = 0
 
 signature = Signature(
@@ -44,7 +44,6 @@ signature = Signature(
     "method", Choice(
         ("averaged approach", "avg"),
         ("concatenated approach", "concat")),
-    "subject_indir", ReadDiskItem("subject", "directory"),
     "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "region", OpenChoice(),
@@ -58,13 +57,12 @@ signature = Signature(
                             "vertex_corr": "Yes",
                             "inflated": "No",
                             "averaged": "No"}),
-    "dw_to_t1", ReadDiskItem(
-        "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix"),
+    "probtrackx_indir", ReadDiskItem("directory",
+                                     "directory"),
+    "outdir", ReadDiskItem("directory", "directory"),
     "keep_regions", ListOf(OpenChoice()),
-    "smoothing", Float(),
-    "fiber_tracts_format", Choice("bundles", "trk"),
     "min_fibers_length", Float(),
-    "max_fibers_length", Float(),
+    "smoothing", Float(),
     "normalize", Boolean(),
     "kmax", Integer(),
 )
@@ -88,9 +86,8 @@ def initialization(self):
 
     # default value
     self.smoothing = 3.0
+    self.min_fibers_length = 20.0
     self.kmax = 12
-    self.min_fibers_length = 20.
-    self.max_fibers_length = 500.
     self.normalize = True
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
@@ -151,152 +148,59 @@ def initialization(self):
             else:
                 self.setValue("region", current, True)
 
-    def method_changed(self, dummy):
-        """
-        """
-        signature = self.signature
-        if self.method == "avg":
-            signature["regions_parcellation"] = ReadDiskItem(
-                "ROI Texture", "Aims texture formats",
-                requiredAttributes={"side": "both", "vertex_corr": "Yes",
-                                    "averaged": "Yes"})
-            self.changeSignature(signature)
-            self.setValue("regions_parcellation",
-                          signature["regions_parcellation"].findValue(
-                              self.subject_indir), True)
-        else:
-            signature["regions_parcellation"] = ReadDiskItem(
-                "ROI Texture", "Aims texture formats",
-                requiredAttributes={"side": "both", "vertex_corr": "Yes",
-                                    "averaged": "No"})
-            self.changeSignature(signature)
-            self.setValue("regions_parcellation", link_label(self), True)
-        fill_study_choice(self)
-
-    def linkMesh(self, dummy):
-        """
-        """
-        if self.method == "avg":
-            if self.regions_parcellation is not None:
-                return self.signature["individual_white_mesh"].findValue(
-                    self.regions_parcellation)
-            return None
-        else:
-            if self.subject_indir is not None:
-                atts = {"subject": self.subject_indir.get("subject")}
-                return self.signature["individual_white_mesh"].findValue(atts)
-
-    def link_label(self, dummy=None):
-        """
-        """
-        roi_type = self.signature["regions_parcellation"]
-        if self.method == "avg" and self.study_name:
-            # just in case study_name corresponds to subjects group...
-            res = roi_type.findValue(
-                {"freesurfer_group_of_subjects": self.study_name})
-            if res is None:
-                res = roi_type.findValue(
-                    {"group_of_subjects": self.study_name})
-            return res
-        elif self.method == "concat" and self.subject_indir is not None:
-            res = roi_type.findValue(
-                self.subject_indir)
-            if res is None:
-                res = roi_type.findValue(
-                    self.subject_indir,
-                    requiredAttributes={"_type": "BothResampledGyri"})
-            return res
-
     # link of parameters for autocompletion
     self.linkParameters(None,
                         "regions_nomenclature",
                         reset_label)
     self.linkParameters(None,
-                        "method",
-                        method_changed)
-    self.linkParameters("individual_white_mesh",
-                        "subject_indir")
-    self.linkParameters(None,
                         "outputs_database",
                         fill_study_choice)
-    self.linkParameters("regions_parcellation",
-                        ["study_name", "subject_indir", "method"],
-                        link_label)
     self.linkParameters("keep_regions",
                         "regions_nomenclature",
                         link_keep_regions)
-
-    method_changed(self, self.method)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
 
     ###########################################################################
-    #        link of parameters for the process: "Bundles Filtering"          #
+    #    link of parameters with the process: "FSL connectome"                #
     ###########################################################################
 
     eNode.addChild(
-        "filter", ProcessExecutionNode("constel_brain_tracts_filtering",
-                                       optional=1))
+        "confsl", ProcessExecutionNode("constel_fsl_connectome", optional=1))
 
-    eNode.addDoubleLink("filter.outputs_database",
+    eNode.addDoubleLink("confsl.probtrackx_indir",
+                        "probtrackx_indir")
+    eNode.addDoubleLink("confsl.regions_parcellation",
+                        "regions_parcellation")
+    eNode.addDoubleLink("confsl.regions_nomenclature",
+                        "regions_nomenclature")
+    eNode.addDoubleLink("confsl.region",
+                        "region")
+    eNode.addDoubleLink("confsl.outdir",
+                        "outdir")
+
+    ###########################################################################
+    #    link of parameters with the process: "Import FSL connectome"         #
+    ###########################################################################
+
+    eNode.addChild(
+        "import", ProcessExecutionNode("import_connectome", optional=1))
+
+    eNode.addDoubleLink("import.outputs_database",
                         "outputs_database")
-    eNode.addDoubleLink("filter.fiber_tracts_format",
-                        "fiber_tracts_format")
-    eNode.addDoubleLink("filter.method",
-                        "method")
-    eNode.addDoubleLink("filter.region",
-                        "region")
-    eNode.addDoubleLink("filter.regions_nomenclature",
-                        "regions_nomenclature")
-    eNode.addDoubleLink("filter.study_name",
+    eNode.addDoubleLink("import.study_name",
                         "study_name")
-    eNode.addDoubleLink("filter.subject_indir",
-                        "subject_indir")
-    eNode.addDoubleLink("filter.regions_parcellation",
-                        "regions_parcellation")
-    eNode.addDoubleLink("filter.individual_white_mesh",
-                        "individual_white_mesh")
-    eNode.addDoubleLink("filter.dw_to_t1",
-                        "dw_to_t1")
-    eNode.addDoubleLink("filter.min_fibers_length",
+    eNode.addDoubleLink("import.method",
+                        "method")
+    eNode.addDoubleLink("import.regions_nomenclature",
+                        "confsl.regions_nomenclature")
+    eNode.addDoubleLink("import.region",
+                        "confsl.region")
+    eNode.addDoubleLink("import.min_fibers_length",
                         "min_fibers_length")
-    eNode.addDoubleLink("filter.max_fibers_length",
-                        "max_fibers_length")
-
-    ###########################################################################
-    #        link of parameters with the process: "Fiber Oversampler"         #
-    ###########################################################################
-
-    eNode.addChild(
-        "oversampler", ProcessExecutionNode("constel_fiber_oversampler",
-                                            optional=1))
-
-    eNode.addDoubleLink("oversampler.semilabeled_fibers",
-                        "filter.semilabeled_fibers")
-
-    ###########################################################################
-    #        link of parameters with the process: "Connectivity Matrix"       #
-    ###########################################################################
-
-    eNode.addChild(
-        "ConnectivityMatrix",
-        ProcessExecutionNode("constel_sparse_individual_matrices", optional=1))
-
-    eNode.addDoubleLink("ConnectivityMatrix.oversampled_semilabeled_fibers",
-                        "oversampler.oversampled_semilabeled_fibers")
-    eNode.addDoubleLink("ConnectivityMatrix.labeled_fibers",
-                        "filter.labeled_fibers")
-    eNode.addDoubleLink("ConnectivityMatrix.regions_nomenclature",
-                        "regions_nomenclature")
-    eNode.addDoubleLink("ConnectivityMatrix.region",
-                        "region")
-    eNode.addDoubleLink("ConnectivityMatrix.regions_parcellation",
-                        "regions_parcellation")
-    eNode.addDoubleLink("ConnectivityMatrix.individual_white_mesh",
-                        "individual_white_mesh")
-    eNode.addDoubleLink("ConnectivityMatrix.dw_to_t1",
-                        "filter.dw_to_t1")
+    eNode.addDoubleLink("import.fsl_connectome",
+                        "confsl.output_connectome")
 
     ###########################################################################
     #    "Constellation Individual Sub-pipeline"                              #
@@ -307,7 +211,7 @@ def initialization(self):
                                         optional=1))
 
     eNode.addDoubleLink("subpipeline.complete_individual_matrix",
-                        "ConnectivityMatrix.complete_individual_matrix")
+                        "import.complete_individual_matrix")
     eNode.addDoubleLink("subpipeline.regions_nomenclature",
                         "regions_nomenclature")
     eNode.addDoubleLink("subpipeline.region",

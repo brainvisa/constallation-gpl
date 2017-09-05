@@ -7,17 +7,8 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-"""
-This script does the following:
-*
-*
 
-Main dependencies:
-
-Author: Sandrine Lefranc, 2016
-"""
-
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # system module
@@ -27,14 +18,22 @@ import sys
 from soma.path import find_in_path
 
 # axon python API module
-from brainvisa.processes import Signature, ReadDiskItem, ListOf, Choice, \
-    WriteDiskItem, neuroHierarchy, OpenChoice, String, ValidationError, Boolean
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import Choice
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import neuroHierarchy
+from brainvisa.processes import OpenChoice
+from brainvisa.processes import String
+from brainvisa.processes import ValidationError
+from brainvisa.processes import Boolean
 
 # constel modules
 try:
     from constel.lib.utils.filetools import read_file
 except:
     pass
+
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
@@ -45,7 +44,7 @@ def validation():
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Remove Individual Constellation Files"
@@ -76,7 +75,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
@@ -132,7 +131,7 @@ def initialization(self):
         link_ofile)
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):

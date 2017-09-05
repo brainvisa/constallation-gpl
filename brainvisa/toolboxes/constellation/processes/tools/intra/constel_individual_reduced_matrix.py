@@ -7,29 +7,22 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-"""
-This script does the following:
-* defines a Brainvisa process
-    - the signature of the inputs/ouputs,
-    - the initialization (by default) of the inputs,
-    - the interlinkages between inputs/outputs.
-* executes the command 'constelConnectionDensityTexture': the reduced
-  connectivity matrix is computed (normalized or not).
 
-Main dependencies: axon python API, soma, constel
-
-Author: Sandrine Lefranc, 2015
-"""
-
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
-# axon python API modules
-from brainvisa.processes import Signature, ReadDiskItem, ValidationError, \
-    WriteDiskItem, String, Boolean
+# Axon python API modules
+from brainvisa.processes import String
+from brainvisa.processes import Boolean
+from brainvisa.processes import Signature
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import ValidationError
+
+# Soma module
 from soma.path import find_in_path
 
-# constel modules
+# Package import
 try:
     from constel.lib.utils.filetools import select_ROI_number
     from constel.lib.utils.matrixtools import save_normalization
@@ -48,15 +41,15 @@ def validation():
             "is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Reduced Individual Matrix From Filtered Reduced Profile"
 userLevel = 2
 
 signature = Signature(
-    # inputs
-    "complete_individual_matrix", ReadDiskItem(
+    # --inputs--
+    "complete_matrix_smoothed", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
@@ -69,19 +62,19 @@ signature = Signature(
                             "intersubject": "no",
                             "step_time": "no",
                             "measure": "no"}),
-    "cortical_regions_nomenclature", ReadDiskItem(
+    "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
-    "cortical_region", String(),
-    "white_mesh", ReadDiskItem(
-        "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
-    "cortical_parcellation", ReadDiskItem(
+    "region", String(),
+    "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"}),
+    "individual_white_mesh", ReadDiskItem(
+        "White Mesh", "Aims mesh formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
 
-    #outputs
+    # --outputs--
     "reduced_individual_matrix", WriteDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
@@ -92,44 +85,44 @@ signature = Signature(
 )
 
 
-#----------------------------Function--------------------------------------
+# ---------------------------Function--------------------------------------
 
 
 def initialization(self):
     """Provides default value and link of parameters"""
     # default value
-    self.cortical_regions_nomenclature = self.signature[
-        "cortical_regions_nomenclature"].findValue(
+    self.regions_nomenclature = self.signature[
+        "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
     self.normalize = True
 
     def link_matrix2label(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
-        signature 'cortical_region'.
+        signature 'region'.
         """
-        if self.complete_individual_matrix is not None:
-            s = str(self.complete_individual_matrix.get("gyrus"))
+        if self.complete_matrix_smoothed is not None:
+            s = str(self.complete_matrix_smoothed.get("gyrus"))
             return s
 
     # link of parameters for autocompletion
     self.linkParameters("filtered_reduced_individual_profile",
-                        "complete_individual_matrix")
-    self.linkParameters("cortical_region",
-                        "complete_individual_matrix",
+                        "complete_matrix_smoothed")
+    self.linkParameters("region",
+                        "complete_matrix_smoothed",
                         link_matrix2label)
     self.linkParameters("reduced_individual_matrix",
                         "filtered_reduced_individual_profile")
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):
     """ Compute reduced connectivity matrix M(target regions, patch vertices)
     """
     # selects the ROI label corresponding to ROI name
-    label_number = select_ROI_number(
-        self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
+    label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
+                                     self.region)
 
     # normalization of the reduced matrix
     if self.normalize:
@@ -140,10 +133,10 @@ def execution(self, context):
     # M(target regions, patch vertices)
     context.system(
         "constelConnectionDensityTexture",
-        "-mesh", self.white_mesh,
-        "-connmatrixfile", self.complete_individual_matrix,
+        "-mesh", self.individual_white_mesh,
+        "-connmatrixfile", self.complete_matrix_smoothed,
         "-targetregionstex", self.filtered_reduced_individual_profile,
-        "-seedregionstex", str(self.cortical_parcellation),
+        "-seedregionstex", str(self.regions_parcellation),
         "-seedlabel", label_number,
         "-type", "seedVertex_to_targets",
         "-connmatrix", self.reduced_individual_matrix,

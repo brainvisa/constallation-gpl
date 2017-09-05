@@ -7,20 +7,8 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-"""
-This script does the following:
-* defines a Brainvisa process
-    - the signature of the inputs/ouputs,
-    - the initialization (by default) of the inputs,
-    - the interlinkages between inputs/outputs.
-* this process executes the command 'constel_remove_internal_connections.py'.
 
-Main dependencies: Axon python API, Soma-base, constel
-
-Author: Sandrine Lefranc, 2015
-"""
-
-#----------------------------Imports-------------------------------------------
+# ---------------------------Imports-------------------------------------------
 
 
 # Axon python API module
@@ -33,7 +21,7 @@ from brainvisa.processes import Choice
 from brainvisa.processes import String
 from brainvisa.processes import ListOf
 
-# constel module
+# Package import
 try:
     from constel.lib.utils.filetools import read_file
     from constel.lib.utils.filetools import select_ROI_number
@@ -52,7 +40,7 @@ def validation():
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Mean Individual Profile Normalization"
@@ -65,13 +53,13 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "all",
                             "normed": "no",
                             "intersubject": "no"}),
-    "cortical_parcellation", ReadDiskItem(
+    "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"}),
-    "cortical_regions_nomenclature", ReadDiskItem(
+    "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
-    "cortical_region", String(),
+    "region", String(),
 
     # --outputs--
     "normed_individual_profile", WriteDiskItem(
@@ -83,47 +71,49 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
     """Provides default values and link of parameters.
     """
     # default value
-    self.cortical_regions_nomenclature = self.signature[
-        "cortical_regions_nomenclature"].findValue(
+    self.regions_nomenclature = self.signature[
+        "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
     def link_keep_regions(self, dummy):
         """
         """
-        if self.cortical_regions_nomenclature is not None:
+        if self.regions_nomenclature is not None:
             s = []
             s += read_file(
-                self.cortical_regions_nomenclature.fullPath(), mode=2)
+                self.regions_nomenclature.fullPath(), mode=2)
             self.signature["keep_regions"] = ListOf(Choice(*s))
             self.changeSignature(self.signature)
 
     def link_matrix2label(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
-        signature 'cortical_region'.
+        signature 'region'.
         """
         if self.mean_individual_profile is not None:
             s = str(self.mean_individual_profile.get("gyrus"))
-            name = self.signature["cortical_region"].findValue(s)
+            name = self.signature["region"].findValue(s)
+        else:
+            name = ""
         return name
 
     # link of parameters for autocompletion
     self.linkParameters(
-        "cortical_region", "mean_individual_profile", link_matrix2label)
+        "region", "mean_individual_profile", link_matrix2label)
     self.linkParameters(
         "normed_individual_profile", "mean_individual_profile")
     self.linkParameters(
-        "keep_regions", "cortical_regions_nomenclature",
+        "keep_regions", "regions_nomenclature",
         link_keep_regions)
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):
@@ -133,20 +123,19 @@ def execution(self, context):
     STEP 2/2: The profile is normalized.
     """
     # selects the label number corresponding to label name
-    label_number = select_ROI_number(
-        self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
+    label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
+                                     self.region)
 
     cmd = ["constel_remove_internal_connections.py",
            label_number,
            self.mean_individual_profile,
-           self.cortical_parcellation,
-           self.normed_individual_profile,
-          ]
+           self.regions_parcellation,
+           self.normed_individual_profile]
 
     labels = []
     for region in self.keep_regions:
         l = select_ROI_number(
-            self.cortical_regions_nomenclature.fullPath(), region)
+            self.regions_nomenclature.fullPath(), region)
         labels.append(l)
     cmd += ["-r"]
     for label in labels:

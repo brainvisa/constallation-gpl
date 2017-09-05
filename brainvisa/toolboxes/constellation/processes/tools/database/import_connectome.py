@@ -13,6 +13,7 @@
 
 # System modules
 import os
+import shutil
 
 # Axon python API module
 from brainvisa.processes import Float
@@ -21,8 +22,10 @@ from brainvisa.processes import Signature
 from brainvisa.processes import OpenChoice
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import getAllFormats
 from brainvisa.processes import neuroHierarchy
 from brainvisa.processes import ValidationError
+
 
 # Soma module
 from soma.path import find_in_path
@@ -30,8 +33,6 @@ from soma.path import find_in_path
 # Package import
 try:
     from constel.lib.utils.filetools import read_file
-    from constel.lib.utils.filetools import select_ROI_number
-    from constel.lib.utils.fibertools import load_fiber_tracts
 except:
     pass
 
@@ -50,44 +51,28 @@ def validation():
 # ---------------------------Header--------------------------------------------
 
 
-name = "Brain Tracts Filtering"
+name = "Import Connectomes."
 userLevel = 2
 
 signature = Signature(
     # --inputs--
     "outputs_database", Choice(),
     "study_name", OpenChoice(),
-    "method", Choice(
-        ("averaged approach", "avg"), ("concatenated approach", "concat")),
-    "subject_indir", ReadDiskItem(
-        "subject", "directory"),    
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
+    "method", Choice(("averaged approach", "avg"),
+                     ("concatenated approach", "concat")),
+    "regions_nomenclature", ReadDiskItem("Nomenclature ROIs File",
+                                         "Text File"),
     "region", OpenChoice(),
-    "regions_parcellation", ReadDiskItem(
-        "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
-    "individual_white_mesh", ReadDiskItem(
-        "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
-    "dw_to_t1", ReadDiskItem(
-        "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix"),
-    "fiber_tracts_format", Choice(
-        "bundles", "trk"),
     "min_fibers_length", Float(),
-    "max_fibers_length", Float(),
+    "fsl_connectome", ReadDiskItem('Any Type', getAllFormats()),
 
     # --outputs--
-    "labeled_fibers", WriteDiskItem(
-        "Filtered Fascicles Bundles", "Aims writable bundles formats",
-        requiredAttributes={"ends_labelled": "both",
-                            "oversampled": "no"}),
-    "semilabeled_fibers", WriteDiskItem(
-        "Filtered Fascicles Bundles", "Aims writable bundles formats",
-        requiredAttributes={"ends_labelled": "one",
-                            "oversampled": "no"}),
+    "complete_individual_matrix", WriteDiskItem("Connectivity Matrix",
+                                                "Sparse Matrix",
+                                                requiredAttributes={
+                                                    "ends_labelled": "all",
+                                                    "reduced": "no",
+                                                    "intersubject": "no"}),
 )
 
 
@@ -99,7 +84,6 @@ def initialization(self):
     """
     # Define the default values
     self.min_fibers_length = 20.  # in mm
-    self.max_fibers_length = 500.  # in mm
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -112,6 +96,29 @@ def initialization(self):
         self.outputs_database = databases[0]
     else:
         self.signature["outputs_database"] = OpenChoice()
+
+    def link_matrix(self, dummy):
+        """
+        """
+        if (self.outputs_database is not None and
+           self.study_name is not None and self.method is not None and
+           self.region is not None and self.fsl_connectome is not None):
+            attrs = dict()
+            attrs["_database"] = self.outputs_database
+            attrs["center"] = "subjects"
+            attrs["method"] = self.method
+            attrs["tracking_session"] = None
+            attrs["studyname"] = self.study_name
+            attrs["smoothing"] = str(0.0)
+            attrs["smallerlength"] = str(self.min_fibers_length)
+            attrs["greaterlength"] = str(500.0)
+            attrs["tracking_session"] = "default_tracking_session"
+            attrs["subject"] = os.path.basename(
+               os.path.dirname(self.fsl_connectome.fullPath()))
+            attrs["gyrus"] = str(self.region)
+            filename = self.signature[
+                "complete_individual_matrix"].findValue(attrs)
+            return filename
 
     def fill_study_choice(self, dummy=None):
         """
@@ -158,25 +165,6 @@ def initialization(self):
             else:
                 self.setValue("region", current, True)
 
-    def link_filtered_bundles(self, dummy):
-        """Defines all attributs of 'labeled_fibers' and return a filename.
-
-        This function automatically creates the signature of 'labeled_fibers'.
-        """
-        if (self.outputs_database and self.study_name and
-                self.region and self.subject_indir) is not None:
-            attrs = dict()
-            attrs["_database"] = self.outputs_database
-            attrs["method"] = self.method
-            attrs["studyname"] = self.study_name
-            attrs["subject"] = os.path.basename(
-                self.subject_indir.fullPath())
-            attrs["gyrus"] = str(self.region)
-            attrs["smallerlength"] = str(int(self.min_fibers_length))
-            attrs["greaterlength"] = str(int(self.max_fibers_length))
-            filename = self.signature["labeled_fibers"].findValue(attrs)
-            return filename
-
     # Link of parameters for autocompletion
     self.linkParameters(None,
                         "regions_nomenclature",
@@ -184,15 +172,14 @@ def initialization(self):
     self.linkParameters(None,
                         "outputs_database",
                         fill_study_choice)
-    self.linkParameters("dw_to_t1",
-                        "subject_indir")
-    self.linkParameters("labeled_fibers",
-                        ("outputs_database", "subject_indir", "method",
-                         "study_name", "region", "min_fibers_length",
-                         "max_fibers_length"),
-                        link_filtered_bundles)
-    self.linkParameters("semilabeled_fibers",
-                        "labeled_fibers")
+    self.linkParameters("complete_individual_matrix",
+                        ("outputs_database",
+                         "study_name",
+                         "method",
+                         "region",
+                         "fsl_connectome",
+                         "min_fibers_length"),
+                        link_matrix)
 
     fill_study_choice(self)
 
@@ -201,47 +188,35 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Run the command 'constelBundlesFiltering'.
-
-    This command filters the fiber tracts according to length.
-
-    Two type of fiber tracts files are to be considered in this process:
-        - the fibers near cortex are defined as having both ends attached to
-          the mesh (and are consequently labelled)
-        - the distant fibers are defined as having only one end attached to the
-          mesh (the other being not identified)
     """
-    # Select all fiber tracts of the given subject.
-    list_fiber_tracts = load_fiber_tracts(self.subject_indir.fullPath(),
-                                          self.fiber_tracts_format)
+    """
+    subject = os.path.basename(
+        os.path.dirname(self.fsl_connectome.fullPath()))
+    src = self.fsl_connectome.fullPath()
+    matrix_name = (subject +
+                   "_" +
+                   self.study_name +
+                   "_" +
+                   self.region +
+                   "_complete_matrix_smooth0.0_" +
+                   str(self.min_fibers_length) +
+                   "to500.0mm.imas")
 
-    # Select the region number corresponding to region name.
-    region_number = select_ROI_number(self.regions_nomenclature.fullPath(),
-                                      self.region)
+    dstdir = os.path.join(self.outputs_database,
+                          "subjects",
+                          subject,
+                          "diffusion",
+                          "default_acquisition",
+                          "default_analysis",
+                          "default_tracking_session",
+                          "connectivity_parcellation",
+                          self.method,
+                          self.study_name,
+                          self.region,
+                          "matrix")
+    if not os.path.isdir(dstdir):
+        os.makedirs(dstdir)
 
-    # Give the command name.
-    cmd = ["constelBundlesFiltering"]
+    dst = os.path.join(dstdir, matrix_name)
 
-    # Give the command options.
-    for fiber_tract in list_fiber_tracts:
-        cmd += ["-i", fiber_tract]
-    cmd += [
-        "-o", self.labeled_fibers,
-        "-n", self.semilabeled_fibers,
-        "--mesh", self.individual_white_mesh,
-        "--tex", self.regions_parcellation,
-        "--trs", self.dw_to_t1,
-        "--mode", "Name1_Name2orNotInMesh",
-        "--names", "^" + str(region_number) + "_[+-]?[0-9]+$",
-        "--names", "^[+-]?[0-9]+_" + str(region_number) + "$",
-        "-g", region_number,
-        "-r",
-        "-l", self.min_fibers_length,
-        "-L", self.max_fibers_length,
-        "--nimlmin", self.min_fibers_length,
-        "--nimlmax", self.max_fibers_length,
-        "--verbose"
-    ]
-
-    # Execute the command.
-    context.system(*cmd)
+    shutil.copy2(src, dst)

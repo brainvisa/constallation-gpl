@@ -7,36 +7,27 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
-"""
-This script does the following:
-* defines a Brainvisa process
-    - the signature of the inputs/ouputs,
-    - the initialization (by default) of the inputs,
-    - the interlinkages between inputs/outputs.
-* executes the command 'constelConnectionDensityTexture': the individual
-  regions profile is computed.
 
-Main dependencies: axon python API, soma, constel
+# ---------------------------Imports-------------------------------------------
 
-Author: Sandrine Lefranc, 2015
-"""
-
-#----------------------------Imports-------------------------------------------
-
-# python module
+# System module
 import numpy
 
-# axon python API module
-from brainvisa.processes import ValidationError, Signature, ReadDiskItem, \
-    WriteDiskItem, OpenChoice, Choice
+# Axon python API modules
+from brainvisa.processes import Choice
+from brainvisa.processes import Signature
+from brainvisa.processes import OpenChoice
+from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import WriteDiskItem
+from brainvisa.processes import ValidationError
 
-# soma- module
-from soma.path import find_in_path
+# Soma module
 from soma import aims
+from soma.path import find_in_path
 
-# constel module
+# Package import
 try:
-    import constel.lib.utils.texturetools as tt
+    from constel.lib.utils.texturetools import remove_labels
     from constel.lib.utils.filetools import read_file, select_ROI_number
 except:
     pass
@@ -53,7 +44,7 @@ def validation():
             "is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header--------------------------------------------
 
 
 name = "Individual Regions Filtering"
@@ -61,7 +52,7 @@ userLevel = 2
 
 signature = Signature(
     # --inputs--
-    "complete_individual_matrix", ReadDiskItem(
+    "complete_matrix_smoothed", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
@@ -74,17 +65,17 @@ signature = Signature(
                             "intersubject": "no",
                             "step_time": "no",
                             "measure": "no"}),
-    "cortical_parcellation", ReadDiskItem(
+    "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"}),
-    "white_mesh", ReadDiskItem(
+    "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"}),
-    "cortical_regions_nomenclature", ReadDiskItem(
+    "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
-    "cortical_region", OpenChoice(),
+    "region", OpenChoice(),
 
     # --outputs--
     "sum_vertices_patch", WriteDiskItem(
@@ -111,62 +102,66 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ---------------------------Functions-----------------------------------------
 
 
 def initialization(self):
     """Provides default values and link of parameters
     """
     # default value
-    self.cortical_regions_nomenclature = self.signature[
-        "cortical_regions_nomenclature"].findValue(
+    self.regions_nomenclature = self.signature[
+        "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
     def reset_label(self, dummy):
         """This callback reads the ROIs nomenclature and proposes them in the
-        signature 'cortical_region' of process.
-        It also resets the cortical_region parameter to default state after
+        signature 'region' of process.
+        It also resets the region parameter to default state after
         the nomenclature changes.
         """
-        current = self.cortical_region
-        self.setValue('cortical_region', current, True)
-        if self.cortical_regions_nomenclature is not None:
-            s = [("Select a cortical_region in this list", None)]
+        current = self.region
+        self.setValue('region', current, True)
+        if self.regions_nomenclature is not None:
+            s = [("Select a region in this list", None)]
             # temporarily set a value which will remain valid
-            self.cortical_region = s[0][1]
+            self.region = s[0][1]
             s += read_file(
-                self.cortical_regions_nomenclature.fullPath(), mode=2)
-            self.signature["cortical_region"].setChoices(*s)
-            if isinstance(self.signature["cortical_region"], OpenChoice):
-                self.signature["cortical_region"] = Choice(*s)
+                self.regions_nomenclature.fullPath(), mode=2)
+            self.signature["region"].setChoices(*s)
+            if isinstance(self.signature["region"], OpenChoice):
+                self.signature["region"] = Choice(*s)
                 self.changeSignature(self.signature)
             if current not in s:
-                self.setValue("cortical_region", s[0][1], True)
+                self.setValue("region", s[0][1], True)
             else:
-                self.setValue("cortical_region", current, True)
+                self.setValue("region", current, True)
 
     def link_matrix2ROI(self, dummy):
-        """Define the attribut 'cortical_region' from fibertracts pattern for
-        the signature 'cortical_region'.
+        """Define the attribut 'region' from fibertracts pattern for
+        the signature 'region'.
         """
-        if self.complete_individual_matrix is not None:
-            s = str(self.complete_individual_matrix.get("gyrus"))
-            name = self.signature["cortical_region"].findValue(s)
+        if self.complete_matrix_smoothed is not None:
+            s = str(self.complete_matrix_smoothed.get("gyrus"))
+            name = self.signature["region"].findValue(s)
         return name
 
-    self.linkParameters(None, "cortical_regions_nomenclature", reset_label)
-    self.linkParameters("cortical_region", "complete_individual_matrix",
+    self.linkParameters(None,
+                        "regions_nomenclature",
+                        reset_label)
+    self.linkParameters("region",
+                        "complete_matrix_smoothed",
                         link_matrix2ROI)
     self.linkParameters("reduced_individual_profile",
-                        "complete_individual_matrix")
-    self.linkParameters("sum_vertices_patch", "complete_individual_matrix")
+                        "complete_matrix_smoothed")
+    self.linkParameters("sum_vertices_patch",
+                        "complete_matrix_smoothed")
     self.linkParameters("duplication_value_patch",
-                        "complete_individual_matrix")
+                        "complete_matrix_smoothed")
     self.linkParameters("filtered_reduced_individual_profile",
-                        "complete_individual_matrix")
+                        "complete_matrix_smoothed")
 
 
-#----------------------------Main program--------------------------------------
+# ---------------------------Main program--------------------------------------
 
 
 def execution(self, context):
@@ -175,27 +170,25 @@ def execution(self, context):
     Compute reduced connectivity matrix
     """
     # selects the ROI label corresponding to ROI name
-    label_number = select_ROI_number(
-        self.cortical_regions_nomenclature.fullPath(), self.cortical_region)
+    label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
+                                     self.region)
 
     context.system("constelConnectionDensityTexture",
-                   "-mesh", self.white_mesh,
-                   "-connmatrixfile", self.complete_individual_matrix,
+                   "-mesh", self.individual_white_mesh,
+                   "-connmatrixfile", self.complete_matrix_smoothed,
                    "-targetregionstex", self.reduced_individual_profile,
-                   "-seedregionstex", self.cortical_parcellation,
+                   "-seedregionstex", self.regions_parcellation,
                    "-seedlabel", label_number,
                    "-type", "oneSeedRegion_to_targets",
                    "-outconntex", self.sum_vertices_patch,
                    "-outconntargets", self.duplication_value_patch,
                    "-normalize", 1)
 
-    fibersNbByWatershedBasinsTarget_tex = aims.read(
-        self.duplication_value_patch.fullPath())
-    subjectWatershedBasins_tex = aims.read(
-        self.reduced_individual_profile.fullPath())
+    fibers_by_basins = aims.read(self.duplication_value_patch.fullPath())
+    basins = aims.read(self.reduced_individual_profile.fullPath())
 
     # TO DO: assorted improvements??? (it is not clear yet...)
-    labelsToRemove_ar = fibersNbByWatershedBasinsTarget_tex[0].arraydata()
+    labelsToRemove_ar = fibers_by_basins[0].arraydata()
     watershedTargets_fibersThreshold = 95
     threshPercent = watershedTargets_fibersThreshold / 100.
     labels = labelsToRemove_ar.copy()
@@ -222,7 +215,7 @@ def execution(self, context):
         if labelsToRemove_list.count(label) == 0:
             labelsToRemove_list.append(label)
 
-    filteredWatershedBasins_tex = tt.remove_labels(
-        subjectWatershedBasins_tex, labelsToRemove_list)
+    filteredWatershedBasins_tex = remove_labels(
+        basins, labelsToRemove_list)
     aims.write(filteredWatershedBasins_tex,
                self.filtered_reduced_individual_profile.fullPath())
