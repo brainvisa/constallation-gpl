@@ -16,11 +16,11 @@ from soma import aims
 from brainvisa import anatomist
 from soma.qt_gui.qt_backend import QtGui, QtCore
 
-# constellation module
 try:
+    # constellation module
     anatomist.validation()
     from constel.anatomist.clusters_inspect import ClustersInspectorWidget, \
-        load_clusters_inspector_files
+                                                   load_clusters_inspector_files
 
     # temp
     import pandas
