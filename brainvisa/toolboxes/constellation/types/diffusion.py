@@ -34,27 +34,6 @@ include( 'builtin' )
 include( 'anatomy' )
 include( 'registration' )
 
-Format( 'Aims bundles', [ 'f|*.bundles', 'f|*.bundlesdata' ] )
-Format( 'Trackvis tracts', 'f|*.trk' )
-Format( 'Bundle Selection Rules', 'f|*.brules' )
-
-createFormatList(
-  'Aims readable bundles formats',
-  (
-    'Aims Bundles',
-    'Trackvis tracts',
-  )
-)
-
-createFormatList(
-  'Aims writable bundles formats',
-  (
-    'Aims Bundles',
-  )
-)
-
-FileType( 'Bundles', 'Any Type', 'Aims readable bundles formats' )
-
 #----------------- Diffusion ----------------------
 
 FileType( 'Directions MESH', 'Mesh' )
