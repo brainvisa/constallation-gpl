@@ -17,6 +17,110 @@ end, we consider intersubject high density connectivity areas extracted using a 
   <img src="bvimage://constellation/schema_concat.png" ALT="" height="400" width="900"/>
 
   </p>
-  <hr/>
+
+  <h2>How to use it</h2>
+
+  There are basically two diffent ways to use Constellation:
+  <ul>
+    <li><a href="#group_pipelines">Perform a complete group parcellation</a>.
+    </li>
+    <li><a href="#using_atlas">Use a predefined reference group parcellation</a> and connectivity profile to parcellate a new subject (or a new set of subjects). This mode is ligher than the complete group parcellation.
+    </li>
+  </ul>
+
+  <h3>Prerequisites</h3>
+
+  To use Constellation, some data and software are required:
+  <ul>
+    <li>Data: the subjects to be processed must have a T1 weighted MRI needed to segment the cortex.
+    </li>
+    <li>Data: the subjects to be processed must have diffusion MRI (dMRI) images with a "sufficient" quality in order to have somewhat reliable tractography.
+    </li>
+    <li>Data: there must be some spatial transformation information between the dMRI data and the T1 MRI, or some registration should have been applied.
+    </li>
+    <li>Software: <a href="https://surfer.nmr.mgh.harvard.edu/">FreeSurfer</a> is needed, at least at the moment, to segment the cortex and make meshes with inter-subject point-to-point correspondance. An alternative based on Hip Hop, in the BrainVISA toolbox Cortical Surface, is in the way.
+    </li>
+    <li>Software: A tractography software is needed to process the dMRI data. Currently Constellation is able to use results from the following software:
+      <ul>
+        <li>Connectomist 2 for the happy few who can use it
+        </li>
+        <li><a href="https://fsl.fmrib.ox.ac.uk/fsl/fslwiki">FSL</a>
+        </li>
+      </ul>
+      It should be possible to use some other software (DiPy, Trackviz, MRtrix...) as long as fiber tracts or connectivity matrices formats can be read or converted. The Trackviz format (.trk) is supported and is a convenient way to import tracts. However all these software have not been validated yet for Constellation, and there will probably some additional work to be done to handle not only file formats, but also spatial transformations, and maybe adapt e few parameters.
+    </li>
+  </ul>
+
+  <h3>Preprocessings</h3>
+
+  <p>Constellation does not handle by itself the use of thirdparty software to process T1 and diffusion MRI data. The user has thus to take care of running Freesurfer on the T1 MRI (either directly or via the BrainVisa toolbox for Freesurfer), and to process the diffusion MRI and run the fiber tracking or connectivity algorithms (using Connectomist or FSL).
+  </p>
+
+  <p>Constellation starts once these preprocessings have been achieved.
+  </p>
+
+  <h3>Constellation processing</h3>
+
+  <a id="group_pipelines">
+    <h4>Building group parcellations</h4></a>
+
+  <p>In this situation, we want to build a new group-based parcellation on a given group of subjects, not using predefined atlases.
+  </p>
+
+  <p>There is some intra-subject processing, and an inter-subject (group) clustering. They correspond to two different pipelines, the intra-subject one should be used before the inter-subject part.
+  </p>
+
+  <p>Depending on the dMRI tractography software used for input to Constellation, there are different ways to handle them. Consequently there are currently 2 intra-subject piplines in Constellation, one dealing with Connectomist tracts, the other with FSL connectivity matrices. They differ on the first steps, and then have common later steps.
+  </p>
+
+  <p>
+    <ul>
+      <li>Intra-subject processing:
+        <ul>
+          <li><a href="bvprocess://constel_individual_pipeline">Connectomist-based intra-subject pipeline</a>
+          </li>
+          <li><a href="bvprocess://constel_individual_pipeline_fsl_connectome">FSL-based intra-subject pipeline</a>
+          </li>
+        </ul>
+      </li>
+      <li><a href="bvprocess://constel_group_pipeline">Group-based parcellation pipeline</a>
+      </li>
+    </ul>
+  </p>
+
+  <p>Group clusterings and assiociated connectivity profiles can then be used to make a new group atlas for instance. Group or individual connectivity profiles obtained on the clusters can be used to build and study connectivity graphs...
+  </p>
+
+  <a id="using_atlas">
+    <h4>Parcellating using predefined atlases</h4></a>
+
+  <p>This is the simplest and lightest way to work: you come with one or several subjects data, and get a parcellation for them, with labels compatible with the atlas.
+  </p>
+
+  <p>There are also two steps: one is to run the intra-subject pipeline above to get individuel connectivity matrices, then use the following process:
+  </p>
+
+  <p>
+    <ul>
+      <li>Intra-subject processing:
+        <ul>
+          <li><a href="bvprocess://constel_individual_pipeline">Connectomist-based intra-subject pipeline</a>
+          </li>
+          <li><a href="bvprocess://constel_individual_pipeline_fsl_connectome">FSL-based intra-subject pipeline</a>
+          </li>
+        </ul>
+      </li>
+      <li><a href="bvprocess://constel_indiv_clusters_from_atlas">Individual clusters from atlas</a>
+      </li>
+    </ul>
+  </p>
+
+  <h3>Other tools</h3>
+
+  <p>Constellation clusters, or other surface-based regions actually, can be used to reduce connectivity information into a region-based connectivity matrix:
+  </p>
+  <p><a href="bvprocess://constel_connectome_reduced">Write the connectome of a given parcellation</a>
+  </p>
+
 </xhtml>
 </minf>
