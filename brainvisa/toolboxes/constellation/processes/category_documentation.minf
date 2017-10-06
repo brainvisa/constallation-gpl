@@ -56,6 +56,19 @@ end, we consider intersubject high density connectivity areas extracted using a 
   <p>Constellation does not handle by itself the use of thirdparty software to process T1 and diffusion MRI data. The user has thus to take care of running Freesurfer on the T1 MRI (either directly or via the BrainVisa toolbox for Freesurfer), and to process the diffusion MRI and run the fiber tracking or connectivity algorithms (using Connectomist or FSL).
   </p>
 
+  <h4>Freesurfer conversions and group mesh / texture</h4>
+
+  Once Freesurfer has run, there is a final pass that should be run on its outputs:
+
+  <ul>
+    <li>Make meshes of the grey/white interfaces with vertex-vertex correspondance between subjects, and corresponding gyri textures (have "``*.white.32k_fs_LR.surf``" files in the ``surf/`` subrirectory of each subject
+    </li>
+    <li>Convert Freesurfer outputs to formats readable by Constellation: use the process from the BrainVISA Freesurfer toolbox <a href="bvprocess://freesurferToBrainvisaConversionPipeline">Freesurfer outputs To BrainVisa conversion pipeline</a>. This has to be done for each subject. You can use the iteration button for that.
+    </li>
+    <li>Make a group mesh and gyri texture
+    </li>
+  </ul>
+
   <p>Constellation starts once these preprocessings have been achieved.
   </p>
 
