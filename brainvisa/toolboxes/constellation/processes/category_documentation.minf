@@ -61,11 +61,21 @@ end, we consider intersubject high density connectivity areas extracted using a 
   Once Freesurfer has run, there is a final pass that should be run on its outputs:
 
   <ul>
-    <li>Make meshes of the grey/white interfaces with vertex-vertex correspondance between subjects, and corresponding gyri textures (have "``*.white.32k_fs_LR.surf``" files in the ``surf/`` subrirectory of each subject
+    <li>Make meshes of the grey/white interfaces with vertex-vertex correspondance between subjects, and corresponding gyri textures for these meshes. There are two ways to do so:
+      <ul>
+        <li>Using Freesurfer
+          <ul>
+            <li>Use Freesurfer <tt>surf2surf</tt> to produce resampled meshes (have "<tt>*.white.32k_fs_LR.surf</tt>" files in the <tt>surf/</tt> subrirectory of each subject
+            </li>
+            <li>Convert Freesurfer outputs to formats readable by Constellation: use the process from the BrainVISA Freesurfer toolbox <a href="bvprocess://freesurferToBrainvisaConversionPipeline">Freesurfer outputs To BrainVisa conversion pipeline</a>. This has to be done for each subject. You can use the iteration button for that.
+            </li>
+          </ul>
+        </li>
+        <li>Use the BrainVisa Freesurfer toolbox and its <a href="bvprocess://freesurferToBrainvisaConversionPipeline">Freesurfer outputs To BrainVisa conversion pipeline</a>. The toolbox will resample on a template spherical mesh, which is not necessarily Freesurfer's one, so it will end up with a different inter-subject correspondance (and a different number of vertices in meshes) than the <tt>surf2surf</tt> tool from FS.
+        </li>
+      </ul>
     </li>
-    <li>Convert Freesurfer outputs to formats readable by Constellation: use the process from the BrainVISA Freesurfer toolbox <a href="bvprocess://freesurferToBrainvisaConversionPipeline">Freesurfer outputs To BrainVisa conversion pipeline</a>. This has to be done for each subject. You can use the iteration button for that.
-    </li>
-    <li>Make a group mesh and gyri texture
+    <li>Make a group mesh and gyri texture, using the BrainVISA process from the Freesurfer toolbox <a href="bvprocess://freesurfer_average_brain_pipeline">FreeSurfer Average Brain Pipeline</a>.
     </li>
   </ul>
 
