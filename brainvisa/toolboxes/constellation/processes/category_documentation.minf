@@ -20,13 +20,20 @@ end, we consider intersubject high density connectivity areas extracted using a 
 
   <h2>How to use it</h2>
 
-  There are basically two diffent ways to use Constellation:
-  <ul>
-    <li><a href="#group_pipelines">Perform a complete group parcellation</a>.
-    </li>
-    <li><a href="#using_atlas">Use a predefined reference group parcellation</a> and connectivity profile to parcellate a new subject (or a new set of subjects). This mode is ligher than the complete group parcellation.
-    </li>
-  </ul>
+  <p>There are basically two diffent ways to use Constellation:
+    <ul>
+      <li><a href="#group_pipelines">Perform a complete group parcellation</a>.
+      </li>
+      <li><a href="#using_atlas">Use a predefined reference group parcellation</a> and connectivity profile to parcellate a new subject (or a new set of subjects). This mode is ligher than the complete group parcellation.
+      </li>
+    </ul>
+  </p>
+
+  <p>Constellation is a somewhat complex toolbox in the meaning that it is using different types of data (namely diffusion MRI and anatomical MRI), each preprocessed in potentially different ways by different software. Moreover Constellation includes both intra and inter-subject processings which are at some point intricated. A few choices have to be done by the user.
+  </p>
+
+  <p>For this reason, users are advised to read the present documentation before processing.
+  </p>
 
   <h3>Prerequisites</h3>
 
@@ -54,6 +61,27 @@ end, we consider intersubject high density connectivity areas extracted using a 
   <h3>Preprocessings</h3>
 
   <p>Constellation does not handle by itself the use of thirdparty software to process T1 and diffusion MRI data. The user has thus to take care of running Freesurfer on the T1 MRI (either directly or via the BrainVisa toolbox for Freesurfer), and to process the diffusion MRI and run the fiber tracking or connectivity algorithms (using Connectomist or FSL).
+  </p>
+
+  <h4>Preprocessing choices</h4>
+
+  <h5>T1 MRI brain mesh resolution and building method</h5>
+
+  <p>Currently T1 MRI have to be processed using FreeSurfer to take advantage of its surface-based inter-subject correspondance. Doing this an important choice have to be made:
+  </p>
+
+  <p><b>Cortical Grey/white interface mesh resolution and method:</b></p>
+  <p>Meshes must be resampled to a common resolution which provides vertex-by-vertex correspondance between subjects. To do so we use the spheric interpolation and the topology of an icosahedron-based template mesh. This can be done either using BrainVisa/Freesurfer toolbox which provides its own template icosphere mesh and interpolation method, or using FreeSurfer, which allows to resample to several icospheres with different resolutions. The choice of the template mesh is very important, because it will determine the corresponance between subjects in the group to be processed. But more importantly, using an atlas to parcellate a new subject will need to use the same template mesh as the atlas.</p>
+  <p>Constellation has been tested using meshed of 30000-40000 vertices per hemisphere. Using lower resolutions will make results more imprecise, and higher resolutions will lead to more resource consuming processing. The atlas shipped with Constellation is based on a mesh of about 32000 vertices per hemisphere, from the Human Connectome Project (HCP) preprocessings.
+  </p>
+
+  <p>Thus in summary we have 3 different methods for it:
+    <ul>
+      <li>BrainVISA/Freesurfer toolbox: 40962 vertices / hemisphere</li>
+      <li>Freesurfer <tt>mei_surf2surf</tt>: generally 40962 vertices / hemisphere, but several choices are possible. Be careful even with the same number of vertices, the template meshes are not the same as those from the BrainVISA/Freesurfer method.
+      </li>
+      <li>HCP 32k mesh</li>
+    </ul>
   </p>
 
   <h4>Freesurfer conversions and group mesh / texture</h4>
