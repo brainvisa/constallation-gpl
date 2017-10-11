@@ -67,45 +67,46 @@ end, we consider intersubject high density connectivity areas extracted using a 
 
   <h5>T1 MRI brain mesh resolution and building method</h5>
 
-  <p>Currently T1 MRI have to be processed using FreeSurfer to take advantage of its surface-based inter-subject correspondance. Doing this an important choice have to be made:
-  </p>
+  <p>Currently T1 MRI have to be processed using FreeSurfer to take advantage of its surface-based inter-subject correspondance. Doing this an important choice have to be made: the <b>Cortical Grey/white interface mesh resolution and method.</b></p>
 
-  <p><b>Cortical Grey/white interface mesh resolution and method:</b></p>
-  <p>Meshes must be resampled to a common resolution which provides vertex-by-vertex correspondance between subjects. To do so we use the spheric interpolation and the topology of an icosahedron-based template mesh. This can be done either using BrainVisa/Freesurfer toolbox which provides its own template icosphere mesh and interpolation method, or using FreeSurfer, which allows to resample to several icospheres with different resolutions. The choice of the template mesh is very important, because it will determine the corresponance between subjects in the group to be processed. But more importantly, using an atlas to parcellate a new subject will need to use the same template mesh as the atlas.</p>
-  <p>Constellation has been tested using meshed of 30000-40000 vertices per hemisphere. Using lower resolutions will make results more imprecise, and higher resolutions will lead to more resource consuming processing. The atlas shipped with Constellation is based on a mesh of about 32000 vertices per hemisphere, from the Human Connectome Project (HCP) preprocessings.
-  </p>
-
-  <p>Thus in summary we have 3 different methods for it:
-    <ul>
-      <li>BrainVISA/Freesurfer toolbox: 40962 vertices / hemisphere</li>
-      <li>Freesurfer <tt>mei_surf2surf</tt>: generally 40962 vertices / hemisphere, but several choices are possible. Be careful even with the same number of vertices, the template meshes are not the same as those from the BrainVISA/Freesurfer method.
-      </li>
-      <li>HCP 32k mesh</li>
-    </ul>
-  </p>
 
   <h4>Freesurfer conversions and group mesh / texture</h4>
 
-  Once Freesurfer has run, there is a final pass that should be run on its outputs:
+  Once Freesurfer has run, there are two final passes that should be run on its outputs. This step features an important choice: the <b>Cortical Grey/white interface mesh resolution and method</b> (<a href="#mesh_resampling">see below</a>).
 
   <ul>
-    <li>Make meshes of the grey/white interfaces with vertex-vertex correspondance between subjects, and corresponding gyri textures for these meshes. There are two ways to do so:
-      <ul>
-        <li>Using Freesurfer
-          <ul>
-            <li>Use Freesurfer <tt>surf2surf</tt> to produce resampled meshes (have "<tt>*.white.32k_fs_LR.surf</tt>" files in the <tt>surf/</tt> subrirectory of each subject
-            </li>
-            <li>Convert Freesurfer outputs to formats readable by Constellation: use the process from the BrainVISA Freesurfer toolbox <a href="bvprocess://freesurferToBrainvisaConversionPipeline">Freesurfer outputs To BrainVisa conversion pipeline</a>. This has to be done for each subject. You can use the iteration button for that.
-            </li>
-          </ul>
-        </li>
-        <li>Use the BrainVisa Freesurfer toolbox and its <a href="bvprocess://freesurferToBrainvisaConversionPipeline">Freesurfer outputs To BrainVisa conversion pipeline</a>. The toolbox will resample on a template spherical mesh, which is not necessarily Freesurfer's one, so it will end up with a different inter-subject correspondance (and a different number of vertices in meshes) than the <tt>surf2surf</tt> tool from FS.
-        </li>
-      </ul>
+    <li>
+      <p>Make meshes of the grey/white interfaces with vertex-vertex correspondance between subjects, and corresponding gyri textures for these meshes. The simplest way to do so is to use the BrainVisa Freesurfer toolbox and its <a href="bvprocess://freesurferToBrainvisaConversionPipeline">Freesurfer outputs To BrainVisa conversion pipeline</a>.
+      </p>
+      <p>The toolbox will resample on a template spherical mesh, which is not necessarily Freesurfer's one, so according to the chosen template mesh, it can end up with a different inter-subject correspondance (and a different number of vertices in meshes) than the <tt>mri_surf2surf</tt> tool from FS.
+      </p>
+      <p>The pipeline will also produce concatenated, whole brain (both hemispheres) meshes and textures for use with Constellation.
+      </p>
+      <p>These operations could also partly be done using Freesurfer <tt>mris_convert</tt> and <tt>mri_surf2surf</tt> commands to produce GIFTI files and resampled meshes but there would still be coordinates systems issues.
+      </p>
     </li>
     <li>Make a group mesh and gyri texture, using the BrainVISA process from the Freesurfer toolbox <a href="bvprocess://freesurfer_average_brain_pipeline">FreeSurfer Average Brain Pipeline</a>.
     </li>
   </ul>
+
+  <div style="background-color: #ffe0e0; padding: 10px; border: 1px solid;">
+    <div style="font-weight: bold"><a name="mesh_resampling">Important: Details about meshes resampling</a></div>
+
+    <p>Meshes must be resampled to a common resolution which provides vertex-by-vertex correspondance between subjects. To do so we use the spheric interpolation and the topology of an icosahedron-based template mesh. This can be done either using BrainVisa/Freesurfer toolbox which provides its own template icosphere mesh and interpolation method, or using FreeSurfer, which allows to resample to several icospheres with different resolutions. The choice of the template mesh is very important, because it will determine the corresponance between subjects in the group to be processed. But more importantly, using an atlas to parcellate a new subject will need to use the same template mesh as the atlas.</p>
+    <p>Constellation has been tested using meshed of 30000-40000 vertices per hemisphere. Using lower resolutions will make results more imprecise, and higher resolutions will lead to more resource consuming processing. The atlas shipped with Constellation is based on meshes of 32492 vertices per hemisphere, the ones used for the Human Connectome Project (HCP) preprocessings.
+    </p>
+
+    <p>Thus in summary we have 3 different template meshes and resampling methods for it:
+      <ul>
+        <li>BrainVISA/Freesurfer toolbox sphere: 40962 vertices / hemisphere.</li>
+        <li>Freesurfer <tt>mri_surf2surf</tt>: generally 40962 vertices / hemisphere, but several choices are possible within Freesurfer. Be careful even with the same number of vertices, the template meshes are not the same as those from the BrainVISA/Freesurfer method.
+        </li>
+        <li>HCP 32k mesh (32492 vertices)
+        </li>
+      </ul>
+      All can be performed using the BrainVISA/Freesurfer toolbox, by running the  <a href="bvprocess://freesurferToBrainvisaConversionPipeline">Freesurfer outputs To BrainVisa conversion pipeline</a>, and selecting the appropriate <tt>icosphere_type</tt> template parameter (the toolbox provides 32k and 40k template meshes from Freesurfer and from the HCP). However Freesurfer native  method can also be run using the <a href="bvprocess://freesurfer_resample_mesh_to_freesurfer_ico">Resample mesh to Freesurfer Ico mesh</a> process and the command <tt>mri_surf2surf</tt> to resample textures, and the HCP method can also be used natively using the HCP workbench.
+    </p>
+  </div>
 
   <p>Constellation starts once these preprocessings have been achieved.
   </p>
