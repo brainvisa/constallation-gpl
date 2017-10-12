@@ -84,8 +84,8 @@
     </li>
   </ul>
 
-  <div style="background-color: #ffe0e0; padding: 10px; border: 1px solid;">
-    <div style="font-weight: bold"><a name="mesh_resampling">Important: Details about meshes resampling</a></div>
+  <div class="warning">
+    <h5><a name="mesh_resampling">Important: Details about meshes resampling</a></h5>
 
     <p>Meshes must be resampled to a common resolution which provides vertex-by-vertex correspondance between subjects. To do so we use the spheric interpolation and the topology of an icosahedron-based template mesh. This can be done either using BrainVisa/Freesurfer toolbox which provides its own template icosphere mesh and interpolation method, or using FreeSurfer, which allows to resample to several icospheres with different resolutions. The choice of the template mesh is very important, because it will determine the corresponance between subjects in the group to be processed. But more importantly, using an atlas to parcellate a new subject will need to use the same template mesh as the atlas.</p>
     <p>Constellation has been tested using meshed of 30000-40000 vertices per hemisphere. Using lower resolutions will make results more imprecise, and higher resolutions will lead to more resource consuming processing. The atlas shipped with Constellation is based on meshes of 32492 vertices per hemisphere, the ones used for <a href="http://www.humanconnectomeproject.org/">the Human Connectome Project (HCP)</a> preprocessings.
