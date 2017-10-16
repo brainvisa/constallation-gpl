@@ -28,7 +28,7 @@
       <xhtml name="regions_parcellation"/>
       <xhtml name="smoothing">Degré du smoothing en millimètre.</xhtml>
       <xhtml name="individual_white_mesh"/>
-      <xhtml name="subject_indir">Ceci doit être le répertoire du sujet dans une base organisée à la fa&ccedil;on <b>Freesurfer</b>, où les maillages corticaux peuvent être trouvés.</xhtml>
+      <xhtml name="subject_indir">Ceci doit être le répertoire du sujet dans une base organisée à la façon <b>Freesurfer</b>, où les maillages corticaux peuvent être trouvés.</xhtml>
       <xhtml name="outputs_database">Une base de données BrainVisa est obligatoire pour l'autocomplétion et l'écriture des fichiers de ce process. Sans celle-ci, aucune donnée pourra être générée. (voir la documentation pour ajouter une base de données dans la configuration de BrainVisa). Ce paramètre récupère l'ensemble des bases de données ayant une ontologie brainvisa présente dans votre configuration, vous n'avez plus qu'à choisir celle qui vous convient pour écrire les fichiers générés.</xhtml>
     </d>
     <xhtml name="long"/>
