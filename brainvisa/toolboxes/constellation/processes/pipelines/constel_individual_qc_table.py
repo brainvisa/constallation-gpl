@@ -8,6 +8,7 @@ signature = Signature(
     'database', Choice(),
     'keys', ListOf(String()),
     'data_filters', ListOf(String()),
+    'output_file', WriteDiskItem('Text File', ['HTML', 'PDF file']),
 )
 
 
@@ -22,7 +23,7 @@ def initialization(self):
     else:
         self.signature["database"] = OpenChoice()
 
-    self.setOptional('data_filters')
+    self.setOptional('data_filters', 'output_file')
     self.keys = ['subject', 'studyname', 'gyrus']
 
 
@@ -31,15 +32,16 @@ def execution(self, context):
               'Connectivity Matrix', 'Connectivity Matrix',
               'Connectivity Profile Texture', 'Connectivity Profile Texture',
               'Connectivity Matrix', 'Connectivity Matrix',
-              'Connectivity Profile Texture',
-              ]
+              'Connectivity Profile Texture', 'Connectivity Matrix',
+              'Connectivity ROI Texture']
 
     tlabels = ['Labeled Filtered Fibers', 'Semi-labeled Filtered Fibers',
                'Labeled Connectivity Matrix',
                'Semi-labeled Connectivity Matrix',
                'Labelled Profile', 'Semi-Labeled Profile',
                'Complete Ind. Matrix', 'Smoothed Ind. Matrix',
-               'Normed Ind. Profile']
+               'Normed Ind. Profile', 'Indiv. Reduced Matrix',
+               'Indiv. Clustering']
 
     custom_filt = [eval(filt) for filt in self.data_filters]
     if len(custom_filt) == 1:
@@ -56,9 +58,11 @@ def execution(self, context):
     filter6 = {'reduced': 'no', 'intersubject': 'no', 'individual': 'yes',
                'smoothing': '3.0'}
     filter7 = {'normed': 'yes', 'intersubject': 'no'}
+    filter8 = {'reduced': 'yes', 'intersubject': 'yes', 'individual': 'yes'}
+    filter9 = {}
 
     filters = [filter1, filter2, filter3, filter4, filter3, filter4,
-               filter5, filter6, filter7]
+               filter5, filter6, filter7, filter8, filter9]
     for filt, custfilt in zip(filters, custom_filt):
         filt.update(custfilt)
     context.write('filters:', filters)
@@ -69,5 +73,6 @@ def execution(self, context):
                               data_types=dtypes,
                               data_filters=filters,
                               keys=self.keys,
-                              type_labels=tlabels)
+                              type_labels=tlabels,
+                              output_file=self.output_file)
 
