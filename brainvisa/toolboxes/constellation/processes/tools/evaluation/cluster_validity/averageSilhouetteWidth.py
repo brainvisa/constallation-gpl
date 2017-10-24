@@ -31,6 +31,7 @@ from brainvisa.processes import Float
 from brainvisa.processes import ListOf
 from brainvisa.processes import Boolean
 from brainvisa.processes import Integer
+from brainvisa.processes import Choice
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
@@ -67,9 +68,11 @@ signature = Signature(
     "kmax", Integer(),
 
     # --outputs--
-    "outpdffile", WriteDiskItem("Any Type", getAllFormats()),
+    "outpdffile", WriteDiskItem("Text File", 'PDF File'),
     "ybound", ListOf(Float()),
-    "ignore_Kopt2",  Boolean(),
+    "kmin_type", Choice("none", "min", "avg_pts"),
+    "kmin", Integer(),
+    "max_avg_points", Float(),
     "save_asw_values", Boolean()
 )
 
@@ -82,7 +85,9 @@ def initialization(self):
     """
     self.kmax = 12
     self.setOptional("ybound")
-    self.ignore_Kopt2 = False
+    self.kmin_type = "none"
+    self.kmin = 0
+    self.max_avg_points = 0
     self.save_asw_values = False
 
     def link_outdir(self, dummy):
@@ -104,16 +109,19 @@ def initialization(self):
 def execution(self, context):
     """Run the command 'constel_calculate_asw.py'.
     """
-    cmd = ["constel_calculate_asw.py",
-           self.reduced_matrices,
-           self.kmax,
+    cmd = ["constel_calculate_asw.py"] \
+        + self.reduced_matrices \
+        + [self.kmax,
            self.outpdffile]
 
     if self.ybound:
-        cmd += ["-s", self.ybound]
+        cmd += ["-s"] + self.ybound
 
-    if self.ignore_Kopt2:
-        cmd += ["-r"]
+    cmd += ["--kmintype", self.kmin_type]
+    if self.kmin_type == "min":
+        cmd += ["--kmin", str(self.kmin)]
+    elif self.kmin_type == "avg_pts":
+        cmd += ["--max_avg_pts", str(self.max_avg_points)]
 
     if self.save_asw_values:
         cmd += ["-c"]

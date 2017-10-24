@@ -28,7 +28,7 @@
       <xhtml name="regions_parcellation"/>
       <xhtml name="smoothing">Degré du smoothing en millimètre.</xhtml>
       <xhtml name="individual_white_mesh"/>
-      <xhtml name="subject_indir">Ceci doit être le répertoire du sujet dans une base organisée à la fa&ccedil;on <b>Freesurfer</b>, où les maillages corticaux peuvent être trouvés.</xhtml>
+      <xhtml name="subject_indir">Ceci doit être le répertoire du sujet dans une base organisée à la façon <b>Freesurfer</b>, où les maillages corticaux peuvent être trouvés.</xhtml>
       <xhtml name="outputs_database">Une base de données BrainVisa est obligatoire pour l'autocomplétion et l'écriture des fichiers de ce process. Sans celle-ci, aucune donnée pourra être générée. (voir la documentation pour ajouter une base de données dans la configuration de BrainVisa). Ce paramètre récupère l'ensemble des bases de données ayant une ontologie brainvisa présente dans votre configuration, vous n'avez plus qu'à choisir celle qui vous convient pour écrire les fichiers générés.</xhtml>
     </d>
     <xhtml name="long"/>
@@ -36,13 +36,13 @@
   <d name="en">
     <xhtml name="short"><img SRC="../../images/constellation/schema_ind.png" ALT="" height="300" width="900"/></xhtml>
     <d name="parameters">
-      <xhtml name="normalize"/>
+      <xhtml name="normalize">By default the connectivity matrices values are normalized to balance any spurious weighting effects due to more connected regions or subjects, or to the tractography algorithm (number of seeds...). But in some cases we like to also see the raw connectivity matrix. In that case, un-set this normalization.</xhtml>
       <xhtml name="fiber_tracts_format">Different fiber tracts formats are supported. Selectable formats are as follows:<br/>
 
 <i>(1)</i> <b>TrackVis file format </b> with .trk as filename extension. <br/>
 <i>(2)</i> <b>Connectomist file format</b> with .bundles as filename extension. <br/></xhtml>
       <xhtml name="min_fibers_length"/>
-      <xhtml name="dw_to_t1"/>
+      <xhtml name="dw_to_t1">Affine spatial transformation to get from the dMRI diffusion (and tracts) space to the T1 MRI space</xhtml>
       <xhtml name="region"/>
       <xhtml name="regions_nomenclature"/>
       <xhtml name="max_fibers_length"/>
@@ -55,17 +55,19 @@
 <span style="color:red;">Implications of the choice of method on the parameter "cortical_parcellation":</span><br/>
 <i><b>(1) "averaged approach" </b></i>, for this method, the parameter "cortical_parcellation" must be a file representing the average parcellation of a subjects group. <br/>
 <i><b>(2) "concatenated approach"</b></i>, the parameter "cortical_parcellation" is an individual parcellation. <br/></xhtml>
-      <xhtml name="kmax"/>
-      <xhtml name="keep_regions"/>
-      <xhtml name="regions_parcellation"/>
+      <xhtml name="kmax">Maximum number of clusters to be explored. All numbers from 2 to <em>kmax</em> are used, then we can determine the best number of clusters based on the max of average silhouette width of each parcellation.</xhtml>
+      <xhtml name="keep_regions">This parameter can be used to exclude some regions from the data (not to take them into account). This is useful to study the specific connectivity between a given set of regions, or to exclude the initial patch region.</xhtml>
+      <xhtml name="regions_parcellation">For the <b>averaged approach</b> the parcellation shuold be a group parcellation (typically, the Freesurfer Desikan gyri parcellation of the average subject). For the <b>concatenated approach</b> and for use with an atlas, the parcellation can be individual parcellations.</xhtml>
       <xhtml name="smoothing">Degree of smoothing (in millimetres)</xhtml>
       <xhtml name="individual_white_mesh"/>
       <xhtml name="subject_indir">This is the subject directory in a <b>Freesurfer</b> database, where the cortical meshes can be found.</xhtml>
       <xhtml name="outputs_database">A BrainVisa database is mandatory for autocompletion and writing files in this process. Without it, no data will be generated. (see the documentation to add a database in the BrainVisa configuration). This parameter retrieves all databases with brainvisa ontology present in your configuration, you just have to pick the right one to write the generated files.</xhtml>
     </d>
-    <xhtml name="long"><p>A complete pipeline: an intra_subject chain which builds the individual connectivity matrices. The preprocessings are done using FreeSurfer for the anatomical data, and Connectomist for the diffusion data.</p>
+    <xhtml name="long"><p>A complete pipeline: an intra_subject chain which builds the individual connectivity matrices for a given input "patch" (gyrus, or large region) of the brain. The preprocessings are done using FreeSurfer for the anatomical data, and Connectomist for the diffusion data.</p>
 <p>The method implemented here is described in:</p>
 <p>S. Lefranc, P. Roca, M. Perrot, C. Poupon, D. Le Bihan, J.-F. Mangin, and D. Rivière. <b>Groupwise connectivity-based parcellation of the whole human cortical surface using watershed-driven dimension reduction.</b> <em>Medical Image Analysis</em>, 30:11-29, 2016. <a href="http://brainvisa.info/biblio/lnao/en/Year/2016.complete.html#Lefranc16">[bibtex-entry]</a>
+</p>
+<p>To parcellate the whole brain, this process has to be iterated over all gyri.
 </p></xhtml>
   </d>
 </d>
