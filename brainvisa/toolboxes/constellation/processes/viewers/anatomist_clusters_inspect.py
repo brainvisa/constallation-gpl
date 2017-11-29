@@ -19,8 +19,6 @@ from soma.qt_gui.qt_backend import QtGui, QtCore
 try:
     # constellation module
     anatomist.validation()
-    from constel.anatomist.clusters_inspect import ClustersInspectorWidget, \
-                                                   load_clusters_inspector_files
 
     # temp
     import pandas
@@ -98,6 +96,8 @@ def exec_main_thread(self, context, meshes, clusters, measurements,
 
 
 def execution(self, context):
+    from constel.anatomist.clusters_inspect import ClustersInspectorWidget, \
+                                                   load_clusters_inspector_files
     from constel.anatomist import clusters_inspect
     reload(clusters_inspect)
     global ClustersInspectorWidget, load_clusters_inspector_files
