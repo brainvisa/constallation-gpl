@@ -25,7 +25,7 @@ from brainvisa.processes import ReadDiskItem
 #----------------------------Header--------------------------------------------
 
 
-name = 'Merge meshes'
+name = 'Merge white and nuclei meshes'
 userLevel = 2
 
 signature = Signature(

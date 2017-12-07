@@ -51,7 +51,7 @@ def validation():
 # ---------------------------Header--------------------------------------------
 
 
-name = "Import Connectomes."
+name = "Import FSL Connectomes."
 userLevel = 2
 
 signature = Signature(

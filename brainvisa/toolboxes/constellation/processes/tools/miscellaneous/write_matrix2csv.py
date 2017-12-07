@@ -49,7 +49,7 @@ except:
 #----------------------------Header--------------------------------------------
 
 
-name = "Write CSV File"
+name = "Write connectivity matrix as CSV File"
 userLevel = 2
 
 signature = Signature(
