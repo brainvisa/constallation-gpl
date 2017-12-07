@@ -115,7 +115,7 @@ def initialization(self):
                 choices.update(
                     [x[0] for x in database.findAttributes(
                         ["studyname"], selection=sel,
-                        _type="Filtered Fascicles Bundles")])
+                        _type="Connectivity Matrix")])
             else:
                 choices = []
         self.signature["study_name"].setChoices(*sorted(choices))
