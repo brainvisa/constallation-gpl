@@ -185,7 +185,7 @@ def initialization(self):
     ###########################################################################
 
     eNode.addChild(
-        "import", ProcessExecutionNode("import_connectome", optional=1))
+        "import", ProcessExecutionNode("import_fsl_connectome", optional=1))
 
     eNode.addDoubleLink("import.outputs_database",
                         "outputs_database")
