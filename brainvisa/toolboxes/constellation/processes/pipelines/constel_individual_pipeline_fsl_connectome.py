@@ -165,6 +165,19 @@ def initialization(self):
         }
         return self.signature["individual_white_mesh"].findValue(match)
 
+    def link_regions_parcellation(self, dummy):
+        if self.method == "concat":
+            if self.individual_white_mesh is None:
+                return None
+            return self.signature["regions_parcellation"].findValue(
+                self.individual_white_mesh)
+        match = {"averaged": "Yes"}
+        if self.individual_white_mesh is not None:
+            match["_database"] = self.individual_white_mesh.get("_database")
+            match["freesurfer_group_of_subjects"] \
+                = self.individual_white_mesh.get(
+                    "freesurfer_group_of_subjects")
+
     # link of parameters for autocompletion
     self.linkParameters(None,
                         "regions_nomenclature",
@@ -176,6 +189,9 @@ def initialization(self):
                         "regions_nomenclature",
                         link_keep_regions)
     self.linkParameters("individual_white_mesh", "probtrackx_indir", link_mesh)
+    self.linkParameters("regions_parcellation",
+                        ("method", "individual_white_mesh"),
+                        link_regions_parcellation)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
@@ -228,6 +244,8 @@ def initialization(self):
                    ProcessExecutionNode("constel_individual_subpipeline",
                                         optional=1))
 
+    eNode.subpipeline.executionNode().ClusteringIntraSubjects.removeLink(
+        "regions_parcellation", "individual_white_mesh")
     eNode.addDoubleLink("subpipeline.complete_individual_matrix",
                         "import.complete_individual_matrix")
     eNode.addDoubleLink("subpipeline.regions_nomenclature",
@@ -238,8 +256,6 @@ def initialization(self):
                         "regions_parcellation")
     eNode.addDoubleLink("subpipeline.individual_white_mesh",
                         "individual_white_mesh")
-    eNode.addDoubleLink("subpipeline.regions_parcellation",
-                        "regions_parcellation")
     eNode.addDoubleLink("subpipeline.smoothing",
                         "smoothing")
     eNode.addDoubleLink("subpipeline.normalize",
