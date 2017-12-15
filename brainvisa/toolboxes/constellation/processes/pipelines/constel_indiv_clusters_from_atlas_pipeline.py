@@ -41,29 +41,31 @@ userLevel = 0
 
 signature = Signature(
     # --inputs--
-    "outputs_database", Choice(),
-    "study_name", OpenChoice(),
+    "outputs_database", Choice(section="output database"),
+    "study_name", OpenChoice(section="output database"),
     "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", OpenChoice(),
+        "Nomenclature ROIs File", "Text File", section="nomenclature"),
+    "region", OpenChoice(section="nomenclature"),
+
+    # FSL data
+    "probtrackx_indir", ReadDiskItem("directory", "directory",
+                                     section="FSL import"),
+    "temp_outdir", ReadDiskItem("directory", "directory",
+                                section="FSL import"),
+
+    # Freesurfer mesh / parcellation
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
                             "inflated": "No",
-                            "averaged": "No"}),
+                            "averaged": "No"},
+        section="Freesurfer mesh and parcellation"),
     "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
-    "probtrackx_indir", ReadDiskItem("directory",
-                                     "directory"),
-    "outdir", ReadDiskItem("directory", "directory"),
-    "keep_regions", ListOf(OpenChoice()),
-    "min_fibers_length", Float(),
-    "smoothing", Float(),
-    "normalize", Boolean(),
-    "kmax", Integer(),
+                            "vertex_corr": "Yes"},
+        section="Freesurfer mesh and parcellation"),
 
     # --atlas inputs--
     "atlas_matrix", ReadDiskItem(
@@ -71,51 +73,64 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
                             "intersubject": "yes",
-                            "individual": "no"}),
+                            "individual": "no"},
+        section="atlas inputs"),
     "filtered_reduced_group_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "yes",
                             "roi_filtered": "yes",
                             "intersubject": "yes",
                             "step_time": "no",
-                            "measure": "no"}),
-    "complete_individual_matrix", WriteDiskItem(
-        "Connectivity Matrix", "Sparse Matrix",
-        requiredAttributes={"ends_labelled": "all",
-                            "reduced": "no",
-                            "intersubject": "no",
-                            "individual": "yes"}),
-    "complete_individual_smoothed_matrix", WriteDiskItem(
-        "Connectivity Matrix", "Sparse Matrix",
-        requiredAttributes={"ends_labelled": "all",
-                            "reduced": "no",
-                            "intersubject": "no",
-                            "individual": "yes"}),
-
-    # --outputs--
-    "reduced_matrix", WriteDiskItem(
-        "Connectivity Matrix", "Aims matrix formats",
-        requiredAttributes={"ends_labelled": "all",
-                            "reduced": "yes",
-                            "intersubject": "yes",
-                            "individual": "yes"}),
-
-    # --inputs--
+                            "measure": "no"},
+        section="atlas inputs"),
     "group_clustering", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "no",
                             "roi_filtered": "no",
                             "intersubject": "yes",
                             "step_time": "yes",
-                            "measure": "no"}),
+                            "measure": "no"},
+        section="atlas inputs"),
+
     # --outputs--
+    "complete_individual_matrix", WriteDiskItem(
+        "Connectivity Matrix", "Sparse Matrix",
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "intersubject": "no",
+                            "individual": "yes"},
+        section="outputs"),
+    "complete_individual_smoothed_matrix", WriteDiskItem(
+        "Connectivity Matrix", "Sparse Matrix",
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "intersubject": "no",
+                            "individual": "yes"},
+        section="outputs"),
+
+    "reduced_matrix", WriteDiskItem(
+        "Connectivity Matrix", "Aims matrix formats",
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "yes",
+                            "intersubject": "yes",
+                            "individual": "yes"},
+        section="outputs"),
+
     "individual_clustering", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "no",
                             "roi_filtered": "no",
                             "intersubject": "yes",
                             "step_time": "yes",
-                            "measure": "no"}),
+                            "measure": "no"},
+        section="outputs"),
+
+    # options
+    "keep_regions", ListOf(OpenChoice(), section="options"),
+    "min_fibers_length", Float(section="options"),
+    "smoothing", Float(section="options"),
+    "normalize", Boolean(section="options"),
+    "kmax", Integer(section="options"),
 )
 
 
@@ -128,7 +143,8 @@ def initialization(self):
             s = []
             s += read_file(
                 self.regions_nomenclature.fullPath(), mode=2)
-            self.signature["keep_regions"] = ListOf(Choice(*s))
+            self.signature["keep_regions"] = ListOf(Choice(*s),
+                                                    section="options")
             self.changeSignature(self.signature)
 
     def fill_study_choice(self, dummy=None):
@@ -172,7 +188,7 @@ def initialization(self):
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s)
+                self.signature["region"] = Choice(*s, section="nomenclature")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)
@@ -190,10 +206,10 @@ def initialization(self):
         return self.signature["atlas_matrix"].findValue(match)
 
     def link_reduced_matrix(self, dummy):
-        print('link_reduced_matrix')
         if self.complete_individual_smoothed_matrix is not None \
                 and self.atlas_matrix is not None:
-            match = dict(self.complete_individual_smoothed_matrix.hierarchyAttributes())
+            match = dict(
+                self.complete_individual_smoothed_matrix.hierarchyAttributes())
             match.update({
                 #"_database":
                     #self.complete_individual_smoothed_matrix.get("_database"),
@@ -208,8 +224,16 @@ def initialization(self):
                         "analysis", "acquisition"]:
                 if att in match:
                     del match[att]
-            print(match)
             return self.signature["reduced_matrix"].findValue(match)
+
+    def link_clusters(self, dummy):
+        if self.reduced_matrix:
+            match = dict(self.reduced_matrix.hierarchyAttributes())
+            for att in ["name_serie", "tracking_session", "subject",
+                        "analysis", "acquisition"]:
+                if att in match:
+                    del match[att]
+            return self.signature["individual_clustering"].findValue(match)
 
 
     # link of parameters for autocompletion
@@ -222,7 +246,7 @@ def initialization(self):
     self.linkParameters("keep_regions",
                         "regions_nomenclature",
                         link_keep_regions)
-    self.linkParameters("regions_parcellation", "individual_white_mesh")
+    #self.linkParameters("regions_parcellation", "individual_white_mesh")
     self.linkParameters("atlas_matrix", "region", link_atlas_matrix)
     self.linkParameters("filtered_reduced_group_profile", "atlas_matrix")
     self.linkParameters("reduced_matrix",
@@ -230,7 +254,8 @@ def initialization(self):
                          "atlas_matrix"),
                         link_reduced_matrix)
     self.linkParameters("group_clustering", "atlas_matrix")
-    self.linkParameters("individual_clustering", "reduced_matrix")
+    self.linkParameters("individual_clustering", "reduced_matrix",
+                        link_clusters)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
@@ -259,7 +284,7 @@ def initialization(self):
     eNode.addDoubleLink("individual_white_mesh",
                         "fsl_indiv.individual_white_mesh")
     eNode.addDoubleLink("probtrackx_indir", "fsl_indiv.probtrackx_indir")
-    eNode.addDoubleLink("outdir", "fsl_indiv.outdir")
+    eNode.addDoubleLink("temp_outdir", "fsl_indiv.temp_outdir")
     eNode.addDoubleLink("keep_regions", "fsl_indiv.keep_regions")
     eNode.addDoubleLink("min_fibers_length", "fsl_indiv.min_fibers_length")
     eNode.addDoubleLink("smoothing", "fsl_indiv.smoothing")
