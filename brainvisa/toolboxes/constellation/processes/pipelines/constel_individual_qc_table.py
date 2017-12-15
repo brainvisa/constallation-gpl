@@ -24,7 +24,7 @@ def initialization(self):
         self.signature["database"] = OpenChoice()
 
     self.setOptional('data_filters', 'output_file')
-    self.keys = ['subject', 'studyname', 'gyrus']
+    self.keys = ['subject', 'studyname', 'gyrus', 'sid']
 
 
 def execution(self, context):
@@ -59,7 +59,8 @@ def execution(self, context):
                'smoothing': '3.0'}
     filter7 = {'normed': 'yes', 'intersubject': 'no'}
     filter8 = {'reduced': 'yes', 'intersubject': 'yes', 'individual': 'yes'}
-    filter9 = {}
+    filter9 = {'intersubject': 'yes', 'roi_autodetect': 'no',
+               'roi_filtered': 'no', 'step_time': 'yes', 'measure': 'no'}
 
     filters = [filter1, filter2, filter3, filter4, filter3, filter4,
                filter5, filter6, filter7, filter8, filter9]
