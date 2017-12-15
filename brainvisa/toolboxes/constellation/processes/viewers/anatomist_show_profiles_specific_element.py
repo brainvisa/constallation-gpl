@@ -136,7 +136,6 @@ def initialization(self):
                 "_database": cm.get("_database"),
                 "roi_filtered": "Yes",
                 "gyrus": cm.get("gyrus"),
-                "texture": cm.get("texture"),
             }
             res = basins_type.findValue(atts)
             if res is None:
@@ -145,7 +144,6 @@ def initialization(self):
                     "_database": cm.get("_database"),
                     "roi_filtered": "Yes",
                     "gyrus": cm.get("gyrus"),
-                    "texture": cm.get("texture"),
                 }
                 res = basins_type.findValue(atts)
             if res is None:
