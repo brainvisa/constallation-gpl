@@ -153,7 +153,7 @@ def initialization(self):
                         "regions_nomenclature",
                         reset_label)
     self.linkParameters(None,
-                        "outputs_database",
+                        ("outputs_database", "method"),
                         fill_study_choice)
     self.linkParameters("keep_regions",
                         "regions_nomenclature",
