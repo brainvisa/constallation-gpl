@@ -19,9 +19,8 @@ def validation():
     except:
         raise ValidationError(_t_('Anatomist not available'))
 
-
 name = 'Anatomist view connectivity matrix'
-#roles = ('viewer', )
+roles = ('viewer', )
 userLevel = 0
 
 signature = Signature(
@@ -36,7 +35,9 @@ signature = Signature(
                                requiredAttributes={"side": "both"}),
     'gyrus_texture', 
         ReadDiskItem('ROI texture', 'anatomist texture formats',
-                     requiredAttributes={"side": "both"}), )
+                     requiredAttributes={"side": "both"}),
+)
+
 
 def initialization(self):
     def link_mesh(self, dummy):
@@ -64,10 +65,10 @@ def initialization(self):
         if self.connectivity_matrix is not None:
             cm = self.connectivity_matrix
             gyrus_type = self.signature["gyrus_texture"]
-            study = cm.get('study')
-            if study == 'avg':
-                print 'averaged study.'
+            method = cm.get('method')
+            if method == 'avg':
                 atts = {
+                    "averaged": "Yes",
                     "group_of_subjects": cm.get("texture"),
                     "freesurfer_group_of_subjects":
                         cm.get("texture"),
@@ -83,6 +84,7 @@ def initialization(self):
                 x = ct.findValue(cm)
                 if x:
                     atts = {
+                        "averaged": "Yes",
                         "group_of_subjects": x.get("group_of_subjects"),
                         "freesurfer_group_of_subjects":
                             x.get("group_of_subjects"),
@@ -90,6 +92,11 @@ def initialization(self):
                     res = gyrus_type.findValue(atts)
                     if res is not None:
                         return res
+                # otherwise fallback to a different group, if there is only one
+                atts = {"averaged": "Yes"}
+                res = gyrus_type.findValue(atts)
+                if res is not None:
+                    return res
             atts = {
                 "subject": cm.get("subject"),
                 "_type": "BothResampledGyri",
