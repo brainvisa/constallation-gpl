@@ -126,12 +126,26 @@ signature = Signature(
         section="outputs"),
 
     # options
-    "keep_regions", ListOf(OpenChoice(), section="options"),
+    "regions_selection", Choice("All but main region", "All", "Custom",
+                                section="options"),
+    "keep_regions", ListOf(OpenChoice(), section="options", userLevel=3),
     "min_fibers_length", Float(section="options"),
     "smoothing", Float(section="options"),
     "normalize", Boolean(section="options"),
     "kmax", Integer(section="options"),
 )
+
+
+def link_keep_regions_value(self, dummy, other=None, oother=None):
+    s = [x[1] for x in self.signature["keep_regions"].contentType.values
+          if x[1] is not None]
+    if self.regions_selection == "All":
+        keep_regions = s
+    elif self.regions_selection == "All but main region":
+        keep_regions = [x for x in s if x != self.region]
+    else:
+        keep_regions = None
+    return keep_regions
 
 
 def initialization(self):
@@ -229,10 +243,16 @@ def initialization(self):
     def link_clusters(self, dummy):
         if self.reduced_matrix:
             match = dict(self.reduced_matrix.hierarchyAttributes())
-            for att in ["name_serie", "tracking_session", "subject",
-                        "analysis", "acquisition"]:
+            for att in ["name_serie", "tracking_session", # "subject",
+                        "analysis", "acquisition", "ends_labelled", "reduced",
+                        "individual"]:
                 if att in match:
                     del match[att]
+            # artificially add format in match. If we do not do this, existing
+            # (GIFTI) files and potential output ones (.tex) do not appear to
+            # have the same attributes, and findValue() cannot decide.
+            # strangely, findValues() returns 1 element....
+            match["_format"] = 'GIFTI file'
             return self.signature["individual_clustering"].findValue(match)
 
 
@@ -243,9 +263,14 @@ def initialization(self):
     self.linkParameters(None,
                         "regions_nomenclature",
                         reset_label)
-    self.linkParameters("keep_regions",
+    self.linkParameters(None,
                         "regions_nomenclature",
                         link_keep_regions)
+    # linkParameters does not keep firing after region is modified once or
+    # twice - I don't know why.
+    self.addLink("keep_regions",
+                 ("regions_nomenclature", "regions_selection", "region"),
+                 self.link_keep_regions_value)
     #self.linkParameters("regions_parcellation", "individual_white_mesh")
     self.linkParameters("atlas_matrix", "region", link_atlas_matrix)
     self.linkParameters("filtered_reduced_group_profile", "atlas_matrix")
@@ -353,6 +378,12 @@ def initialization(self):
                         "individual_clusters.group_clustering")
     eNode.addDoubleLink("individual_clustering",
                         "individual_clusters.individual_clustering")
+    eNode.addDoubleLink("regions_parcellation",
+                        "individual_clusters.individual_regions_parcellation")
+    eNode.addDoubleLink("regions_nomenclature",
+                        "individual_clusters.regions_nomenclature")
+    eNode.addDoubleLink("region",
+                        "individual_clusters.region")
 
     self.setExecutionNode(eNode)
 
