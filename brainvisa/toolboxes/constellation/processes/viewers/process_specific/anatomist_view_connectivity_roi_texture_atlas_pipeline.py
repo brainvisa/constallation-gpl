@@ -1,14 +1,11 @@
 # Axon python API module
 from brainvisa.processes import *
 from brainvisa.processing.process_based_viewer import ProcessBasedViewer
-# Anatomist
-from brainvisa import anatomist
 
 name = 'Anatomist view Connectivity ROI Texture, Atlas pipeline variant'
 base_class = ProcessBasedViewer
 allowed_processes = ['constel_indiv_clusters_from_atlas_pipeline']
-userLevel = 1
-#roles = ('viewer', 'toto')
+
 
 signature = Signature(
     'connectivity_roi_texture', ReadDiskItem(

@@ -1,12 +1,11 @@
 # Axon python API module
 from brainvisa.processes import *
-# Anatomist
-from brainvisa import anatomist
+from brainvisa.processing.process_based_viewer import ProcessBasedViewer
 
 name = 'Anatomist view Connectivity Texture, Atlas pipeline variant'
-userLevel = 3
-roles = ('viewer', )
+base_class = ProcessBasedViewer
 allowed_processes = ['constel_indiv_clusters_from_atlas_pipeline']
+
 
 signature = Signature(
     'connectivity_texture', ReadDiskItem(
@@ -14,14 +13,10 @@ signature = Signature(
 )
 
 
-def initialization(self):
-    self.reference_process = None
-
-
 def execution(self, context):
-    viewer = getProcessInstance('anatomist_view_connectivity_texture')#'AnatomistShowTexture')
+    viewer = getProcessInstance('anatomist_view_connectivity_texture')
     if not hasattr(self, 'reference_process'):
-        return context.runProcess('anatomist_view_connectivity_texture', self.connectivity_texture)
+        return context.runProcess(viewer, self.connectivity_texture)
     mesh = ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes",
