@@ -28,9 +28,18 @@ from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
+from brainvisa.processes import OpenChoice
+from brainvisa.processes import Choice
 
 # soma module
 from soma.path import find_in_path
+
+# Package import
+try:
+    from constel.lib.utils.filetools import read_file
+    from constel.lib.utils.filetools import select_ROI_number
+except:
+    pass
 
 
 def validation():
@@ -67,6 +76,13 @@ signature = Signature(
                             "intersubject": "yes",
                             "step_time": "yes",
                             "measure": "no"}),
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="nomenclature"),
+    "region", OpenChoice(section="nomenclature"),
+    "individual_regions_parcellation", ReadDiskItem(
+        "ROI Texture", "aims texture formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"}),
 
 
     # --outputs--
@@ -85,8 +101,39 @@ signature = Signature(
 
 def initialization(self):
     """Provides link of parameters"""
-    pass
 
+    def reset_label(self, dummy):
+        """Read and/or reset the region parameter.
+
+        This callback reads the labels nomenclature and proposes them in the
+        signature 'region' of process.
+        It also resets the region parameter to default state after
+        the nomenclature changes.
+        """
+        current = self.region
+        self.setValue("region", current, True)
+        if self.regions_nomenclature is not None:
+            s = [("Select a region in this list", None)]
+            # temporarily set a value which will remain valid
+            self.region = s[0][1]
+            s += read_file(
+                self.regions_nomenclature.fullPath(), mode=2)
+            self.signature["region"].setChoices(*s)
+            if isinstance(self.signature["region"], OpenChoice):
+                self.signature["region"] = Choice(*s, section="nomenclature")
+                self.changeSignature(self.signature)
+            if current not in s:
+                self.setValue("region", s[0][1], True)
+            else:
+                self.setValue("region", current, True)
+
+
+    self.linkParameters(None,
+                        "regions_nomenclature",
+                        reset_label)
+    self.regions_nomenclature = self.signature[
+        "regions_nomenclature"].findValue(
+        {"atlasname": "desikan_freesurfer"})
 
 # ---------------------------Main program--------------------------------------
 
@@ -94,8 +141,16 @@ def initialization(self):
 def execution(self, context):
     """Run the command 'constel_clusters_from_atlas'.
     """
+    sup_args = []
+    if self.individual_regions_parcellation is not None:
+        sup_args.append(self.individual_regions_parcellation)
+        # Selects the label number corresponding to label name
+        label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
+                                         self.region)
+        sup_args.append(label_number)
     context.pythonSystem("constel_clusters_from_atlas.py",
                          self.individual_matrix,
                          self.atlas_matrix,
                          self.group_clustering,
-                         self.individual_clustering)
+                         self.individual_clustering,
+                         *sup_args)

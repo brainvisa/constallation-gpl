@@ -60,7 +60,8 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
                             "intersubject": "yes",
-                            "individual": "no"}),
+                            #"individual": "no",
+                            }),
     "white_mesh", ReadDiskItem("White Mesh", "anatomist mesh formats",
                                requiredAttributes={"side": "both",
                                                    "vertex_corr": "Yes"}),
@@ -136,7 +137,6 @@ def initialization(self):
                 "_database": cm.get("_database"),
                 "roi_filtered": "Yes",
                 "gyrus": cm.get("gyrus"),
-                "texture": cm.get("texture"),
             }
             res = basins_type.findValue(atts)
             if res is None:
@@ -145,7 +145,6 @@ def initialization(self):
                     "_database": cm.get("_database"),
                     "roi_filtered": "Yes",
                     "gyrus": cm.get("gyrus"),
-                    "texture": cm.get("texture"),
                 }
                 res = basins_type.findValue(atts)
             if res is None:

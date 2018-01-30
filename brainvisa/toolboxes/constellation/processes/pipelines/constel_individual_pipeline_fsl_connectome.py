@@ -23,6 +23,7 @@ from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import neuroHierarchy
 from brainvisa.processes import SerialExecutionNode
 from brainvisa.processes import ProcessExecutionNode
+import os
 
 # Package import
 try:
@@ -39,32 +40,39 @@ userLevel = 0
 
 signature = Signature(
     # --inputs--
-    "outputs_database", Choice(),
-    "study_name", OpenChoice(),
+    "outputs_database", Choice(section="output database"),
+    "study_name", OpenChoice(section="output database"),
     "method", Choice(
         ("averaged approach", "avg"),
-        ("concatenated approach", "concat")),
+        ("concatenated approach", "concat"),
+        section="output database"),
     "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", OpenChoice(),
-    "regions_parcellation", ReadDiskItem(
-        "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+        "Nomenclature ROIs File", "Text File", section="nomenclature"),
+    "region", OpenChoice(section="nomenclature"),
+
+    "probtrackx_indir", ReadDiskItem("directory", "directory",
+                                     section="FSL import"),
+    "temp_outdir", ReadDiskItem("directory", "directory",
+                                section="FSL import"),
+
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
                             "inflated": "No",
-                            "averaged": "No"}),
-    "probtrackx_indir", ReadDiskItem("directory",
-                                     "directory"),
-    "outdir", ReadDiskItem("directory", "directory"),
-    "keep_regions", ListOf(OpenChoice()),
-    "min_fibers_length", Float(),
-    "smoothing", Float(),
-    "normalize", Boolean(),
-    "kmax", Integer(),
+                            "averaged": "No"},
+        section="Freesurfer mesh and parcellation"),
+    "regions_parcellation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"},
+        section="Freesurfer mesh and parcellation"),
+
+    "keep_regions", ListOf(OpenChoice(section="options")),
+    "min_fibers_length", Float(section="options"),
+    "smoothing", Float(section="options"),
+    "normalize", Boolean(section="options"),
+    "kmax", Integer(section="options"),
 )
 
 
@@ -100,7 +108,8 @@ def initialization(self):
             s = []
             s += read_file(
                 self.regions_nomenclature.fullPath(), mode=2)
-            self.signature["keep_regions"] = ListOf(Choice(*s))
+            self.signature["keep_regions"] = ListOf(Choice(*s),
+                                                    section="options")
             self.changeSignature(self.signature)
 
     def fill_study_choice(self, dummy=None):
@@ -115,7 +124,7 @@ def initialization(self):
                 choices.update(
                     [x[0] for x in database.findAttributes(
                         ["studyname"], selection=sel,
-                        _type="Filtered Fascicles Bundles")])
+                        _type="Connectivity Matrix")])
             else:
                 choices = []
         self.signature["study_name"].setChoices(*sorted(choices))
@@ -141,23 +150,48 @@ def initialization(self):
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s)
+                self.signature["region"] = Choice(*s, section="nomenclature")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)
             else:
                 self.setValue("region", current, True)
 
+    def link_mesh(self, dummy):
+        if self.probtrackx_indir is None:
+            return None
+        match = {
+            "subject": os.path.basename(self.probtrackx_indir.fullName()),
+        }
+        return self.signature["individual_white_mesh"].findValue(match)
+
+    def link_regions_parcellation(self, dummy):
+        if self.method == "concat":
+            if self.individual_white_mesh is None:
+                return None
+            return self.signature["regions_parcellation"].findValue(
+                self.individual_white_mesh)
+        match = {"averaged": "Yes"}
+        if self.individual_white_mesh is not None:
+            match["_database"] = self.individual_white_mesh.get("_database")
+            match["freesurfer_group_of_subjects"] \
+                = self.individual_white_mesh.get(
+                    "freesurfer_group_of_subjects")
+
     # link of parameters for autocompletion
     self.linkParameters(None,
                         "regions_nomenclature",
                         reset_label)
     self.linkParameters(None,
-                        "outputs_database",
+                        ("outputs_database", "method"),
                         fill_study_choice)
     self.linkParameters("keep_regions",
                         "regions_nomenclature",
                         link_keep_regions)
+    self.linkParameters("individual_white_mesh", "probtrackx_indir", link_mesh)
+    self.linkParameters("regions_parcellation",
+                        ("method", "individual_white_mesh"),
+                        link_regions_parcellation)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
@@ -178,7 +212,7 @@ def initialization(self):
     eNode.addDoubleLink("confsl.region",
                         "region")
     eNode.addDoubleLink("confsl.outdir",
-                        "outdir")
+                        "temp_outdir")
 
     ###########################################################################
     #    link of parameters with the process: "Import FSL connectome"         #
@@ -210,6 +244,8 @@ def initialization(self):
                    ProcessExecutionNode("constel_individual_subpipeline",
                                         optional=1))
 
+    eNode.subpipeline.executionNode().ClusteringIntraSubjects.removeLink(
+        "regions_parcellation", "individual_white_mesh")
     eNode.addDoubleLink("subpipeline.complete_individual_matrix",
                         "import.complete_individual_matrix")
     eNode.addDoubleLink("subpipeline.regions_nomenclature",
@@ -220,8 +256,6 @@ def initialization(self):
                         "regions_parcellation")
     eNode.addDoubleLink("subpipeline.individual_white_mesh",
                         "individual_white_mesh")
-    eNode.addDoubleLink("subpipeline.regions_parcellation",
-                        "regions_parcellation")
     eNode.addDoubleLink("subpipeline.smoothing",
                         "smoothing")
     eNode.addDoubleLink("subpipeline.normalize",
