@@ -41,11 +41,11 @@ userLevel = 0
 signature = Signature(
     # --inputs--
     "outputs_database", Choice(section="output database"),
-    "study_name", OpenChoice(section="output database"),
     "method", Choice(
         ("averaged approach", "avg"),
         ("concatenated approach", "concat"),
         section="output database"),
+    "study_name", OpenChoice(section="output database"),
     "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File", section="nomenclature"),
     "region", OpenChoice(section="nomenclature"),
@@ -68,6 +68,8 @@ signature = Signature(
                             "vertex_corr": "Yes"},
         section="Freesurfer mesh and parcellation"),
 
+    "regions_selection", Choice("All but main region", "All", "Custom",
+                                section="options"),
     "keep_regions", ListOf(OpenChoice(section="options")),
     "min_fibers_length", Float(section="options"),
     "smoothing", Float(section="options"),
@@ -77,6 +79,18 @@ signature = Signature(
 
 
 # ---------------------------Functions-----------------------------------------
+
+
+def link_keep_regions_value(self, dummy, other=None, oother=None):
+    s = [x[1] for x in self.signature["keep_regions"].contentType.values
+          if x[1] is not None]
+    if self.regions_selection == "All":
+        keep_regions = s
+    elif self.regions_selection == "All but main region":
+        keep_regions = [x for x in s if x != self.region]
+    else:
+        keep_regions = None
+    return keep_regions
 
 
 def initialization(self):
@@ -177,6 +191,12 @@ def initialization(self):
             match["freesurfer_group_of_subjects"] \
                 = self.individual_white_mesh.get(
                     "freesurfer_group_of_subjects")
+            res = self.signature["regions_parcellation"].findValue(match)
+            if res is None:
+                # in case ther is only one (non-matching) group
+                del match["freesurfer_group_of_subjects"]
+                res = self.signature["regions_parcellation"].findValue(match)
+            return match
 
     # link of parameters for autocompletion
     self.linkParameters(None,
@@ -185,10 +205,15 @@ def initialization(self):
     self.linkParameters(None,
                         ("outputs_database", "method"),
                         fill_study_choice)
-    self.linkParameters("keep_regions",
+    self.linkParameters(None,
                         "regions_nomenclature",
                         link_keep_regions)
     self.linkParameters("individual_white_mesh", "probtrackx_indir", link_mesh)
+    # linkParameters does not keep firing after region is modified once or
+    # twice - I don't know why.
+    self.addLink("keep_regions",
+                 ("regions_nomenclature", "regions_selection", "region"),
+                 self.link_keep_regions_value)
     self.linkParameters("regions_parcellation",
                         ("method", "individual_white_mesh"),
                         link_regions_parcellation)

@@ -42,6 +42,10 @@ userLevel = 0
 signature = Signature(
     # --inputs--
     "outputs_database", Choice(section="output database"),
+    "method", Choice(
+        ("averaged approach", "avg"),
+        ("concatenated approach", "concat"),
+        section="output database"),
     "study_name", OpenChoice(section="output database"),
     "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File", section="nomenclature"),
@@ -136,18 +140,6 @@ signature = Signature(
 )
 
 
-def link_keep_regions_value(self, dummy, other=None, oother=None):
-    s = [x[1] for x in self.signature["keep_regions"].contentType.values
-          if x[1] is not None]
-    if self.regions_selection == "All":
-        keep_regions = s
-    elif self.regions_selection == "All but main region":
-        keep_regions = [x for x in s if x != self.region]
-    else:
-        keep_regions = None
-    return keep_regions
-
-
 def initialization(self):
 
     def link_keep_regions(self, dummy):
@@ -169,10 +161,7 @@ def initialization(self):
             if neuroHierarchy.databases.hasDatabase(self.outputs_database):
                 database = neuroHierarchy.databases.database(
                     self.outputs_database)
-                sel = {
-                    "method":
-                        self.executionNode().child(
-                            "fsl_indiv")._process.method}
+                sel = {"method": self.method}
                 choices.update(
                     [x[0] for x in database.findAttributes(
                         ["studyname"], selection=sel,
@@ -266,12 +255,6 @@ def initialization(self):
     self.linkParameters(None,
                         "regions_nomenclature",
                         link_keep_regions)
-    # linkParameters does not keep firing after region is modified once or
-    # twice - I don't know why.
-    self.addLink("keep_regions",
-                 ("regions_nomenclature", "regions_selection", "region"),
-                 self.link_keep_regions_value)
-    #self.linkParameters("regions_parcellation", "individual_white_mesh")
     self.linkParameters("atlas_matrix", "region", link_atlas_matrix)
     self.linkParameters("filtered_reduced_group_profile", "atlas_matrix")
     self.linkParameters("reduced_matrix",
@@ -300,6 +283,7 @@ def initialization(self):
     fsl_indiv.executionNode().child("subpipeline").child(
         'InternalConnections').setSelected(False)
     eNode.addDoubleLink("outputs_database", "fsl_indiv.outputs_database")
+    eNode.addDoubleLink("method", "fsl_indiv.method")
     eNode.addDoubleLink("study_name", "fsl_indiv.study_name")
     eNode.addDoubleLink("regions_nomenclature",
                         "fsl_indiv.regions_nomenclature")
@@ -310,6 +294,7 @@ def initialization(self):
                         "fsl_indiv.individual_white_mesh")
     eNode.addDoubleLink("probtrackx_indir", "fsl_indiv.probtrackx_indir")
     eNode.addDoubleLink("temp_outdir", "fsl_indiv.temp_outdir")
+    eNode.addDoubleLink("regions_selection", "fsl_indiv.regions_selection")
     eNode.addDoubleLink("keep_regions", "fsl_indiv.keep_regions")
     eNode.addDoubleLink("min_fibers_length", "fsl_indiv.min_fibers_length")
     eNode.addDoubleLink("smoothing", "fsl_indiv.smoothing")
