@@ -247,7 +247,7 @@ def initialization(self):
 
     # link of parameters for autocompletion
     self.linkParameters(None,
-                        "outputs_database",
+                        ("outputs_database", "method"),
                         fill_study_choice)
     self.linkParameters(None,
                         "regions_nomenclature",
