@@ -42,7 +42,7 @@ except:
 
 
 name = "Constellation Group Pipeline"
-userLevel = 0
+userLevel = 1
 
 if neuroConfig.gui:
     import types

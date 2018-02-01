@@ -36,7 +36,7 @@ except:
 
 
 name = "Constellation Individual Pipeline - FSL connectome"
-userLevel = 0
+userLevel = 1
 
 signature = Signature(
     # --inputs--

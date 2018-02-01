@@ -30,13 +30,29 @@ def execution(self, context):
     if not hasattr(self, 'reference_process'):
         return context.runProcess(viewer, self.connectivity_matrix)
     process = get_process(self.reference_process)
+    context.write('process:', process.id())
 
     # -------
     # constel_indiv_clusters_from_atlas_pipeline case
     if process.id() == 'constel_indiv_clusters_from_atlas_pipeline':
         if self.connectivity_matrix == process.atlas_matrix:
+            white_mesh = ReadDiskItem(
+                "White Mesh", "Aims mesh formats",
+                requiredAttributes={"side": "both", "vertex_corr": "Yes",
+                                    "inflated": "Yes"}
+                ).findValue(process.regions_parcellation)
+            if white_mesh is None:
+                white_mesh = ReadDiskItem(
+                    "White Mesh", "Aims mesh formats",
+                    requiredAttributes={"side": "both", "vertex_corr": "Yes",
+                                        "inflated": "No"}
+                    ).findValue(process.regions_parcellation)
+                if white_mesh is None:
+                    white_mesh = process.individual_white_mesh
             return context.runProcess(
                 viewer, connectivity_matrix=self.connectivity_matrix,
+                white_mesh=white_mesh,
+                gyrus_texture=process.regions_parcellation,
                 basins_texture=process.filtered_reduced_group_profile)
         else:
             white_mesh = ReadDiskItem(
