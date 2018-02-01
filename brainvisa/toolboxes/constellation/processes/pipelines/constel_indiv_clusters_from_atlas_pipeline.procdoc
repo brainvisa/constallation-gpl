@@ -41,6 +41,24 @@
 </ul>
 </p>
 
+<h2>Preprocessings</h2>
+<p>Before running this "individual clusters from atlas pipeline", individual data should have undegone some preprocessings:
+<ul>
+  <li>Freesurfer segmentation: <tt>recon-all</tt>, either directly, or via the <a href="bvcategory://freesurfer">Freesurfer toolbox</a> in Brainvisa.</li>
+  <li>Convert Freesurfer meshes and textures to GIFTI format, and resample meshes to the HCP 32k sphere, using the <a href="bvprocess://freesurferToBrainvisaConversionPipeline">Freesurfer outputs To BrainVisa conversion pipeline</a> - don't forget to select "hcp 32k" for the "icosphere_type" parameter.</li>
+  <li>FSL connectivity processings using <a href="https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FDT/UserGuide">bedpostx and probtrackx</a>. There are <a href="bvcategory://constellation#fsl">more details here</a>.</li>
+</ul>
+</p>
+
+<h2>Parameters</h2>
+<p>It is easier to enter parameters in the order they are listed.
+<ul>
+  <li>"study_name" gets a free string value.</li>
+  <li>The FSL parameters have to be selected using the "folder" button, not the "database" button, because FSL data are not indexed in a BrainVisa database (at least not yet).</li>
+  <li>The FSL "temp_outdir" parameter can be a temporary working directory (typically <tt>/tmp</tt>, it is used for intermediate files conversions, and can be removed after the FSL import step is done.</li>
+</ul>
+</p>
+
 <h2>Atlas provided with Constellation</h2>
 
 <a name="tracto">
