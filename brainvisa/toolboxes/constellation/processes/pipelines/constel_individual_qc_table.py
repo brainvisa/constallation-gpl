@@ -24,7 +24,7 @@ def initialization(self):
         self.signature["database"] = OpenChoice()
 
     self.setOptional('data_filters', 'output_file')
-    self.keys = ['subject', 'studyname', 'gyrus', 'sid']
+    self.keys = ['subject', 'studyname', 'gyrus', 'sid', 'method']
 
 
 def execution(self, context):

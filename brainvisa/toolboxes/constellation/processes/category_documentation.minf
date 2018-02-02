@@ -130,7 +130,7 @@
     </ul>
   </p>
 
-  <h5>Using FSL</h5>
+  <a name="fsl"><h5>Using FSL</h5></a>
 
   <p>FSL provides its <a href="https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FDT/UserGuide">diffusion MRI processing and tractography pipelines</a>. The main parts are T1 MRI brain extraction, Bedpostx (local diffusion model fit), and probtrackx (fiber tracking). Probtrackx can process a given number of seeds per voxels (typically 5000), and can track either from the cortex (mode <tt>omatrix1</tt>) or from the whole brain (<tt>omatrix3</tt>). Expect significant computing time, especially for high resolution and large data, and mostly using <tt>omatrix3</tt> mode (for instance processing the HCP data took us more than 2 months of computing for a single subject).
   </p>
