@@ -31,12 +31,11 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-import os, sys
+import os
 from brainvisa.configuration import neuroConfig
 from brainvisa.data import neuroHierarchy
-import distutils.spawn
-from soma.wip.application.api import Application
 import brainvisa.processes
+from brainvisa.data import sqlFSODatabase
 import constel.info as coninfo
 
 constel_db = os.path.join(
@@ -52,10 +51,12 @@ for db_name, ontology in (('constellation_matrix', 'brainvisa-3.2.0'),
             dbs = neuroConfig.DatabaseSettings(db_path)
             dbs.expert_settings.ontology = ontology
             dbs.builtin = True
+            dbs.expert_settings.sqliteFileName = os.path.join(db_path, 'database-%s.sqlite' % sqlFSODatabase.databaseVersion)
             neuroConfig.dataPath.append(dbs)
             db = neuroHierarchy.SQLDatabase(
                 dbs.expert_settings.sqliteFileName, db_path, ontology,
                 context=brainvisa.processes.defaultContext(), settings=dbs)
+            print('db:', db_name, ', sql:', dbs.expert_settings.sqliteFileName)
             neuroHierarchy.databases.add(db)
 
             del dbs, db
