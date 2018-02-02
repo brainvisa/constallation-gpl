@@ -71,6 +71,7 @@ def execution(self, context):
                 'averaged': 'Yes',
                 'vertex_corr': 'Yes',
                 'side': 'both',
+                '_database': mesh.get("_database"),
             }
             group = self.connectivity_matrix.get('group_of_subjects')
             if group is not None:

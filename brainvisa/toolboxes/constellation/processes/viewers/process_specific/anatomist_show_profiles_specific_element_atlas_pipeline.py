@@ -30,7 +30,6 @@ def execution(self, context):
     if not hasattr(self, 'reference_process'):
         return context.runProcess(viewer, self.connectivity_matrix)
     process = get_process(self.reference_process)
-    context.write('process:', process.id())
 
     # -------
     # constel_indiv_clusters_from_atlas_pipeline case
@@ -49,10 +48,31 @@ def execution(self, context):
                     ).findValue(process.regions_parcellation)
                 if white_mesh is None:
                     white_mesh = process.individual_white_mesh
+            if process.method == 'avg':
+                gyrus_texture = process.regions_parcellation
+            else:
+                # take group gyri
+                match = {
+                    'averaged': 'Yes',
+                    'vertex_corr': 'Yes',
+                    'side': 'both',
+                    '_database': white_mesh.get("_database"),
+                }
+                group = self.connectivity_matrix.get('group_of_subjects')
+                if group is not None:
+                    match['freesurfer_group_of_subjects'] = group
+                gyrus_texture = ReadDiskItem(
+                    'ROI Texture',
+                    'anatomist texture formats').findValue(match)
+                if gyrus_texture is None and group is not None:
+                    del match['freesurfer_group_of_subjects']
+                    gyrus_texture = ReadDiskItem(
+                        'ROI Texture',
+                        'anatomist texture formats').findValue(match)
             return context.runProcess(
                 viewer, connectivity_matrix=self.connectivity_matrix,
                 white_mesh=white_mesh,
-                gyrus_texture=process.regions_parcellation,
+                gyrus_texture=gyrus_texture,
                 basins_texture=process.filtered_reduced_group_profile)
         else:
             white_mesh = ReadDiskItem(
@@ -91,6 +111,7 @@ def execution(self, context):
                 'averaged': 'Yes',
                 'vertex_corr': 'Yes',
                 'side': 'both',
+                '_database': mesh.get("_database"),
             }
             group = self.connectivity_matrix.get('group_of_subjects')
             if group is not None:
