@@ -51,12 +51,12 @@ for db_name, ontology in (('constellation_matrix', 'brainvisa-3.2.0'),
             dbs = neuroConfig.DatabaseSettings(db_path)
             dbs.expert_settings.ontology = ontology
             dbs.builtin = True
-            dbs.expert_settings.sqliteFileName = os.path.join(db_path, 'database-%s.sqlite' % sqlFSODatabase.databaseVersion)
+            sqliteFileName = os.path.join(
+                db_path, 'database-%s.sqlite' % sqlFSODatabase.databaseVersion)
             neuroConfig.dataPath.append(dbs)
             db = neuroHierarchy.SQLDatabase(
-                dbs.expert_settings.sqliteFileName, db_path, ontology,
+                sqliteFileName, db_path, ontology,
                 context=brainvisa.processes.defaultContext(), settings=dbs)
-            print('db:', db_name, ', sql:', dbs.expert_settings.sqliteFileName)
             neuroHierarchy.databases.add(db)
 
             del dbs, db
