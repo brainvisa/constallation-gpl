@@ -61,7 +61,7 @@ def initialization(self):
                 atts2['inflated'] = infl2
                 res = mesh_type.findValue(atts2)
             if res is None:
-                res = mesh_type.findValue(label_texture)
+                res = mesh_type.findValue(self.label_texture)
             return res
 
     self.prefer_inflated_meshes = False

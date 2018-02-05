@@ -245,6 +245,9 @@ def initialization(self):
             return self.signature["individual_clustering"].findValue(match)
 
 
+    self.signature['probtrackx_indir'].databaseUserLevel = 3
+    self.signature['temp_outdir'].databaseUserLevel = 3
+
     # link of parameters for autocompletion
     self.linkParameters(None,
                         ("outputs_database", "method"),

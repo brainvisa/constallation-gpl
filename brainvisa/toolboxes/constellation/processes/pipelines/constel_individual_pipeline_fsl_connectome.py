@@ -99,12 +99,16 @@ def initialization(self):
     # list of possible databases, while respecting the ontology
     # ontology: brainvisa-3.2.0
     databases = [h.name for h in neuroHierarchy.hierarchies()
-                 if h.fso.name == "brainvisa-3.2.0" and not h.builtin]
+                 if h.fso.name == "brainvisa-3.2.0" and not h.builtin
+                    and not h.read_only]
     self.signature["outputs_database"].setChoices(*databases)
     if len(databases) != 0:
         self.outputs_database = databases[0]
     else:
         self.signature["outputs_database"] = OpenChoice()
+
+    self.signature['probtrackx_indir'].databaseUserLevel = 3
+    self.signature['temp_outdir'].databaseUserLevel = 3
 
     # default value
     self.smoothing = 3.0
