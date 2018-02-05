@@ -48,7 +48,7 @@ for db_name, ontology in (('constellation_matrix', 'brainvisa-3.2.0'),
     db_path = os.path.join(constel_db, db_name)
     if os.path.isdir(db_path):
         if db_path not in [x.directory for x in neuroConfig.dataPath]:
-            dbs = neuroConfig.DatabaseSettings(db_path)
+            dbs = neuroConfig.DatabaseSettings(db_path, read_only=True)
             dbs.expert_settings.ontology = ontology
             dbs.builtin = True
             sqliteFileName = os.path.join(

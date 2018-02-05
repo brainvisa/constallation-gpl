@@ -33,7 +33,7 @@
 </p>
 <p>In order to make it right, individual connectivity data must be processed -more or less- the same way as the atlas has been processed. Namely this means:
 <ul>
-  <li>Same or compatible diffusion data acquisition - this first condition is almost impossible to guarantee, so we will just suppose the tractography will behave statistically the same.</li>
+  <li>Same or compatible diffusion data acquisition - this first condition is almost impossible to guarantee, so we will just assume the tractography will behave statistically the same.</li>
   <li>Same cortical segmentation method with vertex-wise inter-subject correspondance. The atlas provided with Constellation has been using FreeSurfer segmentation, and mesh resampling on a 32K HCP sphere per hemisphere (thus, 64K for the whole brain).</li>
   <li>Same diffusion data preprocessings and tractography. Here we are in the FSL variant of the pipeline, so it's FSL connectivity, but some parameters may be important, <a href="#tracto">see below</a>.</li>
   <li>Same tracts filtering (regions used or filtered out, length filtering, ...)</li>
@@ -66,7 +66,7 @@
 
 <p>The atlas distributed with Constellation has been built from 200 subjects of the <a href="http://www.humanconnectomeproject.org/">Human Connectome Project (HCP)</a> data, using the HCP processing pipelines, with one exception:
 </p>
-<p>The fiber tracking mask is the whole brain, with sulci skeleton removed in order to avoid tracts to cross a sulcus wall. This mask has been built using <a href="bvprocess://morphologist">Motphologist</a> segmentation and sulci skeleton.
+<p>The fiber tracking mask is the whole brain, with sulci skeleton removed in order to avoid tracts to cross a sulcus wall. This mask has been built using <a href="bvprocess://morphologist">Morphologist</a> segmentation and sulci skeleton.
 </p>
 <p>The tractography was in "omatrix1" mode: seeds in the cortical ribbon, not in the white matter.</p>
 
@@ -78,7 +78,7 @@
   <li>Connectivity matrix smoothing was 3mm.</li>
 </ul>
 </p>
-<p>Individual data should thus follow preprocessings as close as possible as the atlas parameters.
+<p>Individual data should thus follow the atlas preprocessing parameters as closely as possible.
 </p>
 
 <h3>Influence of the "method" parameter</h3>

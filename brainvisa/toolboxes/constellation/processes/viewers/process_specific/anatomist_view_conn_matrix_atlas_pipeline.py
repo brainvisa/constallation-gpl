@@ -21,9 +21,16 @@ signature = Signature(
 
 def get_process(process):
     if process.id() in ('constel_indiv_clusters_from_atlas_pipeline',
-                        'database_qc_table'):
+                        'database_qc_table',
+                        'constel_individual_pipeline_fsl_connectome'):
         return process
-    return process.parent_pipeline()
+    parent = process.parent_pipeline()
+    if parent is not None \
+            and parent.id() in ('constel_indiv_clusters_from_atlas_pipeline',
+                                'database_qc_table',
+                                'constel_individual_pipeline_fsl_connectome'):
+        return parent
+    return None
 
 
 def execution(self, context):
@@ -35,7 +42,8 @@ def execution(self, context):
 
     # -------
     # constel_indiv_clusters_from_atlas_pipeline case
-    if process.id() == 'constel_indiv_clusters_from_atlas_pipeline':
+    if process.id() in ('constel_indiv_clusters_from_atlas_pipeline',
+                        'constel_individual_pipeline_fsl_connectome'):
         white_mesh = ReadDiskItem(
             "White Mesh", "Aims mesh formats",
             requiredAttributes={"side": "both", "vertex_corr": "Yes",

@@ -139,9 +139,10 @@ def initialization(self):
             for att_name in [
                     "name_serie", "tracking_session",
                     "_declared_attributes_location", "analysis", "_ontology",
-                    "acquisition", "subject"]:
+                    "acquisition", "subject", "sid"]:
                 if att_name in atts:
                     del atts[att_name]
+            atts['individual'] = 'no'
             atts["group_of_subjects"] = os.path.basename(
                 os.path.dirname(self.subjects_group.fullPath()))
             if self.method == "avg":
@@ -161,7 +162,14 @@ def initialization(self):
                     )
                 atts["sid"] = "avgSubject"
                 atts["method"] = "avg"
-                atts["tracking_session"] = None
+                atts["step_time"] = "yes"
+                atts["roi_autodetect"] = "no"
+                atts["measure"] = "no"
+                atts["roi_filtered"] = "no"
+                for att in ("tracking_session", "individual", "reduced",
+                            "ends_labelled", "analysis", "name_serie"):
+                    if att in atts:
+                        del atts[att]
                 filename = self.signature[
                     "ROI_clustering"].contentType.findValue(atts)
                 return filename
