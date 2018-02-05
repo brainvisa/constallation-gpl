@@ -19,10 +19,14 @@ signature = Signature(
 
 
 def get_process(process):
-    if process.id() in ('constel_indiv_clusters_from_atlas_pipeline',
-                        'database_qc_table'):
+    allowed = ('constel_indiv_clusters_from_atlas_pipeline',
+               'database_qc_table')
+    if process.id() in allowed:
         return process
-    return process.parent_pipeline()
+    parent = process.parent_pipeline()
+    if parent is not None and parent.id() in allowed:
+        return parent
+    return None
 
 
 def execution(self, context):

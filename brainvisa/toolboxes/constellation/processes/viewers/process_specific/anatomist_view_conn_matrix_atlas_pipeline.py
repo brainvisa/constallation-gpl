@@ -20,15 +20,14 @@ signature = Signature(
 
 
 def get_process(process):
-    if process.id() in ('constel_indiv_clusters_from_atlas_pipeline',
-                        'database_qc_table',
-                        'constel_individual_pipeline_fsl_connectome'):
+    allowed = ('constel_indiv_clusters_from_atlas_pipeline',
+               'database_qc_table',
+               'constel_individual_pipeline_fsl_connectome',
+               'constel_group_pipeline')
+    if process.id() in allowed:
         return process
     parent = process.parent_pipeline()
-    if parent is not None \
-            and parent.id() in ('constel_indiv_clusters_from_atlas_pipeline',
-                                'database_qc_table',
-                                'constel_individual_pipeline_fsl_connectome'):
+    if parent is not None and parent.id() in allowed:
         return parent
     return None
 
@@ -104,3 +103,24 @@ def execution(self, context):
                 viewer, connectivity_matrix=self.connectivity_matrix,
                 white_mesh=mesh,
                 gyrus_texture=gyri)
+
+    # -------
+    # constel_indiv_clusters_from_atlas_pipeline case
+    if process.id() in ('constel_group_pipeline', ):
+        white_mesh = process.average_mesh
+        if process.method == 'avg':
+            gyrus_texture = process.regions_parcellation[0]
+        else:
+            node = process.executionNode.child('ReducedGroupMatrix')
+            print('node:', node)
+            sproc = node.process
+            i = sproc.complete_individual_matrices.index(
+                self.connectivity_matrix)
+            if i >= 0:
+                gyrus_texture = process.regions_parcellation[i]
+        print('gyrus texture:', gyrus_texture)
+        return context.runProcess(
+            viewer, connectivity_matrix=self.connectivity_matrix,
+            white_mesh=white_mesh,
+            gyrus_texture=gyrus_texture)
+
