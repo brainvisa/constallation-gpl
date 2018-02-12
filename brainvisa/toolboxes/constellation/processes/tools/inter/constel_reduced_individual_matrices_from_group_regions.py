@@ -221,10 +221,14 @@ def initialization(self):
                 atts["reduced"] = "yes"
                 atts["individual"] = "yes"
                 atts["intersubject"] = "yes"
+                # bug in axon ? 2 DI with same filename, and differing
+                # attributes for tracking_session, analysis, acquisition...
+                atts['tracking_session'] = ''
                 print('atts:', atts)
                 matrix = self.signature[
                     "intersubject_reduced_matrices"].contentType.findValue(
                     atts)
+                print('matrix:', matrix)
                 if matrix is not None:
                     matrices.append(matrix)
             return matrices
