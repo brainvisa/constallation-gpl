@@ -189,14 +189,12 @@ def initialization(self):
         """Function of link between the complete matrices and
         the reduced matrices.
         """
-        print('link_matrices')
         if self.subjects_group and self.filtered_reduced_group_profile:
             matrices = []
             registerClass("minf_2.0", Subject, "Subject")
             groupOfSubjects = readMinf(self.subjects_group.fullPath())
             matrices = []
             for subject in groupOfSubjects:
-                print('subject:', subject)
                 atts = dict()
                 atts["_database"] = self.filtered_reduced_group_profile.get(
                     "_database")
@@ -224,11 +222,9 @@ def initialization(self):
                 # bug in axon ? 2 DI with same filename, and differing
                 # attributes for tracking_session, analysis, acquisition...
                 atts['tracking_session'] = ''
-                print('atts:', atts)
                 matrix = self.signature[
                     "intersubject_reduced_matrices"].contentType.findValue(
                     atts)
-                print('matrix:', matrix)
                 if matrix is not None:
                     matrices.append(matrix)
             return matrices
