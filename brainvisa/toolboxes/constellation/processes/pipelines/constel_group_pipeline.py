@@ -150,11 +150,15 @@ def initialization(self):
         choices = set()
         for db_name in databases:
             database = neuroHierarchy.databases.database(db_name)
-            sel = {"method": self.method}
+            sel = {
+                "method": self.method,
+                "ends_labelled": "all",
+                "normed": "no",
+                "intersubject": "no"}
             choices.update(
                 [x[0] for x in database.findAttributes(
                     ["studyname"], selection=sel,
-                    _type="Filtered Fascicles Bundles")])
+                    _type="Connectivity Profile Texture")])
         self.signature['study_name'].setChoices(*sorted(choices))
         if len(choices) != 0 and self.isDefault("study_name") \
                 and self.study_name not in choices:
@@ -186,15 +190,12 @@ def initialization(self):
     def method_changed(self, dummy):
         """
         """
-        if self.method == "avg":
-            pass
-        else:
-            pass
         fill_study_choice(self)
 
     def link_profiles(self, dummy):
         """Function of link to determine the connectivity profiles
         """
+        print('link_profiles')
         if (self.constellation_subjects_group and self.region
                 and self.method and self.smoothing and self.study_name):
             registerClass("minf_2.0", Subject, "Subject")
@@ -214,6 +215,7 @@ def initialization(self):
                     "mean_individual_profiles"].contentType.findValue(atts)
                 if profile is not None:
                     profiles.append(profile)
+            print('profiles:', profiles)
             return profiles
 
     def link_regions_parcellation(self, dummy):
@@ -225,8 +227,7 @@ def initialization(self):
             if roi_seg is not None:
                 return [roi_seg]
         else:
-            group = ReadDiskItem("Group definition", "XML").findValue(
-                self.average_mesh)
+            group = self.constellation_subjects_group
             if group:
                 registerClass("minf_2.0", Subject, "Subject")
                 groupOfSubjects = readMinf(group.fullPath())
@@ -278,7 +279,8 @@ def initialization(self):
     self.linkParameters("average_mesh", "constellation_subjects_group",
                         link_mesh)
     self.linkParameters("regions_parcellation",
-                        ["average_mesh", "method"],
+                        ["average_mesh", "method",
+                         "constellation_subjects_group"],
                         link_regions_parcellation)
 
     # visibility level for the user
