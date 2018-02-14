@@ -98,7 +98,6 @@ signature = Signature(
 def afterChildAddedCallback(self, parent, key, child):
     """
     """
-    print('afterChildAddedCallback', key, child)
     # Removes a link added with addLink() function.
     # (destination, source)
     child.removeLink("filtered_reduced_individual_profile",
@@ -136,7 +135,6 @@ def afterChildAddedCallback(self, parent, key, child):
 def beforeChildRemovedCallback(self, parent, key, child):
     """
     """
-    print('beforeChildRemovedCallback', key, child)
     parent.removeDoubleLink(key + ".filtered_reduced_individual_profile",
                             "filtered_reduced_group_profile")
     parent.removeDoubleLink(key + ".individual_white_mesh", "average_mesh")

@@ -195,7 +195,6 @@ def initialization(self):
     def link_profiles(self, dummy):
         """Function of link to determine the connectivity profiles
         """
-        print('link_profiles')
         if (self.constellation_subjects_group and self.region
                 and self.method and self.smoothing and self.study_name):
             registerClass("minf_2.0", Subject, "Subject")
@@ -215,7 +214,6 @@ def initialization(self):
                     "mean_individual_profiles"].contentType.findValue(atts)
                 if profile is not None:
                     profiles.append(profile)
-            print('profiles:', profiles)
             return profiles
 
     def link_regions_parcellation(self, dummy):
