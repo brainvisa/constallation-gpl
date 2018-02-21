@@ -43,7 +43,6 @@ def execution(self, context):
                'constel_group_pipeline'):
         gp = (process.id() == 'constel_group_pipeline')
         if gp or self.connectivity_matrix == process.atlas_matrix:
-            print('**** gp:', gp, '****')
             white_mesh = ReadDiskItem(
                 "White Mesh", "Aims mesh formats",
                 requiredAttributes={"side": "both", "vertex_corr": "Yes",
@@ -77,7 +76,6 @@ def execution(self, context):
                         gyrus_texture = process.regions_parcellation[i]
             elif process.method == 'avg':
                 gyrus_texture = process.regions_parcellation
-                print('gyrus_texture:', gyrus_texture)
             else:
                 # take group gyri
                 match = {
@@ -103,8 +101,6 @@ def execution(self, context):
                         .filtered_reduced_group_profile
             else:
                 basins_texture = process.filtered_reduced_group_profile
-            print('----')
-            print(self.connectivity_matrix, white_mesh, gyrus_texture, basins_texture)
             return context.runProcess(
                 viewer, connectivity_matrix=self.connectivity_matrix,
                 white_mesh=white_mesh,
