@@ -53,7 +53,7 @@ if options.input is not None:
 if options.version is not None:
     atlasversion = options.version
 timeout = options.timeout
-sileng = options.silent
+silent = options.silent
 print('timeout:', timeout)
 
 context = Context()
