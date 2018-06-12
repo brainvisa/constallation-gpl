@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-import urllib2
+from six.moves.urllib import request
+from six.moves.urllib.error import URLError
 from optparse import OptionParser
 import sys
 import tempfile
 import os
 import zipfile
 import socket
+import six
+
+long_type = six.integer_types[-1]
 
 
 class Context(object):
@@ -83,15 +87,15 @@ for fname in files:
         context.write('file %s is local' % tzf)
     else:
         try:
-            ftp = urllib2.urlopen(download_url + '/' + fname, timeout=timeout)
-        except (urllib2.URLError, socket.timeout):
+            ftp = request.urlopen(download_url + '/' + fname, timeout=timeout)
+        except (URLError, socket.timeout):
             if silent:
                 print('warning: operation timed out')
                 sys.exit(0)
             raise
         tzf = context.temporary('zip file')
         f = open(tzf, 'wb')
-        fsize = long(ftp.headers.get('content-length'))
+        fsize = long_type(ftp.headers.get('content-length'))
         chunksize = 100000
         fread = 0
         while fread < fsize:
