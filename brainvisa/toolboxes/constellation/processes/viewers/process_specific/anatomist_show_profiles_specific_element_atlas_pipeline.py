@@ -20,6 +20,7 @@ signature = Signature(
 
 def get_process(process):
     allowed = ('constel_indiv_clusters_from_atlas_pipeline',
+               'constel_group_pipeline',
                'database_qc_table')
     if process.id() in allowed:
         return process
@@ -37,8 +38,11 @@ def execution(self, context):
 
     # -------
     # constel_indiv_clusters_from_atlas_pipeline case
-    if process.id() == 'constel_indiv_clusters_from_atlas_pipeline':
-        if self.connectivity_matrix == process.atlas_matrix:
+    pid = process.id()
+    if pid in ('constel_indiv_clusters_from_atlas_pipeline',
+               'constel_group_pipeline'):
+        gp = (process.id() == 'constel_group_pipeline')
+        if gp or self.connectivity_matrix == process.atlas_matrix:
             white_mesh = ReadDiskItem(
                 "White Mesh", "Aims mesh formats",
                 requiredAttributes={"side": "both", "vertex_corr": "Yes",
@@ -51,8 +55,26 @@ def execution(self, context):
                                         "inflated": "No"}
                     ).findValue(process.regions_parcellation)
                 if white_mesh is None:
-                    white_mesh = process.individual_white_mesh
-            if process.method == 'avg':
+                    if process.id() == 'constel_group_pipeline':
+                        white_mesh = process.average_mesh
+                    else:
+                        white_mesh = process.individual_white_mesh
+            if gp:
+                gyrus_texture = None
+                if process.method == 'avg' \
+                      or self.connectivity_matrix \
+                          == process.executionNode().GroupClustering \
+                              .reduced_group_matrix:
+                    if len(process.regions_parcellation) != 0:
+                        gyrus_texture = process.regions_parcellation[0]
+                else:
+                    matrices \
+                        = process.executionNode().ReducedGroupMatrix \
+                            .intersubject_reduced_matrices
+                    i = matrices.index(self.connectivity_matrix)
+                    if i >= 0 and len(process.regions_parcellation) > i:
+                        gyrus_texture = process.regions_parcellation[i]
+            elif process.method == 'avg':
                 gyrus_texture = process.regions_parcellation
             else:
                 # take group gyri
@@ -73,11 +95,17 @@ def execution(self, context):
                     gyrus_texture = ReadDiskItem(
                         'ROI Texture',
                         'anatomist texture formats').findValue(match)
+            if process.id() == 'constel_group_pipeline':
+                basins_texture \
+                    = process.executionNode().GroupRegionsFiltering \
+                        .filtered_reduced_group_profile
+            else:
+                basins_texture = process.filtered_reduced_group_profile
             return context.runProcess(
                 viewer, connectivity_matrix=self.connectivity_matrix,
                 white_mesh=white_mesh,
                 gyrus_texture=gyrus_texture,
-                basins_texture=process.filtered_reduced_group_profile)
+                basins_texture=basins_texture)
         else:
             white_mesh = ReadDiskItem(
                 "White Mesh", "Aims mesh formats",
@@ -95,7 +123,7 @@ def execution(self, context):
 
     # -------
     # database_qc_table case
-    if process.id() == 'database_qc_table':
+    if pid == 'database_qc_table':
         match = {
             'averaged': 'No',
             'vertex_corr': 'Yes',

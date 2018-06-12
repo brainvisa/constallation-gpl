@@ -56,6 +56,7 @@ signature = Signature(
     "min_width", Integer(),
     "min_height", Integer(),
     "prefer_inflated_meshes", Boolean(),
+    "max_views", Integer()
 )
 
 
@@ -102,6 +103,7 @@ def initialization(self):
     self.linkParameters('white_mesh',
                         ['connectivity_profiles', 'prefer_inflated_meshes'],
                         link_mesh)
+    self.max_views = 10
 
 
 def get_screen_config():
@@ -148,19 +150,30 @@ def execution(self, context):
     # define screen config
     curmon, width, height = mainThreadActions().call(get_screen_config)
 
+    # define the number of files
+    if self.max_views > 0:
+        nb_files = min(len(self.connectivity_profiles), self.max_views)
+    else:
+        # no limit
+        nb_files = len(self.connectivity_profiles)
+
     # define the minimal values (width and height) of the image
     min_width = self.min_width
     min_height = self.min_height
     if min_width is None or min_height is None:
         min_width = 300
         min_height = 200
+        if width / min_width > nb_files:
+            min_width = width / nb_files
+            min_height = height
+            if min_width > 800:
+                min_width = 800
+            if min_height > 600:
+                min_height = 600
 
     # deduce the maximale number of lines and columns accepted
     nb_rows = width / min_width
     nb_columns = height / min_height
-
-    # define the number of files
-    nb_files = len(self.connectivity_profiles)
 
     # define the number of cases in the block
     nb_blocks = nb_rows*nb_columns
@@ -174,8 +187,8 @@ def execution(self, context):
     # generate the widgets
     blocklist = []
     for element in range(14):
-        blocklist.append(
-            a.createWindowsBlock(nbRows=nb_rows, nbCols=nb_columns))
+        block = a.createWindowsBlock(nbRows=nb_rows, nbCols=nb_columns)
+        blocklist.append(block)
 
     # empty list to add the windows
     w = []
@@ -217,6 +230,9 @@ def execution(self, context):
             # create a new window and opens it
             win = a.createWindow(
                 "3D", block=blocklist[0], no_decoration=True)
+            if i == 0:
+                blocklist[0].internalWidget.widget.resize(
+                    nb_columns * min_width, nb_rows * min_height)
             win.camera(view_quaternion=[0.5, 0.5, 0.5, 0.5])
 
             # add objects in windows

@@ -170,15 +170,22 @@ def initialization(self):
                             "ends_labelled", "analysis", "name_serie"):
                     if att in atts:
                         del atts[att]
+                # bug in axon ? 2 DI with same filename, and differing
+                # attributes for tracking_session, analysis, acquisition...
+                atts['tracking_session'] = ''
                 filename = self.signature[
                     "ROI_clustering"].contentType.findValue(atts)
-                return filename
+                return [filename]
             else:
                 profiles = []
                 for matrix in self.intersubject_reduced_matrices:
                     atts = dict(matrix.hierarchyAttributes())
                     atts["method"] = "concat"
                     atts["tracking_session"] = None
+                    for att in ("tracking_session", "individual", "reduced",
+                                "ends_labelled", "analysis", "name_serie"):
+                        if att in atts:
+                            del atts[att]
                     profile = self.signature[
                         'ROI_clustering'].contentType.findValue(atts)
                     if profile is not None:

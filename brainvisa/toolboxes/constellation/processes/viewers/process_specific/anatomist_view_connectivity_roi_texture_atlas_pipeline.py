@@ -67,9 +67,19 @@ def execution(self, context):
             mesh=mesh)
 
     # -------
-    # database_qc_table case
+    # constel_group_pipeline case
     if process.id() == 'constel_group_pipeline':
-        mesh = process.average_mesh
+        sid = self.connectivity_roi_texture.get('sid')
+        mesh = None
+        if sid is not None:
+            match = {'subject': sid, 'side': 'both', 'inflated': 'Yes'}
+            mdi = ReadDiskItem('White Mesh', 'anatomist mesh formats')
+            mesh = mdi.findValue(match)
+            if mesh is None:
+                match['inflated'] = 'No'
+            mesh = mdi.findValue(match)
+        if mesh is None:
+            mesh = process.average_mesh
         return context.runProcess(
             viewer, connectivity_roi_texture=self.connectivity_roi_texture,
             mesh=mesh)
