@@ -33,7 +33,7 @@ set( CONSTEL_ATLAS_DOWNLOAD_SOURCE "ftp:///ftp.cea.fr/pub/dsv/anatomist/data" CA
 set( get_models_cmd
   "${CMAKE_CURRENT_SOURCE_DIR}/scripts/bv_get_constel_atlas.py" )
 add_custom_target( get-constel-atlas ALL
-  COMMAND "${PYTHON_HOST_EXECUTABLE}" "${get_models_cmd}" "-o" "${CMAKE_BINARY_DIR}/share/constellation-${BRAINVISA_PACKAGE_VERSION_MAJOR}.${BRAINVISA_PACKAGE_VERSION_MINOR}" "-i" "${SULCI_MODELS_DOWNLOAD_SOURCE}"
+  COMMAND "${PYTHON_HOST_EXECUTABLE}" "${get_models_cmd}" "-o" "${CMAKE_BINARY_DIR}/share/constellation-${BRAINVISA_PACKAGE_VERSION_MAJOR}.${BRAINVISA_PACKAGE_VERSION_MINOR}" "-i" "${CONSTEL_ATLAS_DOWNLOAD_SOURCE}"
   "--timeout" "5" "--silent"
   )
 add_custom_target( install-constel-atlas

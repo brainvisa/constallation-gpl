@@ -19,6 +19,7 @@ Author: Sandrine Lefranc, 2015
 """
 
 #----------------------------Imports-------------------------------------------
+from __future__ import print_function
 
 import math
 # module PyQt
@@ -76,7 +77,7 @@ def initialization(self):
         mesh_type = self.signature["white_mesh"].contentType
         for parc in self.connectivity_based_parcellation:
             atts = dict(parc.hierarchyAttributes())
-            print 'subject:', parc.get("subject")
+            print('subject:', parc.get("subject"))
             if parc.get("subject") is not None \
                     and parc.get("acquisition") is not None:
                 if parc.get("group_of_subjects"):
@@ -85,8 +86,8 @@ def initialization(self):
                 group = parc.get("group_of_subjects")
                 if group is not None:
                     atts["freesurfer_group_of_subjects"] = group
-                    print 'group', group
-                    print 'atts:', atts
+                    print('group', group)
+                    print('atts:', atts)
             mesh = mesh_type.findValue(
                 atts,
                 requiredAttributes={"inflated": infl1})
@@ -114,22 +115,22 @@ def get_screen_config():
     """
     # the screen contains all monitors
     desktop = QtGui.qApp.desktop()
-    print "desktop size: %d x %d" % (desktop.width(), desktop.height())
+    print("desktop size: %d x %d" % (desktop.width(), desktop.height()))
 
     # collect data about each monitor
     monitors = []
     nmons = desktop.screenCount()
-    print "there are %d monitors" % nmons
+    print("there are %d monitors" % nmons)
     for m in range(nmons):
         mg = desktop.availableGeometry(m)
-        print "monitor %d: %d, %d, %d x %d" % (
-            m, mg.x(), mg.y(), mg.width(), mg.height())
+        print("monitor %d: %d, %d, %d x %d"
+              % (m, mg.x(), mg.y(), mg.width(), mg.height()))
         monitors.append((mg.x(), mg.y(), mg.width(), mg.height()))
 
     # current monitor (test)
     curmon = desktop.screenNumber(QtGui.QCursor.pos())
     x, y, width, height = monitors[curmon]
-    print "monitor %d: %d x %d (current)" % (curmon, width, height)
+    print("monitor %d: %d x %d (current)" % (curmon, width, height))
 
     return (curmon, width, height)
 

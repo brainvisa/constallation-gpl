@@ -11,6 +11,8 @@
 # and INRIA at the following URL "http://www.cecill.info".
 #############################################################################
 
+from __future__ import print_function
+
 # brainvisa
 from brainvisa.processes import *
 from brainvisa import anatomist as ana
@@ -131,9 +133,9 @@ def execution_mainthread(self, context):
         viewing_objects.append(connectivity)
         # remove brain mesh in node "other"
         other_nodes = [node for node in connectivity.graph().vertices()
-                       if node.has_key('name') and node['name'] == 'others']
+                       if 'name' in node and node['name'] == 'others']
         #if len(other_nodes) != 0:
-            #print 'aobj keys:', other_nodes[0].keys()
+            #print('aobj keys:', other_nodes[0].keys())
             #if 'ana_object' in other_nodes[0]:
                 #aobj = other_nodes[0]['ana_object']
                 #aobj.eraseObject(other_nodes[0]['roi_mesh_ana'])

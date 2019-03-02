@@ -22,6 +22,7 @@ Author: Sandrine Lefranc, 2015
 
 #----------------------------Imports-------------------------------------------
 
+from __future__ import print_function
 
 # system module
 import sys
@@ -100,10 +101,10 @@ def execution(self, context):
         subject1 = self.clustering_1.get("subject")
         subject2 = self.clustering_2.get("subject")
         group = self.clustering_1.get("group_of_subjects")
-        print cortical_region
-        print group
-        print subject1
-        print subject2
+        print(cortical_region)
+        print(group)
+        print(subject1)
+        print(subject2)
         title = str(cortical_region) + "_" + str(group) + "_" + str(subject1) + "_" + str(subject2)
 
     cmd = [sys.executable, find_in_path("constel_calculate_scores.py"),
