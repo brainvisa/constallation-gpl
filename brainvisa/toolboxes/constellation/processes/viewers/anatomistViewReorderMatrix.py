@@ -18,7 +18,6 @@ Main dependencies:
 
 # pytohn modules
 import numpy
-import exceptions
 
 # axon python API module
 from brainvisa.processes import Signature

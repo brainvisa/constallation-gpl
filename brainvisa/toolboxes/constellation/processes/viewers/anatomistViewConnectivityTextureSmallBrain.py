@@ -53,7 +53,11 @@ signature = Signature(
                             "reduced":"no",
                             "intersubject":"yes",
                             "individual": "yes"})),
-    'mesh', ReadDiskItem('BothAverageBrainWhite', 'Aims mesh formats'),
+    'mesh', ReadDiskItem(
+        "White Mesh", "Aims mesh formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes",
+                            "averaged": "Yes"}),
     'basins_texture', ListOf(
         ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
         requiredAttributes={"roi_autodetect":"yes",

@@ -7,6 +7,8 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
+from __future__ import print_function
+
 # Axon python API module
 from brainvisa.processes import *
 from soma import aims
@@ -67,7 +69,7 @@ def execution(self, context):
         RGB_colorslist.append(colors[str(best.States[index])])  
     
     RGB_colors = [element for sublist in RGB_colorslist for element in sublist]
-    print RGB_colors
+    print(RGB_colors)
     
     # instance of Anatomist
     a = anatomist.Anatomist()

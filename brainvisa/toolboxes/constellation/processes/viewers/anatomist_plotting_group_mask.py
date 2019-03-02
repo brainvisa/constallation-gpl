@@ -20,7 +20,9 @@ Author: Sandrine Lefranc, 2015
 
 #----------------------------Imports-------------------------------------------
 
-# module PyGt4
+from __future__ import print_function
+
+# module PyQt4
 from soma.qt_gui.qt_backend import QtGui
 
 # axon python API module
@@ -75,22 +77,22 @@ def get_screen_config():
     """
     # the screen contains all monitors
     desktop = QtGui.qApp.desktop()
-    print "desktop size: %d x %d" % (desktop.width(), desktop.height())
+    print("desktop size: %d x %d" % (desktop.width(), desktop.height()))
 
     # collect data about each monitor
     monitors = []
     nmons = desktop.screenCount()
-    print "there are %d monitors" % nmons
+    print("there are %d monitors" % nmons)
     for m in range(nmons):
         mg = desktop.availableGeometry(m)
-        print "monitor %d: %d, %d, %d x %d" % (
-            m, mg.x(), mg.y(), mg.width(), mg.height())
+        print("monitor %d: %d, %d, %d x %d"
+              % (m, mg.x(), mg.y(), mg.width(), mg.height()))
         monitors.append((mg.x(), mg.y(), mg.width(), mg.height()))
 
     # current monitor (test)
     curmon = desktop.screenNumber(QtGui.QCursor.pos())
     x, y, width, height = monitors[curmon]
-    print "monitor %d: %d x %d (current)" % (curmon, width, height)
+    print("monitor %d: %d x %d (current)" % (curmon, width, height))
 
     return (curmon, width, height)
 

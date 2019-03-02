@@ -7,6 +7,8 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
+from __future__ import print_function
+
 # Axon python API module
 from brainvisa.processes import *
 from soma import aims
@@ -47,13 +49,13 @@ def initialization( self ):
             datts['inflated'] = 'Yes'
             yes_no = ['Yes', 'No']
             datts['inflated'] = yes_no[1 - int(self.inflated_mesh)]
-            print 'link_mesh, datts:', datts
+            print('link_mesh, datts:', datts)
             res = self.signature['white_mesh'].findValue(datts)
             if res is None:
                 datts['inflated'] = yes_no[int(self.inflated_mesh)]
-                print 'try other mesh:', datts
+                print('try other mesh:', datts)
                 res = self.signature['white_mesh'].findValue(datts)
-            print 'res:', res
+            print('res:', res)
             return res
 
     self.inflated_mesh = True
