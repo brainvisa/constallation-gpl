@@ -12,6 +12,7 @@
 
 # System module
 import numpy
+import six
 
 # Axon python API modules
 from brainvisa.processes import Choice
@@ -204,7 +205,7 @@ def execution(self, context):
     labelsToRemove_list = labelsToRemove_ar.tolist()
     sup10percentConn_labels = numpy.where(labels > 0.1)[0] + 1
 
-    for sup10percent_label_i in xrange(sup10percentConn_labels.size):
+    for sup10percent_label_i in six.moves.xrange(sup10percentConn_labels.size):
         sup10percent_label = sup10percentConn_labels[sup10percent_label_i]
         if labelsToRemove_list.count(sup10percent_label) != 0:
             labelsToRemove_list.remove(sup10percent_label)

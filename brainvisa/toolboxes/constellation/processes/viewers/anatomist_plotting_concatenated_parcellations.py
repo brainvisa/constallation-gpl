@@ -23,6 +23,8 @@ Author: Sandrine Lefranc, 2015
 #----------------------------Imports-------------------------------------------
 from __future__ import print_function
 
+import six
+
 # PyQt module
 from soma.qt_gui.qt_backend import QtGui
 
@@ -153,7 +155,7 @@ def execution(self, context):
 
     count = 1
     c = 0
-    for i in xrange(nb_files):
+    for i in six.moves.xrange(nb_files):
         # load an object from a file (mesh, texture)
         mesh = a.loadObject(self.white_mesh[i])
         texture1 = a.loadObject(self.clustering_texture_1[i])

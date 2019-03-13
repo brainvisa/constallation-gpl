@@ -22,6 +22,7 @@ Author: Sandrine Lefranc, 2015
 
 from __future__ import print_function
 import math
+import six
 # module PyGt4
 from soma.qt_gui.qt_backend import QtGui
 
@@ -202,7 +203,7 @@ def execution(self, context):
     vmin = 0
     vmax = 0
     textures = []
-    for i in xrange(nb_files):
+    for i in six.moves.xrange(nb_files):
         # load an object from a file (mesh, texture)
         mesh_i = i
         if i >= len(self.white_mesh):
