@@ -22,6 +22,7 @@ Author: Sandrine Lefranc, 2015
 
 from __future__ import print_function
 
+import six
 # module PyQt4
 from soma.qt_gui.qt_backend import QtGui
 
@@ -140,7 +141,7 @@ def execution(self, context):
 
     count = 1
     c = 0
-    for i in xrange(nb_files):
+    for i in six.moves.xrange(nb_files):
         # load an object from a file (mesh, texture)
         mesh = a.loadObject(self.white_mesh[i])
         roi_clustering = a.loadObject(self.group_masks[i])

@@ -22,6 +22,7 @@ Author: Sandrine Lefranc, 2015
 from __future__ import print_function
 
 import math
+import six
 # module PyQt
 from soma.qt_gui.qt_backend import QtGui
 
@@ -184,7 +185,7 @@ def execution(self, context):
 
     count = 1
     c = 0
-    for i in xrange(nb_files):
+    for i in six.moves.xrange(nb_files):
         # load an object from a file (mesh, texture)
         mesh = a.loadObject(self.white_mesh[min(i, nb_files - 1)])
         roi_clustering = a.loadObject(self.connectivity_based_parcellation[i])

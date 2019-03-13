@@ -18,6 +18,7 @@ Main dependencies:
 
 # pytohn modules
 import numpy
+import six
 
 # axon python API module
 from brainvisa.processes import Signature
@@ -118,7 +119,7 @@ def execution(self, context):
     labels_ima = aims.Volume_FLOAT(sortLabels.size, row_thickness, 1, 1)
     labels_ima_array = labels_ima.arraydata()
     labels_ima.header()["voxel_size"] = aims.vector_FLOAT([lines_length / sortLabels.size, 1, 1, 1])
-    for i in xrange(row_thickness):
+    for i in six.moves.xrange(row_thickness):
         labels_ima_array[0, 0, i, :] = sortLabels
 
     mat_ima = a.toAObject(mat_ima)
