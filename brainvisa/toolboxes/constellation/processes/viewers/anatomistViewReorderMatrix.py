@@ -17,6 +17,7 @@ Main dependencies:
 #----------------------------Imports-------------------------------------------
 
 # pytohn modules
+from __future__ import absolute_import
 import numpy
 import six
 

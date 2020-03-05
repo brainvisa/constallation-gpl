@@ -24,6 +24,7 @@ Author: Sandrine Lefranc, 2015
 
 
 # system module
+from __future__ import absolute_import
 import os
 
 # axon python API module
@@ -64,7 +65,7 @@ signature = Signature(
                      requiredAttributes={"ends_labelled": "all",
                                          "reduced": "yes",
                                          "intersubject": "yes",
-                                         "individual": "no"})),
+                                         "individual": "yes"})),
     "kmax", Integer(),
 
     # --outputs--

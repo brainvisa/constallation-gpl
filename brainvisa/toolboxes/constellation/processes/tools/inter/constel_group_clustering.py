@@ -24,6 +24,7 @@ Author: Sandrine Lefranc, 2015
 # ---------------------------Imports-------------------------------------------
 
 # python module
+from __future__ import absolute_import
 import os
 
 # axon python API modules
@@ -35,7 +36,6 @@ from brainvisa.processes import ListOf
 from brainvisa.processes import Choice
 from brainvisa.processes import String
 from brainvisa.processes import Integer
-
 # soma-base module
 from soma.path import find_in_path
 
@@ -87,9 +87,9 @@ signature = Signature(
                             "vertex_corr": "Yes",
                             "averaged": "Yes"}),
     "nb_clusters", Integer(),
-    "clustering_algorithms", Choice(
-        ("K-medoids clustering", "kmedoids"),
-        ("Ward's method", "ward")),
+#    "clustering_algorithms", Choice(
+#        ("K-medoids clustering", "kmedoids"),
+#        ("Ward's method", "ward")),
 
     # --outputs--
     "reduced_group_matrix", WriteDiskItem(
@@ -181,9 +181,13 @@ def initialization(self):
                 for matrix in self.intersubject_reduced_matrices:
                     atts = dict(matrix.hierarchyAttributes())
                     atts["method"] = "concat"
-                    atts["tracking_session"] = None
+                    atts["step_time"] = "yes"
+                    atts["roi_autodetect"] = "no"
+                    atts["measure"] = "no"
+                    atts["roi_filtered"] = "no"
                     for att in ("tracking_session", "individual", "reduced",
-                                "ends_labelled", "analysis", "name_serie"):
+                                "ends_labelled", "analysis", "name_serie",
+                                "acquisition"):
                         if att in atts:
                             del atts[att]
                     profile = self.signature[

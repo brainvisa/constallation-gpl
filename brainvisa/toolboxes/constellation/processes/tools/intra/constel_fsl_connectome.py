@@ -11,6 +11,7 @@
 # ---------------------------Imports-------------------------------------------
 
 # System module
+from __future__ import absolute_import
 import os
 
 # axon python API module

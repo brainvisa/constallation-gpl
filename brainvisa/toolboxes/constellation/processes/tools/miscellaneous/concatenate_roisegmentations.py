@@ -23,6 +23,7 @@ Author: Sandrine Lefranc
 
 
 # system module
+from __future__ import absolute_import
 import numpy
 
 # axon python API module

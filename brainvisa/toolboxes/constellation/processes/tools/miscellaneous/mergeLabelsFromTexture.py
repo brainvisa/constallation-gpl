@@ -23,6 +23,7 @@ Author: Sandrine Lefranc
 
 
 # axon python API module
+from __future__ import absolute_import
 from brainvisa.processes import *
 
 # soma module

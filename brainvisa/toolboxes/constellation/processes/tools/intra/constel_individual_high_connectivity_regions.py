@@ -12,6 +12,7 @@
 
 
 # Axon python API module
+from __future__ import absolute_import
 from brainvisa.processes import ValidationError
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem

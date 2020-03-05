@@ -10,6 +10,7 @@
 from __future__ import print_function
 
 # Axon python API module
+from __future__ import absolute_import
 from brainvisa.processes import *
 from soma import aims
 
@@ -156,7 +157,7 @@ def execution_mainthread(self, context):
               #'17': [0.5, 1., 1., 0.3],
               #'13': [1., 0., 0.5, 0.3]}
     basincolor = [0.9, 0.9, 0.9, 1.]
-    all_regions = patches.keys() + basins.keys()
+    all_regions = list(patches.keys()) + list(basins.keys())
     for v in graph.vertices():
         if v['name'] in all_regions:
             if v['name'] in patches:

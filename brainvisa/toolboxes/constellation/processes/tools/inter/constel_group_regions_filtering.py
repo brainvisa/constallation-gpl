@@ -26,6 +26,7 @@ Author: Sandrine Lefranc
 
 
 # python module
+from __future__ import absolute_import
 import sys
 
 # axon python API module

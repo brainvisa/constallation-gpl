@@ -19,6 +19,7 @@ Main dependencies:
 
 
 # axon python API module
+from __future__ import absolute_import
 from brainvisa.processes import String
 from brainvisa.processes import Boolean
 from brainvisa.processes import Integer

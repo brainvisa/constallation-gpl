@@ -11,6 +11,7 @@
 #############################################################################
 
 # brainvisa
+from __future__ import absolute_import
 from brainvisa.processes import *
 from brainvisa import anatomist as anatomist
 

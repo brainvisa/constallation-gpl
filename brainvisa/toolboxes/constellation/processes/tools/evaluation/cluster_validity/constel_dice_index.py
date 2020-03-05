@@ -24,6 +24,7 @@ Author: Sandrine Lefranc, 2016
 
 
 # python system module
+from __future__ import absolute_import
 import os
 import sys
 
