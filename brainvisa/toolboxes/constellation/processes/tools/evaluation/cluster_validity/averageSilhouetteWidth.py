@@ -64,7 +64,7 @@ signature = Signature(
                      requiredAttributes={"ends_labelled": "all",
                                          "reduced": "yes",
                                          "intersubject": "yes",
-                                         "individual": "no"})),
+                                         "individual": "yes"})),
     "kmax", Integer(),
 
     # --outputs--
