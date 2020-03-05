@@ -9,6 +9,7 @@
 
 from __future__ import print_function
 # Axon python API module
+from __future__ import absolute_import
 from brainvisa.processes import Signature, ReadDiskItem, mainThreadActions
 from soma import aims
 

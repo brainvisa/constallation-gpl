@@ -7,6 +7,7 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 
+from __future__ import absolute_import
 from brainvisa.data.neuroDiskItems import createFormatList
 
 include("diffusion")

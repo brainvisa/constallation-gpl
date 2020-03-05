@@ -1,4 +1,6 @@
 # Axon python API module
+from __future__ import absolute_import
+from __future__ import print_function
 from brainvisa.processes import *
 from brainvisa.processing.process_based_viewer import ProcessBasedViewer
 

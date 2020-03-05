@@ -12,6 +12,7 @@
 
 
 # Axon python API modules
+from __future__ import absolute_import
 from brainvisa.processes import Float
 from brainvisa.processes import Choice
 from brainvisa.processes import ListOf

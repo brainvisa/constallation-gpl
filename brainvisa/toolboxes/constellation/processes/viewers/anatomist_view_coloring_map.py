@@ -10,6 +10,7 @@
 from __future__ import print_function
 
 # Axon python API module
+from __future__ import absolute_import
 from brainvisa.processes import *
 from soma import aims
 from collections import defaultdict
@@ -21,6 +22,7 @@ from constel.lib.utils.four_color_theorem import build_rules, get_best
 
 # Anatomist
 from brainvisa import anatomist
+from six.moves import range
 
 name = "Anatomist view 4-coloring Map"
 userLevel = 0
@@ -57,7 +59,7 @@ def execution(self, context):
     
     # the expected optimal situation will be that all adjacent states have 
     # different colors
-    best = get_best(rules, len(items), len(rules), colors.keys())
+    best = get_best(rules, len(items), len(rules), list(colors.keys()))
 
     # get all items/regions
     keys = sorted(items.keys())

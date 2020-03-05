@@ -23,6 +23,7 @@ Author: Sandrine Lefranc, 2015
 #----------------------------Imports-------------------------------------------
 from __future__ import print_function
 
+from __future__ import absolute_import
 import six
 
 # PyQt module
@@ -31,6 +32,7 @@ from soma.qt_gui.qt_backend import QtGui
 # axon python API module
 from brainvisa.processes import Signature, ListOf, ReadDiskItem, Integer, \
     ValidationError, mainThreadActions
+from six.moves import range
 
 try:
     from brainvisa import anatomist as ana

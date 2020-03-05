@@ -28,6 +28,7 @@ Author: Sandrine Lefranc, 2015
 
 
 # axon python API module
+from __future__ import absolute_import
 from brainvisa.processes import Signature, ReadDiskItem, getFormats, \
     mainThreadActions
 import numpy

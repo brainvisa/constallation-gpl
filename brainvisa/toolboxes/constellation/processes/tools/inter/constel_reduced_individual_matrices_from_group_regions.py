@@ -25,6 +25,7 @@ Author: Sandrine Lefranc, 2015
 
 
 # Axon python API module
+from __future__ import absolute_import
 from brainvisa.processes import Signature, ValidationError, ReadDiskItem, \
     WriteDiskItem, String, ListOf, ParallelExecutionNode, ExecutionNode, \
     mapValuesToChildrenParameters, Boolean

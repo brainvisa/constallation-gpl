@@ -24,6 +24,7 @@ Author: Sandrine Lefranc, 2015
 # ---------------------------Imports-------------------------------------------
 
 # python module
+from __future__ import absolute_import
 import os
 
 # axon python API modules
