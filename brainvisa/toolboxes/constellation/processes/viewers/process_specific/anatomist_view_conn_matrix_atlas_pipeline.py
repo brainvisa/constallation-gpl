@@ -105,15 +105,15 @@ def execution(self, context):
                 gyrus_texture=gyri)
 
     # -------
-    # constel_indiv_clusters_from_atlas_pipeline case
+    # constel_group_pipeline case
     if process.id() in ('constel_group_pipeline', ):
         white_mesh = process.average_mesh
         if process.method == 'avg':
             gyrus_texture = process.regions_parcellation[0]
         else:
-            node = process.executionNode.child('ReducedGroupMatrix')
+            node = process.executionNode().child('ReducedGroupMatrix')
             print('node:', node)
-            sproc = node.process
+            sproc = node._process
             i = sproc.complete_individual_matrices.index(
                 self.connectivity_matrix)
             if i >= 0:
