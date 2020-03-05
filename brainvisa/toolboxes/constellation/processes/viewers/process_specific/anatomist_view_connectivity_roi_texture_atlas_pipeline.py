@@ -4,6 +4,7 @@ from brainvisa.processing.process_based_viewer import ProcessBasedViewer
 
 name = 'Anatomist view Connectivity ROI Texture, Atlas pipeline variant'
 base_class = ProcessBasedViewer
+userLevel = 3
 def allowed_processes(process):
     return get_process(process) is not None
 
@@ -29,7 +30,7 @@ def get_process(process):
 def execution(self, context):
     viewer = getProcessInstance('anatomist_view_connectivity_roi_texture')
     if not hasattr(self, 'reference_process'):
-        return context.runProcess(viewer, self.connectivity_texture)
+        return context.runProcess(viewer, self.connectivity_roi_texture)
     process = get_process(self.reference_process)
 
     # -------
