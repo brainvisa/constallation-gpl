@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Label individual cortical vertices according to FSL connectivity data and an atlas</xhtml>
+    <d name="parameters">
+      <xhtml name="complete_individual_matrix"/>
+      <xhtml name="probtrackx_indir"/>
+      <xhtml name="keep_regions"/>
+      <xhtml name="filtered_reduced_group_profile"/>
+      <xhtml name="regions_parcellation"/>
+      <xhtml name="normalize"/>
+      <xhtml name="smoothing"/>
+      <xhtml name="atlas_matrix"/>
+      <xhtml name="complete_individual_smoothed_matrix"/>
+      <xhtml name="method"/>
+      <xhtml name="temp_outdir"/>
+      <xhtml name="group_clustering"/>
+      <xhtml name="regions_selection"/>
+      <xhtml name="individual_clustering"/>
+      <xhtml name="reduced_matrix"/>
+      <xhtml name="kmax"/>
+      <xhtml name="individual_white_mesh"/>
+      <xhtml name="min_fibers_length"/>
+      <xhtml name="region"/>
+      <xhtml name="regions_nomenclature"/>
+      <xhtml name="study_name"/>
+      <xhtml name="outputs_database"/>
+    </d>
+    <xhtml name="long"><h2>Generalities</h2>
+<p>The principe of this process is simple, but its application not so simple because it depends on many data, preprocessings, and parameters chosen for all of them.</p>
+<p>The idea is to match connectivity data of an individual to the connectivity profiles of an "atlas", using a simple nearest neighbor approach, and to keep the label of the selected atlas vertex.
+</p>
+<p>In order to make it right, individual connectivity data must be processed -more or less- the same way as the atlas has been processed. Namely this means:
+<ul>
+  <li>Same or compatible diffusion data acquisition - this first condition is almost impossible to guarantee, so we will just assume the tractography will behave statistically the same.</li>
+  <li>Same cortical segmentation method with vertex-wise inter-subject correspondance. The atlas provided with Constellation has been using FreeSurfer segmentation, and mesh resampling on a 32K HCP sphere per hemisphere (thus, 64K for the whole brain).</li>
+  <li>Same diffusion data preprocessings and tractography. Here we are in the FSL variant of the pipeline, so it's FSL connectivity, but some parameters may be important, <a href="#tracto">see below</a>.</li>
+  <li>Same tracts filtering (regions used or filtered out, length filtering, ...)</li>
+  <li>Same connectivity profile reduction, using the atlas watershed basins</li>
+</ul>
+</p>
+
+<h2>Preprocessings</h2>
+<p>Before running this "individual clusters from atlas pipeline", individual data should have undegone some preprocessings:
+<ul>
+  <li>Freesurfer segmentation: <tt>recon-all</tt>, either directly, or via the <a href="bvcategory://freesurfer">Freesurfer toolbox</a> in Brainvisa.</li>
+  <li>Convert Freesurfer meshes and textures to GIFTI format, and resample meshes to the HCP 32k sphere, using the <a href="bvprocess://freesurferToBrainvisaConversionPipeline">Freesurfer outputs To BrainVisa conversion pipeline</a> - don't forget to select "hcp 32k" for the "icosphere_type" parameter.</li>
+  <li>FSL connectivity processings using <a href="https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FDT/UserGuide">bedpostx and probtrackx</a>. There are <a href="bvcategory://constellation#fsl">more details here</a>.</li>
+</ul>
+</p>
+
+<h2>Parameters</h2>
+<p>It is easier to enter parameters in the order they are listed.
+<ul>
+  <li>"study_name" gets a free string value.</li>
+  <li>The FSL parameters have to be selected using the "folder" button, not the "database" button, because FSL data are not indexed in a BrainVisa database (at least not yet).</li>
+  <li>The FSL "temp_outdir" parameter can be a temporary working directory (typically <tt>/tmp</tt>, it is used for intermediate files conversions, and can be removed after the FSL import step is done.</li>
+</ul>
+</p>
+
+<h2>Atlas provided with Constellation</h2>
+
+<a name="tracto">
+<h3>FSL preprocessings and tractography</h3></a>
+
+<p>The atlas distributed with Constellation has been built from 200 subjects of the <a href="http://www.humanconnectomeproject.org/">Human Connectome Project (HCP)</a> data, using the HCP processing pipelines, with one exception:
+</p>
+<p>The fiber tracking mask is the whole brain, with sulci skeleton removed in order to avoid tracts to cross a sulcus wall. This mask has been built using <a href="bvprocess://morphologist">Morphologist</a> segmentation and sulci skeleton.
+</p>
+<p>The tractography was in "omatrix1" mode: seeds in the cortical ribbon, not in the white matter.</p>
+
+<h3>Atlas parameters</h3>
+<p>
+<ul>
+  <li>The atlas has been built in "averaged" mode (of course), with fibers lengths limited to 20-500mm.</li>
+  <li>The selected regions were "all but main regions", meaning that intra-region tracts (going from the region to be parcelled to itself) were discarded, in order to avoid any bias to the clustering.</li>
+  <li>Connectivity matrix smoothing was 3mm.</li>
+</ul>
+</p>
+<p>Individual data should thus follow the atlas preprocessing parameters as closely as possible.
+</p>
+
+<h3>Influence of the "method" parameter</h3>
+<p>As there is no group analysis here, we can wonder why specifying the "method" parameter ? It actually just changes the "region_parcellation" parameter, taking either a group initial parcellation (average Freesurfer gyri) from the template for the "averaged" mode, or an individual Freesurfer gyri texture for the "concatenated" mode.
+</p>
+
+</xhtml>
+  </d>
+</d>
+</minf>

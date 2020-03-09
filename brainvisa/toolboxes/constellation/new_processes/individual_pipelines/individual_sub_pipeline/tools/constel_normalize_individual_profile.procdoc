@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="fr">
+    <xhtml name="short"/>
+    <xhtml name="long"/>
+    <d name="parameters">
+      <xhtml name="cortical_regions_nomenclature">Ce paramètre est un fichier texte. Il définit les relations entre le nom et le numéro de chaque région présent dans la parcellisation du cortex, paramètre 'cortical parcellation'. Ce fichier doit être construit comme ceci (l'ordre des noms ou des numéros n'a pas d'importance) : <br/>
+<br/>
+<pre>1              nomA</pre>
+<pre>2              nomB</pre>
+<pre>3              nomC</pre>
+<pre>4              nomD</pre>
+<pre>5              nomE</pre>
+<pre>..             .....   </pre>
+<br/>
+ 
+Par exemple, vous pouvez utilser l'atlas Desikan-Killiany ou l'atlas Destrieux issus de FreeSurfer.</xhtml>
+      <xhtml name="keep_internal_connections">Cet option permet de garder les connections internes à la région corticale d'étude. Par défault, l'option n'est pas coché.</xhtml>
+      <xhtml name="mean_individual_profile">Le profil de connectivité individuel moyennée.</xhtml>
+      <xhtml name="cortical_parcellation">Parcellisation de la surface corticale en régions anatomiques (lobes, gyri...). Par exemple, FreeSurfer propose une parcellisation corticale en gyri.</xhtml>
+      <xhtml name="cortical_region">La liste des noms de labels présents dans le fichier texte 'labels_nomenclature' est proposée. Vous devez choisir une région à étudier.</xhtml>
+      <xhtml name="normed_individual_profile">Le profil de connectivité individuel moyennée et normée.</xhtml>
+    </d>
+  </d>
+  <d name="en">
+    <xhtml name="short"><img SRC="../../images/constellation/norm_profile.png" ALT="" height="400" width="900"/></xhtml>
+    <d name="parameters">
+      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed as follows (The order of labels is not relevant.): <br/>
+<br/>
+<pre>1              nameA</pre>
+<pre>2              nameB</pre>
+<pre>3              nameC</pre>
+<pre>4              nameD</pre>
+<pre>5              nameE</pre>
+<pre>..             .....   </pre>
+<br/>
+For example, you can use the Desikan-Killiany Atlas or the Destrieux Atlas of the FreeSurfer software.</xhtml>
+      <xhtml name="keep_internal_connections">This check box allows to keep the internal connections at the cortical region. By default, this box is not checked.</xhtml>
+      <xhtml name="mean_individual_profile">The mean individual profile.</xhtml>
+      <xhtml name="cortical_parcellation">Parcellation of the cortical surface into anatomical region (lobes, gyri...). For example, FreeSurfer provides a cortical parcellation into gyri.<br/>
+A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
+      <xhtml name="cortical_region">The list of region names, present in the text file 'cortical_regions_nomenclature' is proposed. <br/>
+You must choose a region. The study will be done on this region.</xhtml>
+      <xhtml name="normed_individual_profile">The individual profile normed.</xhtml>
+    </d>
+    <xhtml name="long">Remove internal connections of the cortical region and normalization of profile. This process also performs normalization of connectivity profiles by the total number of connections (the number of tracts reaching the label).<br/>
+<br/>
+Example inputs/outputs:
+<br/>
+<pre>mean_individual_profile:         /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
+                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.postcentral/clustering/smooth3.0/
+                                 001_studyA_lh.postcentral_meanConnectivityProfile.gii</pre>
+<pre>cortical_parcellation:           /my/path/database_freesurfer/group_analysis/01to40/average_brain/bh.annot.averagebrain.gii</pre>
+<pre>labels_nomenclature:             /my/path/share/brainvisa-share-4.5/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
+<pre>label_name:                      lh.postcentral </pre>
+<pre>normed_individual_profile:       /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
+                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.postcentral/clustering/smooth3.0/
+                                 001_studyA_lh.postcentral_normedMeanConnectivityProfile.gii</pre>
+<pre>keep_internal_connections:       X</pre></xhtml>
+  </d>
+</d>
+</minf>

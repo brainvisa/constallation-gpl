@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="fr">
+    <xhtml name="short"/>
+    <d name="parameters">
+      <xhtml name="keys"/>
+      <xhtml name="data_filters"/>
+      <xhtml name="output_file"/>
+      <xhtml name="database"/>
+    </d>
+    <xhtml name="long"/>
+  </d>
+  <d name="en">
+    <xhtml name="short">Display a table with present and missing data in a database</xhtml>
+    <d name="parameters">
+      <xhtml name="keys">Keys are used to sort and display data. One data line will be created for a single keys values combination.</xhtml>
+      <xhtml name="data_filters"><p>For each data type to display, a selection filter can be specified. Each filter is given as a string for technical reasons, but the strings should contain python dictionaries code (JSON-like), for instance: {"acquisition": "timepoint_0"}.
+</p>
+<p>The number of filters should normally match the number of data types. However if only one filter is present, it will apply to all data types (specify a second empty filter if you need to avoid this behaviour), and "missing" filters are empty otherwise.
+</p>
+</xhtml>
+      <xhtml name="output_file"><p>Allows to save the QC table as a HTML file. If this parameter is filled, then the process will not open the Qt GUI and will run in batch mode.</p>
+<p>PDF export is also possible, if the program <a href="https://wkhtmltopdf.org">wkhtmltopdf</a> is installad on the system and available in the PATH.</p></xhtml>
+      <xhtml name="database">Database to be displayed</xhtml>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>

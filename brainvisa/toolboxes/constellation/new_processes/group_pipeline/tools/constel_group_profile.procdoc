@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short"/>
+    <d name="parameters">
+      <xhtml name="normed_individual_profiles"/>
+      <xhtml name="subjects_group">The XML file corresponding the study group.</xhtml>
+      <xhtml name="new_study_name">In the group pipeline, you want to change the study name. In this case, the outputs will be written in the new study name directory.</xhtml>
+      <xhtml name="group_profile"/>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>

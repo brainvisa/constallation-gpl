@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="fr">
+    <xhtml name="short">Filtrages des fibres individuelles appartenant à une région d'étude.<br/>
+<br/>
+<img SRC="../../images/constellation/labeled_fibers.jpg" ALT=""/>
+<img SRC="../../images/constellation/semilabeled_fibers.jpg" ALT=""/><br/></xhtml>
+    <d name="parameters">
+      <xhtml name="fiber_tracts_format">Différents formats de faisceaux de fibres sont pris en charge. Les formats acceptés sont les suivants.<br/>
+
+<i>(1)</i> <b>Format de fichier TrackVis</b> avec .trk comme extension de nom de fichier. <br/>
+<i>(2)</i> <b>Format de fichiers Connectomist</b> avec .bundles comme extension de nom de fichier. <br/></xhtml>
+      <xhtml name="cortical_regions_nomenclature">Ce paramètre est un fichier texte. Il définit les relations entre le nom et le numéro de chaque région présent dans la parcellisation du cortex, paramètre 'cortical parcellation'. Ce fichier doit être construit comme ceci (l'ordre des noms ou des numéros n'a pas d'importance) : <br/>
+<br/>
+<pre>1              nomA</pre>
+<pre>2              nomB</pre>
+<pre>3              nomC</pre>
+<pre>4              nomD</pre>
+<pre>5              nomE</pre>
+<pre>..             .....   </pre>
+<br/>
+ 
+Par exemple, vous pouvez utilser l'atlas Desikan-Killiany ou l'atlas Destrieux issus de FreeSurfer.</xhtml>
+      <xhtml name="dw_to_t1">Matrice de transformation de la donnée de diffusion vers la T1.</xhtml>
+      <xhtml name="subject_directory">Répertoire où se trouve les fichiers de tractographie du sujet.</xhtml>
+      <xhtml name="study_name">Ce paramètre obligatoire est libre et permet de donner un nom au pipeline. La valeur de "study_name" sera intégrée à chaque nom de fichier de sortie ainsi qu'à l'arborescence de la base de données qui récupère les fichiers de sortie. </xhtml>
+      <xhtml name="maxlength_semilabeled_fibers">Longueur maximale (en mm) acceptée pour les fibres ayant qu'une seule extrémité identifiée sur le maillage (semi-labelisée). Les fibres plus longues que ce seuil ne seront pas gardées.</xhtml>
+      <xhtml name="cortical_parcellation">Parcellisation de la surface corticale en régions anatomiques (lobes, gyri...). Par exemple, FreeSurfer propose une parcellisation corticale en gyri.</xhtml>
+      <xhtml name="cortical_region">La liste des noms de labels présents dans le fichier texte 'labels_nomenclature' est proposée. Vous devez choisir une région à étudier.</xhtml>
+      <xhtml name="minlength_labeled_fibers">Longueur minimale (en mm) acceptée pour les fibres ayant leur deux extrémités identifiées sur le maillage (labelisées). Les fibres plus courtes que ce seuil ne seront pas gardées.</xhtml>
+      <xhtml name="semilabeled_fibers">L'ensemble des fibres ayant qu'une seule extrémité identifiée sur le maillage et répondant aux différents critères de ce process sont réunis en un seul fichier de sortie.</xhtml>
+      <xhtml name="maxlength_labeled_fibers">Longueur maximale (en mm) acceptée pour les fibres ayant leur deux extrémités identifiées sur le maillage (labelisées). Les fibres plus longues que ce seuil ne seront pas gardées.</xhtml>
+      <xhtml name="labeled_fibers">L'ensemble des fibres ayant leur deux extrémités identifiées sur le maillage et répondant aux différents critères de ce process sont réunis en un seul fichier de sortie.</xhtml>
+      <xhtml name="minlength_semilabeled_fibers">Longueur minimale (en mm) acceptée pour les fibres ayant qu'une seule extrémité identifiée sur le maillage (semi-labelisée). Les fibres plus courtes que ce seuil ne seront pas gardées.</xhtml>
+      <xhtml name="method">Deux méthodes sont proposées: <br/>
+<i><b>(1) "averaged approach" </b></i> pour obtenir un unique résultat de groupe. <br/>
+<i><b>(2) "concatenated approach"</b></i> pour obtenir des résultats individuels à l'échelle du groupe.  <br/>
+<br/>
+<img SRC="../../images/constellation/panneau_attention.jpg" ALT="" height="20" width="20"/>
+<span style="text-decoration:underline">Incidences du choix de la méthode sur le paramètre "ROIs_nomenclature":</span><br/>
+<i><b>(1) "averaged approach" </b></i>, dans le cadre de cette approche le paramètre "ROIs_nomenclature" doit être un fichier représentant la segmentation moyenne du groupe de sujets <br/>
+<i><b>(2) "concatenated approach"</b></i>, le paramètre "ROIs_nomenclature" est une segmentation individuelle. <br/></xhtml>
+      <xhtml name="outputs_database">Une base de donnée BrainVisa est obligatoire pour l'autocomplétion et l'écriture des fichiers de ce process. Sans celle-ci, aucune donnée pourra être générer. (voir la documentation pour ajouter une base de données dans la configuration de BrainVisa). Ce paramètre récupère l'ensemble des bases de données ayant une ontologie brainvisa présente dans votre configuration, vous n'avez plus qu'à choisir celle qui vous convient pour écrire les fichiers générés.</xhtml>
+      <xhtml name="white_mesh">Maillage individuel de la surface corticale, définie comme étant l'interface entre la substance blanche et la substance grise (également appelé interface gris/blanc).</xhtml>
+    </d>
+    <xhtml name="long">En fonction de la région de départ étudiée, les faisceaux de fibres peuvent être filtrés selon trois  critères : <br/>
+<br/>
+<i>(1)</i> seuls les tracts connectés à la région de départ sont conservés <b>(critère obligatoire)</b> <br/>
+<i>(2)</i> les fibres de longueur inférieure à un seuil sont supprimées <b>(critère obligatoire)</b> <br/>
+<i>(3)</i> les fibres de longueur supérieure à un seuil sont supprimées <b>(critère obligatoire)</b> <br/>
+<br/>
+<br/>
+Decription des différentes étapes réalisées :<br/>
+<ul>
+<li><b><i> lecture des fichiers de fibres : </i> </b> Seules les fibres générées par les logiciels Connectomist-2.0 et TrackVis sont acceptés. Il est possible de mettre une liste de fichiers. </li>
+<li><b><i> attribution des pairs de labels aux fibres : </i> </b> chaque extrémité des fibres est associée à un noeud du maillage, lui même labelisé par la segmentation en région de départ. Ce label est attribué à la fibre. Si une extrémité de fibre n'est pas identifiée sur la maillage dans ce cas, elle est labelisée "notInMesh". </li>
+<li><b><i> sélection des fibres par leur label : </i> </b> les fibres appartenant au moins par une extrémité à la région de départ sont gardées. </li>
+<li><b><i> filtrage par longueur : </i> </b>  les fibres plus petites que le seuil "minlength_?" ou plus grande que le seuil "maxlength_?" sont supprimées. </li>
+<li><b><i> fusion des fichiers : </i> </b> création d'un seul fichier en sortie par type de fibres (voir ci-dessous) . </li>
+</ul>
+<br/>
+Deux types de fibres sont à considérer dans cette brique:<br/>
+<ul>
+<li><b><i>les fibres labelisées</i> </b> sont définit comme ayant les deux extrémités associées chacune à un point du maillage (et sont par conséquent labelisées) </li>
+<li><b><i>les fibres semi-labelisées</i></b> sont définit comme ayant qu'une seule extrémité associée à un point du maillage (l'autre n'étant pas identifiée) </li>
+</ul>
+<br/>
+Exemple inputs/outputs:
+<br/>
+
+<pre>study_name:                      studyA  </pre>
+<pre>outputs_database:                /my/path/database_brainvisa </pre>
+<pre>fiber_tracts_format:             bundles  </pre>
+<pre>method:                          averaged approach  </pre>
+<pre>labels_nomenclature:             /my/path/share/brainvisa-share-4.5/nomenclature/translation/nomenclature_desikan_freesurfer.txt  </pre>
+<pre>label_name:                      lh.postcentral  </pre>
+<pre>subject_directory:               /my/path/001  </pre>
+<pre>cortical_parcellation:           /my/path/database_freesurfer/group_analysis/01to40/average_brain/bh.annot.averagebrain.gii  </pre>
+<pre>white_mesh:                      /my/path/database_freesurfer/001/surf/bh.r.aims.white.gii  </pre>
+<pre>dw_to_t1:                        /my/path/001/dw_to_t1.trm </pre>
+<pre>minlength_labeled_fibers:        30.0  </pre>
+<pre>maxlength_labeled_fibers:        500.0  </pre>
+<pre>minlength_semilabeled_fibers:    20.0  </pre>
+<pre>maxlength_semilabeled_fibers:    500.0  </pre>
+<pre>labeled_fibers:                  /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
+                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
+                                 001_studyA_lh.postcentral_fibersNearCortex_30to500mm.bundles  </pre>
+<pre>semilabeled_fibers:              /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
+                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
+                                 001_studyA_lh.postcentral_outsideFibersOfCortex_20to500mm.bundles  </pre>
+
+</xhtml>
+  </d>
+  <d name="en">
+    <xhtml name="short"><img SRC="../../images/constellation/brain_tracts_filtering.png" ALT="" height="400" width="900"/></xhtml>
+    <d name="parameters">
+      <xhtml name="fiber_tracts_format">Different fiber tracts formats are supported. Selectable formats are as follows:<br/>
+
+<i>(1)</i> <b>TrackVis file format </b> with .trk as filename extension. <br/>
+<i>(2)</i> <b>Connectomist file format</b> with .bundles as filename extension. <br/></xhtml>
+      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed as in the following (The order of labels is not relevant.): <br/>
+<br/>
+<pre>1              nameA</pre>
+<pre>2              nameB</pre>
+<pre>3              nameC</pre>
+<pre>4              nameD</pre>
+<pre>5              nameE</pre>
+<pre>..             .....   </pre>
+<br/>
+For example, you can use the Desikan-Killiany Atlas or the Destrieux Atlas of the FreeSurfer software.</xhtml>
+      <xhtml name="dw_to_t1">Transformation from t2 to anat</xhtml>
+      <xhtml name="subject_directory">Tractography directory of the subject. It thus should belong to a database organized according to the tractography model (Connectomist).</xhtml>
+      <xhtml name="study_name">This mandatory parameter is free and allows to give a name to the pipeline. The value of "study_name" will be integrated into each output file name as well as the directory of the database that retrieves the output files.</xhtml>
+      <xhtml name="maxlength_semilabeled_fibers">Maximum length (in mm) accepted for fibers having one end identified in the mesh (semi-labelled). The fibers longer than this threshold will not be kept.</xhtml>
+      <xhtml name="cortical_parcellation">Parcellation of the cortical surface into anatomical regions (lobes, gyri...). For example, FreeSurfer provides a cortical parcellation into gyri.<br/>
+A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
+      <xhtml name="cortical_region">The list of region names, present in the text file 'cortical_regions_nomenclature' is proposed. <br/>
+You must choose a region. The study will be done on this region.</xhtml>
+      <xhtml name="minlength_labeled_fibers">Minimum length (in mm) accepted for fibers having their two ends identified on the mesh (labelled). Shorter fibers than this threshold will not be retained.</xhtml>
+      <xhtml name="semilabeled_fibers">All the fibers having one end identified on the mesh and  corresponding to the various criteria of this process are merged into one output file.</xhtml>
+      <xhtml name="maxlength_labeled_fibers">Maximum length (in mm) accepted for fibers having their two ends identified on the mesh (labelled). The fibers longer than this threshold will not be kept.</xhtml>
+      <xhtml name="labeled_fibers">All the fibers having their ends identified on the mesh and corresponding to the various criteria in this process are merged into one output file.</xhtml>
+      <xhtml name="minlength_semilabeled_fibers">Minimum length (in mm) accepted for fibers having one end identified in the mesh (semi-labelled). Fibers shorter than this threshold will not be retained.</xhtml>
+      <xhtml name="method">Two methods are proposed: <br/>
+<i><b>(1) "averaged approach" </b></i> to obtain a single group result. <br/>
+<i><b>(2) "concatenated approach"</b></i> to obtain individual results across the group.  <br/>
+<br/>
+<img SRC="../../images/constellation/panneau_attention.jpg" ALT="" height="20" width="20"/>
+<span style="color:red;">Implications of the choice of method on the parameter "cortical_parcellation":</span><br/>
+<i><b>(1) "averaged approach" </b></i>, for this method, the parameter "cortical_parcellation" must be a file representing the average parcellation of a subjects group. <br/>
+<i><b>(2) "concatenated approach"</b></i>, the parameter "cortical_parcellation" is an individual parcellation. <br/></xhtml>
+      <xhtml name="outputs_database">A BrainVisa database is mandatory for autocompletion and writing files in this process. Without it, no data will be generated. (see the documentation to add a database in the BrainVisa configuration). This parameter retrieves all databases with brainvisa ontology present in your configuration, you just have to pick the right one to write the generated files.</xhtml>
+      <xhtml name="white_mesh">Individual white mesh of the entire cortical surface (white/gray interface).</xhtml>
+    </d>
+    <xhtml name="long">Depending on the starting region, the fiber tracts are filtered according to three criteria:<br/>
+<br/>
+<i>(1)</i> only fibers connected to the starting region are retained <b>(mandatory criteria)</b> <br/>
+<i>(2)</i> the fibers  less than a threshold in length are removed <b>(mandatory criteria)</b> <br/>
+<i>(3)</i> the fibers of longer than a threshold are removed <b>(mandatory criteria)</b> <br/>
+<br/>
+<br/>
+This filtering is organized as follow:<br/>
+<ul>
+<li><b><i>reads fibers:</i> </b> Only fibers generated by the Connectomist-2.0 and TrackVis softwares are accepted. It is possible to put a list of files. <br/></li>
+<li><b><i>set gyrus pair name on each fiber:</i></b> Each end of the fibers is associated with a vertex of the mesh, itself labeled by the starting region segmentation. This label is awarded to the fiber. If a fiber end is not identified on the mesh, it is labelled "notInMesh".<br/></li>
+<li><b><i>select bundles from names:</i></b> the fibers from at least one end to the starting region are kept.<br/></li>
+<li><b><i>filter by length:</i></b> smaller fibers than the threshold "minlength?" or larger than the threshold "maxlength_?" are deleted.<br/></li>
+<li><b><i>merge the files:</i></b> creating a single file output by fiber type (see below)<br/></li>
+</ul>
+<br/>
+Two types of fiber tracts have to be taken into  consideration in this process:<br/>
+<ul>
+<li><b><i>labeled fibers</i> </b> are defined as having both ends attached to the mesh (and are consequently labelled) </li>
+<li><b><i>semilabeled fibers</i></b> are defined as having only one end attached to the mesh (the other being not identified) </li>
+</ul>
+
+<br/>
+Example inputs/outputs:
+<br/>
+
+<pre>study_name:                      studyA  </pre>
+<pre>outputs_database:                /my/path/database_brainvisa </pre>
+<pre>fiber_tracts_format:             bundles  </pre>
+<pre>method:                          averaged approach  </pre>
+<pre>cortical_regions_nomenclature:   /my/path/share/brainvisa-share-4.5/nomenclature/translation/nomenclature_desikan_freesurfer.txt  </pre>
+<pre>cortical_region:                 lh.postcentral  </pre>
+<pre>subject_directory:               /my/path/001  </pre>
+<pre>cortical_parcellation:           /my/path/database_freesurfer/group_analysis/01to40/average_brain/bh.annot.averagebrain.gii  </pre>
+<pre>white_mesh:                      /my/path/database_freesurfer/001/surf/bh.r.aims.white.gii  </pre>
+<pre>dw_to_t1:                        /my/path/001/dw_to_t1.trm </pre>
+<pre>minlength_labeled_fibers:        30.0  </pre>
+<pre>maxlength_labeled_fibers:        500.0  </pre>
+<pre>minlength_semilabeled_fibers:    20.0  </pre>
+<pre>maxlength_semilabeled_fibers:    500.0  </pre>
+<pre>labeled_fibers:                  /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
+                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
+                                 001_studyA_lh.postcentral_fibersNearCortex_30to500mm.bundles  </pre>
+<pre>semilabeled_fibers:              /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
+                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
+                                 001_studyA_lh.postcentral_outsideFibersOfCortex_20to500mm.bundles  </pre>
+
+</xhtml>
+  </d>
+</d>
+</minf>
