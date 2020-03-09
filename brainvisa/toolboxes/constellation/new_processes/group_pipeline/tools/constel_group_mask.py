@@ -13,21 +13,20 @@ This script does the following:
     - the signature of the inputs/ouputs,
     - the initialization (by default) of the inputs,
     - the interlinkages between inputs/outputs.
-* executes the command 'constel_connectivity_profile_overlap_mask': the mask of the
-  all individual profiles is computed.
+* executes the command 'constel_connectivity_profile_overlap_mask':
+the mask of the all individual profiles is computed.
 
 Main dependencies: axon python API, soma, constel
 
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # python system module
 from __future__ import absolute_import
 import os
-import sys
 
 # axon python API module
 from brainvisa.processes import Signature, ListOf, ReadDiskItem, String, \
@@ -46,7 +45,7 @@ def validation():
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = "Group Connectivity Mask"
@@ -67,7 +66,7 @@ signature = Signature(
         "Mask Texture", "Aims texture formats"), )
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 def initialization(self):
@@ -97,7 +96,7 @@ def initialization(self):
         link_mask)
 
 
-#----------------------------Main program--------------------------------------
+# ----------------------------Main program-------------------------------------
 
 
 def execution(self, context):

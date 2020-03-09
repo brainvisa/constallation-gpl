@@ -31,8 +31,8 @@ from soma.path import find_in_path
 try:
     from constel.lib.utils.texturetools import remove_labels
     from constel.lib.utils.filetools import read_file, select_ROI_number
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 def validation():

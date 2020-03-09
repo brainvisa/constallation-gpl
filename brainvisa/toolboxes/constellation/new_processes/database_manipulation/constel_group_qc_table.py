@@ -1,6 +1,7 @@
 
 from __future__ import absolute_import
-from brainvisa.processes import *
+from brainvisa.processes import Signature, Choice, ListOf, String,\
+    WriteDiskItem, neuroHierarchy, getProcessInstance, OpenChoice
 from six.moves import zip
 
 name = 'Constellation Group QC table'
@@ -19,8 +20,8 @@ def initialization(self):
     # ontology: brainvisa-3.2.0, non-builtin first
     databases = [h.name for h in neuroHierarchy.hierarchies()
                  if h.fso.name == "brainvisa-3.2.0" and not h.builtin] \
-        + [h.name for h in neuroHierarchy.hierarchies()
-                 if h.fso.name == "brainvisa-3.2.0" and h.builtin]
+                 + [h.name for h in neuroHierarchy.hierarchies()
+                    if h.fso.name == "brainvisa-3.2.0" and h.builtin]
     self.signature["database"].setChoices(*databases)
     if len(databases) >= 1:
         self.database = databases[0]
@@ -37,9 +38,12 @@ def execution(self, context):
               'Connectivity ROI Texture', 'Connectivity Matrix',
               'Connectivity ROI Texture', ]
 
-    tlabels = ['Group Mask Texture', 'Group Profile','Normalized Group Profile',
+    tlabels = ['Group Mask Texture',
+               'Group Profile',
+               'Normalized Group Profile',
                'Group Filtered Watershed',
-               'Group Reduced Matrix', 'Group Clustering, all K']
+               'Group Reduced Matrix',
+               'Group Clustering, all K']
 
     custom_filt = [eval(filt) for filt in self.data_filters]
     if len(custom_filt) == 1:
@@ -68,4 +72,3 @@ def execution(self, context):
                               keys=self.keys,
                               type_labels=tlabels,
                               output_file=self.output_file)
-

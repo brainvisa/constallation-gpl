@@ -12,7 +12,7 @@ Compute the connectome of a given parcellation.
 """
 
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # axon python API module
@@ -23,7 +23,7 @@ from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 
 
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = 'Write the connectome of a given parcellation'
@@ -53,7 +53,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 def initialization(self):
@@ -68,7 +68,7 @@ def initialization(self):
     self.constellation_regions = False
 
 
-#----------------------------Main Program--------------------------------------
+# ----------------------------Main Program-------------------------------------
 
 
 def execution(self, context):

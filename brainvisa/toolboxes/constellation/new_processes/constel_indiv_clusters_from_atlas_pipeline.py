@@ -25,14 +25,13 @@ from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import neuroHierarchy
 from brainvisa.processes import SerialExecutionNode
 from brainvisa.processes import ProcessExecutionNode
-import sys
+from brainvisa.processes import ValidationError
 
 # Package import
 try:
     from constel.lib.utils.filetools import read_file
-except:
-    pass
-
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 # ---------------------------Header--------------------------------------------
 
@@ -201,8 +200,8 @@ def initialization(self):
 
     def link_atlas_matrix(self, dummy):
         match = {
-            #"method":
-                #self.executionNode().child("fsl_indiv")._process.method,
+            # "method":
+            # self.executionNode().child("fsl_indiv")._process.method,
             # force averaged method to match the atlas
             "method": "avg",
             "gyrus": self.region,
@@ -215,14 +214,14 @@ def initialization(self):
             match = dict(
                 self.complete_individual_smoothed_matrix.hierarchyAttributes())
             match.update({
-                #"_database":
-                    #self.complete_individual_smoothed_matrix.get("_database"),
+                # "database":
+                # self.complete_individual_smoothed_matrix.get("_database"),
                 "group_of_subjects":
                     self.atlas_matrix.get("group_of_subjects"),
                 "sid": self.complete_individual_smoothed_matrix.get("subject"),
                 "reduced": "yes",
                 "intersubject": "yes",
-                "_format": "gz compressed NIFTI-1 image", # bug in findValue ?
+                "_format": "gz compressed NIFTI-1 image",  # bug in findValue ?
             })
             for att in ["name_serie", "tracking_session", "subject",
                         "analysis", "acquisition"]:
@@ -233,7 +232,7 @@ def initialization(self):
     def link_clusters(self, dummy):
         if self.reduced_matrix:
             match = dict(self.reduced_matrix.hierarchyAttributes())
-            for att in ["name_serie", "tracking_session", # "subject",
+            for att in ["name_serie", "tracking_session",  # "subject",
                         "analysis", "acquisition", "ends_labelled", "reduced",
                         "individual"]:
                 if att in match:
@@ -244,7 +243,6 @@ def initialization(self):
             # strangely, findValues() returns 1 element....
             match["_format"] = 'GIFTI file'
             return self.signature["individual_clustering"].findValue(match)
-
 
     self.signature['probtrackx_indir'].databaseUserLevel = 3
     self.signature['temp_outdir'].databaseUserLevel = 3
@@ -278,7 +276,8 @@ def initialization(self):
     ###########################################################################
 
     eNode.addChild(
-        "fsl_indiv", ProcessExecutionNode("constel_individual_pipeline_fsl_connectome",
+        "fsl_indiv",
+        ProcessExecutionNode("constel_individual_pipeline_fsl_connectome",
                              optional=True))
     fsl_indiv = eNode.child("fsl_indiv")._process
     fsl_indiv.method = 'concat'
@@ -324,9 +323,8 @@ def initialization(self):
 
     eNode.addChild(
         "reduced_matrix",
-        ProcessExecutionNode(
-            "constel_individual_reduced_matrix",
-            optional=True))
+        ProcessExecutionNode("constel_individual_reduced_matrix",
+                             optional=True))
     eNode.child('reduced_matrix')._process.removeLink(
         "filtered_reduced_individual_profile", "complete_matrix_smoothed")
     eNode.child('reduced_matrix')._process.removeLink(
@@ -380,4 +378,3 @@ def initialization(self):
         self.outputs_database = self.signature["outputs_database"].values[0][0]
     self.regions_nomenclature \
         = eNode.child("fsl_indiv")._process.regions_nomenclature
-

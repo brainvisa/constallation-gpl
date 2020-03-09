@@ -22,7 +22,7 @@ Main dependencies: axon python API, soma-base, constel
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # system module
@@ -32,7 +32,7 @@ import numpy
 # axon python API modules
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
-from brainvisa.processes import Integer, String
+from brainvisa.processes import Integer, String, ValidationError
 
 # soma module
 from soma import aims
@@ -43,11 +43,11 @@ try:
         compute_mclusters_by_nbasins_matrix
     from constel.lib.utils.matrixtools import write_matrix2csv
     from constel.lib.utils.matrixtools import calculate_percentage
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that aims-free is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header-------------------------------------------
 
 
 name = "Write connectivity matrix as CSV File"
@@ -74,7 +74,7 @@ signature = Signature(
     "csv_file", String(),
 )
 
-#----------------------------Function------------------------------------------
+# ----------------------------Function-----------------------------------------
 
 
 def initialization(self):
@@ -82,7 +82,7 @@ def initialization(self):
     """
     self.number_of_clusters = 5
 
-#----------------------------Main program--------------------------------------
+# ----------------------------Main program-------------------------------------
 
 
 def execution(self, context):

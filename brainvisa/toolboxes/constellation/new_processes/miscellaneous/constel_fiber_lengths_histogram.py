@@ -15,7 +15,7 @@ Main dependencies:
 """
 
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # axon python API module
@@ -25,7 +25,7 @@ from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 
 
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = 'Write the fiber lengths in a text file'
@@ -41,7 +41,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 def initialization(self):
@@ -50,7 +50,7 @@ def initialization(self):
     pass
 
 
-#----------------------------Main Program--------------------------------------
+# ----------------------------Main Program-------------------------------------
 
 
 def execution(self, context):

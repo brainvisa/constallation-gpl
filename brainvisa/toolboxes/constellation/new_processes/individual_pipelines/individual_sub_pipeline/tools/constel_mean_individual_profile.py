@@ -25,8 +25,8 @@ from soma.path import find_in_path
 # Package import
 try:
     from constel.lib.utils.filetools import select_ROI_number
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 def validation():

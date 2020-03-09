@@ -209,10 +209,10 @@ def initialization(self):
                     "method")
                 atts["gyrus"] = self.filtered_reduced_group_profile.get(
                     "gyrus")
-                atts["smallerlength"] = self.filtered_reduced_group_profile.get(
-                    "smallerlength")
-                atts["greaterlength"] = self.filtered_reduced_group_profile.get(
-                    "greaterlength")
+                atts["smallerlength"] = self.filtered_reduced_group_profile\
+                    .get("smallerlength")
+                atts["greaterlength"] = self.filtered_reduced_group_profile\
+                    .get("greaterlength")
                 atts["smoothing"] = self.filtered_reduced_group_profile.get(
                     "smoothing")
                 atts["sid"] = subject.attributes().get("subject")
@@ -237,7 +237,8 @@ def initialization(self):
             s = str(self.filtered_reduced_group_profile.get("gyrus"))
             return s
 
-    def mapValuesToChildrenParametersMult(destNode, sourceNode, dest, source,
+    def mapValuesToChildrenParametersMult(
+            destNode, sourceNode, dest, source,
             value1=None, value2=None, value3=None, defaultProcess=None,
             defaultProcessOptions={}, name=None, resultingSize=-1,
             allow_remove=False):
@@ -274,12 +275,12 @@ def initialization(self):
     # Add links to refresh child nodes when main lists are modified
     eNode.addLink(
         None,
-        #"complete_individual_matrices",
+        # "complete_individual_matrices",
         ("complete_individual_matrices", "intersubject_reduced_matrices",
          "regions_parcellation"),
         partial(mapValuesToChildrenParametersMult, eNode,
                 eNode,
-                #"complete_matrix_smoothed", "complete_individual_matrices",
+                # "complete_matrix_smoothed", "complete_individual_matrices",
                 ["complete_matrix_smoothed",
                  "reduced_individual_matrix", "regions_parcellation"],
                 ["complete_individual_matrices",
@@ -287,19 +288,3 @@ def initialization(self):
                 defaultProcess="constel_individual_reduced_matrix",
                 name="constel_individual_reduced_matrix",
                 allow_remove=True))
-
-    #eNode.addLink(
-        #None, "intersubject_reduced_matrices",
-        #partial(mapValuesToChildrenParameters, eNode,
-                #eNode, "reduced_individual_matrix",
-                #"intersubject_reduced_matrices",
-                #defaultProcess="constel_individual_reduced_matrix",
-                #name="constel_individual_reduced_matrix"))
-
-    #eNode.addLink(
-        #None, "regions_parcellation",
-        #partial(mapValuesToChildrenParameters, eNode,
-                #eNode, "regions_parcellation",
-                #"regions_parcellation",
-                #defaultProcess="constel_individual_reduced_matrix",
-                #name="constel_individual_reduced_matrix"))

@@ -32,8 +32,8 @@ from brainvisa.processes import Boolean
 # constel modules
 try:
     from constel.lib.utils.filetools import read_file
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 def validation():

@@ -7,21 +7,23 @@ Created on Mon Oct 20 09:35:29 2014
 
 # Axon python API module
 from __future__ import absolute_import
-from brainvisa.processes import *
-from soma.path import find_in_path
+from brainvisa.processes import Signature, String, ReadDiskItem, Integer,\
+    neuroHierarchy, OpenChoice, ValidationError, Choice
 from six.moves import range
+import os
 
 
 def validation():
-    """This function is executed at BrainVisa startup when the process is loaded.
-
+    """
+    This function is executed at BrainVisa startup when the process is loaded.
     It checks some conditions for the process to be available.
     """
     try:
         from soma import aims
     except ImportError:
         raise ValidationError(
-            "soma.aims module not found - Please make sure that aims-free is installed.")
+            "Please make sure that aims-free is installed.")
+
 
 name = "Extract clusters"
 userLevel = 2
@@ -33,11 +35,11 @@ signature = Signature(
     "white_mesh", ReadDiskItem("White Mesh", "Aims mesh formats"),
     "clustering_texture", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
-        requiredAttributes={"roi_autodetect":"No",
-                            "roi_filtered":"No",
-                            "averaged":"No",
-                            "intersubject":"Yes",
-                            "step_time":"Yes"}),
+        requiredAttributes={"roi_autodetect": "No",
+                            "roi_filtered": "No",
+                            "averaged": "No",
+                            "intersubject": "Yes",
+                            "step_time": "Yes"}),
     "number_of_clusters", Integer(),
     "transfo_joy", ReadDiskItem(
         "Transform Raw T1 MRI to Talairach-AC/PC-Anatomist",

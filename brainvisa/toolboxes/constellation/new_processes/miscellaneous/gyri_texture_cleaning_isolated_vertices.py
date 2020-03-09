@@ -19,7 +19,7 @@ Author: Sandrine Lefranc
 """
 
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # axon python API module
@@ -28,21 +28,24 @@ from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
-    
+
 # soma module
 from soma.path import find_in_path
 
-#from constel.lib.utils.processtools import write_filelog
+# from constel.lib.utils.processtools import write_filelog
 
 
 def validation():
     """
+    This function is executed at BrainVisa startup when the process is loaded.
+    It checks some conditions for the process to be available.
     """
     if not find_in_path('AimsGyriTextureCleaningIsolatedVertices.py'):
-        raise ValidationError('constel module is not here.')
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = 'Cleaning Isolated Vertices'
@@ -50,7 +53,7 @@ userLevel = 2
 
 
 signature = Signature(
-    #--inputs--
+    # --inputs--
     'gyri_texture', ReadDiskItem(
         'ROI Texture', 'Aims texture formats',
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
@@ -58,13 +61,13 @@ signature = Signature(
         'White Mesh', 'Aims mesh formats',
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
 
-    #--outputs--
+    # --outputs--
     'clean_gyri_texture', WriteDiskItem(
         'ROI Texture', 'Aims texture formats',
-        requiredAttributes={"side":"both", "vertex_corr":"Yes"}),)
+        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),)
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 def initialization(self):
@@ -74,15 +77,14 @@ def initialization(self):
     self.linkParameters('clean_gyri_texture', 'gyri_texture')
 
 
-#----------------------------Main Program--------------------------------------
+# ----------------------------Main Program-------------------------------------
 
 
 def execution(self, context):
     """
     """
-    #write_filelog()
+    # write_filelog()
     context.pythonSystem('AimsGyriTextureCleaningIsolatedVertices.py',
                          self.gyri_texture,
                          self.mesh,
                          self.clean_gyri_texture)
-

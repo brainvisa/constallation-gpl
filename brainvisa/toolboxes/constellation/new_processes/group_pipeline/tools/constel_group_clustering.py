@@ -42,8 +42,8 @@ from soma.path import find_in_path
 # constel module
 try:
     from constel.lib.utils.filetools import select_ROI_number
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 def validation():
@@ -87,9 +87,6 @@ signature = Signature(
                             "vertex_corr": "Yes",
                             "averaged": "Yes"}),
     "nb_clusters", Integer(),
-#    "clustering_algorithms", Choice(
-#        ("K-medoids clustering", "kmedoids"),
-#        ("Ward's method", "ward")),
 
     # --outputs--
     "reduced_group_matrix", WriteDiskItem(
@@ -215,7 +212,8 @@ def initialization(self):
 def execution(self, context):
     """Compute the clustering of the ROI.
 
-    Execute 'constel_inter_subject_clustering' and 'constel_calculate_group_matrix'.
+    Execute 'constel_inter_subject_clustering' and
+    'constel_calculate_group_matrix'.
 
     The gyrus vertices connectivity profiles of all the subjects are
     concatenated into a big matrix. The clustering is performed with the

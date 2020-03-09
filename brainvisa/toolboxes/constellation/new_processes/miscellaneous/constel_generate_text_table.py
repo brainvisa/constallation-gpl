@@ -10,17 +10,13 @@
 """
 """
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # system module
 from __future__ import absolute_import
-import os
 
 # axon python API module
-from brainvisa.processes import Float
-from brainvisa.processes import ListOf
-from brainvisa.processes import Boolean
 from brainvisa.processes import Integer
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
@@ -36,20 +32,19 @@ def validate(self):
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    pass
-    #if not find_in_path("constel_table_measurements.py"):
-    #    raise ValidationError(
-    #        "Please make sure that constel module is installed.")
+    if not find_in_path("constel_table_measurements.py"):
+        raise ValidationError(
+           "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = "Write a different measures in csv file"
 userLevel = 2
 
 signature = Signature(
-    #--inputs
+    # --inputs--
     "clusters", ReadDiskItem(
         "Connectivity ROI texture", "aims texture formats",
         requiredAttributes={'step_time': 'yes'}),
@@ -63,12 +58,12 @@ signature = Signature(
                             "intersubject": "yes",
                             "individual": "no"}),
 
-    #--outputs--
+    # --outputs--
     "csvfile", WriteDiskItem("Any Type", getAllFormats()),
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 def initialization(self):
@@ -77,7 +72,7 @@ def initialization(self):
     pass
 
 
-#----------------------------Main program--------------------------------------
+# ----------------------------Main program-------------------------------------
 
 
 def execution(self, context):

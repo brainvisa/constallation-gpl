@@ -36,7 +36,6 @@ from brainvisa.processes import Choice
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
-from brainvisa.processes import getAllFormats
 from brainvisa.processes import ValidationError
 
 # soma module

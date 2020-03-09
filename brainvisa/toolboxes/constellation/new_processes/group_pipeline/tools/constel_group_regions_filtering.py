@@ -27,7 +27,6 @@ Author: Sandrine Lefranc
 
 # python module
 from __future__ import absolute_import
-import sys
 
 # axon python API module
 from brainvisa.processes import Signature
@@ -35,20 +34,15 @@ from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
 
-# constel module
-try:
-    from constel.lib.utils.texturetools import remove_labels
-except:
-    pass
+# soma module
+from soma.path import find_in_path
 
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    try:
-        import constel
-    except:
+    if not find_in_path("constel_filtering_watershed.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
@@ -100,7 +94,7 @@ def initialization(self):
                         "normed_group_profile")
 
 
-#----------------------------Main program--------------------------------------
+# ----------------------------Main program-------------------------------------
 
 
 def execution(self, context):
@@ -114,7 +108,7 @@ def execution(self, context):
                          self.normed_group_profile,
                          self.average_mesh,
                          self.reduced_group_profile,
-                         "--threshold", 0.02, # update the parameter
+                         "--threshold", 0.02,  # update the parameter
                          "--mode", "or")
 
     # execute the command

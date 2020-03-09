@@ -27,8 +27,8 @@ from soma.path import find_in_path
 try:
     from constel.lib.utils.filetools import select_ROI_number
     from constel.lib.utils.matrixtools import replace_negative_values
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 def validation():

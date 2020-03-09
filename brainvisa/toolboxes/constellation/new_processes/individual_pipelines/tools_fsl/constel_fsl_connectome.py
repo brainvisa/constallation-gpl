@@ -21,7 +21,6 @@ from brainvisa.processes import Signature
 from brainvisa.processes import OpenChoice
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
-from brainvisa.processes import getAllFormats
 from brainvisa.processes import ValidationError
 
 # soma.path module
@@ -31,8 +30,8 @@ from soma.path import find_in_path
 try:
     from constel.lib.utils.filetools import read_file
     from constel.lib.utils.filetools import select_ROI_number
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 def validation():

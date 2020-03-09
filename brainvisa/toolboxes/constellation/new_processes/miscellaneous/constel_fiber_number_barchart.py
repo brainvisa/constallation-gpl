@@ -15,22 +15,22 @@ Main dependencies:
 """
 
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # axon python API module
 from __future__ import absolute_import
 from brainvisa.processes import String
 from brainvisa.processes import Boolean
-from brainvisa.processes import Integer
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import ValidationError
 
 try:
     from constel.lib.utils.filetools import select_ROI_number
-except:
-    pass
-#----------------------------Header--------------------------------------------
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
+# ----------------------------Header-------------------------------------------
 
 
 name = 'Fiber number by region'
@@ -50,7 +50,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 def initialization(self):
@@ -75,7 +75,7 @@ def initialization(self):
         "cortical_region", "fiber_tracts", link_fiber2label)
 
 
-#----------------------------Main Program--------------------------------------
+# ----------------------------Main Program-------------------------------------
 
 
 def execution(self, context):
@@ -95,7 +95,6 @@ def execution(self, context):
 
     if self.sort:
         cmd += ["-s"]
-
 
     # Execute the command
     context.system(*cmd)

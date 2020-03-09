@@ -24,10 +24,8 @@ Author: Sandrine Lefranc
 
 # system module
 from __future__ import absolute_import
-import numpy
 
 # axon python API module
-from brainvisa.processes import String
 from brainvisa.processes import ListOf
 from brainvisa.processes import Integer
 from brainvisa.processes import Signature
@@ -39,8 +37,10 @@ from brainvisa.processes import ValidationError
 from soma import aims
 
 # constel module
-from constel.lib.utils.texturetools import concatenate_texture
-
+try:
+    from constel.lib.utils.texturetools import concatenate_texture
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 # ---------------------------Header--------------------------------------------
 

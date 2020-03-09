@@ -24,13 +24,14 @@ from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import neuroHierarchy
 from brainvisa.processes import SerialExecutionNode
 from brainvisa.processes import ProcessExecutionNode
+from brainvisa.processes import ValidationError
 import os
 
 # Package import
 try:
     from constel.lib.utils.filetools import read_file
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 # ---------------------------Header--------------------------------------------
@@ -84,7 +85,7 @@ signature = Signature(
 
 def link_keep_regions_value(self, dummy, other=None, oother=None):
     s = [x[1] for x in self.signature["keep_regions"].contentType.values
-          if x[1] is not None]
+         if x[1] is not None]
     if self.regions_selection == "All":
         keep_regions = s
     elif self.regions_selection == "All but main region":
@@ -101,7 +102,7 @@ def initialization(self):
     # ontology: brainvisa-3.2.0
     databases = [h.name for h in neuroHierarchy.hierarchies()
                  if h.fso.name == "brainvisa-3.2.0" and not h.builtin
-                    and not h.read_only]
+                 and not h.read_only]
     self.signature["outputs_database"].setChoices(*databases)
     if len(databases) != 0:
         self.outputs_database = databases[0]

@@ -12,18 +12,16 @@ Compute the connectome of a given parcellation.
 """
 
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # axon python API module
 from __future__ import absolute_import
 from brainvisa.processes import String
-from brainvisa.processes import Boolean
 from brainvisa.processes import Signature
-from brainvisa.processes import ReadDiskItem
 
 
-#----------------------------Header--------------------------------------------
+# ---------------------------Header-------------------------------------------
 
 
 name = 'Merge white and nuclei meshes'
@@ -41,7 +39,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 def initialization(self):
@@ -50,7 +48,7 @@ def initialization(self):
     pass
 
 
-#----------------------------Main Program--------------------------------------
+# ----------------------------Main Program-------------------------------------
 
 
 def execution(self, context):

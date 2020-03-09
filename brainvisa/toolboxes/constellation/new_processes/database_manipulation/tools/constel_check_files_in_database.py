@@ -31,8 +31,8 @@ from brainvisa.processes import ValidationError
 # constel modules
 try:
     from constel.lib.utils.filetools import read_file
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 def validation():
@@ -123,17 +123,3 @@ def execution(self, context):
                    self.study_name,
                    self.ROI,
                    self.result_in_textfile)
-
-
-
-
-#        if os.path.exists(self.labeled_fibers.fullPath()):
-#            if os.access(self.labeled_fibers.fullPath(), os.R_OK):
-#                f.write(self.labeled_fibers.fullPath() +
-#                        " - File exists and is readable\n")
-#            else:
-#                f.write(self.labeled_fibers.fullPath() + " - File exists but" +
-#                        "the user doesn't have access rights\n")
-#        else:
-#            f.write(self.labeled_fibers.fullPath() +
-#                    " - Either the file is missing or is not readable\n")

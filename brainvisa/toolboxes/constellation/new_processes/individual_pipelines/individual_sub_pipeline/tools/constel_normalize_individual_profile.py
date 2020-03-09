@@ -26,19 +26,14 @@ from brainvisa.processes import ListOf
 try:
     from constel.lib.utils.filetools import read_file
     from constel.lib.utils.filetools import select_ROI_number
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    try:
-        import constel
-    except:
-        raise ValidationError(
-            "Please make sure that constel module is installed.")
 
 
 # ---------------------------Header--------------------------------------------
@@ -135,9 +130,9 @@ def execution(self, context):
 
     labels = []
     for region in self.keep_regions:
-        l = select_ROI_number(
+        label_number = select_ROI_number(
             self.regions_nomenclature.fullPath(), region)
-        labels.append(l)
+        labels.append(label_number)
     cmd += ["-r"]
     for label in labels:
         cmd += [label]

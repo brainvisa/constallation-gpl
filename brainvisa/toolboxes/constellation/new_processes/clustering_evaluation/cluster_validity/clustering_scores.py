@@ -20,7 +20,7 @@ Main dependencies: axon python API, soma-base, constel
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 from __future__ import print_function
 
@@ -51,7 +51,7 @@ def validate(self):
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = "Clustering scores"
@@ -79,7 +79,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 def initialization(self):
@@ -106,7 +106,8 @@ def execution(self, context):
         print(group)
         print(subject1)
         print(subject2)
-        title = str(cortical_region) + "_" + str(group) + "_" + str(subject1) + "_" + str(subject2)
+        title = str(cortical_region) + "_" + str(group) + "_" + str(subject1)
+        + "_" + str(subject2)
 
     cmd = [sys.executable, find_in_path("constel_calculate_scores.py"),
            self.clustering_1,

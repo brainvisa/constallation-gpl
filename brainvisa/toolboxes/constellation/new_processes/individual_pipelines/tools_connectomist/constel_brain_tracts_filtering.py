@@ -33,8 +33,8 @@ try:
     from constel.lib.utils.filetools import read_file
     from constel.lib.utils.filetools import select_ROI_number
     from constel.lib.utils.fibertools import load_fiber_tracts
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 def validation():
@@ -61,7 +61,7 @@ signature = Signature(
     "method", Choice(
         ("averaged approach", "avg"), ("concatenated approach", "concat")),
     "subject_indir", ReadDiskItem(
-        "subject", "directory"),    
+        "subject", "directory"),
     "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "region", OpenChoice(),

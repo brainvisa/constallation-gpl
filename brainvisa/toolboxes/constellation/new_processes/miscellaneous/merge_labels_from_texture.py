@@ -19,13 +19,13 @@ Author: Sandrine Lefranc
 """
 
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # axon python API module
 from __future__ import absolute_import
-from brainvisa.processes import *
-
+from brainvisa.processes import Signature, String, ReadDiskItem, Boolean,\
+    WriteDiskItem, OpenChoice, ValidationError, Choice, ListOf
 # soma module
 from soma.path import find_in_path
 
@@ -35,10 +35,9 @@ try:
     from constel.lib.utils.filetools import read_file, select_ROI_number
     from constel.lib.utils.filetools import add_region_in_nomenclature
     from constel.lib.utils.filetools import delete_regions_in_nomenclature
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
-from brainvisa.processes import getAllFormats
 
 def validation():
     """
@@ -49,14 +48,14 @@ def validation():
         raise ValidationError("aims module is not here.")
 
 
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = "Merge Labels From texture"
 userLevel = 2
 
 signature = Signature(
-    #--inputs--
+    # --inputs--
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
@@ -64,17 +63,17 @@ signature = Signature(
         "Nomenclature ROIs File", "Text File"),
     "cortical_regions", OpenChoice(),
     "new_cortical_region", String(),
-  
-    #--outputs--
+
+    # --outputs--
     "new_cortical_parcellation", WriteDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side":"both", "vertex_corr":"Yes"}),
+        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
     "new_nomenclature", WriteDiskItem(
         "Nomenclature ROIs File", "Text File"),
     "keep_only_merged_regions", Boolean(),)
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 def initialization(self):
@@ -99,7 +98,7 @@ def initialization(self):
         "cortical_regions", "cortical_regions_nomenclature",
         link_cortical_regions)
 
-#----------------------------Main Program--------------------------------------
+# ----------------------------Main Program-------------------------------------
 
 
 def execution(self, context):
@@ -133,5 +132,3 @@ def execution(self, context):
     add_region_in_nomenclature(up_nom,
                                self.new_cortical_region,
                                min_nb)
-
-

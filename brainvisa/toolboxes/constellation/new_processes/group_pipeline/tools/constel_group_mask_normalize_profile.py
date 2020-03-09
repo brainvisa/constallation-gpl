@@ -21,12 +21,11 @@ Main dependencies: axon python API, soma, constel
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # python system module
 from __future__ import absolute_import
-import sys
 
 # Axon python API module
 from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
@@ -36,7 +35,7 @@ from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
 from soma.path import find_in_path
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 # Plot constel module
@@ -47,6 +46,7 @@ def validation():
     if not find_in_path("constel_norm_profile.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
+
 
 name = "Mask and Normalize Group Profile"
 userLevel = 2
@@ -96,7 +96,7 @@ def initialization(self):
                         link_normprofile)
 
 
-#----------------------------Main program--------------------------------------
+# ----------------------------Main program-------------------------------------
 
 
 def execution(self, context):
@@ -105,6 +105,6 @@ def execution(self, context):
     Create a group profile normed.
     """
     context.pythonSystem("constel_norm_profile.py",
-                   self.group_mask,
-                   self.group_profile,
-                   self.normed_group_profile)
+                         self.group_mask,
+                         self.group_profile,
+                         self.normed_group_profile)

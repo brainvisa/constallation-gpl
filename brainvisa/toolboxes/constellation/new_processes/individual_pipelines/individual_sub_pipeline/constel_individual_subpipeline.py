@@ -23,12 +23,13 @@ from brainvisa.processes import OpenChoice
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import SerialExecutionNode
 from brainvisa.processes import ProcessExecutionNode
+from brainvisa.processes import ValidationError
 
 # Package import
 try:
     from constel.lib.utils.filetools import read_file
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 # ---------------------------Header--------------------------------------------
@@ -244,8 +245,6 @@ def initialization(self):
                    ProcessExecutionNode("constel_individual_clustering",
                                         optional=1, selected=False))
 
-    #eNode.ClusteringIntraSubjects.removeLink("regions_parcellation",
-    #                                         "individual_white_mesh")
     eNode.addDoubleLink("ClusteringIntraSubjects.reduced_individual_matrix",
                         "ReducedMatrix.reduced_individual_matrix")
     eNode.addDoubleLink("ClusteringIntraSubjects.regions_nomenclature",

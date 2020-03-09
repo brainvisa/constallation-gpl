@@ -24,12 +24,13 @@ from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import neuroHierarchy
 from brainvisa.processes import SerialExecutionNode
 from brainvisa.processes import ProcessExecutionNode
+from brainvisa.processes import ValidationError
 
 # Package import
 try:
     from constel.lib.utils.filetools import read_file
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 # ---------------------------Header--------------------------------------------

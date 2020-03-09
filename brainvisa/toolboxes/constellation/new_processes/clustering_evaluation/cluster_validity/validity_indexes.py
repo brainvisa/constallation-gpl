@@ -20,12 +20,11 @@ Main dependencies: axon python API, soma-base, constel
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # system module
 from __future__ import absolute_import
-import os
 import sys
 
 # axon python API module
@@ -34,9 +33,11 @@ from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.data.neuroDiskItems import getAllFormats
+from brainvisa.processes import ValidationError
 
 # soma module
 from soma.path import find_in_path
+
 
 def validate(self):
     """This function is executed at BrainVisa startup when the process is
@@ -47,7 +48,7 @@ def validate(self):
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = "Validity Indexes"
@@ -65,7 +66,7 @@ signature = Signature(
     "indexFile", WriteDiskItem("Any Type", getAllFormats()))
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 def initialization(self):
@@ -81,10 +82,10 @@ def execution(self, context):
     """
     cortical_region = self.matrix.get("gyrus")
 
-    context.system(sys.executable, find_in_path("constel_getting_validity_indexes.py"),
+    context.system(sys.executable,
+                   find_in_path("constel_getting_validity_indexes.py"),
                    self.matrix,
                    cortical_region,
                    self.nbIter,
                    self.kmax,
                    self.indexFile)
-

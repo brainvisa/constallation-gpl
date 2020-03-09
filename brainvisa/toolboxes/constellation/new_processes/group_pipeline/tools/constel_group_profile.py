@@ -13,8 +13,8 @@ This script does the following:
     - the signature of the inputs/ouputs,
     - the initialization (by default) of the inputs,
     - the interlinkages between inputs/outputs.
-* this process executes the command 'constel_avg_connectivity_profile': the mean
-  group profile is computed.
+* this process executes the command 'constel_avg_connectivity_profile':
+the mean group profile is computed.
 
 Main dependencies: axon python API, soma, constel
 
@@ -22,13 +22,12 @@ Author: sandrine.lefranc@cea.fr
 """
 
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # python system module
 from __future__ import absolute_import
 import os
-import sys
 
 # axon python API module
 from brainvisa.processes import Signature, ListOf, ReadDiskItem, String, \
@@ -47,7 +46,7 @@ def validation():
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = "Group Connectivity Profile"
@@ -72,7 +71,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 def initialization(self):
@@ -103,8 +102,10 @@ def initialization(self):
             atts['acquisition'] = ""
             atts['analysis'] = ""
             atts['tracking_session'] = ""
-            atts['smallerlength'] = self.normed_individual_profiles[0].get("smallerlength")
-            atts['greaterlength'] = self.normed_individual_profiles[0].get("greaterlength")
+            atts['smallerlength'] = self.normed_individual_profiles[0].get(
+                 "smallerlength")
+            atts['greaterlength'] = self.normed_individual_profiles[0].get(
+                 "greaterlength")
             atts["intersubject"] = "yes"
             atts["normed"] = "no"
             return self.signature["group_profile"].findValue(atts)
@@ -116,7 +117,7 @@ def initialization(self):
         link_group_profiles)
 
 
-#----------------------------Main program--------------------------------------
+# ----------------------------Main program-------------------------------------
 
 
 def execution(self, context):
@@ -126,5 +127,5 @@ def execution(self, context):
     (for a group of subjects)
     """
     context.pythonSystem("constel_avg_connectivity_profile.py",
-                   self.normed_individual_profiles,
-                   self.group_profile)
+                         self.normed_individual_profiles,
+                         self.group_profile)

@@ -23,12 +23,13 @@ Author: Sandrine Lefranc
 """
 
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # Axon python API module
 from __future__ import absolute_import
-from brainvisa.processes import *
+from brainvisa.processes import Signature, ValidationError, ReadDiskItem, \
+    WriteDiskItem, String, ListOf, Integer
 
 # Soma-base module
 from soma.path import find_in_path
@@ -44,46 +45,48 @@ def validation():
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
+
 name = "Ward Hierarchical Clustering Method"
 userLevel = 2
 
 signature = Signature(
     "kmax", Integer(),
-    "patch", Integer(), # TODO: to put a label to a name?
-    "group_matrix", String(), # TODO: to define a type
-    "distance_matrix_file", String(), # TODO: to define a type
+    "patch", Integer(),  # TODO: to put a label to a name?
+    "group_matrix", String(),  # TODO: to define a type
+    "distance_matrix_file", String(),  # TODO: to define a type
     "average_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
-        requiredAttributes={"side":"both",
-                            "vertex_corr":"Yes",
-                            "averaged":"Yes"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes",
+                            "averaged": "Yes"}),
     "gyri_texture", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side":"both",
-                            "vertex_corr":"Yes"})),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"})),
     "tex_time", ListOf(
         WriteDiskItem("Connectivity ROI Texture", "Aims texture formats",
-                      requiredAttributes={"roi_autodetect":"no",
-                                          "roi_filtered":"no",
-                                          "intersubject":"yes",
-                                          "step_time":"yes",
+                      requiredAttributes={"roi_autodetect": "no",
+                                          "roi_filtered": "no",
+                                          "intersubject": "yes",
+                                          "step_time": "yes",
                                           "individual": "no"})),
 )
 
 
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 def initialization(self):
-   '''Declare the default value.
-   '''
-   # Default value
-   self.kmax = 12
+    '''
+    Declare the default value.
+    '''
+    # Default value
+    self.kmax = 12
 
 
 def execution(self, context):
-    """Run th command "constel_clustering_ward".
-    
+    """
+    Run the command "constel_clustering_ward".
     Run a Ward's hierarchical clustering method.
     """
     args = ["constel_clustering_ward.py"]

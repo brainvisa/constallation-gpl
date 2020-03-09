@@ -19,7 +19,7 @@ Main dependencies: axon python API, soma-base, constel
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # system module
@@ -43,14 +43,14 @@ from brainvisa.processes import ReadDiskItem
 from soma import aims
 
 
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = "Dendrogram"
 userLevel = 2
 
 signature = Signature(
-    #--inputs--
+    # --inputs--
     "connectivity_matrix", ReadDiskItem(
         "Connectivity Matrix", "GIS image",
         requiredAttributes={"ends_labelled": "mixed",
@@ -65,7 +65,7 @@ signature = Signature(
     "outdir", ReadDiskItem("Directory", "Directory"))
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 def initialization(self):
@@ -77,7 +77,7 @@ def initialization(self):
     self.linkParameters("outdir", "connectivity_matrix")
 
 
-#----------------------------Main program--------------------------------------
+# ----------------------------Main program-------------------------------------
 
 
 def execution(self, context):

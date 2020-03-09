@@ -34,8 +34,8 @@ from soma.path import find_in_path
 # Package import
 try:
     from constel.lib.utils.filetools import read_file
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 def validation():

@@ -20,17 +20,15 @@ Main dependencies: axon python API, soma, constel
 Author: Sandrine Lefranc, 2016
 """
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # python system module
 from __future__ import absolute_import
-import os
-import sys
 
 # axon python API module
-from brainvisa.processes import Signature, ListOf, ReadDiskItem, String, \
-    WriteDiskItem, ValidationError, Integer
+from brainvisa.processes import Signature, ReadDiskItem, String, \
+    ValidationError, Integer
 
 # soma module
 from soma.path import find_in_path
@@ -45,7 +43,7 @@ def validation():
             "Please make sure that constel module is installed.")
 
 
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = "Dice Index"
@@ -54,20 +52,19 @@ userLevel = 2
 signature = Signature(
     # --inputs--
     "individual_clustering",
-        ReadDiskItem("Connectivity ROI Texture", "Aims texture formats",
-                      requiredAttributes={"roi_autodetect": "no",
-                                          "roi_filtered": "no",
-                                          "intersubject": "yes",
-                                          "step_time": "yes",
-                                          "measure": "no"}),
-    "nb_individual_clusters", Integer(),
+    ReadDiskItem("Connectivity ROI Texture", "Aims texture formats",
+                 requiredAttributes={"roi_autodetect": "no",
+                                     "roi_filtered": "no",
+                                     "intersubject": "yes",
+                                     "step_time": "yes",
+                                     "measure": "no"}),
     "atlas_clustering",
-        ReadDiskItem("Connectivity ROI Texture", "Aims texture formats",
-                     requiredAttributes={"roi_autodetect": "no",
-                                         "roi_filtered": "no",
-                                         "intersubject": "yes",
-                                         "step_time": "yes",
-                                         "measure": "no"}),
+    ReadDiskItem("Connectivity ROI Texture", "Aims texture formats",
+                 requiredAttributes={"roi_autodetect": "no",
+                                     "roi_filtered": "no",
+                                     "intersubject": "yes",
+                                     "step_time": "yes",
+                                     "measure": "no"}),
     "nb_atlas_clusters", Integer(),
     "white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
@@ -79,7 +76,7 @@ signature = Signature(
 )
 
 
-#----------------------------Functions-----------------------------------------
+# ----------------------------Functions----------------------------------------
 
 
 def initialization(self):
@@ -88,7 +85,7 @@ def initialization(self):
     self.nb_atlas_clusters = 5
 
 
-#----------------------------Main program--------------------------------------
+# ----------------------------Main program-------------------------------------
 
 
 def execution(self, context):
@@ -97,12 +94,12 @@ def execution(self, context):
     # Check the input parameter
     if (self.nb_individual_clusters < 2 or self.nb_atlas_clusters < 2):
         raise ValueError("The cluster number must be largest tha '2'.")
-    
+
     # In the Constellation toolbox, the minimun of clusters is '2'.
     # For nb_clusters = 2, python indexation is 0.
     individual_time_step = self.nb_individual_clusters - 2
     atlas_time_step = self.nb_atlas_clusters - 2
-    
+
     # Return the cortical region name
     cortical_region = self.atlas_clustering.get("gyrus")
 
@@ -115,4 +112,3 @@ def execution(self, context):
                          atlas_time_step,
                          cortical_region,
                          self.stem_plot_pdffile)
-

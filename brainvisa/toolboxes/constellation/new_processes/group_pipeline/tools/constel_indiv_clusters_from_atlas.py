@@ -39,8 +39,8 @@ from soma.path import find_in_path
 try:
     from constel.lib.utils.filetools import read_file
     from constel.lib.utils.filetools import select_ROI_number
-except:
-    pass
+except ImportError:
+    raise ValidationError("Please make sure that constel module is installed.")
 
 
 def validation():
@@ -127,7 +127,6 @@ def initialization(self):
                 self.setValue("region", s[0][1], True)
             else:
                 self.setValue("region", current, True)
-
 
     self.linkParameters(None,
                         "regions_nomenclature",

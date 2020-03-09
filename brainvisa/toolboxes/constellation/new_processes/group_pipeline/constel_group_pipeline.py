@@ -35,7 +35,7 @@ from soma.minf.api import registerClass, readMinf
 # Package import
 try:
     from constel.lib.utils.filetools import read_file
-except:
+except ImportError:
     raise ValidationError("Please make sure that constel module is installed.")
 
 
@@ -64,7 +64,7 @@ if neuroConfig.gui:
             create_btn = QtGui.QPushButton()
             create_btn.setIcon(GroupCreatorEditor.new_icon)
             create_btn.setIconSize(buttonIconSize)
-            create_btn.setToolTip(_t_("Create new group"))
+            create_btn.setToolTip(_t_("Create new group"))  # PEP8 issue
             create_btn.setFixedSize(buttonIconSize + buttonMargin)
             create_btn.setFocusPolicy(QtCore.Qt.NoFocus)
             self.layout().addWidget(create_btn)
@@ -323,7 +323,7 @@ def initialization(self):
         "normed_individual_profiles")
 
     ###########################################################################
-    #link of parameters for the "Normed Connectivity Profile of Group" process#
+    # link of parameters for the "Normed Connectivity Profile of Group" process
     ###########################################################################
 
     eNode.addChild("NormedGroupProfile",
