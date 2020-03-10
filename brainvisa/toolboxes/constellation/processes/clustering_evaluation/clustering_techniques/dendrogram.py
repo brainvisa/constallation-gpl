@@ -53,10 +53,10 @@ signature = Signature(
     # --inputs--
     "connectivity_matrix", ReadDiskItem(
         "Connectivity Matrix", "GIS image",
-        requiredAttributes={"ends_labelled": "mixed",
-                            "reduced": "No",
-                            "dense": "No",
-                            "intersubject": "Yes"}),
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "individual": "no",
+                            "intersubject": "yes"}),
     "transpose", Boolean(),
     "linkage_method_X", Choice("single", "complete", "average", "weighted",
                                "centroid", "median", "ward"),

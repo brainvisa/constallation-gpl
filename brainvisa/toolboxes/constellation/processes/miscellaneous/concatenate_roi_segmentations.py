@@ -59,9 +59,9 @@ signature = Signature(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "no",
                             "roi_filtered": "no",
-                            "measure": "no",
                             "intersubject": "yes",
-                            "step_time": "yes"})),
+                            "step_time": "yes",
+                            "measure": "no"})),
     "time_step", ListOf(Integer()),
     "mesh", ReadDiskItem("White Mesh", "Aims mesh formats"),
     "concatenated_ROIseg", WriteDiskItem(
