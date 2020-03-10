@@ -22,18 +22,16 @@ from brainvisa.processes import Choice
 from brainvisa.processes import String
 from brainvisa.processes import ListOf
 
-# Package import
-try:
-    from constel.lib.utils.filetools import read_file
-    from constel.lib.utils.filetools import select_ROI_number
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
-
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
+    try:
+        from constel.lib.utils.filetools import read_file, select_ROI_number
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 
 # ---------------------------Header--------------------------------------------
@@ -73,6 +71,7 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters.
     """
+    from constel.lib.utils.filetools import read_file
     # default value
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
@@ -118,6 +117,7 @@ def execution(self, context):
     STEP 1/2: Remove internals connections of patch.
     STEP 2/2: The profile is normalized.
     """
+    from constel.lib.utils.filetools import select_ROI_number
     # selects the label number corresponding to label name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)

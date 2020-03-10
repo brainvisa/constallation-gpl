@@ -22,12 +22,6 @@ from brainvisa.processes import ValidationError
 # Soma module
 from soma.path import find_in_path
 
-# Package import
-try:
-    from constel.lib.utils.filetools import select_ROI_number
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
-
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
@@ -38,7 +32,11 @@ def validation():
         raise ValidationError(
             "'{0}' is not contained in PATH environnement variable. "
             "Please make sure that constel package is installed.".format(cmd))
-
+    try:
+        from constel.lib.utils.filetools import select_ROI_number
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 # ---------------------------Header--------------------------------------------
 
@@ -104,6 +102,7 @@ def execution(self, context):
 
     Compute the connectivity profile (no normalize) from connectivity matrix.
     """
+    from constel.lib.utils.filetools import select_ROI_number
     # selects the label number corresponding to label name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)

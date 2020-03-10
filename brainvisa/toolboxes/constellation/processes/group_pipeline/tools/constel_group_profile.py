@@ -103,9 +103,9 @@ def initialization(self):
             atts['analysis'] = ""
             atts['tracking_session'] = ""
             atts['smallerlength'] = self.normed_individual_profiles[0].get(
-                 "smallerlength")
+                "smallerlength")
             atts['greaterlength'] = self.normed_individual_profiles[0].get(
-                 "greaterlength")
+                "greaterlength")
             atts["intersubject"] = "yes"
             atts["normed"] = "no"
             return self.signature["group_profile"].findValue(atts)

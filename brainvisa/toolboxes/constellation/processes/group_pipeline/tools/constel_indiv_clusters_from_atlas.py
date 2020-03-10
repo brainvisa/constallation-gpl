@@ -35,19 +35,17 @@ from brainvisa.processes import Choice
 # soma module
 from soma.path import find_in_path
 
-# Package import
-try:
-    from constel.lib.utils.filetools import read_file
-    from constel.lib.utils.filetools import select_ROI_number
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
-
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
     if not find_in_path("constel_clusters_from_atlas.py"):
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
+    try:
+        from constel.lib.utils.filetools import read_file, select_ROI_number
+    except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
@@ -111,6 +109,7 @@ def initialization(self):
         It also resets the region parameter to default state after
         the nomenclature changes.
         """
+        from constel.lib.utils.filetools import read_file
         current = self.region
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
@@ -141,6 +140,7 @@ def initialization(self):
 def execution(self, context):
     """Run the command 'constel_clusters_from_atlas'.
     """
+    from constel.lib.utils.filetools import select_ROI_number
     sup_args = []
     if self.individual_regions_parcellation is not None:
         sup_args.append(self.individual_regions_parcellation)

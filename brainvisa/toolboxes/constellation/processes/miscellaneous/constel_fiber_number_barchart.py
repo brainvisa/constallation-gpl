@@ -26,10 +26,23 @@ from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import ValidationError
 
-try:
-    from constel.lib.utils.filetools import select_ROI_number
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
+# soma
+from soma.path import find_in_path
+
+
+def validation(self):
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
+    """
+    if not find_in_path("constel_write_fibers_barchart.py"):
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
+    try:
+        from constel.lib.utils.texturetools import select_ROI_number
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
+
 # ----------------------------Header-------------------------------------------
 
 
@@ -81,6 +94,7 @@ def initialization(self):
 def execution(self, context):
     """Execute the python command "constel_fibers_histogram".
     """
+    from constel.lib.utils.texturetools import select_ROI_number
     # selects the label number corresponding to label name
     label_number = select_ROI_number(
         self.cortical_regions_nomenclature.fullPath(), self.cortical_region)

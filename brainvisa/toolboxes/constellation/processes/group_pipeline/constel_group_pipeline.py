@@ -28,15 +28,19 @@ from brainvisa.processes import ValidationError
 from brainvisa.processes import SerialExecutionNode
 from brainvisa.processes import ProcessExecutionNode
 
-
 # Soma module
 from soma.minf.api import registerClass, readMinf
 
-# Package import
-try:
-    from constel.lib.utils.filetools import read_file
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
+
+def validation(self):
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
+    """
+    try:
+        from constel.lib.utils.filetools import read_file
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 
 # ---------------------------Header--------------------------------------------
@@ -171,6 +175,7 @@ def initialization(self):
         It also resets the region paramter to default state after
         the nomenclature changes.
         """
+        from constel.lib.utils.filetools import read_file
         current = self.region
         self.setValue('region', current, True)
         if self.regions_nomenclature is not None:
@@ -262,7 +267,7 @@ def initialization(self):
                     self.constellation_subjects_group.get("group_of_subjects"),
                     "group_of_subjects":
                     self.constellation_subjects_group.get("group_of_subjects")
-                    }
+                }
                 mesh = mesh_type.findValue(atts)
         return mesh
 

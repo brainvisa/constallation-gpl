@@ -23,13 +23,6 @@ from brainvisa.processes import ValidationError
 # Soma module
 from soma.path import find_in_path
 
-# Package import
-try:
-    from constel.lib.utils.filetools import select_ROI_number
-    from constel.lib.utils.matrixtools import save_normalization
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
-
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
@@ -40,6 +33,12 @@ def validation():
             "constelConnectionDensityTexture is not contained in PATH"
             "environnement variable or please make sure that constellation "
             "is installed.")
+    try:
+        from constel.lib.utils.filetools import select_ROI_number,\
+            save_normalization
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 
 # ---------------------------Header--------------------------------------------
@@ -121,6 +120,8 @@ def initialization(self):
 def execution(self, context):
     """ Compute reduced connectivity matrix M(target regions, patch vertices)
     """
+    from constel.lib.utils.filetools import select_ROI_number,\
+        save_normalization
     # selects the ROI label corresponding to ROI name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)
@@ -142,8 +143,7 @@ def execution(self, context):
         "-type", "seedVertex_to_targets",
         "-connmatrix", self.reduced_individual_matrix,
         "-normalize", norm,
-        "-verbose", 1
-        )
+        "-verbose", 1)
 
     # save the normalization values
     if not self.normalize:

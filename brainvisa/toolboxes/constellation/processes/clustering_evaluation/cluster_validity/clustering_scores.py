@@ -75,7 +75,7 @@ signature = Signature(
     "time_step_max", Integer(),
     "output_dir", WriteDiskItem("Directory", "Directory"),
     "ybound", ListOf(Float()),
-    "ignore_Kopt2",  Boolean(),
+    "ignore_Kopt2", Boolean(),
 )
 
 

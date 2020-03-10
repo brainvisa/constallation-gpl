@@ -37,15 +37,18 @@ from brainvisa.processes import Integer, String, ValidationError
 # soma module
 from soma import aims
 
-# constel modules
-try:
-    from constel.lib.utils.matrixtools import \
-        compute_mclusters_by_nbasins_matrix
-    from constel.lib.utils.matrixtools import write_matrix2csv
-    from constel.lib.utils.matrixtools import calculate_percentage
-except ImportError:
-    raise ValidationError("Please make sure that aims-free is installed.")
 
+def validation(self):
+    """
+    This function is executed at BrainVisa startup when the process is loaded.
+    It checks some conditions for the process to be available.
+    """
+    try:
+        from constel.lib.utils.matrixtools import write_matrix2csv,\
+            calculate_percentage, compute_mclusters_by_nbasins_matrix
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 # ---------------------------Header-------------------------------------------
 
@@ -88,6 +91,8 @@ def initialization(self):
 def execution(self, context):
     """
     """
+    from constel.lib.utils.matrixtools import write_matrix2csv,\
+        calculate_percentage, compute_mclusters_by_nbasins_matrix
     # read the matrix by converting it into numpy array
     reduced_matrix = aims.read(self.reduced_matrix.fullPath())
     matrix = numpy.array(reduced_matrix)[:, :, 0, 0]

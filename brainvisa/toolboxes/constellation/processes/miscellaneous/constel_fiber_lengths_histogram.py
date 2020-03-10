@@ -23,7 +23,19 @@ from __future__ import absolute_import
 from brainvisa.processes import String
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
+from brainvisa.processes import ValidationError
 
+# soma
+from soma.path import find_in_path
+
+
+def validation(self):
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
+    """
+    if not find_in_path("constel_write_fibers_histogram.py"):
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 # ----------------------------Header-------------------------------------------
 

@@ -28,14 +28,6 @@ from brainvisa.processes import ValidationError
 # Soma module
 from soma.path import find_in_path
 
-# Package import
-try:
-    from constel.lib.utils.filetools import read_file
-    from constel.lib.utils.filetools import select_ROI_number
-    from constel.lib.utils.fibertools import load_fiber_tracts
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
-
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
@@ -46,6 +38,12 @@ def validation():
         raise ValidationError(
             "'{0}' is not contained in PATH environnement variable. "
             "Please make sure that constel package is installed.".format(cmd))
+    try:
+        from constel.lib.utils.filetools import read_file, select_ROI_number,\
+            load_fiber_tracts
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 
 # ---------------------------Header--------------------------------------------
@@ -142,6 +140,7 @@ def initialization(self):
         It also resets the region parameter to default state after
         the nomenclature changes.
         """
+        from constel.lib.utils.filetools import read_file
         current = self.region
         self.setValue('region', current, True)
         if self.regions_nomenclature is not None:
@@ -164,8 +163,8 @@ def initialization(self):
 
         This function automatically creates the signature of 'labeled_fibers'.
         """
-        if (self.outputs_database and self.study_name and
-                self.region and self.subject_indir) is not None:
+        if (self.outputs_database and self.study_name
+                and self.region and self.subject_indir) is not None:
             attrs = dict()
             attrs["_database"] = self.outputs_database
             attrs["method"] = self.method
@@ -212,6 +211,8 @@ def execution(self, context):
         - the distant fibers are defined as having only one end attached to the
           mesh (the other being not identified)
     """
+    from constel.lib.utils.filetools import load_fiber_tracts,\
+        select_ROI_number
     # Select all fiber tracts of the given subject.
     list_fiber_tracts = load_fiber_tracts(self.subject_indir.fullPath(),
                                           self.fiber_tracts_format)

@@ -38,7 +38,6 @@ from soma.path import find_in_path
 def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded.
-
     It checks some conditions for the process to be available.
     """
     if not find_in_path("constelConnectionDensityTexture"):

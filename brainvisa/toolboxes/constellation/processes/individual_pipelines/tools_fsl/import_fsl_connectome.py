@@ -31,12 +31,6 @@ from brainvisa.processes import ValidationError
 # Soma module
 from soma.path import find_in_path
 
-# Package import
-try:
-    from constel.lib.utils.filetools import read_file
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
-
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
@@ -47,6 +41,11 @@ def validation():
         raise ValidationError(
             "'{0}' is not contained in PATH environnement variable. "
             "Please make sure that constel package is installed.".format(cmd))
+    try:
+        from constel.lib.utils.filetools import read_file
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 
 # ---------------------------Header--------------------------------------------
@@ -101,9 +100,10 @@ def initialization(self):
     def link_matrix(self, dummy):
         """
         """
-        if (self.outputs_database is not None and
-           self.study_name is not None and self.method is not None and
-           self.region is not None and self.fsl_connectome is not None):
+        if (self.outputs_database is not None
+            and self.study_name is not None and self.method is not None
+                and self.region is not None and self.fsl_connectome
+                is not None):
             attrs = dict()
             attrs["_database"] = self.outputs_database
             attrs["center"] = "subjects"
@@ -115,7 +115,7 @@ def initialization(self):
             attrs["greaterlength"] = str(500.0)
             attrs["tracking_session"] = "default_tracking_session"
             attrs["subject"] = os.path.basename(
-               os.path.dirname(self.fsl_connectome.fullPath()))
+                os.path.dirname(self.fsl_connectome.fullPath()))
             attrs["gyrus"] = str(self.region)
             filename = self.signature[
                 "complete_individual_matrix"].findValue(attrs)
@@ -149,6 +149,7 @@ def initialization(self):
         It also resets the region parameter to default state after
         the nomenclature changes.
         """
+        from constel.lib.utils.filetools import read_file
         current = self.region
         self.setValue('region', current, True)
         if self.regions_nomenclature is not None:
@@ -194,14 +195,14 @@ def execution(self, context):
     subject = os.path.basename(
         os.path.dirname(self.fsl_connectome.fullPath()))
     src = self.fsl_connectome.fullPath()
-    matrix_name = (subject +
-                   "_" +
-                   self.study_name +
-                   "_" +
-                   self.region +
-                   "_complete_matrix_smooth0.0_" +
-                   str(self.min_fibers_length) +
-                   "to500.0mm.imas")
+    matrix_name = (subject
+                   + "_"
+                   + self.study_name
+                   + "_"
+                   + self.region
+                   + "_complete_matrix_smooth0.0_"
+                   + str(self.min_fibers_length)
+                   + "to500.0mm.imas")
 
     dstdir = os.path.join(self.outputs_database,
                           "subjects",

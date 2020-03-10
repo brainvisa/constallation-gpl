@@ -34,7 +34,7 @@ def validate(self):
     """
     if not find_in_path("constel_table_measurements.py"):
         raise ValidationError(
-           "Please make sure that constel module is installed.")
+            "Please make sure that constel module is installed.")
 
 
 # ----------------------------Header-------------------------------------------

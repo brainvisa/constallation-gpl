@@ -27,11 +27,16 @@ from brainvisa.processes import ProcessExecutionNode
 from brainvisa.processes import ValidationError
 import os
 
-# Package import
-try:
-    from constel.lib.utils.filetools import read_file
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
+
+def validation(self):
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
+    """
+    try:
+        from constel.lib.utils.filetools import read_file
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 
 # ---------------------------Header--------------------------------------------
@@ -98,6 +103,7 @@ def link_keep_regions_value(self, dummy, other=None, oother=None):
 def initialization(self):
     """Provides default values and link of parameters.
     """
+    from constel.lib.utils.filetools import read_file
     # list of possible databases, while respecting the ontology
     # ontology: brainvisa-3.2.0
     databases = [h.name for h in neuroHierarchy.hierarchies()

@@ -30,22 +30,21 @@ from brainvisa.processes import Signature, String, ReadDiskItem, Boolean,\
 from soma.path import find_in_path
 
 
-# constel modules
-try:
-    from constel.lib.utils.filetools import read_file, select_ROI_number
-    from constel.lib.utils.filetools import add_region_in_nomenclature
-    from constel.lib.utils.filetools import delete_regions_in_nomenclature
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
-
-
 def validation():
     """
+    This function is executed at BrainVisa startup when the process is loaded.
+    It checks some conditions for the process to be available.
     """
     if not find_in_path("AimsMergeLabelsFromTexture.py"):
         raise ValidationError("aims module is not here.")
     if not find_in_path("AimsExtractLabelsFromTexture.py"):
         raise ValidationError("aims module is not here.")
+    try:
+        from constel.lib.utils.filetools import read_file, select_ROI_number,\
+            add_region_in_nomenclature, delete_regions_in_nomenclature
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 
 # ----------------------------Header-------------------------------------------
@@ -87,6 +86,7 @@ def initialization(self):
     def link_cortical_regions(self, dummy):
         """
         """
+        from constel.lib.utils.filetools import read_file
         if self.cortical_regions_nomenclature is not None:
             s = []
             s += read_file(
@@ -104,6 +104,8 @@ def initialization(self):
 def execution(self, context):
     """
     """
+    from constel.lib.utils.filetools import select_ROI_number,\
+        add_region_in_nomenclature, delete_regions_in_nomenclature
     cmd_args = []
     nb = []
     for region in self.cortical_regions:

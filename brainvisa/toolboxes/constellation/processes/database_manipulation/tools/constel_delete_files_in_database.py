@@ -29,18 +29,17 @@ from brainvisa.processes import String
 from brainvisa.processes import ValidationError
 from brainvisa.processes import Boolean
 
-# constel modules
-try:
-    from constel.lib.utils.filetools import read_file
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
-
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
     if not find_in_path("constel_datacheck.py"):
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
+    try:
+        from constel.lib.utils.filetools import read_file
+    except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
 
@@ -100,6 +99,7 @@ def initialization(self):
         """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
         of process.
         """
+        from constel.lib.utils.filetools import read_file
         if self.ROIs_nomenclature is not None:
             s = ["Select a ROI in this list"]
             s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)

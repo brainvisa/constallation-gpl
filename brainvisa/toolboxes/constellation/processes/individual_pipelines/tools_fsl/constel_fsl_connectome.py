@@ -26,23 +26,22 @@ from brainvisa.processes import ValidationError
 # soma.path module
 from soma.path import find_in_path
 
-# Package import
-try:
-    from constel.lib.utils.filetools import read_file
-    from constel.lib.utils.filetools import select_ROI_number
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
-
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    cmd_name = "constel_reorganize_fsl_connectome.py"
-    if not find_in_path(cmd_name):  # checks command
+    cmd = "constel_reorganize_fsl_connectome.py"
+    if not find_in_path(cmd):  # checks command
         raise ValidationError(
             "'{0}' is not contained in PATH environnement variable. "
-            "Please make sure that aims is installed.".format(cmd_name))
+            "Please make sure that constel module is installed.".format(cmd))
+    try:
+        from constel.lib.utils.filetools import read_file, select_ROI_number
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
+
 
 # ---------------------------Header--------------------------------------------
 
@@ -84,6 +83,7 @@ def initialization(self):
         It also resets the region parameter to default state after
         the nomenclature changes.
         """
+        from constel.lib.utils.filetools import read_file
         current = self.region
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
@@ -104,9 +104,10 @@ def initialization(self):
     def link_connectome(self, dummy):
         """
         """
-        if (self.probtrackx_indir is not None and
-                self.regions_nomenclature is not None and
-                self.region is not None and self.outdir is not None):
+        from constel.lib.utils.filetools import select_ROI_number
+        if (self.probtrackx_indir is not None
+            and self.regions_nomenclature is not None
+                and self.region is not None and self.outdir is not None):
             subject = os.path.basename(self.probtrackx_indir.fullPath())
             sdir = os.path.join(self.outdir.fullPath(), subject)
             label_nb = select_ROI_number(self.regions_nomenclature.fullPath(),
@@ -134,7 +135,7 @@ def execution(self, context):
     """Run the command 'constel_reorganize_fsl_connectome.py'.
 
     Compute connectome from the FSL outputs (probtrackx2)."""
-
+    from constel.lib.utils.filetools import select_ROI_number
     # Selects the label number corresponding to label name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)

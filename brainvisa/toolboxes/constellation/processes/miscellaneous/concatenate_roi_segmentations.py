@@ -36,11 +36,16 @@ from brainvisa.processes import ValidationError
 # soma module
 from soma import aims
 
-# constel module
-try:
-    from constel.lib.utils.texturetools import concatenate_texture
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
+
+def validation(self):
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
+    """
+    try:
+        from constel.lib.utils.texturetools import concatenate_texture
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 # ---------------------------Header--------------------------------------------
 
@@ -79,5 +84,6 @@ def initialization(self):
 def execution(self, context):
     """
     """
+    from constel.lib.utils.texturetools import concatenate_texture
     final_rseg = concatenate_texture(self.ROI_clustering, self.time_step)
     aims.write(final_rseg, self.concatenated_ROIseg.fullPath())

@@ -23,12 +23,6 @@ from brainvisa.processes import ValidationError
 # Soma module
 from soma.path import find_in_path
 
-# Package import
-try:
-    from constel.lib.utils.filetools import select_ROI_number
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
-
 
 def validation():
     """This function is executed at BrainVisa startup when the process is
@@ -39,7 +33,11 @@ def validation():
             "constel_intra_subject_clustering is not contained in PATH "
             "environnement variable or please make sure that constellation "
             "is installed.")
-
+    try:
+        from constel.lib.utils.filetools import select_ROI_number
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 # ---------------------------Header--------------------------------------------
 
@@ -116,6 +114,7 @@ def execution(self, context):
 
     Reduced connectivity matrix is clustered using the kmedoids algorithm.
     """
+    from constel.lib.utils.filetools import select_ROI_number
     # selects the label number corresponding to label name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)

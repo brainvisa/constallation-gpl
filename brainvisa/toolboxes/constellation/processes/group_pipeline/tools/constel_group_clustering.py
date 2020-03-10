@@ -36,14 +36,9 @@ from brainvisa.processes import ListOf
 from brainvisa.processes import Choice
 from brainvisa.processes import String
 from brainvisa.processes import Integer
+
 # soma-base module
 from soma.path import find_in_path
-
-# constel module
-try:
-    from constel.lib.utils.filetools import select_ROI_number
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
 
 
 def validation():
@@ -53,7 +48,11 @@ def validation():
     if not find_in_path("constel_inter_subject_clustering.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
-
+    try:
+        from constel.lib.utils.filetools import select_ROI_number
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 # ---------------------------Header--------------------------------------------
 
@@ -76,7 +75,7 @@ signature = Signature(
         "Nomenclature ROIs File", "Text File"),
     "region", String(),
     "subjects_group", ReadDiskItem(
-         "Group definition", "XML"),
+        "Group definition", "XML"),
     "regions_parcellation", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
@@ -156,7 +155,7 @@ def initialization(self):
             if self.method == "avg":
                 atts = dict(
                     self.intersubject_reduced_matrices[0].hierarchyAttributes()
-                    )
+                )
                 atts["sid"] = "avgSubject"
                 atts["method"] = "avg"
                 atts["step_time"] = "yes"
@@ -220,6 +219,7 @@ def execution(self, context):
     classical kmedoids algorithm and the Euclidean distance between profiles
     as dissimilarity measure.
     """
+    from constel.lib.utils.filetools import select_ROI_number
     # selects the label number corresponding to label name
     label_number = select_ROI_number(
         self.regions_nomenclature.fullPath(), self.region)

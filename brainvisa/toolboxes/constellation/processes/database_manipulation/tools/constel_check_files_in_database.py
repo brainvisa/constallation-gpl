@@ -15,9 +15,6 @@
 from __future__ import absolute_import
 import sys
 
-# soma-base module
-from soma.path import find_in_path
-
 # axon python API module
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
@@ -28,11 +25,8 @@ from brainvisa.processes import OpenChoice
 from brainvisa.processes import String
 from brainvisa.processes import ValidationError
 
-# constel modules
-try:
-    from constel.lib.utils.filetools import read_file
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
+# soma-base module
+from soma.path import find_in_path
 
 
 def validation():
@@ -42,7 +36,11 @@ def validation():
     if not find_in_path("constel_datacheck.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
-
+    try:
+        from constel.lib.utils.filetools import read_file
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 # ---------------------------Header--------------------------------------------
 
@@ -70,6 +68,7 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters
     """
+    from constel.lib.utils.filetools import read_file
     # default values
     self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({
         "atlasname": "desikan_freesurfer"})

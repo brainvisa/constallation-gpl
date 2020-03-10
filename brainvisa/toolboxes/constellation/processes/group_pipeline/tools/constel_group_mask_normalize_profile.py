@@ -35,9 +35,6 @@ from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
 from soma.path import find_in_path
 
 
-# ----------------------------Functions----------------------------------------
-
-
 # Plot constel module
 def validation():
     """This function is executed at BrainVisa startup when the process is
@@ -46,6 +43,9 @@ def validation():
     if not find_in_path("constel_norm_profile.py"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
+
+
+# ----------------------------Functions----------------------------------------
 
 
 name = "Mask and Normalize Group Profile"

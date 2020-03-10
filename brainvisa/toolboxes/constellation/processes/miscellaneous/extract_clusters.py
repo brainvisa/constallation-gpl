@@ -64,6 +64,7 @@ def initialization(self):
 
 
 def execution(self, context):
+    from soma import aims
     # load the clustering individual of concatenated approach
     clustering_texture = aims.read(self.clustering_texture.fullPath())
     # error if the number is too great or small
@@ -76,7 +77,7 @@ def execution(self, context):
     # value of the time step on the clustering texture
     clusters_texture = aims.TimeTexture_S16()
     clusters_texture[0].assign(
-        clustering_texture[self.number_of_clusters-1].arraydata())
+        clustering_texture[self.number_of_clusters - 1].arraydata())
     mesh = aims.read(self.white_mesh.fullPath())
     subject = os.path.basename(
         os.path.dirname(self.clustering_texture.fullPath()))
@@ -88,16 +89,16 @@ def execution(self, context):
     for label in range(1, self.number_of_clusters + 1):
         cluster_submesh = aims.SurfaceManip.meshExtract(
             mesh, clusters_texture, label)[0]
-        path = (self.output_database + "/t1-1mm-1/" + subject + "/t1mri/" +
-                "default_acquisition/default_analysis/segmentation/mesh/")
+        path = (self.output_database + "/t1-1mm-1/" + subject + "/t1mri/"
+                + "default_acquisition/default_analysis/segmentation/mesh/")
         if not os.path.exists(path):
             os.makedirs(path)
 
-        name = (subject + self.name_group_of_subjects + "_" + gyrus +
-                "_cluster" + str(label) + ".gii")
+        name = (subject + self.name_group_of_subjects + "_" + gyrus
+                + "_cluster" + str(label) + ".gii")
         ofile = path + name
         context.write("--> SUBMESH " + str(label) + ": ", ofile)
-        aims.write(cluster_submesh,  ofile)
+        aims.write(cluster_submesh, ofile)
 
         # apply the transfo to obtain a common space to a target subject
         transfo_joy = aims.read(self.transfo_joy.fullPath())
@@ -105,10 +106,10 @@ def execution(self, context):
         transfo_target = transfo_joy * transfo_morpho
         aims.SurfaceManip.meshTransform(cluster_submesh, transfo_target)
 
-        path_t = (self.output_database + "/t1-1mm-1/" + subject + "/t1mri/" +
-                  "default_acquisition/default_analysis/segmentation/mesh/")
-        name_t = (subject + self.name_group_of_subjects + "_" + gyrus +
-                  "_cluster" + str(label) + "_transfo_to_target_subject.gii")
+        path_t = (self.output_database + "/t1-1mm-1/" + subject + "/t1mri/"
+                  + "default_acquisition/default_analysis/segmentation/mesh/")
+        name_t = (subject + self.name_group_of_subjects + "_" + gyrus
+                  + "_cluster" + str(label) + "_transfo_to_target_subject.gii")
         ofile_t = path_t + name_t
         context.write("--> SUBMESH " + str(label) + ": ", ofile_t)
-        aims.write(cluster_submesh,  ofile_t)
+        aims.write(cluster_submesh, ofile_t)
