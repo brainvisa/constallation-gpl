@@ -53,7 +53,7 @@ signature = Signature(
                             "vertex_corr": "Yes",
                             "averaged": "Yes"}),
     'basins_texture', ListOf(
-        ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
+        ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats')),
 
     'clustering_texture', ListOf(
         ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
