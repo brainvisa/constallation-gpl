@@ -1,11 +1,14 @@
 # Axon python API module
 from __future__ import absolute_import
 from __future__ import print_function
-from brainvisa.processes import *
+from brainvisa.processes import Signature, ReadDiskItem, getProcessInstance,\
+    getFormats
 from brainvisa.processing.process_based_viewer import ProcessBasedViewer
 
 name = 'Anatomist view connectivity matrix, Atlas pipeline variant'
 base_class = ProcessBasedViewer
+
+
 def allowed_processes(process):
     return get_process(process) is not None
 
@@ -14,9 +17,9 @@ signature = Signature(
     'connectivity_matrix', ReadDiskItem(
         'Connectivity Matrix',
         getFormats("aims matrix formats").data + ['Sparse Matrix'],
-        requiredAttributes={"ends_labelled":"all",
-                            "reduced":"no",
-                            "intersubject":"no",
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "intersubject": "no",
                             "individual": "yes"}),
 )
 
@@ -125,4 +128,3 @@ def execution(self, context):
             viewer, connectivity_matrix=self.connectivity_matrix,
             white_mesh=white_mesh,
             gyrus_texture=gyrus_texture)
-

@@ -64,4 +64,3 @@ for db_name, ontology in (('constellation_matrix', 'brainvisa-3.2.0'),
     del db_path
 del db_name, ontology, constel_db
 neuroHierarchy.update_soma_workflow_translations()
-

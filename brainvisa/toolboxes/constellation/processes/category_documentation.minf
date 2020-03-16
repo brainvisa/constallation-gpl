@@ -3,15 +3,15 @@
 
 <xhtml name="en">
   <h1>Constellation <img align="right" src="bvimage://constellation/constellation.png" width="256" /></h1>
-  
+
   <p><a>CONnectivity-based STructural parcELLATION</a></p>
-  
+
   <h2>Presentation</h2>
-  
+
   <p>The toolbox Constellation proposes a connectivity-based parcellation framework for the whole cortical surface. The approach chosen performs gyrus by gyrus to parcellate the whole human cortex. The main originality of the method is to compress for each gyrus the connectivity profiles used for the clustering without any anatomical prior information. This step takes into account the interindividual cortical and connectivity variability. To this end, we consider intersubject high density connectivity areas extracted using a surface-based watershed algorithm.
 
   <b>Methods are organized as follow:</b><br/>
-  
+
   <img src="bvimage://constellation/schema_avg.png" ALT="" height="400" width="900"/><br/>
   <img src="bvimage://constellation/schema_concat.png" ALT="" height="400" width="900"/>
 

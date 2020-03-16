@@ -18,7 +18,7 @@ Main dependencies: PyQt
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 from __future__ import print_function
 
@@ -32,20 +32,15 @@ from brainvisa.processes import Signature, ListOf, ReadDiskItem, Integer, \
     mainThreadActions, ValidationError
 from six.moves import range
 
-try:
-    from brainvisa import anatomist as ana
-except:
-    pass
-
 
 def validation():
     try:
         from brainvisa import anatomist as ana
-    except:
+    except ImportError:
         raise ValidationError(_t_("Anatomist not available"))
+    ana.validation()
 
-
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = "Anatomist Plotting Group Mask"
@@ -61,7 +56,7 @@ signature = Signature(
 )
 
 
-#----------------------------Function------------------------------------------
+# ----------------------------Function-----------------------------------------
 
 
 def initialization(self):
@@ -100,12 +95,13 @@ def get_screen_config():
     return (curmon, width, height)
 
 
-#----------------------------Main program--------------------------------------
+# ----------------------------Main program-------------------------------------
 
 
 def execution(self, context):
     """
     """
+    from brainvisa import anatomist as ana
     # instance of anatomist
     a = ana.Anatomist()
 
