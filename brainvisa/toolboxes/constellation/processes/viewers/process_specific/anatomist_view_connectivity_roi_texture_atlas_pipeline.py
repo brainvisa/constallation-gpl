@@ -1,11 +1,13 @@
 # Axon python API module
 from __future__ import absolute_import
-from brainvisa.processes import *
+from brainvisa.processes import Signature, ReadDiskItem, getProcessInstance
 from brainvisa.processing.process_based_viewer import ProcessBasedViewer
 
 name = 'Anatomist view Connectivity ROI Texture, Atlas pipeline variant'
 base_class = ProcessBasedViewer
 userLevel = 3
+
+
 def allowed_processes(process):
     return get_process(process) is not None
 
@@ -43,7 +45,7 @@ def execution(self, context):
                                 "inflated": "Yes"}
             ).findValue(process.individual_white_mesh)
         if mesh is None:
-          mesh = process.individual_white_mesh
+            mesh = process.individual_white_mesh
         return context.runProcess(
             viewer, connectivity_roi_texture=self.connectivity_roi_texture,
             mesh=mesh)
@@ -85,4 +87,3 @@ def execution(self, context):
         return context.runProcess(
             viewer, connectivity_roi_texture=self.connectivity_roi_texture,
             mesh=mesh)
-

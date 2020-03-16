@@ -12,7 +12,7 @@
 
 # brainvisa
 from __future__ import absolute_import
-from brainvisa.processes import *
+from brainvisa.processes import Signature, ListOf, ReadDiskItem
 from brainvisa import anatomist as anatomist
 
 # system import
@@ -21,39 +21,32 @@ import numpy
 # soma
 from soma import aims
 
-# constel module
-try:
-    import constel
-    import constel.lib.utils.matrixtools as clcmt
-    from constel.lib.utils.texturetools import geodesic_gravity_center
-except:
-    pass
-
 
 def validation():
-    """This function is executed at setup when the process is loaded. 
+    """This function is executed at setup when the process is loaded.
 
     It checks some conditions for the process to be available.
     """
     try:
-        import constel.lib.utils.matrixtools as clcmt
-    except:
+        import constel.lib.utils.matrixtools
+        from constel.lib.utils.texturetools import geodesic_gravity_center
+    except ImportError:
         raise ValidationError("Please make sure that constel module"
                               "is installed")
 
 
 name = "Anatomist view mozaic visualization of textured mesh"
 userLevel = 2
-#roles = ("viewer", )
+# roles = ("viewer", )
 
 
 signature = Signature(
     'connectivity_matrix', ListOf(
         ReadDiskItem('Connectivity Matrix', 'aims readable volume formats',
-        requiredAttributes={"ends_labelled":"all",
-                            "reduced":"no",
-                            "intersubject":"yes",
-                            "individual": "yes"})),
+                     requiredAttributes={"ends_labelled": "all",
+                                         "reduced": "no",
+                                         "intersubject": "yes",
+                                         "individual": "yes"})),
     'mesh', ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
@@ -61,17 +54,13 @@ signature = Signature(
                             "averaged": "Yes"}),
     'basins_texture', ListOf(
         ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
-        requiredAttributes={"roi_autodetect":"yes",
-                            "roi_filtered":"yes",
-                            "intersubject":"yes",
-                            "step_time":"no",
-                            "measure": "no"})),
+
     'clustering_texture', ListOf(
         ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
-        requiredAttributes={"roi_autodetect":"no",
-                            "roi_filtered":"no",
-                            "intersubject":"yes",
-                            "step_time":"yes",
+        requiredAttributes={"roi_autodetect": "no",
+                            "roi_filtered": "no",
+                            "intersubject": "yes",
+                            "step_time": "yes",
                             "measure": "no"})),
     'time_step', ListOf(Integer()),
     'major_texture', ReadDiskItem(

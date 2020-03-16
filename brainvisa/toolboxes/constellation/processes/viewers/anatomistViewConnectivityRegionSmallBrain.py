@@ -15,12 +15,21 @@ from __future__ import print_function
 
 # brainvisa
 from __future__ import absolute_import
-from brainvisa.processes import *
-from brainvisa import anatomist as ana
+from brainvisa.processes import Signature, ListOf, ReadDiskItem, Integer,\
+    mainThreadActions
+
+
+def validation(self):
+    try:
+        from brainvisa import anatomist as ana
+    except ImportError:
+        raise ValidationError(_t_("Anatomist not available"))
+    ana.validation()
+
 
 name = 'Anatomist view mozaic visualization of fibers'
 userLevel = 0
-#roles = ('viewer', )
+# roles = ('viewer', )
 
 
 signature = Signature(
@@ -45,7 +54,7 @@ signature = Signature(
 )
 
 
-def initialization( self ):
+def initialization(self):
     def link_trans(self, dummy):
         if len(self.bundles) != 0:
             return self.bundles[0]
@@ -64,6 +73,7 @@ def loadFilteredBundles(self, bundles_name):
     '''
     from soma import aims
     from soma.minf import api as minf
+    from brainvisa import anatomist as ana
 
     maxFibers = self.max_number_of_fibers
     nfibers = 0
@@ -74,7 +84,7 @@ def loadFilteredBundles(self, bundles_name):
         elif 'fibers_count' in binfo:
             nfibers = binfo['fibers_count']
         else:
-            nfibers = 500000 # arbitrary...
+            nfibers = 500000  # arbitrary...
     graph = aims.Graph('RoiArg')
     graph['fibers_count'] = nfibers
     a = ana.Anatomist()
@@ -85,19 +95,20 @@ def loadFilteredBundles(self, bundles_name):
 
 def execution_mainthread(self, context):
     """Visualization of small brains on the parcellated cortical surface.
-    
+
     For each cluster or region, a small brain represents the connections
     usinf fiber tracts.
     """
+    from brainvisa import anatomist as ana
     # instance of anatomist
     a = ana.Anatomist()
-    
+
     # load object
     mesh = a.loadObject(self.white_mesh)
-    
+
     r = a.createReferential()
     mr = mesh.referential
-    
+
     viewing_objects = []
     living_objects = []
     bundleslist = []
@@ -126,43 +137,32 @@ def execution_mainthread(self, context):
         living_objects.append(clusters)
         context.write('processing bundles:', ct+1, '/', len(self.bundles))
         bundles.graph()['fibers_proportion_filter'] = fibers_proportion_filter
-        connectivity = a.fusionObjects([mesh, clusters, bundles],
-            method='FusionBundlesSplitByCorticalROIsMethod')
+        connectivity = a.fusionObjects(
+                            [mesh, clusters, bundles],
+                            method='FusionBundlesSplitByCorticalROIsMethod')
         if connectivity is None:
             raise ValueError('could not fusion objects - '
-                'mesh, texture and bundles')
+                             'mesh, texture and bundles')
         viewing_objects.append(connectivity)
-        # remove brain mesh in node "other"
-        other_nodes = [node for node in connectivity.graph().vertices()
-                       if 'name' in node and node['name'] == 'others']
-        #if len(other_nodes) != 0:
-            #print('aobj keys:', other_nodes[0].keys())
-            #if 'ana_object' in other_nodes[0]:
-                #aobj = other_nodes[0]['ana_object']
-                #aobj.eraseObject(other_nodes[0]['roi_mesh_ana'])
-                #del other_nodes[0]['roi_mesh_ana']
-                #del other_nodes[0]['roi_mesh']
-                #del other_nodes[0]['ana_object']
-                #connectivity.eraseObject(aobj)
 
     # load object
     ana_major_texture = a.loadObject(self.major_texture)
-    
+
     # define a palette
     ana_major_texture.setPalette(palette='parcellation720',
                                  minVal=11,
                                  maxVal=730,
                                  absoluteMode=True)
-    
+
     # fusion between mesh and texure
     major_textured_mesh = a.fusionObjects([mesh, ana_major_texture],
-                          method='FusionTexSurfMethod')
-    
+                                          method='FusionTexSurfMethod')
+
     # change major_textured_mesh settings
     a.execute("TexturingParams",
               objects=[major_textured_mesh],
               interpolation="rgb")
-    
+
     # view object
     wgroup = a.createWindowsBlock(nbCols=2)
     win1 = a.createWindow("3D", block=wgroup)
@@ -172,15 +172,16 @@ def execution_mainthread(self, context):
     win1.setReferential(mesh.getReferential())
 
     # control on objects
-    a.execute("SetControl", windows = [win1], control="SmallBrainsControl")
+    a.execute("SetControl", windows=[win1], control="SmallBrainsControl")
     action = win1.view().controlSwitch().getAction(
                  "SmallBrainSelectionAction")
     action.secondaryView = win2
-    
+
     living_objects.append(major_textured_mesh)
     living_objects += viewing_objects
 
     return [win1, win2, living_objects]
+
 
 def execution(self, context):
     return mainThreadActions().call(self.execution_mainthread, context)

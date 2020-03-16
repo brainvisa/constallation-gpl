@@ -18,7 +18,7 @@ Main dependencies: PyQt
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 from __future__ import print_function
 from __future__ import absolute_import
@@ -32,20 +32,16 @@ from brainvisa.processes import Signature, ListOf, ReadDiskItem, Integer, \
     mainThreadActions, ValidationError, Boolean
 from six.moves import range
 
-try:
-    from brainvisa import anatomist as ana
-except:
-    pass
-
 
 def validation():
     try:
         from brainvisa import anatomist as ana
-    except:
+    except ImportError:
         raise ValidationError(_t_("Anatomist not available"))
+    ana.validation()
 
 
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = "Anatomist Plotting Connectivity Profiles"
@@ -64,7 +60,7 @@ signature = Signature(
 )
 
 
-#----------------------------Function------------------------------------------
+# ----------------------------Function-----------------------------------------
 
 
 def initialization(self):
@@ -138,16 +134,13 @@ def get_screen_config():
     return (curmon, width, height)
 
 
-#def get_texture_extrema(self, ana_tex):
-    #tex = ana.Anatomist().toAimsObject(ana_tex)
-    #return
-
-#----------------------------Main program--------------------------------------
+# ----------------------------Main program-------------------------------------
 
 
 def execution(self, context):
     """
     """
+    from brainvisa import anatomist as ana
     # instance of anatomist
     a = ana.Anatomist()
 
@@ -214,7 +207,7 @@ def execution(self, context):
         roi_clustering = a.loadObject(self.connectivity_profiles[i])
         tex_info = roi_clustering.getInfos()
         tmin, tmax = tex_info['texture']['textureMin'], \
-          tex_info['texture']['textureMax']
+            tex_info['texture']['textureMax']
         vmin, vmax = min(vmin, tmin), max(vmax, tmax)
 
         # assign a palette to object

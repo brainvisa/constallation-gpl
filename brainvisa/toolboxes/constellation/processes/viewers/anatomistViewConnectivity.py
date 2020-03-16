@@ -11,15 +11,21 @@ from __future__ import print_function
 
 # Axon python API module
 from __future__ import absolute_import
-from brainvisa.processes import *
-from soma import aims
+from brainvisa.processes import Signature, ReadDiskItem, Integer, Boolean,\
+    mainThreadActions
 
-# Anatomist
-from brainvisa import anatomist
+
+def validation(self):
+    try:
+        from brainvisa import anatomist as ana
+    except ImportError:
+        raise ValidationError(_t_("Anatomist not available"))
+    ana.validation()
+
 
 name = 'Anatomist view connectivity'
 userLevel = 0
-#roles = ('viewer', )
+# roles = ('viewer', )
 
 signature = Signature(
     'bundles', ReadDiskItem(
@@ -28,25 +34,26 @@ signature = Signature(
         'Transform T2 Diffusion MR to Raw T1 MRI', 'Transformation matrix'),
     'white_mesh', ReadDiskItem(
         'White Mesh', 'anatomist mesh formats',
-        requiredAttributes={"side":"both",
-                            "vertex_corr":"Yes",
-                            "averaged":"No"}),
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes",
+                            "averaged": "No"}),
     'clustering_texture', ReadDiskItem(
         'Connectivity ROI Texture', 'anatomist texture formats'),
-    #'watershed', ReadDiskItem(
-        #'Connectivity ROI Texture', 'anatomist texture formats'),
-    'cluster_number', Integer(), 
+    # 'watershed', ReadDiskItem(
+    # 'Connectivity ROI Texture', 'anatomist texture formats'),
+    'cluster_number', Integer(),
     'max_number_of_fibers', Integer(),
     'clustering_texture_timestep', Integer(),
     'inflated_mesh', Boolean(),
 )
 
-def initialization( self ):
+
+def initialization(self):
     def link_mesh(self, dummy):
         if self.bundles is not None:
             atts = ['center', 'subject']
             datts = dict([(att, self.bundles.get(att)) for att in atts
-                           if self.bundles.get(att) is not None])
+                          if self.bundles.get(att) is not None])
             datts['inflated'] = 'Yes'
             yes_no = ['Yes', 'No']
             datts['inflated'] = yes_no[1 - int(self.inflated_mesh)]
@@ -74,6 +81,7 @@ def loadFilteredBundles(self, bundles_name):
     '''
     from soma import aims
     from soma.minf import api as minf
+    from brainvisa import anatomist
 
     maxFibers = self.max_number_of_fibers
     nfibers = 0
@@ -84,7 +92,7 @@ def loadFilteredBundles(self, bundles_name):
         elif 'fibers_count' in binfo:
             nfibers = binfo['fibers_count']
         else:
-            nfibers = 500000 # arbitrary...
+            nfibers = 500000  # arbitrary...
     graph = aims.Graph('RoiArg')
     graph['fibers_count'] = nfibers
     a = anatomist.Anatomist()
@@ -96,13 +104,14 @@ def loadFilteredBundles(self, bundles_name):
 def execution_mainthread(self, context):
     """
     """
+    from brainvisa import anatomist
     # instance of Anatomist
     a = anatomist.Anatomist()
 
     # load objects
     mesh = a.loadObject(self.white_mesh)
     clusters = a.loadObject(self.clustering_texture)
-    #wat = a.loadObject(self.watershed)
+    # wat = a.loadObject(self.watershed)
 
     # filtering fiber tracts
     clusters.attributed()['time_step'] \
@@ -132,8 +141,9 @@ def execution_mainthread(self, context):
 
     # fusion T1, mesh, texture and bundles
     fusionned = [mesh, clusters, bundles]
-    connectivity = a.fusionObjects(fusionned,
-        method = 'FusionBundlesSplitByCorticalROIsMethod')
+    connectivity = a.fusionObjects(
+                        fusionned,
+                        method='FusionBundlesSplitByCorticalROIsMethod')
 
     if connectivity is None:
         raise ValueError('could not fusion objects')
@@ -143,8 +153,9 @@ def execution_mainthread(self, context):
 
     # get the Aims graph
     graph = a.toAimsObject(connectivity)
-    a.execute('SetMaterial', objects=[connectivity],
-        diffuse=[0.5, 0., 1., 0.2])
+    a.execute('SetMaterial',
+              objects=[connectivity],
+              diffuse=[0.5, 0., 1., 0.2])
 
     # list of builtin patches/clusters colors
     # TODO: this has to move to a more flexible nomenclature
@@ -153,17 +164,16 @@ def execution_mainthread(self, context):
                '5': [0.8, 0.3, 0.8, 1.], '6': [0.3, 0.8, 0.8, 1.]}
     patches[self.cluster_number] = [0.4, 0.6, 1., 1.]
     basins = {'17': [0., 0., 1., 0.35], '14': [1., 0., 0., 0.35],
-              '15': [0., 1., 0., 0.35],}
-              #'17': [0.5, 1., 1., 0.3],
-              #'13': [1., 0., 0.5, 0.3]}
+              '15': [0., 1., 0., 0.35]}
+
     basincolor = [0.9, 0.9, 0.9, 1.]
     all_regions = list(patches.keys()) + list(basins.keys())
     for v in graph.vertices():
         if v['name'] in all_regions:
             if v['name'] in patches:
                 a.execute('SetMaterial', objects=[v['ana_object']],
-                    diffuse=patches[v['name']],
-                    selectable_mode='always_selectable')
+                          diffuse=patches[v['name']],
+                          selectable_mode='always_selectable')
                 for edge in v.edges():
                     if edge.vertices()[0]['name'] in basins \
                             or edge.vertices()[1]['name'] in basins:
@@ -172,21 +182,25 @@ def execution_mainthread(self, context):
                         else:
                             color = basins[edge.vertices()[1]['name']]
                         edgeobj = edge['ana_object']
-                        a.execute('SetMaterial', objects=[edgeobj],
-                            diffuse=color)
+                        a.execute('SetMaterial',
+                                  objects=[edgeobj],
+                                  diffuse=color)
                         win.addObjects(edgeobj)
             else:
-                a.execute('SetMaterial', objects=[v['ana_object']],
-                    diffuse=basincolor, selectable_mode='always_selectable')
+                a.execute('SetMaterial',
+                          objects=[v['ana_object']],
+                          diffuse=basincolor,
+                          selectable_mode='always_selectable')
         else:
-            a.execute('SetMaterial', objects=[v['ana_object']],
-                selectable_mode='always_selectable')
+            a.execute('SetMaterial',
+                      objects=[v['ana_object']],
+                      selectable_mode='always_selectable')
 
     win.setControl('SelectControl')
     sel_action = win.view().controlSwitch().getAction('SelectionAction')
     sel_action.mode = sel_action.mode_intersection
     return [win, connectivity] + fusionned
 
+
 def execution(self, context):
     return mainThreadActions().call(self.execution_mainthread, context)
-

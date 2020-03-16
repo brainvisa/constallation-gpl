@@ -9,9 +9,17 @@
 
 # Axon python API module
 from __future__ import absolute_import
-from brainvisa.processes import *
-# Anatomist
-from brainvisa import anatomist
+from brainvisa.processes import Signature, ReadDiskItem, Boolean,\
+    ValidationError
+
+
+def validation(self):
+    try:
+        from brainvisa import anatomist as ana
+    except ImportError:
+        raise ValidationError(_t_("Anatomist not available"))
+    ana.validation()
+
 
 name = 'Anatomist view Connectivity Texture'
 userLevel = 0
@@ -25,6 +33,7 @@ signature = Signature(
                                              "vertex_corr": "Yes"}),
     "prefer_inflated_meshes", Boolean(),
 )
+
 
 def initialization(self):
     def link_mesh(self, dummy):
@@ -58,7 +67,7 @@ def initialization(self):
                                       requiredAttributes={'inflated': infl1})
             if res is not None:
                 return res
-            res = mesh_type.findValue( ct,
+            res = mesh_type.findValue(ct,
                                       requiredAttributes={'inflated': infl2})
             if res is not None:
                 return res
@@ -74,15 +83,12 @@ def initialization(self):
             res = mesh_type.findValue(atts1)
             if res is None:
                 atts2 = {
-                'group_of_subjects':
-                    ct.get(
-                        'freesurfer_group_of_subjects'),
-                'freesurfer_group_of_subjects': ct.get(
-                    'group_of_subjects'),
-                'inflated': infl1,
-                "side": "both",
-                "vertex_corr": "Yes"
-            }
+                 'group_of_subjects': ct.get('freesurfer_group_of_subjects'),
+                 'freesurfer_group_of_subjects': ct.get('group_of_subjects'),
+                 'inflated': infl1,
+                 "side": "both",
+                 "vertex_corr": "Yes"
+                 }
             res = mesh_type.findValue(atts2)
             if res is None:
                 atts1['inflated'] = infl2

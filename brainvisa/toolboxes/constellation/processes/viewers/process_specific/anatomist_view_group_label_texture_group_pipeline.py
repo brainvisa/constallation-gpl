@@ -1,10 +1,12 @@
 # Axon python API module
 from __future__ import absolute_import
-from brainvisa.processes import *
+from brainvisa.processes import Signature, ReadDiskItem, getProcessInstance
 from brainvisa.processing.process_based_viewer import ProcessBasedViewer
 
 name = 'Anatomist View Group Label Texture, Group pipeline variant'
 base_class = ProcessBasedViewer
+
+
 def allowed_processes(process):
     return get_process(process) is not None
 

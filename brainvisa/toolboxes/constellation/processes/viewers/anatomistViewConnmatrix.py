@@ -7,18 +7,17 @@
 # CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
 ###############################################################################
 from __future__ import absolute_import
-from brainvisa.processes import *
-try:
-    from brainvisa import anatomist as ana
-except:
-    pass
+from brainvisa.processes import Signature, ReadDiskItem, ValidationError,\
+    getFormats, mainThreadActions
 
-    
+
 def validation():
     try:
         from brainvisa import anatomist as ana
-    except:
+    except ImportError:
         raise ValidationError(_t_('Anatomist not available'))
+    ana.validation()
+
 
 name = 'Anatomist view connectivity matrix'
 roles = ('viewer', )
@@ -28,13 +27,13 @@ signature = Signature(
     'connectivity_matrix', ReadDiskItem(
         'Connectivity Matrix',
         getFormats("aims matrix formats").data + ['Sparse Matrix'],
-        requiredAttributes={"ends_labelled":"all",
-                            "reduced":"no",
-                            "intersubject":"no",
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "intersubject": "no",
                             "individual": "yes"}),
     'white_mesh', ReadDiskItem('White Mesh', 'anatomist mesh formats',
                                requiredAttributes={"side": "both"}),
-    'gyrus_texture', 
+    'gyrus_texture',
         ReadDiskItem('ROI texture', 'anatomist texture formats',
                      requiredAttributes={"side": "both"}),
 )
@@ -115,6 +114,7 @@ def initialization(self):
 
 
 def execution(self, context):
+    from brainvisa import anatomist as ana
     a = ana.Anatomist()
     mesh = a.loadObject(self.white_mesh)
     patch = a.loadObject(self.gyrus_texture)
@@ -123,15 +123,16 @@ def execution(self, context):
         [mesh, patch, sparse], method='ConnectivityMatrixFusionMethod')
     if conn is None:
         raise ValueError(
-            'could not fusion objects-matrix, mesh and labels texture may not correspond.')
-    
+            'could not fusion objects-matrix,\
+            mesh and labels texture may not correspond.')
+
     wgroup = a.createWindowsBlock(2)
     win = a.createWindow('3D', block=wgroup, no_decoration=False)
-    a.execute('WindowConfig', windows=[win], light={'background' : [0.,0.,0.,0.]})
+    a.execute('WindowConfig',
+              windows=[win],
+              light={'background': [0., 0., 0., 0.]})
     win.camera(view_quaternion=[0.5, 0.5, 0.5, 0.5])
-#    win1 = a.createWindow('Sagittal', block=wgroup, no_decoration=True)
-#    a.execute('WindowConfig', windows=[win1], light={'background' : [0.,0.,0.,0.]})
-    
+
     win.addObjects(conn)
 #    win1.addObjects(conn)
     win.setControl('ConnectivityMatrixControl')

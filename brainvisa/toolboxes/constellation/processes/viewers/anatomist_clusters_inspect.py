@@ -10,34 +10,19 @@
 from __future__ import print_function
 # Axon python API module
 from __future__ import absolute_import
-from brainvisa.processes import Signature, ReadDiskItem, mainThreadActions
-from soma import aims
+from brainvisa.processes import Signature, ReadDiskItem, mainThreadActions,\
+    ValidationError
 
 # Anatomist
-from brainvisa import anatomist
-from soma.qt_gui.qt_backend import QtGui, QtCore
+from soma.qt_gui.qt_backend import QtGui
 
-try:
-    # constellation module
-    anatomist.validation()
-
-    # temp
-    import pandas
-except:
-    pass # anatomist invalid
-
-import numpy as np
 
 def validation():
     try:
         from brainvisa import anatomist as ana
-    except:
+    except ImportError:
         raise ValidationError(_t_("Anatomist not available"))
     ana.validation()
-    try:
-        import pandas
-    except:
-        raise ValidationError(_t_("pandas not available"))
 
 
 name = 'Anatomist clusters inspect tool'
@@ -45,7 +30,7 @@ userLevel = 0
 
 signature = Signature(
     'clusters', ReadDiskItem('Connectivity ROI texture',
-                             'aims texture formats', 
+                             'aims texture formats',
                              requiredAttributes={'step_time': 'yes'}),
     'mesh', ReadDiskItem('White Mesh', 'aims mesh formats'),
     'clusters_measurements', ReadDiskItem('CSV file', 'CSV file'),
@@ -63,7 +48,7 @@ def initialization(self):
 
 
 def exec_main_thread(self, context, meshes, clusters, measurements,
-        seed_gyri, matrix):
+                     seed_gyri, matrix):
     if hasattr(self, 'gui'):
         gui = self.gui
         parent = gui.parentWidget()
@@ -72,8 +57,8 @@ def exec_main_thread(self, context, meshes, clusters, measurements,
     else:
         te = context.findChild(QtGui.QTextEdit)
         parent = te.parentWidget()
-        #parent.removeWidget(te)
-        #te.setParent(None)
+        # parent.removeWidget(te)
+        # te.setParent(None)
         te.hide()
     gui = QtGui.QWidget()
     gui.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
@@ -87,18 +72,18 @@ def exec_main_thread(self, context, meshes, clusters, measurements,
         print('remove item:', old_item)
         w = old_item.widget()
         layout.removeItem(layout.itemAt(1))
-        w.setParent(None) # should delete it also
+        w.setParent(None)  # should delete it also
     cw = ClustersInspectorWidget(
         meshes, clusters, measurements=measurements, seed_gyri=seed_gyri,
         matrix=matrix)
     layout.addWidget(cw)
     cw.show()
-    #return cw
+    # return cw
 
 
 def execution(self, context):
-    from constel.anatomist.clusters_inspect import ClustersInspectorWidget, \
-                                                   load_clusters_inspector_files
+    from constel.anatomist.clusters_inspect import ClustersInspectorWidget,\
+                                                  load_clusters_inspector_files
     from constel.anatomist import clusters_inspect
     reload(clusters_inspect)
     global ClustersInspectorWidget, load_clusters_inspector_files
@@ -112,16 +97,7 @@ def execution(self, context):
             [self.clusters_measurements.fullPath()],
             [self.seed_gyri.fullPath()],
             self.reduced_matrix.fullPath())
-    # temp
-    #measurements = dict(
-        #(i, pandas.DataFrame(np.random.ranf((i + 2, 4)),
-                             #columns=('size', 'homogeneity', 'conn_density',
-                                      #'other')))
-        #for i in range(max([len(clusters_tex) for clusters_tex in clusters])))
-    #print('artificial measuremenst:')
-    #print(measurements)
 
     return mainThreadActions().call(
         self.exec_main_thread, context, meshes, clusters, measurements,
         seed_gyri, matrix)
-

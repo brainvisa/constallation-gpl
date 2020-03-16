@@ -24,30 +24,22 @@ Main dependencies:
 Author: Sandrine Lefranc, 2015
 """
 
-#----------------------------Imports-------------------------------------------
+# ----------------------------Imports------------------------------------------
 
 
 # axon python API module
 from __future__ import absolute_import
-from brainvisa.processes import Signature, ReadDiskItem, getFormats, \
-    mainThreadActions
-import numpy
-
-try:
-    from brainvisa import anatomist as ana
-    from soma import aims
-except:
-    pass
+from brainvisa.processes import Signature, ReadDiskItem, getFormats
 
 
 def validation():
     try:
         from brainvisa import anatomist as ana
-    except:
+    except ImportError:
         raise ValidationError(_t_("Anatomist not available"))
+    ana.validation()
 
-
-#----------------------------Header--------------------------------------------
+# ----------------------------Header-------------------------------------------
 
 
 name = "Anatomist Show Connectivity Profiles of a Specific Cortical Element"
@@ -61,7 +53,7 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
                             "intersubject": "yes",
-                            #"individual": "no",
+                            # "individual": "no",
                             }),
     "white_mesh", ReadDiskItem("White Mesh", "anatomist mesh formats",
                                requiredAttributes={"side": "both",
@@ -76,7 +68,7 @@ signature = Signature(
 )
 
 
-#----------------------------Function------------------------------------------
+# ----------------------------Function-----------------------------------------
 
 
 def initialization(self):
@@ -157,10 +149,11 @@ def initialization(self):
     self.linkParameters("basins_texture", "connectivity_matrix", link_basins)
 
 
-#----------------------------Main program--------------------------------------
+# ----------------------------Main program-------------------------------------
 def execution(self, context):
     """
     """
+    from bainvisa import anatomist as ana
     # instance of anatomist
     a = ana.Anatomist()
 
@@ -168,11 +161,6 @@ def execution(self, context):
     # load an object from a file
     mesh = a.loadObject(self.white_mesh)
     patch = a.loadObject(self.gyrus_texture)
-    # force reading the matrix as a matrix, not as a volume
-    #matrix_reader = aims.Reader(
-        #typemap={'Volume' : {'DOUBLE': 'SparseOrDenseMatrix'}})
-    #matrix = matrix_reader.read(self.connectivity_matrix.fullPath())
-    # sparse = a.toAObject(matrix)
     sparse = a.loadObject(self.connectivity_matrix)
     basins = a.loadObject(self.basins_texture)
 

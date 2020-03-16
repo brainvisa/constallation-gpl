@@ -1,10 +1,14 @@
 # Axon python API module
 from __future__ import absolute_import
-from brainvisa.processes import *
+from brainvisa.processes import Signature, ReadDiskItem, getFormats,\
+    getProcessInstance
 from brainvisa.processing.process_based_viewer import ProcessBasedViewer
 
-name = 'Anatomist Show Connectivity Profiles of a Specific Cortical Element, Atlas pipeline variant'
+name = 'Anatomist Show Connectivity Profiles of a Specific Cortical Element,\
+        Atlas pipeline variant'
 base_class = ProcessBasedViewer
+
+
 def allowed_processes(process):
     return get_process(process) is not None
 
@@ -63,15 +67,15 @@ def execution(self, context):
             if gp:
                 gyrus_texture = None
                 if process.method == 'avg' \
-                      or self.connectivity_matrix \
-                          == process.executionNode().GroupClustering \
-                              .reduced_group_matrix:
+                    or self.connectivity_matrix \
+                        == process.executionNode().GroupClustering \
+                        .reduced_group_matrix:
                     if len(process.regions_parcellation) != 0:
                         gyrus_texture = process.regions_parcellation[0]
                 else:
                     matrices \
                         = process.executionNode().ReducedGroupMatrix \
-                            .intersubject_reduced_matrices
+                        .intersubject_reduced_matrices
                     i = matrices.index(self.connectivity_matrix)
                     if i >= 0 and len(process.regions_parcellation) > i:
                         gyrus_texture = process.regions_parcellation[i]
@@ -99,7 +103,7 @@ def execution(self, context):
             if process.id() == 'constel_group_pipeline':
                 basins_texture \
                     = process.executionNode().GroupRegionsFiltering \
-                        .filtered_reduced_group_profile
+                    .filtered_reduced_group_profile
             else:
                 basins_texture = process.filtered_reduced_group_profile
             return context.runProcess(
