@@ -34,8 +34,8 @@ def validation():
             "'{0}' is not contained in PATH environnement variable. "
             "Please make sure that AIMS C++ library is installed.".format(cmd))
     try:
-        from constel.lib.utils.filetools import select_ROI_number,\
-            replace_negative_values
+        from constel.lib.utils.filetools import select_ROI_number
+        from constel.lib.utils.matrixtools import replace_negative_values
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -124,8 +124,8 @@ def execution(self, context):
     """Run the command 'AimsSparseMatrixSmoothing'.
 
     Smoothing of the individual matrix."""
-    from constel.lib.utils.filetools import select_ROI_number,\
-        replace_negative_values
+    from constel.lib.utils.filetools import select_ROI_number
+    from constel.lib.utils.matrixtools import replace_negative_values
     # selects the label number corresponding to label name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)
