@@ -12,11 +12,12 @@
 
 # brainvisa
 from __future__ import absolute_import
-from brainvisa.processes import Signature, ListOf, ReadDiskItem
-from brainvisa import anatomist as anatomist
+from brainvisa.processes import Signature, ListOf, ReadDiskItem,\
+    ValidationError, Integer, Float, Choice, mainThreadActions
 
 # system import
 import numpy
+import os
 
 # soma
 from soma import aims
@@ -28,11 +29,17 @@ def validation():
     It checks some conditions for the process to be available.
     """
     try:
+        import constel
         import constel.lib.utils.matrixtools
         from constel.lib.utils.texturetools import geodesic_gravity_center
     except ImportError:
         raise ValidationError("Please make sure that constel module"
                               "is installed")
+    try:
+        from brainvisa import anatomist as ana
+    except ImportError:
+        raise ValidationError(_t_("Anatomist not available"))
+    ana.validation()
 
 
 name = "Anatomist view mozaic visualization of textured mesh"
@@ -53,15 +60,20 @@ signature = Signature(
                             "vertex_corr": "Yes",
                             "averaged": "Yes"}),
     'basins_texture', ListOf(
-        ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats')),
+        ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
+                     requiredAttributes={"roi_autodetect": "yes",
+                                         "roi_filtered": "yes",
+                                         "intersubject": "yes",
+                                         "step_time": "no",
+                                         "measure": "no"})),
 
     'clustering_texture', ListOf(
         ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
-        requiredAttributes={"roi_autodetect": "no",
-                            "roi_filtered": "no",
-                            "intersubject": "yes",
-                            "step_time": "yes",
-                            "measure": "no"})),
+                     requiredAttributes={"roi_autodetect": "no",
+                                         "roi_filtered": "no",
+                                         "intersubject": "yes",
+                                         "step_time": "yes",
+                                         "measure": "no"})),
     'time_step', ListOf(Integer()),
     'major_texture', ReadDiskItem(
         'Label Texture', 'anatomist texture formats'),
@@ -86,6 +98,10 @@ def execution_mainthread(self, context):
     For each cluster or region, a small brain represents the connections
     on a textured mesh of the cortex.
     """
+    from brainvisa import anatomist
+    import constel
+    import constel.lib.utils.matrixtools as clcmt
+    from constel.lib.utils.texturetools import geodesic_gravity_center
     # instance of anatomist
     a = anatomist.Anatomist()
 
@@ -264,7 +280,7 @@ def execution_mainthread(self, context):
     # view object
     wgroup = a.createWindowsBlock(nbCols=2)
     win1 = a.createWindow("3D", block=wgroup)
-    #win2 = a.createWindow("3D", block=wgroup)
+    # win2 = a.createWindow("3D", block=wgroup)
     win1.addObjects(major_textured_mesh)
     win1.addObjects(graph_list)
 
@@ -272,12 +288,12 @@ def execution_mainthread(self, context):
     a.execute("SetControl", windows=[win1], control="SmallBrainsControl")
     action = win1.view().controlSwitch().getAction(
         "SmallBrainSelectionAction")
-    #action.secondaryView = win2
+    # action.secondaryView = win2
 
     wgroup.widgetProxy().widget.resize(1200, 800)
 
     return [ana_mesh, graph_list, ana_clusters,
-            major_textured_mesh, win1]#, win2]
+            major_textured_mesh, win1]  # , win2]
 
 
 def execution(self, context):
