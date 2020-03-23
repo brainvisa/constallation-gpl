@@ -48,31 +48,40 @@ name = "Reduced Individual Matrix From Filtered Reduced Profile"
 userLevel = 2
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "region", String(section="Study parameters"),
+
     # --inputs--
     "complete_matrix_smoothed", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
                             "intersubject": "no",
-                            "individual": "yes"}),
+                            "individual": "yes"},
+        section="Inputs"),
     "filtered_reduced_individual_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "yes",
                             "roi_filtered": "yes",
                             "intersubject": "no",
                             "step_time": "no",
-                            "measure": "no"}),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", String(),
-    "regions_parcellation", ReadDiskItem(
-        "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+                            "measure": "no"},
+        section="Inputs"),
+
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+    "regions_parcellation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+
+    "normalize", Boolean(section="Options"),
 
     # --outputs--
     "reduced_individual_matrix", WriteDiskItem(
@@ -80,8 +89,8 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
                             "intersubject": "no",
-                            "individual": "yes"}),
-    "normalize", Boolean(),
+                            "individual": "yes"},
+        section="Reduced matrix"),
 )
 
 

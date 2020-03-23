@@ -61,31 +61,39 @@ name = "Clustering From Reduced Group Matrix"
 userLevel = 2
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "method", Choice(
+        ("averaged approach", "avg"),
+        ("concatenated approach", "concat"),
+        section="Study parameters"),
+    "region", String(section="Study parameters"),
+
     # --inputs--
+    "subjects_group", ReadDiskItem(
+        "Group definition", "XML", section="Group inputs"),
     "intersubject_reduced_matrices", ListOf(ReadDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
                             "intersubject": "yes",
-                            "individual": "yes"})),
-    "method", Choice(
-        ("averaged approach", "avg"),
-        ("concatenated approach", "concat")),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", String(),
-    "subjects_group", ReadDiskItem(
-        "Group definition", "XML"),
-    "regions_parcellation", ListOf(ReadDiskItem(
-        "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"})),
+                            "individual": "yes"},
+        section="Group inputs")),
+
     "average_mesh", ReadDiskItem(
         "White Mesh", "BrainVISA mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
-                            "averaged": "Yes"}),
-    "nb_clusters", Integer(),
+                            "averaged": "Yes"},
+        section="Freesurfer data"),
+    "regions_parcellation", ListOf(ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data")),
+
+    "nb_clusters", Integer(section="Options"),
 
     # --outputs--
     "reduced_group_matrix", WriteDiskItem(
@@ -93,14 +101,16 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
                             "intersubject": "yes",
-                            "individual": "no"}),
+                            "individual": "no"},
+        section="Clustering"),
     "ROI_clustering", ListOf(WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "no",
                             "roi_filtered": "no",
                             "intersubject": "yes",
                             "step_time": "yes",
-                            "measure": "no"})),
+                            "measure": "no"},
+        section="Clustering")),
 )
 
 

@@ -46,17 +46,18 @@ name = "Constellation Individual Pipeline - FSL connectome"
 userLevel = 1
 
 signature = Signature(
-    # --inputs--
-    "outputs_database", Choice(section="output database"),
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "outputs_database", Choice(section="Study parameters"),
+    "study_name", OpenChoice(section="Study parameters"),
     "method", Choice(
         ("averaged approach", "avg"),
         ("concatenated approach", "concat"),
-        section="output database"),
-    "study_name", OpenChoice(section="output database"),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File", section="nomenclature"),
-    "region", OpenChoice(section="nomenclature"),
+        section="Study parameters"),
+    "region", OpenChoice(section="Study parameters"),
 
+    # --inputs--
     "probtrackx_indir", ReadDiskItem("directory", "directory",
                                      section="FSL import"),
     "temp_outdir", ReadDiskItem("directory", "directory",
@@ -68,20 +69,20 @@ signature = Signature(
                             "vertex_corr": "Yes",
                             "inflated": "No",
                             "averaged": "No"},
-        section="Freesurfer mesh and parcellation"),
+        section="Freesurfer data"),
     "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"},
-        section="Freesurfer mesh and parcellation"),
+        section="Freesurfer data"),
 
     "regions_selection", Choice("All but main region", "All", "Custom",
-                                section="options"),
-    "keep_regions", ListOf(OpenChoice(section="options")),
-    "min_fibers_length", Float(section="options"),
-    "smoothing", Float(section="options"),
-    "normalize", Boolean(section="options"),
-    "kmax", Integer(section="options"),
+                                section="Options"),
+    "keep_regions", ListOf(OpenChoice(), section="Options"),
+    "min_fibers_length", Float(section="Options"),
+    "smoothing", Float(section="Options"),
+    "kmax", Integer(section="Options"),
+    "normalize", Boolean(section="Options"),
 )
 
 
@@ -135,7 +136,7 @@ def initialization(self):
             s += read_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["keep_regions"] = ListOf(Choice(*s),
-                                                    section="options")
+                                                    section="Options")
             self.changeSignature(self.signature)
 
     def fill_study_choice(self, dummy=None):

@@ -18,6 +18,7 @@ from brainvisa.processes import Float
 from brainvisa.processes import String
 from brainvisa.processes import Choice
 from brainvisa.processes import ListOf
+from brainvisa.processes import Integer
 from brainvisa.group_utils import Subject
 from brainvisa.processes import Signature
 from brainvisa.processes import OpenChoice
@@ -80,35 +81,47 @@ if neuroConfig.gui:
 
 signature = Signature(
     "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", OpenChoice(),
-    "study_name", OpenChoice(),
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "study_name", OpenChoice(section="Study parameters"),
+    "new_study_name", String(section="Study parameters"),
     "method", Choice(
         ("averaged approach", "avg"),
-        ("concatenated approach", "concat")),
-    "new_study_name", String(),
-    "smoothing", Float(),
+        ("concatenated approach", "concat"),
+        section="Study parameters"),
+    "region", OpenChoice(section="Study parameters"),
+
     "constellation_subjects_group", ReadDiskItem(
-        "Group definition", "XML", exactType=True),
+        "Group definition", "XML",
+        exactType=True,
+        section="Group inputs"),
     "mean_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
                      requiredAttributes={"ends_labelled": "all",
                                          "normed": "no",
-                                         "intersubject": "no"})),
+                                         "intersubject": "no"},
+                     section="Group inputs")),
     "normed_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
                      requiredAttributes={"ends_labelled": "all",
                                          "normed": "yes",
-                                         "intersubject": "no"})),
+                                         "intersubject": "no"},
+                     section="Group inputs")),
+
     "average_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
-                            "averaged": "Yes"}),
+                            "averaged": "Yes"},
+        section="Freesurfer data"),
     "regions_parcellation", ListOf(
         ReadDiskItem("ROI Texture", "Aims texture formats",
                      requiredAttributes={"side": "both",
-                                         "vertex_corr": "Yes"})),
+                                         "vertex_corr": "Yes"},
+                     section="Freesurfer data")),
+
+    "smoothing", Float(section="Options"),
+    "nb_clusters", Integer(section="Options"),
 )
 
 
@@ -131,6 +144,7 @@ def initialization(self):
 
     # default value
     self.smoothing = 3.0
+    self.nb_clusters = 12
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -387,6 +401,8 @@ def initialization(self):
                         "regions_parcellation")
     eNode.addDoubleLink("GroupClustering.intersubject_reduced_matrices",
                         "ReducedGroupMatrix.intersubject_reduced_matrices")
+    eNode.addDoubleLink("GroupClustering.nb_clusters",
+                        "nb_clusters")
 
     self.setExecutionNode(eNode)
 

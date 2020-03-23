@@ -50,18 +50,25 @@ name = "FSL Connectome."
 userLevel = 2
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem("Nomenclature ROIs File",
+                                         "Text File",
+                                         section="Nomenclature"),
+
+    "region", OpenChoice(section="Study parameters"),
+
     # --inputs--
     "probtrackx_indir", ReadDiskItem("directory",
-                                     "directory"),
+                                     "directory",
+                                     section="FSL import"),
+
     "regions_parcellation", ReadDiskItem("ROI Texture",
-                                         "Aims texture formats"),
-    "regions_nomenclature", ReadDiskItem("Nomenclature ROIs File",
-                                         "Text File"),
-    "region", OpenChoice(),
+                                         "Aims texture formats",
+                                         section="Freesurfer data"),
 
     # --outputs--
-    "outdir", WriteDiskItem("directory", "directory"),
-    "output_connectome", String(),
+    "temp_outdir", WriteDiskItem("directory", "directory",
+                                 section="Temporary outputs"),
+    "output_connectome", String(section="Temporary outputs"),
 )
 
 # ---------------------------Functions-----------------------------------------
@@ -107,9 +114,9 @@ def initialization(self):
         from constel.lib.utils.filetools import select_ROI_number
         if (self.probtrackx_indir is not None
             and self.regions_nomenclature is not None
-                and self.region is not None and self.outdir is not None):
+                and self.region is not None and self.temp_outdir is not None):
             subject = os.path.basename(self.probtrackx_indir.fullPath())
-            sdir = os.path.join(self.outdir.fullPath(), subject)
+            sdir = os.path.join(self.temp_outdir.fullPath(), subject)
             label_nb = select_ROI_number(self.regions_nomenclature.fullPath(),
                                          self.region)
             name = "connectome_label" + str(label_nb) + ".imas"
@@ -124,7 +131,7 @@ def initialization(self):
                         ("probtrackx_indir",
                          "regions_nomenclature",
                          "region",
-                         "outdir"),
+                         "temp_outdir"),
                         link_connectome)
 
 
@@ -145,4 +152,4 @@ def execution(self, context):
                          self.probtrackx_indir,
                          self.regions_parcellation,
                          label_number,
-                         self.outdir)
+                         self.temp_outdir)

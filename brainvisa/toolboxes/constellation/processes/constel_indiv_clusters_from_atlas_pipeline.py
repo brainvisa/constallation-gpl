@@ -40,16 +40,17 @@ name = "Constellation Individual Clusters from atlas pipeline - FSL connectome"
 userLevel = 0
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
     # --inputs--
-    "outputs_database", Choice(section="output database"),
+    "outputs_database", Choice(section="Study parameters"),
+    "study_name", OpenChoice(section="Study parameters"),
     "method", Choice(
         ("averaged approach", "avg"),
         ("concatenated approach", "concat"),
-        section="output database"),
-    "study_name", OpenChoice(section="output database"),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File", section="nomenclature"),
-    "region", OpenChoice(section="nomenclature"),
+        section="Study parameters"),
+    "region", OpenChoice(section="Study parameters"),
 
     # FSL data
     "probtrackx_indir", ReadDiskItem("directory", "directory",
@@ -64,12 +65,12 @@ signature = Signature(
                             "vertex_corr": "Yes",
                             "inflated": "No",
                             "averaged": "No"},
-        section="Freesurfer mesh and parcellation"),
+        section="Freesurfer data"),
     "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"},
-        section="Freesurfer mesh and parcellation"),
+        section="Freesurfer data"),
 
     # --atlas inputs--
     "atlas_matrix", ReadDiskItem(
@@ -78,7 +79,7 @@ signature = Signature(
                             "reduced": "yes",
                             "intersubject": "yes",
                             "individual": "no"},
-        section="atlas inputs"),
+        section="Atlas inputs"),
     "filtered_reduced_group_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "yes",
@@ -86,7 +87,7 @@ signature = Signature(
                             "intersubject": "yes",
                             "step_time": "no",
                             "measure": "no"},
-        section="atlas inputs"),
+        section="Atlas inputs"),
     "group_clustering", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "no",
@@ -94,7 +95,7 @@ signature = Signature(
                             "intersubject": "yes",
                             "step_time": "yes",
                             "measure": "no"},
-        section="atlas inputs"),
+        section="Atlas inputs"),
 
     # --outputs--
     "complete_individual_matrix", WriteDiskItem(
@@ -103,23 +104,21 @@ signature = Signature(
                             "reduced": "no",
                             "intersubject": "no",
                             "individual": "yes"},
-        section="outputs"),
+        section="Outputs"),
     "complete_individual_smoothed_matrix", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
                             "intersubject": "no",
                             "individual": "yes"},
-        section="outputs"),
-
+        section="Outputs"),
     "reduced_matrix", WriteDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
                             "intersubject": "yes",
                             "individual": "yes"},
-        section="outputs"),
-
+        section="Outputs"),
     "individual_clustering", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "no",
@@ -127,16 +126,16 @@ signature = Signature(
                             "intersubject": "yes",
                             "step_time": "yes",
                             "measure": "no"},
-        section="outputs"),
+        section="Outputs"),
 
     # options
     "regions_selection", Choice("All but main region", "All", "Custom",
-                                section="options"),
-    "keep_regions", ListOf(OpenChoice(), section="options", userLevel=3),
-    "min_fibers_length", Float(section="options"),
-    "smoothing", Float(section="options"),
-    "normalize", Boolean(section="options"),
-    "kmax", Integer(section="options"),
+                                section="Options"),
+    "keep_regions", ListOf(OpenChoice(), section="Options", userLevel=2),
+    "min_fibers_length", Float(section="Options"),
+    "smoothing", Float(section="Options"),
+    "kmax", Integer(section="Options"),
+    "normalize", Boolean(section="Options"),
 )
 
 

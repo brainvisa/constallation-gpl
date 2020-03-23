@@ -45,25 +45,32 @@ name = "Mean Individual Profile From Smoothed Matrix"
 userLevel = 2
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "region", String(section="Study parameters"),
+
     # --inputs--
     "complete_matrix_smoothed", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
                             "intersubject": "no",
-                            "individual": "yes"}),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", String(),
+                            "individual": "yes"},
+        section="Smoothed matrix"),
+
     "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
+        requiredAttributes={"side": "both", "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+
     # --ouputs--
     "mean_individual_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
                             "normed": "no",
-                            "intersubject": "no"}),
+                            "intersubject": "no"},
+        section="Mean profile"),
 )
 
 

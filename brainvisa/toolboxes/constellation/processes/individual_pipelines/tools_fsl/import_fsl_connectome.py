@@ -55,16 +55,22 @@ name = "Import FSL Connectomes."
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
-    "outputs_database", Choice(),
-    "study_name", OpenChoice(),
-    "method", Choice(("averaged approach", "avg"),
-                     ("concatenated approach", "concat")),
     "regions_nomenclature", ReadDiskItem("Nomenclature ROIs File",
-                                         "Text File"),
-    "region", OpenChoice(),
-    "min_fibers_length", Float(),
-    "fsl_connectome", ReadDiskItem('Any Type', getAllFormats()),
+                                         "Text File",
+                                         section="Nomenclature"),
+
+    # --inputs--
+    "outputs_database", Choice(section="Study parameters"),
+    "study_name", OpenChoice(section="Study parameters"),
+    "method", Choice(("averaged approach", "avg"),
+                     ("concatenated approach", "concat"),
+                     section="Study parameters"),
+    "region", OpenChoice(section="Study parameters"),
+
+    "fsl_connectome", ReadDiskItem('Any Type', getAllFormats(),
+                                   section="Temporary import directory"),
+
+    "min_fibers_length", Float(section="Options"),
 
     # --outputs--
     "complete_individual_matrix", WriteDiskItem("Connectivity Matrix",
@@ -72,7 +78,8 @@ signature = Signature(
                                                 requiredAttributes={
                                                     "ends_labelled": "all",
                                                     "reduced": "no",
-                                                    "intersubject": "no"}),
+                                                    "intersubject": "no"},
+                                                section="FSL matrix"),
 )
 
 

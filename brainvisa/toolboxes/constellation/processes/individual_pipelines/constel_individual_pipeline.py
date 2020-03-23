@@ -45,39 +45,62 @@ name = "Constellation Individual Pipeline -  Connectomist"
 userLevel = 1
 
 signature = Signature(
-    # --inputs--
-    "outputs_database", Choice(),
-    "study_name", OpenChoice(),
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "outputs_database", Choice(section="Study parameters"),
+    "study_name", OpenChoice(section="Study parameters"),
     "method", Choice(
         ("averaged approach", "avg"),
-        ("concatenated approach", "concat")),
-    "subject_indir", ReadDiskItem("subject", "directory"),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", OpenChoice(),
-    "regions_parcellation", ReadDiskItem(
-        "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+        ("concatenated approach", "concat"),
+        section="Study parameters"),
+    "region", OpenChoice(section="Study parameters"),
+
+    # --inputs--
+    "subject_indir", ReadDiskItem("subject", "directory",
+                                  section="Tractography inputs"),
+
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
                             "inflated": "No",
-                            "averaged": "No"}),
+                            "averaged": "No"},
+        section="Freesurfer data"),
     "dw_to_t1", ReadDiskItem(
-        "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix"),
-    "keep_regions", ListOf(OpenChoice()),
-    "smoothing", Float(),
-    "fiber_tracts_format", Choice("bundles", "trk"),
-    "min_fibers_length", Float(),
-    "max_fibers_length", Float(),
-    "normalize", Boolean(),
-    "kmax", Integer(),
+        "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix",
+        section="Freesurfer data"),
+    "regions_parcellation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+
+    "regions_selection", Choice("All but main region", "All", "Custom",
+                                section="Options"),
+    "keep_regions", ListOf(OpenChoice(), section="Options"),
+    "fiber_tracts_format", Choice("bundles", "trk", section="Options"),
+    "min_fibers_length", Float(section="Options"),
+    "max_fibers_length", Float(section="Options"),
+    "smoothing", Float(section="Options"),
+    "kmax", Integer(section="Options"),
+    "normalize", Boolean(section="Options"),
 )
 
 
 # ---------------------------Functions-----------------------------------------
+
+
+def link_keep_regions_value(self, dummy, other=None, oother=None):
+    s = [x[1] for x in self.signature["keep_regions"].contentType.values
+         if x[1] is not None]
+    if self.regions_selection == "All":
+        keep_regions = s
+    elif self.regions_selection == "All but main region":
+        keep_regions = [x for x in s if x != self.region]
+    else:
+        keep_regions = None
+    return keep_regions
 
 
 def initialization(self):
@@ -111,7 +134,8 @@ def initialization(self):
             s = []
             s += read_file(
                 self.regions_nomenclature.fullPath(), mode=2)
-            self.signature["keep_regions"] = ListOf(Choice(*s))
+            self.signature["keep_regions"] = ListOf(Choice(*s),
+                                                    section="Options")
             self.changeSignature(self.signature)
 
     def fill_study_choice(self, dummy=None):
@@ -230,9 +254,12 @@ def initialization(self):
     self.linkParameters("regions_parcellation",
                         ["study_name", "subject_indir", "method"],
                         link_label)
-    self.linkParameters("keep_regions",
+    self.linkParameters(None,
                         "regions_nomenclature",
                         link_keep_regions)
+    self.addLink("keep_regions",
+                 ("regions_nomenclature", "regions_selection", "region"),
+                 self.link_keep_regions_value)
 
     method_changed(self, self.method)
 

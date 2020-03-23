@@ -53,40 +53,52 @@ name = "Brain Tracts Filtering"
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
-    "outputs_database", Choice(),
-    "study_name", OpenChoice(),
-    "method", Choice(
-        ("averaged approach", "avg"), ("concatenated approach", "concat")),
-    "subject_indir", ReadDiskItem(
-        "subject", "directory"),
     "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", OpenChoice(),
-    "regions_parcellation", ReadDiskItem(
-        "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+
+    "outputs_database", Choice(section="Study parameters"),
+    "study_name", OpenChoice(section="Study parameters"),
+    "method", Choice(
+        ("averaged approach", "avg"),
+        ("concatenated approach", "concat"),
+        section="Study parameters"),
+    "region", OpenChoice(section="Study parameters"),
+
+    # --inputs--
+    "subject_indir", ReadDiskItem(
+        "subject", "directory", section="Tractography inputs"),
+
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
     "dw_to_t1", ReadDiskItem(
-        "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix"),
-    "fiber_tracts_format", Choice(
-        "bundles", "trk"),
-    "min_fibers_length", Float(),
-    "max_fibers_length", Float(),
+        "Transform T2 Diffusion MR to Raw T1 MRI",
+        "Transformation matrix",
+        section="Freesurfer data"),
+    "regions_parcellation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+
+    "fiber_tracts_format", Choice("bundles", "trk", section="Options"),
+    "min_fibers_length", Float(section="Options"),
+    "max_fibers_length", Float(section="Options"),
 
     # --outputs--
     "labeled_fibers", WriteDiskItem(
         "Filtered Fascicles Bundles", "Aims writable bundles formats",
         requiredAttributes={"ends_labelled": "both",
-                            "oversampled": "no"}),
+                            "oversampled": "no"},
+        section="Filtered tracts"),
     "semilabeled_fibers", WriteDiskItem(
         "Filtered Fascicles Bundles", "Aims writable bundles formats",
         requiredAttributes={"ends_labelled": "one",
-                            "oversampled": "no"}),
+                            "oversampled": "no"},
+        section="Filtered tracts"),
 )
 
 

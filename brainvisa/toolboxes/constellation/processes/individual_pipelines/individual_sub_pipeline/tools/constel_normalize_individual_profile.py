@@ -41,27 +41,34 @@ name = "Mean Individual Profile Normalization"
 userLevel = 2
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "region", String(section="Study parameters"),
+
     # --inputs--
     "mean_individual_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
                             "normed": "no",
-                            "intersubject": "no"}),
+                            "intersubject": "no"},
+        section="Mean profile"),
+
     "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", String(),
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+
+    "keep_regions", ListOf(OpenChoice(), section="Options"),
 
     # --outputs--
     "normed_individual_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
                             "normed": "yes",
-                            "intersubject": "no"}),
-    "keep_regions", ListOf(OpenChoice()),
+                            "intersubject": "no"},
+        section="Normed profile"),
 )
 
 
