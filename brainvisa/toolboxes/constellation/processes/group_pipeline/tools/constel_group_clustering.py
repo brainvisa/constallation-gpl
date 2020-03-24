@@ -78,8 +78,8 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
                             "intersubject": "yes",
-                            "individual": "yes"},
-        section="Group inputs")),
+                            "individual": "yes"}),
+        section="Group inputs"),
 
     "average_mesh", ReadDiskItem(
         "White Mesh", "BrainVISA mesh formats",
@@ -90,8 +90,8 @@ signature = Signature(
     "regions_parcellation", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"},
-        section="Freesurfer data")),
+                            "vertex_corr": "Yes"}),
+        section="Freesurfer data"),
 
     "nb_clusters", Integer(section="Options"),
 
@@ -109,8 +109,8 @@ signature = Signature(
                             "roi_filtered": "no",
                             "intersubject": "yes",
                             "step_time": "yes",
-                            "measure": "no"},
-        section="Clustering")),
+                            "measure": "no"}),
+        section="Clustering"),
 )
 
 

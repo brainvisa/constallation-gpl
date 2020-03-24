@@ -99,7 +99,8 @@ def initialization(self):
             s = []
             s += read_file(
                 self.regions_nomenclature.fullPath(), mode=2)
-            self.signature["keep_regions"] = ListOf(Choice(*s))
+            self.signature["keep_regions"] = ListOf(Choice(*s),
+                                                    section="Options")
             self.changeSignature(self.signature)
 
     def reset_label(self, dummy):
@@ -120,7 +121,8 @@ def initialization(self):
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s)
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)

@@ -60,8 +60,8 @@ signature = Signature(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
                             "normed": "yes",
-                            "intersubject": "no"},
-        section="Group inputs")),
+                            "intersubject": "no"}),
+        section="Group inputs"),
     "subjects_group", ReadDiskItem("Group definition", "XML",
                                    section="Group inputs"),
 

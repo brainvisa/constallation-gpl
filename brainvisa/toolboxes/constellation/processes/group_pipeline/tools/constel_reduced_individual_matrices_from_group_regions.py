@@ -67,8 +67,8 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
                             "intersubject": "no",
-                            "individual": "yes"},
-        section="Group inputs")),
+                            "individual": "yes"}),
+        section="Group inputs"),
 
     "filtered_reduced_group_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
@@ -88,8 +88,8 @@ signature = Signature(
     "regions_parcellation", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"},
-        section="Freesurfer data")),
+                            "vertex_corr": "Yes"}),
+        section="Freesurfer data"),
 
     "normalize", Boolean(section="Options"),
 
@@ -100,7 +100,8 @@ signature = Signature(
                             "reduced": "yes",
                             "intersubject": "yes",
                             "individual": "yes"},
-        section="Output matrices")),
+        section="Reduced matrix"),
+        section="Output matrices"),
 )
 
 

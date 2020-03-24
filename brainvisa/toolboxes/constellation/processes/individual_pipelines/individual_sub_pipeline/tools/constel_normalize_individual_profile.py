@@ -91,7 +91,8 @@ def initialization(self):
             s = []
             s += read_file(
                 self.regions_nomenclature.fullPath(), mode=2)
-            self.signature["keep_regions"] = ListOf(Choice(*s))
+            self.signature["keep_regions"] = ListOf(Choice(*s),
+                                                    section="Options")
             self.changeSignature(self.signature)
 
     def link_matrix2label(self, dummy):

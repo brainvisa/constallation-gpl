@@ -99,14 +99,14 @@ signature = Signature(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
                      requiredAttributes={"ends_labelled": "all",
                                          "normed": "no",
-                                         "intersubject": "no"},
-                     section="Group inputs")),
+                                         "intersubject": "no"}),
+        section="Group inputs"),
     "normed_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
                      requiredAttributes={"ends_labelled": "all",
                                          "normed": "yes",
-                                         "intersubject": "no"},
-                     section="Group inputs")),
+                                         "intersubject": "no"}),
+        section="Group inputs"),
 
     "average_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
@@ -117,8 +117,8 @@ signature = Signature(
     "regions_parcellation", ListOf(
         ReadDiskItem("ROI Texture", "Aims texture formats",
                      requiredAttributes={"side": "both",
-                                         "vertex_corr": "Yes"},
-                     section="Freesurfer data")),
+                                         "vertex_corr": "Yes"}),
+        section="Freesurfer data"),
 
     "smoothing", Float(section="Options"),
     "nb_clusters", Integer(section="Options"),
@@ -200,7 +200,8 @@ def initialization(self):
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s)
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)

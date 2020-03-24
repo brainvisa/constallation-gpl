@@ -122,7 +122,9 @@ def initialization(self):
     if len(databases) != 0:
         self.outputs_database = databases[0]
     else:
-        self.signature["outputs_database"] = OpenChoice()
+        self.signature["outputs_database"] = OpenChoice(
+                                                section="Study parameters"
+        )
 
     def fill_study_choice(self, dummy=None):
         """
@@ -163,7 +165,8 @@ def initialization(self):
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s)
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)

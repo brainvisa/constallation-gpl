@@ -61,8 +61,8 @@ signature = Signature(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
                      requiredAttributes={"ends_labelled": "all",
                                          "normed": "no",
-                                         "intersubject": "no"},
-                     section="Group inputs")),
+                                         "intersubject": "no"}),
+        section="Group inputs"),
 
     # --outputs--
     "group_mask", WriteDiskItem(

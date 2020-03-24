@@ -115,7 +115,8 @@ def initialization(self):
     if len(databases) != 0:
         self.outputs_database = databases[0]
     else:
-        self.signature["outputs_database"] = OpenChoice()
+        self.signature["outputs_database"] = OpenChoice(
+                                                section="Study parameters")
 
     # default value
     self.smoothing = 3.0
@@ -176,7 +177,8 @@ def initialization(self):
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s)
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)
@@ -191,7 +193,8 @@ def initialization(self):
             signature["regions_parcellation"] = ReadDiskItem(
                 "ROI Texture", "Aims texture formats",
                 requiredAttributes={"side": "both", "vertex_corr": "Yes",
-                                    "averaged": "Yes"})
+                                    "averaged": "Yes"},
+                section="Freesurfer data")
             self.changeSignature(signature)
             self.setValue("regions_parcellation",
                           signature["regions_parcellation"].findValue(
@@ -200,7 +203,8 @@ def initialization(self):
             signature["regions_parcellation"] = ReadDiskItem(
                 "ROI Texture", "Aims texture formats",
                 requiredAttributes={"side": "both", "vertex_corr": "Yes",
-                                    "averaged": "No"})
+                                    "averaged": "No"},
+                section="Freesurfer data")
             self.changeSignature(signature)
             self.setValue("regions_parcellation", link_label(self), True)
         fill_study_choice(self)

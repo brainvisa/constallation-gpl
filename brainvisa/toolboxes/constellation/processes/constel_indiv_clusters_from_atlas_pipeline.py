@@ -156,7 +156,7 @@ def initialization(self):
             s += read_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["keep_regions"] = ListOf(Choice(*s),
-                                                    section="options")
+                                                    section="Options")
             self.changeSignature(self.signature)
 
     def fill_study_choice(self, dummy=None):
@@ -197,7 +197,8 @@ def initialization(self):
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s, section="nomenclature")
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)
