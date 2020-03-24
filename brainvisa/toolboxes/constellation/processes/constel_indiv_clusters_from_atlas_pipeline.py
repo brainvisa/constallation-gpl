@@ -187,6 +187,7 @@ def initialization(self):
         It also resets the region parameter to default state after
         the nomenclature changes.
         """
+        from constel.lib.utils.filetools import read_nomenclature_file
         current = self.region
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
