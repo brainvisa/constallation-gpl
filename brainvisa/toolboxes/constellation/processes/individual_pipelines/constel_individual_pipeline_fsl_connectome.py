@@ -249,7 +249,7 @@ def initialization(self):
                         "regions_nomenclature")
     eNode.addDoubleLink("confsl.region",
                         "region")
-    eNode.addDoubleLink("confsl.outdir",
+    eNode.addDoubleLink("confsl.temp_outdir",
                         "temp_outdir")
 
     ###########################################################################
