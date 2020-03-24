@@ -150,6 +150,7 @@ def initialization(self):
     def link_keep_regions(self, dummy):
         """
         """
+        from constel.lib.utils.filetools import read_file
         if self.regions_nomenclature is not None:
             s = []
             s += read_file(
