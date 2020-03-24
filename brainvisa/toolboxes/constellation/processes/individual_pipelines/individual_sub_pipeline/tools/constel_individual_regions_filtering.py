@@ -38,7 +38,8 @@ def validation():
             "environnement variable or please make sure that constel module "
             "is installed.")
     try:
-        from constel.lib.utils.texturetools import remove_labels, read_file,\
+        from constel.lib.utils.filetools import read_file
+        from constel.lib.utils.texturetools import remove_labels,\
             select_ROI_number
     except ImportError:
         raise ValidationError(
@@ -118,7 +119,7 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters
     """
-    from constel.lib.utils.texturetools import read_file
+    from constel.lib.utils.filetools import read_file
     # default value
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
