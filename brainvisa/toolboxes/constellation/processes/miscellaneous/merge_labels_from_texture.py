@@ -40,8 +40,9 @@ def validation():
     if not find_in_path("AimsExtractLabelsFromTexture.py"):
         raise ValidationError("aims module is not here.")
     try:
-        from constel.lib.utils.filetools import read_file, select_ROI_number,\
-            add_region_in_nomenclature, delete_regions_in_nomenclature
+        from constel.lib.utils.filetools import read_nomenclature_file,\
+            select_ROI_number, add_region_in_nomenclature,\
+            delete_regions_in_nomenclature
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -86,10 +87,10 @@ def initialization(self):
     def link_cortical_regions(self, dummy):
         """
         """
-        from constel.lib.utils.filetools import read_file
+        from constel.lib.utils.filetools import read_nomenclature_file
         if self.cortical_regions_nomenclature is not None:
             s = []
-            s += read_file(
+            s += read_nomenclature_file(
                 self.cortical_regions_nomenclature.fullPath(), mode=2)
             self.signature["cortical_regions"] = ListOf(Choice(*s))
             self.changeSignature(self.signature)

@@ -32,7 +32,7 @@ def validation(self):
     loaded. It checks some conditions for the process to be available.
     """
     try:
-        from constel.lib.utils.filetools import read_file
+        from constel.lib.utils.filetools import read_nomenclature_file
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -106,7 +106,7 @@ def link_keep_regions_value(self, dummy, other=None, oother=None):
 def initialization(self):
     """Provides default values and link of parameters.
     """
-    from constel.lib.utils.filetools import read_file
+    from constel.lib.utils.filetools import read_nomenclature_file
     # list of possible databases, while respecting the ontology
     # ontology: brainvisa-3.2.0
     databases = [h.name for h in neuroHierarchy.hierarchies()
@@ -133,7 +133,7 @@ def initialization(self):
         """
         if self.regions_nomenclature is not None:
             s = []
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["keep_regions"] = ListOf(Choice(*s),
                                                     section="Options")
@@ -173,7 +173,7 @@ def initialization(self):
             s = [("Select a region in this list", None)]
             # temporarily set a value which will remain valid
             self.region = s[0][1]
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):

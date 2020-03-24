@@ -28,7 +28,8 @@ def validation():
     loaded. It checks some conditions for the process to be available.
     """
     try:
-        from constel.lib.utils.filetools import read_file, select_ROI_number
+        from constel.lib.utils.filetools import read_nomenclature_file,\
+            select_ROI_number
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -78,7 +79,7 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters.
     """
-    from constel.lib.utils.filetools import read_file
+    from constel.lib.utils.filetools import read_nomenclature_file
     # default value
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
@@ -89,7 +90,7 @@ def initialization(self):
         """
         if self.regions_nomenclature is not None:
             s = []
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["keep_regions"] = ListOf(Choice(*s),
                                                     section="Options")

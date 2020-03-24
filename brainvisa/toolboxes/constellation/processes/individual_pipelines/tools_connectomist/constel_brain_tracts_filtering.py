@@ -39,7 +39,8 @@ def validation():
             "'{0}' is not contained in PATH environnement variable. "
             "Please make sure that constel package is installed.".format(cmd))
     try:
-        from constel.lib.utils.filetools import read_file, select_ROI_number
+        from constel.lib.utils.filetools import read_nomenclature_file,\
+            select_ROI_number
         from constel.lib.utils.fibertools import load_fiber_tracts
     except ImportError:
         raise ValidationError(
@@ -154,14 +155,14 @@ def initialization(self):
         It also resets the region parameter to default state after
         the nomenclature changes.
         """
-        from constel.lib.utils.filetools import read_file
+        from constel.lib.utils.filetools import read_nomenclature_file
         current = self.region
         self.setValue('region', current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
             # Temporarily set a value which will remain valid
             self.region = s[0][1]
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
