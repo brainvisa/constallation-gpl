@@ -27,11 +27,17 @@ from brainvisa.processes import SerialExecutionNode
 from brainvisa.processes import ProcessExecutionNode
 from brainvisa.processes import ValidationError
 
+
 # Package import
-try:
-    from constel.lib.utils.filetools import read_file
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
+def validation(self):
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
+    """
+    try:
+        from constel.lib.utils.filetools import read_file
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 # ---------------------------Header--------------------------------------------
 
