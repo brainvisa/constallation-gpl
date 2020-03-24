@@ -34,8 +34,8 @@ def validation():
             "environnement variable or please make sure that constellation "
             "is installed.")
     try:
-        from constel.lib.utils.filetools import select_ROI_number,\
-            save_normalization
+        from constel.lib.utils.filetools import select_ROI_number
+        from constel.lib.utils.matrixtools import save_normalization
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -129,8 +129,8 @@ def initialization(self):
 def execution(self, context):
     """ Compute reduced connectivity matrix M(target regions, patch vertices)
     """
-    from constel.lib.utils.filetools import select_ROI_number,\
-        save_normalization
+    from constel.lib.utils.filetools import select_ROI_number
+    from constel.lib.utils.matrixtools import save_normalization
     # selects the ROI label corresponding to ROI name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)
