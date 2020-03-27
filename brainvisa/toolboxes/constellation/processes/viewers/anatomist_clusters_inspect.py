@@ -26,7 +26,7 @@ def validation():
 
 
 name = 'Anatomist clusters inspect tool'
-userLevel = 0
+userLevel = 2
 
 signature = Signature(
     'clusters', ReadDiskItem('Connectivity ROI texture',

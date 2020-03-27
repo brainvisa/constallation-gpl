@@ -44,7 +44,7 @@ def validation():
 
 name = "Anatomist Show Connectivity Profiles of a Specific Cortical Element"
 roles = ("viewer", )
-userLevel = 0
+userLevel = 2
 
 signature = Signature(
     "connectivity_matrix", ReadDiskItem(

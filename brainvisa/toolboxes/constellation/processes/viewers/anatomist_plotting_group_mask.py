@@ -45,7 +45,7 @@ def validation():
 
 name = "Anatomist Plotting Group Mask"
 roles = ("viewer",)
-userLevel = 0
+userLevel = 2
 
 signature = Signature(
     "group_masks", ListOf(

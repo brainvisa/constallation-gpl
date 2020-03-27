@@ -28,7 +28,7 @@ def validation(self):
 
 
 name = 'Anatomist view mozaic visualization of fibers'
-userLevel = 0
+userLevel = 2
 # roles = ('viewer', )
 
 

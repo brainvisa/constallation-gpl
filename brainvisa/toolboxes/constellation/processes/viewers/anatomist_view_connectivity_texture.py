@@ -22,7 +22,7 @@ def validation(self):
 
 
 name = 'Anatomist view Connectivity Texture'
-userLevel = 0
+userLevel = 2
 roles = ('viewer', )
 
 signature = Signature(
