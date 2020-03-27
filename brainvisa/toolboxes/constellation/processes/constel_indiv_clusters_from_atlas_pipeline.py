@@ -103,6 +103,15 @@ signature = Signature(
                             "measure": "no"},
         section="Atlas inputs"),
 
+    # options
+    "regions_selection", Choice("All but main region", "All", "Custom",
+                                section="Options"),
+    "keep_regions", ListOf(OpenChoice(), section="Options", userLevel=2),
+    "min_fibers_length", Float(section="Options"),
+    "smoothing", Float(section="Options"),
+    "kmax", Integer(section="Options"),
+    "normalize", Boolean(section="Options"),
+
     # --outputs--
     "complete_individual_matrix", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
@@ -134,14 +143,6 @@ signature = Signature(
                             "measure": "no"},
         section="Outputs"),
 
-    # options
-    "regions_selection", Choice("All but main region", "All", "Custom",
-                                section="Options"),
-    "keep_regions", ListOf(OpenChoice(), section="Options", userLevel=2),
-    "min_fibers_length", Float(section="Options"),
-    "smoothing", Float(section="Options"),
-    "kmax", Integer(section="Options"),
-    "normalize", Boolean(section="Options"),
 )
 
 
