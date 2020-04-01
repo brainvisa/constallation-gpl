@@ -54,6 +54,11 @@ signature = Signature(
                             "averaged": "Yes"}),
     'basins_texture', ListOf(
         ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
+                     requiredAttributes={"roi_autodetect": "yes",
+                                         "roi_filtered": "yes",
+                                         "intersubject": "yes",
+                                         "step_time": "no",
+                                         "measure": "no"})),
 
     'clustering_texture', ListOf(
         ReadDiskItem('Connectivity ROI Texture', 'anatomist texture formats',
