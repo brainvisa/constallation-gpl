@@ -12,7 +12,7 @@
 
 # brainvisa
 from __future__ import absolute_import
-from brainvisa.processes import Signature, ListOf, ReadDiskItem
+from brainvisa.processes import Signature, Choice, ListOf, ReadDiskItem, Integer, Float
 from brainvisa import anatomist as anatomist
 
 # system import
