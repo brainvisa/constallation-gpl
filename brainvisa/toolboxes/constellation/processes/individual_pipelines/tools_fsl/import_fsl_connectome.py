@@ -231,3 +231,6 @@ def execution(self, context):
     dst = os.path.join(dstdir, matrix_name)
 
     shutil.copy2(src, dst)
+
+    # Delete the temporary directory after import
+    os.remove(os.path.dirname(src))
