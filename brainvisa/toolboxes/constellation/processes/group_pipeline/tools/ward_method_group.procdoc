@@ -2,7 +2,9 @@
 <minf expander="minf_2.0">
 <d>
   <d name="en">
-    <xhtml name="short">Ward method minimizes the total within-cluster variance.  At each step the pair of clusters with minimum cluster distance are merged. To implement this method, at each step find the pair of clusters that leads to minimum increase in total within-cluster variance after merging.</xhtml>
+    <xhtml name="short"><b>Not used in group pipeline</b>.
+
+Ward method minimizes the total within-cluster variance.  At each step the pair of clusters with minimum cluster distance are merged. To implement this method, at each step find the pair of clusters that leads to minimum increase in total within-cluster variance after merging.</xhtml>
     <d name="parameters">
       <xhtml name="average_mesh">Both average brain mesh (from a group of subject)</xhtml>
       <xhtml name="distance_matrix_file"/>

@@ -153,7 +153,7 @@ def initialization(self):
 def execution(self, context):
     """
     """
-    from bainvisa import anatomist as ana
+    from brainvisa import anatomist as ana
     # instance of anatomist
     a = ana.Anatomist()
 

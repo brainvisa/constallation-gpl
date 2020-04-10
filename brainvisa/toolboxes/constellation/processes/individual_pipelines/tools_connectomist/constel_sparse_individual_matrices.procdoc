@@ -24,71 +24,62 @@ Par exemple, vous pouvez utilser l'atlas Desikan-Killiany ou l'atlas Destrieux i
       <xhtml name="oversampled_semilabeled_fibers">Ensemble des fibres suréchantillonnée à partir des fibres ayant qu'une seule extrémité associée à un point du maillage</xhtml>
       <xhtml name="cortical_parcellation">Parcellisation de la surface corticale en régions anatomiques (lobes, gyri...). Par exemple, FreeSurfer propose une parcellisation corticale en gyri.</xhtml>
       <xhtml name="profile_semilabeled_fibers">Projection de la matrice de connectivité des fibres semi labelisées sur la surface corticale.</xhtml>
-      <xhtml name="profile_labeled_fibers">Projection de la matrice de connectivité des fibres labelisées sur la surface corticale.</xhtml>
+      <xhtml name="cortical_region">La liste des noms de labels présents dans le fichier texte 'labels_nomenclature' est proposée. Vous devez choisir une région à étudier.</xhtml>
       <xhtml name="labeled_fibers">L'ensemble des fibres ayant leur deux extrémités identifiées sur le maillage.</xhtml>
       <xhtml name="matrix_semilabeled_fibers">Matrice de connectivité des fibres semilabelisées.</xhtml>
       <xhtml name="matrix_labeled_fibers">Matrice de connectivité des fibres labelisées.</xhtml>
-      <xhtml name="cortical_region">La liste des noms de labels présents dans le fichier texte 'labels_nomenclature' est proposée. Vous devez choisir une région à étudier.</xhtml>
+      <xhtml name="profile_labeled_fibers">Projection de la matrice de connectivité des fibres labelisées sur la surface corticale.</xhtml>
     </d>
   </d>
   <d name="en">
-    <xhtml name="short"><img SRC="../../images/constellation/matrice.png" ALT="" height="450" width="900"/>
+    <xhtml name="short">Construction of the cortical region connectivity matrix. <br/>
+<br/>
+<img SRC="../../images/constellation/matrice.png" ALT="" height="450" width="900"/>
 </xhtml>
     <d name="parameters">
-      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed like that (The order of labels is not relevant.): <br/>
-<br/>
-<pre>1              nameA</pre>
-<pre>2              nameB</pre>
-<pre>3              nameC</pre>
-<pre>4              nameD</pre>
-<pre>5              nameE</pre>
-<pre>..             .....   </pre>
-<br/>
-For example, you can use the Desikan-Killiany Atlas or the Destrieux Atlas of the FreeSurfer software.</xhtml>
-      <xhtml name="dw_to_t1">Transformation from t2 to anat</xhtml>
-      <xhtml name="profile_labeled_fibers">Projection of the connectivity matrix (of the labeled fibers) on the cortical surface.</xhtml>
-      <xhtml name="oversampled_semilabeled_fibers">All the fibers having one end identified on the mesh and oversampled.</xhtml>
-      <xhtml name="cortical_parcellation">Parcellation of the cortical surface into anatomical region (lobes, gyri...). For example, FreeSurfer provides a cortical parcellation into gyri.<br/>
-A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
-      <xhtml name="profile_semilabeled_fibers">Projection of the connectivity matrix (of the semilabeled fibers) on the cortical surface.</xhtml>
-      <xhtml name="cortical_region">The list oflregion names, present in the text file 'cortical_regions_nomenclature' is proposed. <br/>
-You must choose a region. The study will be done on this region.</xhtml>
+      <xhtml name="dw_to_t1">Affine spatial transformation to get the T1 MRI space from the dMRI diffusion (and tracts) space.</xhtml>
+      <xhtml name="matrix_semilabeled_fibers">Connectivity matrix that links labeled vertices to unlabeled vertices on the given cortical parcellation.</xhtml>
+      <xhtml name="region">The study region based on <i>regions_nomenclature</i> file.</xhtml>
+      <xhtml name="regions_nomenclature">Nomenclature of the cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas</xhtml>
       <xhtml name="labeled_fibers">All the fibers having their ends identified on the mesh.</xhtml>
-      <xhtml name="matrix_semilabeled_fibers">This connectivity matrix links the label vertices to vertices not labeled by the cortical parcellation given.</xhtml>
-      <xhtml name="matrix_labeled_fibers">This connectivity matrix links the label vertices to all the vertices of the cortical surface.</xhtml>
-      <xhtml name="white_mesh">Individual white mesh of the entire cortical surface (white/gray interface).</xhtml>
+      <xhtml name="matrix_labeled_fibers">Connectivity matrix that links labeled vertices of the study region to other labeled vertices of the cortex on the given cortical parcellation.</xhtml>
+      <xhtml name="profile_semilabeled_fibers">Projection of the semilabeled connectivity matrix on the cortical surface.</xhtml>
+      <xhtml name="profile_labeled_fibers">Projection of the labeled connectivity matrix on the cortical surface.</xhtml>
+      <xhtml name="regions_parcellation">Cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas (?h.aparc.annot).</xhtml>
+      <xhtml name="individual_white_mesh">Freesurfer white-grey interface of the cortex.<br/>
+Should not be inflated.</xhtml>
+      <xhtml name="oversampled_semilabeled_fibers">All the fibers having one end identified on the mesh and oversampled.</xhtml>
+      <xhtml name="complete_individual_matrix">Superposition of both semilabeled and labeled matrices.</xhtml>
     </d>
-    <xhtml name="long">Construction of the cortical region connectivity matrix. <br/>
-<br/>
-(1) Each fibertract connects two vertices of the cortical surface and contributes to the cortical connectivity matrix.<br/>
+    <xhtml name="long">(1) Each fibertract connects two vertices of the cortical surface and contributes to the cortical connectivity matrix.<br/>
 (2) The matrix where each line corresponds to the connectivity profile of one vertex of the input cortical region with the whole cortical surface.<br/>
-<br/>
-Example inputs/outputs:
-<br/>
+
+
+<h2>Usage example</h2>
+
+<pre>regions_nomenclature:            /casa/build/share/brainvisa-share-4.6/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
+<pre>region:                          lh.inferiorparietal</pre>
 <pre>oversampled_semilabeled_fibers:  /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
-                                 001_studyA_lh.postcentral_outsideFibersOfCortex_20to500mm_oversampled.bundles</pre>
-<pre>labeled_fibers:                  /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
-                                 001_studyA_lh.postcentral_fibersNearCortex_30to500mm.bundles</pre>
-<pre>labels_nomenclature:             /my/path/share/brainvisa-share-4.5/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
-<pre>label_name:                      lh.postcentral </pre>
-<pre>white_mesh:                      /my/path/database_freesurfer/001/surf/bh.r.aims.white.gii</pre>
-<pre>cortical_parcellation:           /my/path/database_freesurfer/group_analysis/01to40/average_brain/bh.annot.averagebrain.gii</pre>
-<pre>dw_to_t1:                        /my/path/001/dw_to_t1.trm </pre>
-<pre>matrix_semilabeled_fibers:       /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.postcentral/matrix/
-                                 001_studyA_lh.postcentral_connectivityMatrix_outsideFibersOfCortex_20to500mm.imas</pre>
-<pre>matrix_labeled_fibers:           /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.postcentral/matrix/
-                                 001_studyA_lh.postcentral_connectivityMatrix_fibersNearCortex_30to500mm.imas</pre>
-<pre>profile_semilabeled_fibers:      /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.postcentral/matrix/
-                                 001_studyA_lh.postcentral_meanConnectivityProfile_outsideFibersOfCortex_20to500mm.gii</pre>
-<pre>profile_labeled_fibers:          /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.postcentral/matrix/
-                                 001_studyA_lh.postcentral_meanConnectivityProfile_fibersNearCortex_30to500mm.gii</pre>
-</xhtml>
+                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.inferiorparietal/filteredTracts/
+                                 001_studyA_lh.inferiorparietal_oversampled_semilabelled_fibers_20to500mm.bundles</pre>
+<pre>labeled_fibers:                  /my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/
+                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.inferiorparietal/filteredTracts/
+                                 001_studyA_lh.inferiorparietal_labelled_fibers_20to500mm.bundles  </pre>
+<pre>individual_white_mesh:           /my/path/freesurfer_db/001/surf/bh.r.aims.white.gii</pre>
+<pre>dw_to_t1:                        /my/path/connectomist_db/B1500/StreamlineProbabilistic/aQBI/27seeds/001/dw_to_t1.trm</pre>
+<pre>regions_parcellation:            /my/path/freesurfer_db/group_analysis/average_group/average_brain/bh.annot.averagebrain.gii</pre>
+<pre>matrix_semilabeled_fibers:       /my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/default_tracking_session/connectivity_parcellation/avg/studyA/
+                                 lh.inferiorparietal/matrix/001_studyA_lh.inferiorparietal_semilabelled_fibers_matrix_20to500mm.imas</pre>
+<pre>matrix_labeled_fibers:           /my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/default_tracking_session/connectivity_parcellation/avg/studyA/
+                                 lh.inferiorparietal/matrix/001_studyA_lh.inferiorparietal_labelled_fibers_matrix_20to500mm.imas</pre>
+<pre>profile_semilabeled_fibers:      /my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/default_tracking_session/connectivity_parcellation/avg/studyA/
+                                 lh.inferiorparietal/matrix/001_studyA_lh.inferiorparietal_semilabelled_fibers_mean_profile_20to500mm.imas</pre>
+<pre>profile_labeled_fibers:          /my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/default_tracking_session/connectivity_parcellation/avg/studyA/
+                                 lh.inferiorparietal/matrix/001_studyA_lh.inferiorparietal_labelled_fibers_meanprofile_20to500mm.imas</pre>
+<pre>complete_individual_matrix:      /my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/default_tracking_session/connectivity_parcellation/avg/studyA/
+                                 lh.inferiorparietal/matrix/001_studyA_lh.inferiorparietal_complete_matrix_smooth0.0_20to500mm.imas</pre></xhtml>
   </d>
 </d>
 </minf>

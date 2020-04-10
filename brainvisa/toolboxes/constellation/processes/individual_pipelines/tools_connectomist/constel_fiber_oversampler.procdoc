@@ -20,21 +20,21 @@ Exemple inputs/outputs:
                                  001_studyA_lh.postcentral_outsideFibersOfCortex_20to500mm_oversampled.bundles  </pre></xhtml>
   </d>
   <d name="en">
-    <xhtml name="short"><img SRC="../../images/constellation/fiber_oversampler.png" ALT="" height="400" width="1000"/></xhtml>
+    <xhtml name="short">Fibers tracts are oversampled to connect their ends to the cortical surface.<br/><br/>
+
+<img SRC="../../images/constellation/fiber_oversampler.png" ALT="" height="400" width="1000"/></xhtml>
     <d name="parameters">
       <xhtml name="semilabeled_fibers">All the fibers having one end identified on the mesh.</xhtml>
       <xhtml name="oversampled_semilabeled_fibers">All the fibers having one end identified on the mesh and oversampled.</xhtml>
     </d>
-    <xhtml name="long">Fibers tracts are oversampled to attach their ends with the cortical surface.<br/>
-<br/>
-Example inputs/outputs:
-<br/>
+    <xhtml name="long"><h2>Usage example</h2>
+
 <pre>semilabeled_fibers:              /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
-                                 001_studyA_lh.postcentral_outsideFibersOfCortex_20to500mm.bundles  </pre>
+                                 default_tracking_session/ connectivity_parcellation/avg/studya/lh.inferiorparietal/filteredTracts/
+                                 001_studyA_lh.inferiorparietal_semilabelled_fibers_20to500mm.bundles</pre>
 <pre>oversampled_semilabeled_fibers:  /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
-                                 001_studyA_lh.postcentral_outsideFibersOfCortex_20to500mm_oversampled.bundles  </pre></xhtml>
+                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.inferiorparietal/filteredTracts/
+                                 001_studyA_lh.inferiorparietal_oversampled_semilabelled_fibers_20to500mm.bundles</pre></xhtml>
   </d>
 </d>
 </minf>

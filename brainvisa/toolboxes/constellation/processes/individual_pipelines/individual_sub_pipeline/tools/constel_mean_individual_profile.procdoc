@@ -5,36 +5,36 @@
     <xhtml name="short"/>
     <xhtml name="long"/>
     <d name="parameters">
-      <xhtml name="cortical_region"/>
-      <xhtml name="cortical_regions_nomenclature"/>
       <xhtml name="complete_individual_matrix"/>
+      <xhtml name="cortical_regions_nomenclature"/>
+      <xhtml name="cortical_region"/>
       <xhtml name="mean_individual_profile">Le profil de connectivité individuel moyenné.</xhtml>
       <xhtml name="cortical_parcellation">Parcellisation de la surface corticale en régions anatomiques (lobes, gyri...). Par exemple, FreeSurfer propose une parcellisation corticale en gyri.</xhtml>
     </d>
   </d>
   <d name="en">
-    <xhtml name="short"><img SRC="../../images/constellation/profile_matrice.png" ALT="" height="400" width="900"/></xhtml>
+    <xhtml name="short">Calculation of the mean individual profile by summing all vertices of the cortical region.<br/><br/>
+<img SRC="../../images/constellation/profile_matrice.png" ALT="" height="400" width="900"/></xhtml>
     <d name="parameters">
-      <xhtml name="cortical_parcellation">Parcellation of the cortical surface into anatomical region (lobes, gyri...). For example, FreeSurfer provides a cortical parcellation into gyri.<br/>
-A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
-      <xhtml name="cortical_regions_nomenclature"/>
-      <xhtml name="complete_individual_matrix"/>
-      <xhtml name="mean_individual_profile">The mean individual profile.</xhtml>
-      <xhtml name="cortical_region"/>
+      <xhtml name="region">The study region based on <i>regions_nomenclature</i> file.</xhtml>
+      <xhtml name="regions_nomenclature">Nomenclature of the cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas</xhtml>
+      <xhtml name="regions_parcellation">Cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas (?h.aparc.annot).</xhtml>
+      <xhtml name="mean_individual_profile">Mean individual profile calculated from smoothed matrix.</xhtml>
+      <xhtml name="complete_matrix_smoothed">Smoothed connectivity matrix.</xhtml>
     </d>
     <xhtml name="long">In each matrix, the ith line corresponds to the cortical connectivity profile of the ith point of the patch, representing its connexions towards each point of the cortical surface. Then, all profiles are averaged across all patch points. So, the connectivity profile of the patch is computed.<br/>
-<br/>
-Example inputs/outputs:
-<br/>
-<pre>complete_individual_matrix:      /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.postcentral/matrix/
-                                 001_studyA_lh.postcentral_connectivityMatrixSmooth3.0.imas</pre>
-<pre>labels_nomenclature:             /my/path/share/brainvisa-share-4.5/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
-<pre>label_name:                      lh.postcentral </pre>
-<pre>cortical_parcellation:           /my/path/database_freesurfer/group_analysis/01to40/average_brain/bh.annot.averagebrain.gii</pre>
-<pre>mean_individual_profile:         /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.postcentral/clustering/smooth3.0/
-                                 001_studyA_lh.postcentral_meanConnectivityProfile.gii</pre></xhtml>
+
+<h2>Usage example</h2>
+
+<pre>regions_nomenclature:            /casa/build/share/brainvisa-share-4.6/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
+<pre>region:                          lh.inferiorparietal</pre>
+<pre>complete_matrix_smoothed:        /my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/default_tracking_session/connectivity_parcellation
+                                 /avg/studyA/lh.inferiorparietal/matrix/001_studyA_lh.inferiorparietal_complete_matrix_smooth3.0_20.0to500.0mm.imas</pre>
+<pre>regions_parcellation:            /my/path/freesurfer_db/group_analysis/average_group/average_brain/bh.annot.averagebrain.gii</pre>
+<pre>mean_individual_profile:         /my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/default_tracking_session/connectivity_parcellation
+                                 /avg/studyA/lh.inferiorparietal/clustering/smooth3.0/001_studyA_lh.inferiorparietal_mean_profile_20.0to500.0mm.gii</pre></xhtml>
   </d>
 </d>
 </minf>

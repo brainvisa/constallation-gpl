@@ -3,25 +3,32 @@
 <d>
   <d name="fr">
     <xhtml name="short"><img SRC="../../images/constellation/mask.png" ALT="" height="400" width="900"/></xhtml>
+    <xhtml name="long">Un masque ne gardant que les points fortement connectés pour une majorité de sujets est calculé.</xhtml>
     <d name="parameters">
       <xhtml name="mean_individual_profiles">Liste de tous les profiles individuels appartenant au sujets d'un groupe d'étude.</xhtml>
       <xhtml name="subjects_group"/>
       <xhtml name="new_study_name"/>
       <xhtml name="group_mask">Le masque réprésente le pattern le plus représentatif dans un groupe de sujets.</xhtml>
     </d>
-    <xhtml name="long">Un masque ne gardant que les points fortement connectés pour une majorité de sujets est calculé.</xhtml>
   </d>
   <d name="en">
-    <xhtml name="short"><img SRC="../../images/constellation/mask.png" ALT="" height="400" width="900"/></xhtml>
+    <xhtml name="short">A mask is calculated to identify the cortical regions strongly connected and reproducible among subjects.<br/><br/>
+<img SRC="../../images/constellation/mask.png" ALT="" height="400" width="900"/></xhtml>
     <d name="parameters">
-      <xhtml name="mean_individual_profiles">List of the all individual mean profiles for a group of subjects.</xhtml>
-      <xhtml name="subjects_group">The XML file corresponding the study group.</xhtml>
-      <xhtml name="new_study_name">In the group pipeline, you want to change the study name. In this case, the outputs will be written in the new study name directory.</xhtml>
-      <xhtml name="group_mask">The mask represents the pattern the most representative of a subjects group.</xhtml>
+      <xhtml name="new_study_name">Optional name given to the group study. <br/>
+Default to <i>study_name</i>.</xhtml>
+      <xhtml name="subjects_group">The XML file corresponding the subjects group.</xhtml>
+      <xhtml name="group_mask">The most representative connectivity pattern of a group of subjects.</xhtml>
+      <xhtml name="mean_individual_profiles">List of the mean individual profiles of the given group of subjects.</xhtml>
     </d>
-    <xhtml name="long">A mask is calculated to identify the cortical regions stronlgy connected and reproducible between the subjects.
+    <xhtml name="long"><h2>Usage example</h2>
 
-</xhtml>
+<pre>new_study_name:                  group_studyA</pre>
+<pre>subjects_group:                  /my/path/brainvisa_db/subjects/group_analysis/g1/g1_group.xml</pre>
+<pre>mean_individual_profiles:        '/my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/default_tracking_session/connectivity_parcellation
+                                 /avg/studyA/lh.inferiorparietal/clustering/smooth3.0/001_studyA_lh.inferiorparietal_mean_profile_20to500mm.gii'</pre>
+<pre>group_mask:                     /my/path/brainvisa_db/subjects/group_analysis/g1/connectivity_clustering/avg/studyA/lh.inferiorparietal/smooth3.0
+                                /g1_avg_studyA_lh.inferiorparietal_mask_20to500mm.gii</pre></xhtml>
   </d>
 </d>
 </minf>

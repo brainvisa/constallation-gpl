@@ -91,7 +91,7 @@ signature = Signature(
         section="Study parameters"),
     "region", OpenChoice(section="Study parameters"),
 
-    "constellation_subjects_group", ReadDiskItem(
+    "subjects_group", ReadDiskItem(
         "Group definition", "XML",
         exactType=True,
         section="Group inputs"),
@@ -140,7 +140,7 @@ def linkGroup(self, param1):
 def initialization(self):
     """Provides default values and link of parameters
     """
-    self.addLink(None, "constellation_subjects_group", self.linkGroup)
+    self.addLink(None, "subjects_group", self.linkGroup)
 
     # default value
     self.smoothing = 3.0
@@ -154,12 +154,12 @@ def initialization(self):
 
     if neuroConfig.gui:
         self.signature[
-            "constellation_subjects_group"].editor = types.MethodType(
+            "subjects_group"].editor = types.MethodType(
             lambda self, parent, name, context:
             GroupCreatorEditor(self, parent, name,
                                context=context,
                                write=self._write),
-            self.signature["constellation_subjects_group"])
+            self.signature["subjects_group"])
 
     def fill_study_choice(self, dummy=None):
         """
@@ -216,11 +216,11 @@ def initialization(self):
     def link_profiles(self, dummy):
         """Function of link to determine the connectivity profiles
         """
-        if (self.constellation_subjects_group and self.region
+        if (self.subjects_group and self.region
                 and self.method and self.smoothing and self.study_name):
             registerClass("minf_2.0", Subject, "Subject")
             groupOfSubjects \
-                = readMinf(self.constellation_subjects_group.fullPath())
+                = readMinf(self.subjects_group.fullPath())
             profiles = []
             for subject in groupOfSubjects:
                 atts = {}
@@ -229,7 +229,7 @@ def initialization(self):
                 atts["smoothing"] = str(self.smoothing)
                 atts["studyname"] = self.study_name
                 atts["_database"] \
-                    = self.constellation_subjects_group.get("_database")
+                    = self.subjects_group.get("_database")
                 atts.update(subject.attributes())
                 profile = self.signature[
                     "mean_individual_profiles"].contentType.findValue(atts)
@@ -246,7 +246,7 @@ def initialization(self):
             if roi_seg is not None:
                 return [roi_seg]
         else:
-            group = self.constellation_subjects_group
+            group = self.subjects_group
             if group:
                 registerClass("minf_2.0", Subject, "Subject")
                 groupOfSubjects = readMinf(group.fullPath())
@@ -274,14 +274,14 @@ def initialization(self):
         """
         mesh_type = self.signature["average_mesh"]
         mesh = None
-        if mesh is None and self.constellation_subjects_group is not None:
-            mesh = mesh_type.findValue(self.constellation_subjects_group)
+        if mesh is None and self.subjects_group is not None:
+            mesh = mesh_type.findValue(self.subjects_group)
             if mesh is None:
                 atts = {
                     "freesurfer_group_of_subjects":
-                    self.constellation_subjects_group.get("group_of_subjects"),
+                    self.subjects_group.get("group_of_subjects"),
                     "group_of_subjects":
-                    self.constellation_subjects_group.get("group_of_subjects")
+                    self.subjects_group.get("group_of_subjects")
                 }
                 mesh = mesh_type.findValue(atts)
         return mesh
@@ -291,15 +291,15 @@ def initialization(self):
     self.linkParameters(None, "method", method_changed)
     self.linkParameters("mean_individual_profiles",
                         ("method", "region", "smoothing",
-                         "study_name", "constellation_subjects_group"),
+                         "study_name", "subjects_group"),
                         link_profiles)
     self.linkParameters("normed_individual_profiles",
                         "mean_individual_profiles")
-    self.linkParameters("average_mesh", "constellation_subjects_group",
+    self.linkParameters("average_mesh", "subjects_group",
                         link_mesh)
     self.linkParameters("regions_parcellation",
                         ["average_mesh", "method",
-                         "constellation_subjects_group"],
+                         "subjects_group"],
                         link_regions_parcellation)
 
     # visibility level for the user
@@ -319,7 +319,7 @@ def initialization(self):
                        optional=1))
 
     eNode.addDoubleLink("CreateMask.subjects_group",
-                        "constellation_subjects_group")
+                        "subjects_group")
     eNode.addDoubleLink("CreateMask.new_study_name", "new_study_name")
     eNode.addDoubleLink("CreateMask.mean_individual_profiles",
                         "mean_individual_profiles")
@@ -335,7 +335,7 @@ def initialization(self):
 
     eNode.addDoubleLink(
         "GroupConnectivityProfile.subjects_group",
-        "constellation_subjects_group")
+        "subjects_group")
     eNode.addDoubleLink(
         "GroupConnectivityProfile.new_study_name", "new_study_name")
     eNode.addDoubleLink(
@@ -377,7 +377,7 @@ def initialization(self):
             optional=1))
 
     eNode.addDoubleLink("ReducedGroupMatrix.subjects_group",
-                        "constellation_subjects_group")
+                        "subjects_group")
     eNode.addDoubleLink("ReducedGroupMatrix.study_name",
                         "study_name")
     eNode.addDoubleLink("ReducedGroupMatrix.average_mesh", "average_mesh")
@@ -395,7 +395,7 @@ def initialization(self):
                                         optional=1))
 
     eNode.addDoubleLink("GroupClustering.subjects_group",
-                        "constellation_subjects_group")
+                        "subjects_group")
     eNode.addDoubleLink("GroupClustering.method", "method")
     eNode.addDoubleLink("GroupClustering.average_mesh", "average_mesh")
     eNode.addDoubleLink("GroupClustering.regions_parcellation",
@@ -410,5 +410,5 @@ def initialization(self):
     fill_study_choice(self)
     if len(self.signature["study_name"].values) != 0:
         self.study_name = self.signature["study_name"].values[0][0]
-    self.constellation_subjects_group = self.signature[
-        "constellation_subjects_group"].findValue({})
+    self.subjects_group = self.signature[
+        "subjects_group"].findValue({})
