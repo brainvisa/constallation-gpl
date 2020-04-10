@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short"/>
+    <d name="parameters">
+      <xhtml name="normalize">By default the connectivity matrices values are normalized to balance any spurious weighting effects due to more connected regions or subjects, or to the tractography algorithm (number of seeds...). But sometimes we also like to see the raw connectivity matrix: in that case, uncheck this normalization.</xhtml>
+      <xhtml name="complete_individual_matrix">Connectivity matrix of the study region compatible with Constellation requirements.</xhtml>
+      <xhtml name="region">The study region based on <i>regions_nomenclature</i> file.</xhtml>
+      <xhtml name="regions_nomenclature">Nomenclature of the cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas</xhtml>
+      <xhtml name="smoothing">Degree of smoothing (in millimetres).<br/>
+Default to 3.0 mm.</xhtml>
+      <xhtml name="kmax">Maximal number of clusters used to parcellate the study region.<br/>
+Default to 12.</xhtml>
+      <xhtml name="keep_regions">Kept regions for the data analysis.</xhtml>
+      <xhtml name="regions_parcellation">Cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas (?h.aparc.annot).</xhtml>
+      <xhtml name="individual_white_mesh">Freesurfer white-grey interface of the cortex.<br/>
+Should not be inflated.</xhtml>
+    </d>
+    <xhtml name="long"><h2>Usage example</h2>
+
+<pre>regions_nomenclature:            /casa/build/share/brainvisa-share-4.6/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
+<pre>region:                          lh.inferiorparietal</pre>
+<pre>complete_individual_matrix:      /my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/default_tracking_session/connectivity_parcellation/avg/hcp/
+                                 lh.inferiorparietal/matrix/001_hcp_lh.inferiorparietal_complete_matrix_smooth0.0_20.0to500.0mm.imas</pre>
+<pre>individual_white_mesh:           /my/path/freesurfer_db/001/surf/bh.r.aims.white.gii</pre>
+<pre>regions_parcellation:            /my/path/freesurfer_db/group_analysis/average_group/average_brain/bh.annot.averagebrain.gii</pre>
+<pre>keep_regions:                    'lh.unknown' 'lh.bankssts' 'lh.inferiorparietal'</pre>
+<pre>smoothing:                       3.0  </pre>
+<pre>kmax:                            12  </pre>
+<pre>normalize:                       True  </pre>
+</xhtml>
+  </d>
+</d>
+</minf>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short"><b>Not used in group pipeline</b>.</xhtml>
+    <d name="parameters">
+      <xhtml name="individual_clustering"/>
+      <xhtml name="group_clustering"/>
+      <xhtml name="region"/>
+      <xhtml name="regions_nomenclature"/>
+      <xhtml name="individual_regions_parcellation"/>
+      <xhtml name="individual_matrix"/>
+      <xhtml name="atlas_matrix"/>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>
