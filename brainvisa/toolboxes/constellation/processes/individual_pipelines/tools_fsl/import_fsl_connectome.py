@@ -233,4 +233,4 @@ def execution(self, context):
     shutil.copy2(src, dst)
 
     # Delete the temporary directory after import
-    os.remove(os.path.dirname(src))
+    shutil.rmtree(os.path.dirname(src))
