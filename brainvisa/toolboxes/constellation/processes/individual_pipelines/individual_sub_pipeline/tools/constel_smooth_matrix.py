@@ -16,9 +16,11 @@ from __future__ import absolute_import
 from brainvisa.processes import Float
 from brainvisa.processes import String
 from brainvisa.processes import Signature
+from brainvisa.processes import Boolean
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
+from brainvisa.data import neuroHierarchy
 
 # Soma module
 from soma.path import find_in_path
@@ -66,6 +68,7 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
+
     "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
@@ -73,6 +76,8 @@ signature = Signature(
         section="Freesurfer data"),
 
     "smoothing", Float(section="Options"),
+
+    "erase_matrices", Boolean(section="Options"),
 
     # --outputs--
     "complete_matrix_smoothed", WriteDiskItem(
@@ -91,7 +96,8 @@ def initialization(self):
     """Provides default values and link of parameters"""
 
     # default values
-    self.smoothing = 3.0
+    self.smoothing = 3.
+    self.erase_matrices = True
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -148,3 +154,9 @@ def execution(self, context):
                    "-p", label_number)
 
     replace_negative_values(self.complete_individual_matrix.fullPath())
+
+    if self.erase_matrices:
+        matrix_database = self.complete_individual_matrix.get('_database')
+        if matrix_database:
+            db = neuroHierarchy.databases.database(matrix_database)
+            db.removeDiskItem(self.complete_individual_matrix, eraseFiles=True)

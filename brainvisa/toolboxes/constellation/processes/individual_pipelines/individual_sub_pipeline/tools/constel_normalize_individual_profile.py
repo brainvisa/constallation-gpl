@@ -145,5 +145,4 @@ def execution(self, context):
     cmd += ["-r"]
     for label in labels:
         cmd += [label]
-    context.write(cmd)
     context.pythonSystem(*cmd)

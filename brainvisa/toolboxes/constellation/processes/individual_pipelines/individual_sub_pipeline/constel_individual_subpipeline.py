@@ -74,6 +74,8 @@ signature = Signature(
     "smoothing", Float(section="Options"),
     "kmax", Integer(section="Options"),
     "normalize", Boolean(section="Options"),
+    "erase_matrices", Boolean(section="Options")
+
 )
 
 
@@ -88,6 +90,7 @@ def initialization(self):
     self.smoothing = 3.0
     self.kmax = 12
     self.normalize = True
+    self.erase_matrices = True
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -159,6 +162,8 @@ def initialization(self):
                         "regions_parcellation")
     eNode.addDoubleLink("smoothing.smoothing",
                         "smoothing")
+    eNode.addDoubleLink("smoothing.erase_matrices",
+                        "erase_matrices")
 
     ###########################################################################
     #    link of parameters with the process: "Mean Connectivity Profile"     #
@@ -176,7 +181,8 @@ def initialization(self):
                         "region")
     eNode.addDoubleLink("MeanProfile.regions_parcellation",
                         "regions_parcellation")
-
+    eNode.addDoubleLink("MeanProfile.erase_matrices",
+                        "erase_matrices")
     ###########################################################################
     #    link of parameters with the process: "Remove Internal Connections"   #
     ###########################################################################

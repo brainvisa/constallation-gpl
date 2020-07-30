@@ -18,6 +18,8 @@ from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
+from brainvisa.processes import Boolean
+from brainvisa.data import neuroHierarchy
 
 # Soma module
 from soma.path import find_in_path
@@ -64,6 +66,8 @@ signature = Signature(
         requiredAttributes={"side": "both", "vertex_corr": "Yes"},
         section="Freesurfer data"),
 
+    "erase_matrices", Boolean(section="Options"),
+
     # --ouputs--
     "mean_individual_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
@@ -80,6 +84,7 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters"""
     # default value
+    self.erase_matrices = True
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -123,3 +128,9 @@ def execution(self, context):
                    "-type", "seed_mean_connectivity_profile",
                    "-normalize", 0,
                    "-verbose", 1)
+
+    if self.erase_matrices:
+        matrix_database = self.complete_matrix_smoothed.get('_database')
+        if matrix_database:
+            db = neuroHierarchy.databases.database(matrix_database)
+            db.removeDiskItem(self.complete_matrix_smoothed, eraseFiles=True)

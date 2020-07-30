@@ -19,8 +19,8 @@
       <xhtml name="smoothing">Degré du smoothing en millimètre.</xhtml>
       <xhtml name="kmax"/>
       <xhtml name="keep_regions"/>
-      <xhtml name="region"/>
       <xhtml name="regions_parcellation"/>
+      <xhtml name="region"/>
       <xhtml name="individual_white_mesh"/>
       <xhtml name="method">Deux méthodes sont proposées: <br/>
 <i><b>(1) "averaged approach" </b></i> pour obtenir un unique résultat de groupe. <br/>
@@ -57,6 +57,8 @@ Default to 500mm.</xhtml>
       <xhtml name="method">Two methods are proposed: <br/>
 <i><b>(1) averaged approach</b></i> to obtain an average result on the group.<br/>
 <i><b>(2) concatenated approach</b></i> to obtain individual results across the group.<br/></xhtml>
+      <xhtml name="erase_matrix">Option to erase the complete smoothed matrix in order to save some storage space on hard disk. Can be unchecked for debugging purposes or to specifically keep this matrix.<br/>
+Default to True.</xhtml>
       <xhtml name="kmax">Maximal number of clusters used to parcellate the study region.<br/>
 Default to 12.</xhtml>
       <xhtml name="keep_regions">Kept regions for the data analysis.</xhtml>
@@ -94,7 +96,8 @@ Should not be inflated.</xhtml>
 <pre>max_fibers_length:               500.0  </pre>
 <pre>smoothing:                       3.0  </pre>
 <pre>kmax:                            12  </pre>
-<pre>normalize:                       True  </pre></xhtml>
+<pre>normalize:                       True  </pre>
+<pre>erase_matrix:                    True  </pre></xhtml>
   </d>
 </d>
 </minf>

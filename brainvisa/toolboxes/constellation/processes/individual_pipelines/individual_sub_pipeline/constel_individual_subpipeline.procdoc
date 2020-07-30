@@ -11,6 +11,8 @@
 <i>Example :</i> Freesurfer Desikan_Killiany Atlas</xhtml>
       <xhtml name="smoothing">Degree of smoothing (in millimetres).<br/>
 Default to 3.0 mm.</xhtml>
+      <xhtml name="erase_matrix">Option to erase the complete smoothed matrix in order to save some storage space on hard disk. Can be unchecked for debugging purposes or to specifically keep this matrix.<br/>
+Default to True.</xhtml>
       <xhtml name="kmax">Maximal number of clusters used to parcellate the study region.<br/>
 Default to 12.</xhtml>
       <xhtml name="keep_regions">Kept regions for the data analysis.</xhtml>
@@ -31,7 +33,7 @@ Should not be inflated.</xhtml>
 <pre>smoothing:                       3.0  </pre>
 <pre>kmax:                            12  </pre>
 <pre>normalize:                       True  </pre>
-</xhtml>
+<pre>erase_matrix:                    True  </pre></xhtml>
   </d>
 </d>
 </minf>

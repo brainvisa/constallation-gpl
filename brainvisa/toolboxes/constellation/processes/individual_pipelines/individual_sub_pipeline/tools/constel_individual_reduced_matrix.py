@@ -19,6 +19,7 @@ from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
+from brainvisa.data import neuroHierarchy
 
 # Soma module
 from soma.path import find_in_path
@@ -82,6 +83,7 @@ signature = Signature(
         section="Freesurfer data"),
 
     "normalize", Boolean(section="Options"),
+    "erase_matrices", Boolean(section="Options"),
 
     # --outputs--
     "reduced_individual_matrix", WriteDiskItem(
@@ -104,6 +106,7 @@ def initialization(self):
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
     self.normalize = True
+    self.erase_matrices = True
 
     def link_matrix2label(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
@@ -157,3 +160,9 @@ def execution(self, context):
     # save the normalization values
     if not self.normalize:
         save_normalization(self.reduced_individual_matrix.fullPath())
+
+    if self.erase_matrices:
+        matrix_database = self.complete_matrix_smoothed.get('_database')
+        if matrix_database:
+            db = neuroHierarchy.databases.database(matrix_database)
+            db.removeDiskItem(self.complete_matrix_smoothed, eraseFiles=True)

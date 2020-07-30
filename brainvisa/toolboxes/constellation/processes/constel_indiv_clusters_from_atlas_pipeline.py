@@ -111,6 +111,7 @@ signature = Signature(
     "smoothing", Float(section="Options"),
     "kmax", Integer(section="Options"),
     "normalize", Boolean(section="Options"),
+    "erase_matrices", Boolean(section="Options"),
 
     # --outputs--
     "complete_individual_matrix", WriteDiskItem(
@@ -163,6 +164,9 @@ def initialization(self):
     def fill_study_choice(self, dummy=None):
         """
         """
+
+        self.erase_matrices = True
+
         choices = set()
         if self.outputs_database is not None:
             if neuroHierarchy.databases.hasDatabase(self.outputs_database):
@@ -311,6 +315,7 @@ def initialization(self):
     eNode.addDoubleLink("min_fibers_length", "fsl_indiv.min_fibers_length")
     eNode.addDoubleLink("smoothing", "fsl_indiv.smoothing")
     eNode.addDoubleLink("normalize", "fsl_indiv.normalize")
+    eNode.addDoubleLink("erase_matrices", "fsl_indiv.erase_matrices")
     eNode.addDoubleLink("kmax", "fsl_indiv.kmax")
     eNode.addDoubleLink("complete_individual_matrix",
                         "fsl_indiv.import.complete_individual_matrix")

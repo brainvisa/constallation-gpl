@@ -233,4 +233,6 @@ def execution(self, context):
     shutil.copy2(src, dst)
 
     # Delete the temporary directory after import
-    shutil.rmtree(os.path.dirname(src))
+    # shutil.rmtree(os.path.dirname(src))
+    self.fsl_connectome.eraseFiles()
+    os.rmdir(os.path.dirname(src))
