@@ -149,6 +149,8 @@ signature = Signature(
 
 def initialization(self):
 
+    self.erase_matrices = True
+
     def link_keep_regions(self, dummy):
         """
         """
@@ -164,8 +166,6 @@ def initialization(self):
     def fill_study_choice(self, dummy=None):
         """
         """
-
-        self.erase_matrices = True
 
         choices = set()
         if self.outputs_database is not None:
@@ -361,6 +361,8 @@ def initialization(self):
                         "reduced_matrix.individual_white_mesh")
     eNode.addDoubleLink("normalize",
                         "reduced_matrix.normalize")
+    eNode.addDoubleLink("erase_matrices",
+                        "reduced_matrix.erase_matrices")
 
     ###########################################################################
     #    link of parameters with the process:                                 #
