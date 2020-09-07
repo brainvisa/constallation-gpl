@@ -156,7 +156,4 @@ def execution(self, context):
     replace_negative_values(self.complete_individual_matrix.fullPath())
 
     if self.erase_matrices:
-        matrix_database = self.complete_individual_matrix.get('_database')
-        if matrix_database:
-            db = neuroHierarchy.databases.database(matrix_database)
-            db.removeDiskItem(self.complete_individual_matrix, eraseFiles=True)
+        self.complete_individual_matrix.eraseFiles(remove_from_database=True)
