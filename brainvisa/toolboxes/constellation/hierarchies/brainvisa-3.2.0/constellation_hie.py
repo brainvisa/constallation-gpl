@@ -251,6 +251,13 @@ insert("{center}/group_analysis/{group_of_subjects}",
                     "step_time", "yes",
                     "measure", "no"),
 
+    "<group_of_subjects>_<method>_<studyname>_<gyrus>_{sid}_silhouette_{smallerlength}to{greaterlength}mm",
+        SetType("Clustering Silhouette"),
+        SetWeakAttr("roi_autodetect", "no",
+                    "roi_filtered", "no",
+                    "intersubject", "yes",
+                    "step_time", "yes",
+                    "measure", "no"),
 ),  # end smoothing
 ),  # end gyrus
 ),  # end texture
