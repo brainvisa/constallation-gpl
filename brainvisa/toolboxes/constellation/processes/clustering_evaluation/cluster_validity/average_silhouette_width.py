@@ -58,8 +58,8 @@ signature = Signature(
                                    "Aims matrix formats",
                                    requiredAttributes={"ends_labelled": "all",
                                                        "reduced": "yes",
-                                                       "intersubject": "yes",
-                                                       "individual": "yes"},
+                                                       "intersubject": "yes"},
+                                                      # "individual": "yes"},
                                    section="Clustering inputs"),
     "individual_clustering", ReadDiskItem("Connectivity ROI Texture",
                                           "Aims texture formats",
@@ -92,12 +92,6 @@ def initialization(self):
     def link_silhouette(self, dummy):
         """
         """
-        # if self.reduced_matrix:
-        #     path = os.path.dirname(self.reduced_matrix.fullPath())
-        #     # path = self.reduced_matrix.fullPath()
-        #     # matrix_name = '.'.join(path.split('.')[:-2])
-        #     filename = os.path.join(path, "asw.json")
-        #     return filename
         if self.individual_clustering:
             match = dict(self.individual_clustering.hierarchyAttributes())
             return self.signature["clustering_silhouette"].findValue(match)
