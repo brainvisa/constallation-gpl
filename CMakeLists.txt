@@ -34,7 +34,7 @@ set( get_models_cmd
   "${CMAKE_CURRENT_SOURCE_DIR}/scripts/bv_get_constel_atlas.py" )
 add_custom_target( get-constel-atlas ALL
   COMMAND "${PYTHON_HOST_EXECUTABLE}" "${get_models_cmd}" "-o" "${CMAKE_BINARY_DIR}/share/constellation-${BRAINVISA_PACKAGE_VERSION_MAJOR}.${BRAINVISA_PACKAGE_VERSION_MINOR}" "-i" "${CONSTEL_ATLAS_DOWNLOAD_SOURCE}"
-  "--timeout" "5" "--silent"
+  "--timeout" "5" "--silent" "--check"
   )
 add_custom_target( install-constel-atlas
   COMMAND "${CMAKE_COMMAND}" "-E" "copy_directory" "${CMAKE_BINARY_DIR}/share/constellation-${BRAINVISA_PACKAGE_VERSION_MAJOR}.${BRAINVISA_PACKAGE_VERSION_MINOR}/constellation_atlas_hcp_200s" "$(BRAINVISA_INSTALL_PREFIX)/share/constellation-${BRAINVISA_PACKAGE_VERSION_MAJOR}.${BRAINVISA_PACKAGE_VERSION_MINOR}/constellation_atlas_hcp_200s"
