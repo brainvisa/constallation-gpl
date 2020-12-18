@@ -102,6 +102,9 @@ signature = Signature(
                             "step_time": "yes",
                             "measure": "no"},
         section="Atlas inputs"),
+    "atlas_silhouette", ReadDiskItem("Clustering Silhouette",
+                                     "JSON file",
+                                     section="Atlas inputs"),
 
     # options
     "regions_selection", Choice("All but main region", "All", "Custom",
@@ -143,6 +146,16 @@ signature = Signature(
                             "step_time": "yes",
                             "measure": "no"},
         section="Outputs"),
+    "optimal_clustering", WriteDiskItem("Connectivity ROI Texture",
+                                        "Aims texture formats",
+                                        requiredAttributes={
+                                            "roi_autodetect": "no",
+                                            "roi_filtered": "no",
+                                            "intersubject": "yes",
+                                            "step_time": "yes",
+                                            "measure": "no",
+                                            "optimal": "silhouette"},
+                                        section="Optimal result"),
 
 )
 
@@ -387,6 +400,24 @@ def initialization(self):
                         "individual_clusters.regions_nomenclature")
     eNode.addDoubleLink("region",
                         "individual_clusters.region")
+
+    ###########################################################################
+    #    link of parameters with the process:                                 #
+    #        "Optimal Clustering"                                             #
+    ###########################################################################
+
+    eNode.addChild(
+        "optimal_clusters",
+        ProcessExecutionNode("constel_optimal_clustering",
+                             optional=True))
+    eNode.addDoubleLink("individual_clustering",
+                        "optimal_clusters.individual_clustering")
+    eNode.addDoubleLink("region",
+                        "optimal_clusters.region")
+    eNode.addDoubleLink("atlas_silhouette",
+                        "optimal_clusters.atlas_silhouette")
+    eNode.addDoubleLink("optimal_clustering",
+                        "optimal_clusters.optimal_clustering")
 
     self.setExecutionNode(eNode)
 
