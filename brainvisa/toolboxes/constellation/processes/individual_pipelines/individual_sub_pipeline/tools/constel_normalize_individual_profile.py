@@ -28,7 +28,8 @@ def validation():
     loaded. It checks some conditions for the process to be available.
     """
     try:
-        from constel.lib.utils.filetools import read_file, select_ROI_number
+        from constel.lib.utils.filetools import read_nomenclature_file,\
+            select_ROI_number
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -41,27 +42,34 @@ name = "Mean Individual Profile Normalization"
 userLevel = 2
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "region", String(section="Study parameters"),
+
     # --inputs--
     "mean_individual_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
                             "normed": "no",
-                            "intersubject": "no"}),
+                            "intersubject": "no"},
+        section="Mean profile"),
+
     "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", String(),
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+
+    "keep_regions", ListOf(OpenChoice(), section="Options"),
 
     # --outputs--
     "normed_individual_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
                             "normed": "yes",
-                            "intersubject": "no"}),
-    "keep_regions", ListOf(OpenChoice()),
+                            "intersubject": "no"},
+        section="Normed profile"),
 )
 
 
@@ -71,7 +79,7 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters.
     """
-    from constel.lib.utils.filetools import read_file
+    from constel.lib.utils.filetools import read_nomenclature_file
     # default value
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
@@ -82,9 +90,10 @@ def initialization(self):
         """
         if self.regions_nomenclature is not None:
             s = []
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
-            self.signature["keep_regions"] = ListOf(Choice(*s))
+            self.signature["keep_regions"] = ListOf(Choice(*s),
+                                                    section="Options")
             self.changeSignature(self.signature)
 
     def link_matrix2label(self, dummy):
@@ -136,5 +145,4 @@ def execution(self, context):
     cmd += ["-r"]
     for label in labels:
         cmd += [label]
-    context.write(cmd)
     context.pythonSystem(*cmd)

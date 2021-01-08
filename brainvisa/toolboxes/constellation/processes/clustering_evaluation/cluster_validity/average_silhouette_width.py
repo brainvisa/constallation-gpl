@@ -25,14 +25,9 @@ Author: Sandrine Lefranc, 2015
 
 # system module
 from __future__ import absolute_import
-import os
 
 # axon python API module
-from brainvisa.processes import Float
-from brainvisa.processes import ListOf
-from brainvisa.processes import Boolean
 from brainvisa.processes import Integer
-from brainvisa.processes import Choice
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
@@ -59,21 +54,29 @@ userLevel = 2
 
 signature = Signature(
     # --inputs
-    "reduced_matrices", ListOf(
-        ReadDiskItem("Connectivity Matrix", "Aims matrix formats",
-                     requiredAttributes={"ends_labelled": "all",
-                                         "reduced": "yes",
-                                         "intersubject": "yes",
-                                         "individual": "yes"})),
-    "kmax", Integer(),
+    "reduced_matrix", ReadDiskItem("Connectivity Matrix",
+                                   "Aims matrix formats",
+                                   requiredAttributes={"ends_labelled": "all",
+                                                       "reduced": "yes",
+                                                       "intersubject": "yes"},
+                                                      # "individual": "yes"},
+                                   section="Clustering inputs"),
+    "individual_clustering", ReadDiskItem("Connectivity ROI Texture",
+                                          "Aims texture formats",
+                                          requiredAttributes={
+                                            "roi_autodetect": "no",
+                                            "roi_filtered": "no",
+                                            "intersubject": "yes",
+                                            "step_time": "yes",
+                                            "measure": "no"},
+                                          section="Clustering inputs"),
+    "kmin", Integer(section="Options"),
+    "kmax", Integer(section="Options"),
 
     # --outputs--
-    "outpdffile", WriteDiskItem("Text File", 'PDF File'),
-    "ybound", ListOf(Float()),
-    "kmin_type", Choice("none", "min", "avg_pts"),
-    "kmin", Integer(),
-    "max_avg_points", Float(),
-    "save_asw_values", Boolean()
+    "clustering_silhouette", WriteDiskItem("Clustering Silhouette",
+                                           "JSON file",
+                                           section="Silhouette"),
 )
 
 
@@ -83,25 +86,35 @@ signature = Signature(
 def initialization(self):
     """
     """
+    self.kmin = 2
     self.kmax = 12
-    self.setOptional("ybound")
-    self.kmin_type = "none"
-    self.kmin = 0
-    self.max_avg_points = 0
-    self.save_asw_values = False
 
-    def link_outdir(self, dummy):
+    def link_silhouette(self, dummy):
         """
         """
-        if self.reduced_matrices:
-            for matrix in self.reduced_matrices:
-                name = os.path.dirname(os.path.dirname(
-                                       os.path.dirname(matrix.fullPath())))
-            filename = os.path.join(name, "asw.pdf")
-            return filename
+        if self.individual_clustering:
+            match = dict(self.individual_clustering.hierarchyAttributes())
+            return self.signature["clustering_silhouette"].findValue(match)
 
-    self.linkParameters("outpdffile", "reduced_matrices", link_outdir)
+    def link_clusters(self, dummy):
+        if self.reduced_matrix:
+            match = dict(self.reduced_matrix.hierarchyAttributes())
+            for att in ["name_serie", "tracking_session",  # "subject",
+                        "analysis", "acquisition", "ends_labelled", "reduced",
+                        "individual"]:
+                if att in match:
+                    del match[att]
+            # artificially add format in match. If we do not do this, existing
+            # (GIFTI) files and potential output ones (.tex) do not appear to
+            # have the same attributes, and findValue() cannot decide.
+            # strangely, findValues() returns 1 element...
+            match["_format"] = 'GIFTI file'
+            return self.signature["individual_clustering"].findValue(match)
 
+    self.linkParameters(
+        "individual_clustering", "reduced_matrix", link_clusters)
+    self.linkParameters(
+        "clustering_silhouette", "individual_clustering", link_silhouette)
 
 # ---------------------------Main program--------------------------------------
 
@@ -109,21 +122,15 @@ def initialization(self):
 def execution(self, context):
     """Run the command 'constel_calculate_asw.py'.
     """
-    cmd = ["constel_calculate_asw.py"] \
-        + self.reduced_matrices \
-        + [self.kmax,
-           self.outpdffile]
+    base_cmd = ["constel_calculate_asw.py"]
 
-    if self.ybound:
-        cmd += ["-s"] + self.ybound
+    parameters = [self.reduced_matrix,
+                  self.individual_clustering,
+                  self.kmax,
+                  self.clustering_silhouette]
 
-    cmd += ["--kmintype", self.kmin_type]
-    if self.kmin_type == "min":
-        cmd += ["--kmin", str(self.kmin)]
-    elif self.kmin_type == "avg_pts":
-        cmd += ["--max_avg_pts", str(self.max_avg_points)]
+    options = ["--kmin", str(self.kmin)]
 
-    if self.save_asw_values:
-        cmd += ["-c"]
+    cmd = base_cmd + parameters + options
 
     context.pythonSystem(*cmd)

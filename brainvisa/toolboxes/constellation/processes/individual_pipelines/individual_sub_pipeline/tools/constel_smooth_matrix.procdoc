@@ -27,47 +27,34 @@ Par exemple, vous pouvez utilser l'atlas Desikan-Killiany ou l'atlas Destrieux i
     </d>
   </d>
   <d name="en">
-    <xhtml name="short">Smoothing on the connectivity matrix resulting from the addition of two sparse matrices. </xhtml>
+    <xhtml name="short">Smoothing of the connectivity matrix resulting from the preprocessing of tractography data.</xhtml>
     <d name="parameters">
-      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed like that (The order of labels is not relevant.): <br/>
-<br/>
-<pre>1              nameA</pre>
-<pre>2              nameB</pre>
-<pre>3              nameC</pre>
-<pre>4              nameD</pre>
-<pre>5              nameE</pre>
-<pre>..             .....   </pre>
-<br/>
-For example, you can use the Desikan-Killiany Atlas or the Destrieux Atlas of the FreeSurfer software.</xhtml>
-      <xhtml name="complete_individual_matrix">Complete connectivity matrix.</xhtml>
-      <xhtml name="matrix_labeled_fibers">This connectivity matrix links the label vertices to all the vertices of the cortical surface.</xhtml>
-      <xhtml name="cortical_parcellation">Parcellation of the cortical surface into anatomical region (lobes, gyri...). For example, FreeSurfer provides a cortical parcellation into gyri.<br/>
-A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
-      <xhtml name="cortical_region">The list oflregion names, present in the text file 'cortical_regions_nomenclature' is proposed. <br/>
-You must choose a region. The study will be done on this region.</xhtml>
-      <xhtml name="smoothing">Degree of smoothing (in millimetres)</xhtml>
-      <xhtml name="matrix_semilabeled_fibers">This connectivity matrix links the label vertices to vertices not labeled by the cortical parcellation given.</xhtml>
-      <xhtml name="white_mesh">Individual white mesh of the entire cortical surface (white/gray interface).</xhtml>
+      <xhtml name="complete_individual_matrix">Connectivity matrix after preprocessing.</xhtml>
+      <xhtml name="region">The study region based on <i>regions_nomenclature</i> file.</xhtml>
+      <xhtml name="regions_nomenclature">Nomenclature of the cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas</xhtml>
+      <xhtml name="smoothing">Degree of smoothing (in millimetres).<br/>
+Default to 3.0 mm.</xhtml>
+      <xhtml name="regions_parcellation">Cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas (?h.aparc.annot).</xhtml>
+      <xhtml name="individual_white_mesh">Freesurfer white-grey interface of the cortex.<br/>
+Should not be inflated.</xhtml>
+      <xhtml name="complete_matrix_smoothed">Smoothed connectivity matrix.</xhtml>
     </d>
     <xhtml name="long">There are two matrices, one for each type of fibers (labeled fibers or semilabeled fibers),  and subsequently summed to give complete connectivity matrix (labelled patch vertices, cortex vertices).
 Sparse matrix smoothing using   heat diffusion, with the geometry of a mesh.<br/>
-<br/>
-Example inputs/outputs:
-<br/>
-<pre>matrix_semilabeled_fibers:       /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.postcentral/matrix/
-                                 001_studyA_lh.postcentral_connectivityMatrix_outsideFibersOfCortex_20to500mm.imas</pre>
-<pre>matrix_labeled_fibers:           /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.postcentral/matrix/
-                                 001_studyA_lh.postcentral_connectivityMatrix_fibersNearCortex_30to500mm.imas</pre>
-<pre>labels_nomenclature:             /my/path/share/brainvisa-share-4.5/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
-<pre>label_name:                      lh.postcentral </pre>
-<pre>cortical_parcellation:           /my/path/database_freesurfer/group_analysis/01to40/average_brain/bh.annot.averagebrain.gii</pre>
-<pre>white_mesh:                      /my/path/database_freesurfer/001/surf/bh.r.aims.white.gii</pre>
-<pre>smoothing:                       3.0</pre>
-<pre>complete_individual_matrix:      /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.postcentral/matrix/
-                                 001_studyA_lh.postcentral_connectivityMatrixSmooth3.0.imas</pre></xhtml>
+
+<h2>Usage example</h2>
+
+<pre>regions_nomenclature:            /casa/build/share/brainvisa-share-4.6/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
+<pre>region:                          lh.inferiorparietal</pre>
+<pre>complete_individual_matrix:      /my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/default_tracking_session/connectivity_parcellation
+                                 /avg/studyA/lh.inferiorparietal/matrix/001_studyA_lh.inferiorparietal_complete_matrix_smooth0.0_20.0to500.0mm.imas</pre>
+<pre>individual_white_mesh:           /my/path/freesurfer_db/001/surf/bh.r.aims.white.gii</pre>
+<pre>regions_parcellation:            /my/path/freesurfer_db/group_analysis/average_group/average_brain/bh.annot.averagebrain.gii</pre>
+<pre>smoothing:                       3.0  </pre>
+<pre>complete_matrix_smoothed:        /my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/default_tracking_session/connectivity_parcellation
+                                 /avg/studyA/lh.inferiorparietal/matrix/001_studyA_lh.inferiorparietal_complete_matrix_smooth3.0_20.0to500.0mm.imas</pre></xhtml>
   </d>
 </d>
 </minf>

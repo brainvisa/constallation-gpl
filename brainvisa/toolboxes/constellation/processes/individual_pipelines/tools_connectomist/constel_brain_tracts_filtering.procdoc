@@ -93,45 +93,35 @@ Exemple inputs/outputs:
 </xhtml>
   </d>
   <d name="en">
-    <xhtml name="short"><img SRC="../../images/constellation/brain_tracts_filtering.png" ALT="" height="400" width="900"/></xhtml>
-    <d name="parameters">
-      <xhtml name="fiber_tracts_format">Different fiber tracts formats are supported. Selectable formats are as follows:<br/>
+    <xhtml name="short">A filtration of the study region fibers according to minimal and maximal allowed length, and a separation into two groups depending on whether one or two of their ends are connected to the mesh.<br/><br/>
 
-<i>(1)</i> <b>TrackVis file format </b> with .trk as filename extension. <br/>
+<img SRC="../../images/constellation/brain_tracts_filtering.png" ALT="" height="400" width="900"/></xhtml>
+    <d name="parameters">
+      <xhtml name="fiber_tracts_format">Different fiber tracts formats are supported.<br/>
+Selectable formats are:<br/>
+
+<i>(1)</i> <b>TrackVis file format</b> with .trk as filename extension. <br/>
 <i>(2)</i> <b>Connectomist file format</b> with .bundles as filename extension. <br/></xhtml>
-      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed as in the following (The order of labels is not relevant.): <br/>
-<br/>
-<pre>1              nameA</pre>
-<pre>2              nameB</pre>
-<pre>3              nameC</pre>
-<pre>4              nameD</pre>
-<pre>5              nameE</pre>
-<pre>..             .....   </pre>
-<br/>
-For example, you can use the Desikan-Killiany Atlas or the Destrieux Atlas of the FreeSurfer software.</xhtml>
-      <xhtml name="dw_to_t1">Transformation from t2 to anat</xhtml>
-      <xhtml name="subject_directory">Tractography directory of the subject. It thus should belong to a database organized according to the tractography model (Connectomist).</xhtml>
-      <xhtml name="study_name">This mandatory parameter is free and allows to give a name to the pipeline. The value of "study_name" will be integrated into each output file name as well as the directory of the database that retrieves the output files.</xhtml>
-      <xhtml name="maxlength_semilabeled_fibers">Maximum length (in mm) accepted for fibers having one end identified in the mesh (semi-labelled). The fibers longer than this threshold will not be kept.</xhtml>
-      <xhtml name="cortical_parcellation">Parcellation of the cortical surface into anatomical regions (lobes, gyri...). For example, FreeSurfer provides a cortical parcellation into gyri.<br/>
-A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
-      <xhtml name="cortical_region">The list of region names, present in the text file 'cortical_regions_nomenclature' is proposed. <br/>
-You must choose a region. The study will be done on this region.</xhtml>
-      <xhtml name="minlength_labeled_fibers">Minimum length (in mm) accepted for fibers having their two ends identified on the mesh (labelled). Shorter fibers than this threshold will not be retained.</xhtml>
-      <xhtml name="semilabeled_fibers">All the fibers having one end identified on the mesh and  corresponding to the various criteria of this process are merged into one output file.</xhtml>
-      <xhtml name="maxlength_labeled_fibers">Maximum length (in mm) accepted for fibers having their two ends identified on the mesh (labelled). The fibers longer than this threshold will not be kept.</xhtml>
-      <xhtml name="labeled_fibers">All the fibers having their ends identified on the mesh and corresponding to the various criteria in this process are merged into one output file.</xhtml>
-      <xhtml name="minlength_semilabeled_fibers">Minimum length (in mm) accepted for fibers having one end identified in the mesh (semi-labelled). Fibers shorter than this threshold will not be retained.</xhtml>
+      <xhtml name="min_fibers_length">A filtering parameter to exclude low length fibers.
+Default to 20mm.</xhtml>
+      <xhtml name="dw_to_t1">Affine spatial transformation to get the T1 MRI space from the dMRI diffusion (and tracts) space.</xhtml>
+      <xhtml name="semilabeled_fibers">All fibers having only one end identified on the mesh and corresponding to the various criteria of this process are merged into one output file.</xhtml>
+      <xhtml name="subject_indir">This is the subjects directory in a <b>Connectomist</b> database, where the fiber tracts files can be found.</xhtml>
+      <xhtml name="regions_nomenclature">Nomenclature of the cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas</xhtml>
+      <xhtml name="max_fibers_length">A filtering parameter to exclude long length fibers.
+Default to 500mm.</xhtml>
+      <xhtml name="study_name">General name of the study.</xhtml>
       <xhtml name="method">Two methods are proposed: <br/>
-<i><b>(1) "averaged approach" </b></i> to obtain a single group result. <br/>
-<i><b>(2) "concatenated approach"</b></i> to obtain individual results across the group.  <br/>
-<br/>
-<img SRC="../../images/constellation/panneau_attention.jpg" ALT="" height="20" width="20"/>
-<span style="color:red;">Implications of the choice of method on the parameter "cortical_parcellation":</span><br/>
-<i><b>(1) "averaged approach" </b></i>, for this method, the parameter "cortical_parcellation" must be a file representing the average parcellation of a subjects group. <br/>
-<i><b>(2) "concatenated approach"</b></i>, the parameter "cortical_parcellation" is an individual parcellation. <br/></xhtml>
-      <xhtml name="outputs_database">A BrainVisa database is mandatory for autocompletion and writing files in this process. Without it, no data will be generated. (see the documentation to add a database in the BrainVisa configuration). This parameter retrieves all databases with brainvisa ontology present in your configuration, you just have to pick the right one to write the generated files.</xhtml>
-      <xhtml name="white_mesh">Individual white mesh of the entire cortical surface (white/gray interface).</xhtml>
+<i><b>(1) averaged approach</b></i> to obtain an average result on the group.<br/>
+<i><b>(2) concatenated approach</b></i> to obtain individual results across the group.<br/></xhtml>
+      <xhtml name="regions_parcellation">Cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas (?h.aparc.annot).</xhtml>
+      <xhtml name="labeled_fibers">All fibers having their ends identified on the mesh and corresponding to the various criteria in this process are merged into one output file.</xhtml>
+      <xhtml name="individual_white_mesh">Freesurfer white-grey interface of the cortex.<br/>
+Should not be inflated.</xhtml>
+      <xhtml name="region">The study region based on <i>regions_nomenclature</i> file.</xhtml>
+      <xhtml name="outputs_database">This parameter retrieves all databases with brainvisa ontology present in your configuration, the generated files will be written on the chosen one (see the documentation to add a database in the BrainVisa configuration).</xhtml>
     </d>
     <xhtml name="long">Depending on the starting region, the fiber tracts are filtered according to three criteria:<br/>
 <br/>
@@ -155,30 +145,26 @@ Two types of fiber tracts have to be taken into  consideration in this process:<
 <li><b><i>semilabeled fibers</i></b> are defined as having only one end attached to the mesh (the other being not identified) </li>
 </ul>
 
-<br/>
-Example inputs/outputs:
-<br/>
+<h2>Usage example</h2>
 
+<pre>regions_nomenclature:            /casa/build/share/brainvisa-share-4.6/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
+<pre>outputs_database:                /my/path/brainvisa_db </pre>
 <pre>study_name:                      studyA  </pre>
-<pre>outputs_database:                /my/path/database_brainvisa </pre>
-<pre>fiber_tracts_format:             bundles  </pre>
 <pre>method:                          averaged approach  </pre>
-<pre>cortical_regions_nomenclature:   /my/path/share/brainvisa-share-4.5/nomenclature/translation/nomenclature_desikan_freesurfer.txt  </pre>
-<pre>cortical_region:                 lh.postcentral  </pre>
-<pre>subject_directory:               /my/path/001  </pre>
-<pre>cortical_parcellation:           /my/path/database_freesurfer/group_analysis/01to40/average_brain/bh.annot.averagebrain.gii  </pre>
-<pre>white_mesh:                      /my/path/database_freesurfer/001/surf/bh.r.aims.white.gii  </pre>
-<pre>dw_to_t1:                        /my/path/001/dw_to_t1.trm </pre>
-<pre>minlength_labeled_fibers:        30.0  </pre>
-<pre>maxlength_labeled_fibers:        500.0  </pre>
-<pre>minlength_semilabeled_fibers:    20.0  </pre>
-<pre>maxlength_semilabeled_fibers:    500.0  </pre>
-<pre>labeled_fibers:                  /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
-                                 001_studyA_lh.postcentral_fibersNearCortex_30to500mm.bundles  </pre>
+<pre>region:                          lh.inferiorparietal</pre>
+<pre>subject_indir:                   /my/path/connectomist_db/B1500/StreamlineProbabilistic/aQBI/27seeds/001</pre>
+<pre>individual_white_mesh:           /my/path/freesurfer_db/001/surf/bh.r.aims.white.gii</pre>
+<pre>dw_to_t1:                        /my/path/connectomist_db/B1500/StreamlineProbabilistic/aQBI/27seeds/001/dw_to_t1.trm</pre>
+<pre>regions_parcellation:            /my/path/freesurfer_db/group_analysis/average_group/average_brain/bh.annot.averagebrain.gii</pre>
+<pre>fiber_tracts_format:             bundles</pre>
+<pre>min_fibers_length:               20.0  </pre>
+<pre>max_fibers_length:               500.0  </pre>
+<pre>labeled_fibers:                  /my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/
+                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.inferiorparietal/filteredTracts/
+                                 001_studyA_lh.inferiorparietal_labelled_fibers_20to500mm.bundles  </pre>
 <pre>semilabeled_fibers:              /my/path/database_brainvisa/subjects/001/diffusion/default_acquisition/default_analysis/
-                                 default_tracking_session/ connectivity_parcellation/avg/studyA/lh.postcentral/filteredTracts/
-                                 001_studyA_lh.postcentral_outsideFibersOfCortex_20to500mm.bundles  </pre>
+                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.inferiorparietal/filteredTracts/
+                                 001_studyA_lh.inferiorparietal_semilabelled_fibers_20to500mm.bundles  </pre>
 
 </xhtml>
   </d>

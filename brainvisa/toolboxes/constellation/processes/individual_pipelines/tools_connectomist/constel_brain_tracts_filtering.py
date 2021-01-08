@@ -39,8 +39,9 @@ def validation():
             "'{0}' is not contained in PATH environnement variable. "
             "Please make sure that constel package is installed.".format(cmd))
     try:
-        from constel.lib.utils.filetools import read_file, select_ROI_number,\
-            load_fiber_tracts
+        from constel.lib.utils.filetools import read_nomenclature_file,\
+            select_ROI_number
+        from constel.lib.utils.fibertools import load_fiber_tracts
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -53,40 +54,52 @@ name = "Brain Tracts Filtering"
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
-    "outputs_database", Choice(),
-    "study_name", OpenChoice(),
-    "method", Choice(
-        ("averaged approach", "avg"), ("concatenated approach", "concat")),
-    "subject_indir", ReadDiskItem(
-        "subject", "directory"),
     "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", OpenChoice(),
-    "regions_parcellation", ReadDiskItem(
-        "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+
+    "outputs_database", Choice(section="Study parameters"),
+    "study_name", OpenChoice(section="Study parameters"),
+    "method", Choice(
+        ("averaged approach", "avg"),
+        ("concatenated approach", "concat"),
+        section="Study parameters"),
+    "region", OpenChoice(section="Study parameters"),
+
+    # --inputs--
+    "subject_indir", ReadDiskItem(
+        "subject", "directory", section="Tractography inputs"),
+
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
     "dw_to_t1", ReadDiskItem(
-        "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix"),
-    "fiber_tracts_format", Choice(
-        "bundles", "trk"),
-    "min_fibers_length", Float(),
-    "max_fibers_length", Float(),
+        "Transform T2 Diffusion MR to Raw T1 MRI",
+        "Transformation matrix",
+        section="Freesurfer data"),
+    "regions_parcellation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+
+    "fiber_tracts_format", Choice("bundles", "trk", section="Options"),
+    "min_fibers_length", Float(section="Options"),
+    "max_fibers_length", Float(section="Options"),
 
     # --outputs--
     "labeled_fibers", WriteDiskItem(
         "Filtered Fascicles Bundles", "Aims writable bundles formats",
         requiredAttributes={"ends_labelled": "both",
-                            "oversampled": "no"}),
+                            "oversampled": "no"},
+        section="Filtered tracts"),
     "semilabeled_fibers", WriteDiskItem(
         "Filtered Fascicles Bundles", "Aims writable bundles formats",
         requiredAttributes={"ends_labelled": "one",
-                            "oversampled": "no"}),
+                            "oversampled": "no"},
+        section="Filtered tracts"),
 )
 
 
@@ -110,7 +123,9 @@ def initialization(self):
     if len(databases) != 0:
         self.outputs_database = databases[0]
     else:
-        self.signature["outputs_database"] = OpenChoice()
+        self.signature["outputs_database"] = OpenChoice(
+                                                section="Study parameters"
+        )
 
     def fill_study_choice(self, dummy=None):
         """
@@ -140,18 +155,19 @@ def initialization(self):
         It also resets the region parameter to default state after
         the nomenclature changes.
         """
-        from constel.lib.utils.filetools import read_file
+        from constel.lib.utils.filetools import read_nomenclature_file
         current = self.region
         self.setValue('region', current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
             # Temporarily set a value which will remain valid
             self.region = s[0][1]
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s)
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)
@@ -211,8 +227,8 @@ def execution(self, context):
         - the distant fibers are defined as having only one end attached to the
           mesh (the other being not identified)
     """
-    from constel.lib.utils.filetools import load_fiber_tracts,\
-        select_ROI_number
+    from constel.lib.utils.filetools import select_ROI_number
+    from constel.lib.utils.fibertools import load_fiber_tracts
     # Select all fiber tracts of the given subject.
     list_fiber_tracts = load_fiber_tracts(self.subject_indir.fullPath(),
                                           self.fiber_tracts_format)

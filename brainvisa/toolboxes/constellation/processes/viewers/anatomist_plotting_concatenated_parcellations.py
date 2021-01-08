@@ -48,7 +48,7 @@ def validation():
 
 name = "Anatomist Plotting Concatenated Connectivity-based Parcellations"
 roles = ("viewer", )
-userLevel = 0
+userLevel = 2
 
 signature = Signature(
     "clustering_texture_1", ListOf(

@@ -16,9 +16,11 @@ from __future__ import absolute_import
 from brainvisa.processes import Float
 from brainvisa.processes import String
 from brainvisa.processes import Signature
+from brainvisa.processes import Boolean
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
+from brainvisa.data import neuroHierarchy
 
 # Soma module
 from soma.path import find_in_path
@@ -34,8 +36,8 @@ def validation():
             "'{0}' is not contained in PATH environnement variable. "
             "Please make sure that AIMS C++ library is installed.".format(cmd))
     try:
-        from constel.lib.utils.filetools import select_ROI_number,\
-            replace_negative_values
+        from constel.lib.utils.filetools import select_ROI_number
+        from constel.lib.utils.matrixtools import replace_negative_values
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -48,31 +50,42 @@ name = "Smoothing of the Individual Matrix."
 userLevel = 2
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "region", String(section="Study parameters"),
+
     # --inputs--
     "complete_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
-                            "intersubject": "no"}),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", String(),
-    "regions_parcellation", ReadDiskItem(
-        "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+                            "intersubject": "no"},
+        section="Input matrix"),
+
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
-    "smoothing", Float(),
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+
+    "regions_parcellation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+
+    "smoothing", Float(section="Options"),
+
+    "erase_matrices", Boolean(section="Options"),
 
     # --outputs--
     "complete_matrix_smoothed", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
-                            "intersubject": "no"}),
+                            "intersubject": "no"},
+        section="Smoothed matrix"),
 )
 
 
@@ -83,7 +96,8 @@ def initialization(self):
     """Provides default values and link of parameters"""
 
     # default values
-    self.smoothing = 3.0
+    self.smoothing = 3.
+    self.erase_matrices = True
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -124,8 +138,8 @@ def execution(self, context):
     """Run the command 'AimsSparseMatrixSmoothing'.
 
     Smoothing of the individual matrix."""
-    from constel.lib.utils.filetools import select_ROI_number,\
-        replace_negative_values
+    from constel.lib.utils.filetools import select_ROI_number
+    from constel.lib.utils.matrixtools import replace_negative_values
     # selects the label number corresponding to label name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)
@@ -140,3 +154,6 @@ def execution(self, context):
                    "-p", label_number)
 
     replace_negative_values(self.complete_individual_matrix.fullPath())
+
+    if self.erase_matrices:
+        self.complete_individual_matrix.eraseFiles(remove_from_database=True)

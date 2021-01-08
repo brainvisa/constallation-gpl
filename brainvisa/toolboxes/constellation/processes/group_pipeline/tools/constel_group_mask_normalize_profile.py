@@ -53,17 +53,21 @@ userLevel = 2
 
 # Argument declaration
 signature = Signature(
-    "group_mask", ReadDiskItem("Mask Texture", "Aims texture formats"),
+    "group_mask", ReadDiskItem("Mask Texture", "Aims texture formats",
+                               section="Inputs"),
     "group_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
                             "normed": "no",
-                            "intersubject": "yes"}),
+                            "intersubject": "yes"},
+        section="Inputs"),
+
     "normed_group_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
                             "normed": "yes",
-                            "intersubject": "yes"}),)
+                            "intersubject": "yes"},
+        section="Group profile outputs"))
 
 
 def initialization(self):

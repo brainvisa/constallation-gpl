@@ -53,34 +53,45 @@ name = "Reduced Individual Matrices From Group Regions"
 userLevel = 2
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "study_name", String(section="Study parameters"),
+    "region", String(section="Study parameters"),
+
     # --inputs--
+    "subjects_group", ReadDiskItem("Group definition", "XML",
+                                   section="Group inputs"),
+    "complete_individual_matrices", ListOf(ReadDiskItem(
+        "Connectivity Matrix", "Sparse Matrix",
+        requiredAttributes={"ends_labelled": "all",
+                            "reduced": "no",
+                            "intersubject": "no",
+                            "individual": "yes"}),
+        section="Group inputs"),
+
     "filtered_reduced_group_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "yes",
                             "roi_filtered": "yes",
                             "intersubject": "yes",
                             "step_time": "no",
-                            "measure": "no"}),
-    "subjects_group", ReadDiskItem("Group definition", "XML"),
-    "study_name", String(),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", String(),
-    "complete_individual_matrices", ListOf(ReadDiskItem(
-        "Connectivity Matrix", "Sparse Matrix",
-        requiredAttributes={"ends_labelled": "all",
-                            "reduced": "no",
-                            "intersubject": "no",
-                            "individual": "yes"})),
+                            "measure": "no"},
+        section="Watershed"),
+
     "average_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
-                            "averaged": "Yes"}),
+                            "averaged": "Yes"},
+        section="Freesurfer data"),
     "regions_parcellation", ListOf(ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"})),
+                            "vertex_corr": "Yes"}),
+        section="Freesurfer data"),
+
+    "normalize", Boolean(section="Options"),
 
     # --outputs--
     "intersubject_reduced_matrices", ListOf(WriteDiskItem(
@@ -88,8 +99,9 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
                             "intersubject": "yes",
-                            "individual": "yes"})),
-    "normalize", Boolean(),
+                            "individual": "yes"},
+        section="Reduced matrix"),
+        section="Output matrices"),
 )
 
 

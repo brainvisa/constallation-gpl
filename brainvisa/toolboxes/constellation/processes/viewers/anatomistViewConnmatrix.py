@@ -21,7 +21,7 @@ def validation():
 
 name = 'Anatomist view connectivity matrix'
 roles = ('viewer', )
-userLevel = 0
+userLevel = 2
 
 signature = Signature(
     'connectivity_matrix', ReadDiskItem(

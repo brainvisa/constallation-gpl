@@ -46,25 +46,33 @@ name = "Clustering From Reduced Individual Matrix"
 userLevel = 2
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "region", String(section="Study parameters"),
+
     # inputs
     "reduced_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
                             "intersubject": "no",
-                            "individual": "yes"}),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", String(),
-    "regions_parcellation", ReadDiskItem(
-        "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+                            "individual": "yes"},
+        section="Reduced matrix"),
+
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
-    "kmax", Integer(),
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+    "regions_parcellation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+
+
+    "kmax", Integer(section="Options"),
 
     # outputs
     "individual_ROI_clustering", WriteDiskItem(
@@ -73,7 +81,8 @@ signature = Signature(
                             "roi_filtered": "no",
                             "intersubject": "no",
                             "step_time": "yes",
-                            "measure": "no"}),
+                            "measure": "no"},
+        section="Clustering"),
 )
 
 

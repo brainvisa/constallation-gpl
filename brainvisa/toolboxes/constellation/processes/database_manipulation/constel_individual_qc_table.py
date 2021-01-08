@@ -5,7 +5,7 @@ from brainvisa.processes import Signature, Choice, ListOf, String,\
 from six.moves import zip
 
 name = 'Constellation Individual QC table'
-userLevel = 0
+userLevel = 1
 
 signature = Signature(
     'database', Choice(),

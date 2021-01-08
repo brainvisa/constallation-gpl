@@ -38,7 +38,7 @@ def validation():
         raise ValidationError(
             "Please make sure that constel module is installed.")
     try:
-        from constel.lib.utils.filetools import read_file
+        from constel.lib.utils.filetools import read_nomenclature_file
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -99,10 +99,11 @@ def initialization(self):
         """Reads the ROIs nomenclature and proposes them in the signature 'ROI'
         of process.
         """
-        from constel.lib.utils.filetools import read_file
+        from constel.lib.utils.filetools import read_nomenclature_file
         if self.ROIs_nomenclature is not None:
             s = ["Select a ROI in this list"]
-            s += read_file(self.ROIs_nomenclature.fullPath(), mode=2)
+            s += read_nomenclature_file(
+                self.ROIs_nomenclature.fullPath(), mode=2)
             self.signature["ROI"].setChoices(*s)
             if isinstance(self.signature['ROI'], OpenChoice):
                 self.signature["ROI"] = Choice(*s)

@@ -37,7 +37,8 @@ def validation():
             "'{0}' is not contained in PATH environnement variable. "
             "Please make sure that constel module is installed.".format(cmd))
     try:
-        from constel.lib.utils.filetools import read_file, select_ROI_number
+        from constel.lib.utils.filetools import read_nomenclature_file,\
+            select_ROI_number
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -50,18 +51,25 @@ name = "FSL Connectome."
 userLevel = 2
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem("Nomenclature ROIs File",
+                                         "Text File",
+                                         section="Nomenclature"),
+
+    "region", OpenChoice(section="Study parameters"),
+
     # --inputs--
     "probtrackx_indir", ReadDiskItem("directory",
-                                     "directory"),
+                                     "directory",
+                                     section="FSL import"),
+
     "regions_parcellation", ReadDiskItem("ROI Texture",
-                                         "Aims texture formats"),
-    "regions_nomenclature", ReadDiskItem("Nomenclature ROIs File",
-                                         "Text File"),
-    "region", OpenChoice(),
+                                         "Aims texture formats",
+                                         section="Freesurfer data"),
 
     # --outputs--
-    "outdir", WriteDiskItem("directory", "directory"),
-    "output_connectome", String(),
+    "temp_outdir", WriteDiskItem("directory", "directory",
+                                 section="Temporary outputs"),
+    "output_connectome", String(section="Temporary outputs"),
 )
 
 # ---------------------------Functions-----------------------------------------
@@ -73,7 +81,7 @@ def initialization(self):
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
-    self.signature["output_connectome"].userLevel = 3
+    self.signature["output_connectome"].userLevel = 2
 
     def reset_label(self, dummy):
         """Read and/or reset the region parameter.
@@ -83,18 +91,19 @@ def initialization(self):
         It also resets the region parameter to default state after
         the nomenclature changes.
         """
-        from constel.lib.utils.filetools import read_file
+        from constel.lib.utils.filetools import read_nomenclature_file
         current = self.region
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
             # temporarily set a value which will remain valid
             self.region = s[0][1]
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s)
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)
@@ -107,9 +116,9 @@ def initialization(self):
         from constel.lib.utils.filetools import select_ROI_number
         if (self.probtrackx_indir is not None
             and self.regions_nomenclature is not None
-                and self.region is not None and self.outdir is not None):
+                and self.region is not None and self.temp_outdir is not None):
             subject = os.path.basename(self.probtrackx_indir.fullPath())
-            sdir = os.path.join(self.outdir.fullPath(), subject)
+            sdir = os.path.join(self.temp_outdir.fullPath(), subject)
             label_nb = select_ROI_number(self.regions_nomenclature.fullPath(),
                                          self.region)
             name = "connectome_label" + str(label_nb) + ".imas"
@@ -124,7 +133,7 @@ def initialization(self):
                         ("probtrackx_indir",
                          "regions_nomenclature",
                          "region",
-                         "outdir"),
+                         "temp_outdir"),
                         link_connectome)
 
 
@@ -145,4 +154,4 @@ def execution(self, context):
                          self.probtrackx_indir,
                          self.regions_parcellation,
                          label_number,
-                         self.outdir)
+                         self.temp_outdir)

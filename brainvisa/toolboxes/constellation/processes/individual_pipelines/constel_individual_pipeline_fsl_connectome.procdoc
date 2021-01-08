@@ -3,6 +3,7 @@
 <d>
   <d name="fr">
     <xhtml name="short"/>
+    <xhtml name="long"/>
     <d name="parameters">
       <xhtml name="normalize"/>
       <xhtml name="min_fibers_length"/>
@@ -19,30 +20,61 @@
       <xhtml name="outputs_database"/>
       <xhtml name="outdir"/>
     </d>
-    <xhtml name="long"/>
   </d>
   <d name="en">
-    <xhtml name="short"><img SRC="../../images/constellation/schema_ind.png" ALT="" height="300" width="900"/></xhtml>
+    <xhtml name="short">A pipeline to process FSL connectome data of a subject into an individual connectivity matrix compatible with Constellation requirements.<br/><br/>
+<img SRC="../../images/constellation/schema_ind.png" ALT="" height="300" width="900"/></xhtml>
     <d name="parameters">
-      <xhtml name="normalize"/>
-      <xhtml name="min_fibers_length"/>
-      <xhtml name="region"/>
-      <xhtml name="regions_nomenclature"/>
-      <xhtml name="study_name"/>
-      <xhtml name="smoothing"/>
-      <xhtml name="kmax"/>
-      <xhtml name="probtrackx_indir"/>
-      <xhtml name="keep_regions"/>
-      <xhtml name="regions_parcellation"/>
-      <xhtml name="individual_white_mesh"/>
-      <xhtml name="method"/>
-      <xhtml name="outputs_database">A BrainVisa database is mandatory for autocompletion and writing files in this process. Without it, no data will be generated. (see the documentation to add a database in the BrainVisa configuration). This parameter retrieves all databases with brainvisa ontology present in your configuration, you just have to pick the right one to write the generated files.</xhtml>
-      <xhtml name="outdir"/>
+      <xhtml name="normalize">By default the connectivity matrices values are normalized to balance any spurious weighting effects due to more connected regions or subjects, or to the tractography algorithm (number of seeds...). But sometimes we also like to see the raw connectivity matrix: in that case, uncheck this normalization.</xhtml>
+      <xhtml name="min_fibers_length">A filtering parameter to exclude low length fibers.
+Default to 20mm.</xhtml>
+      <xhtml name="regions_selection">This parameter can be used to exclude some regions from the data analysis. This is useful to study the specific connectivity between a given set of regions, or to exclude the initial patch region.</xhtml>
+      <xhtml name="region">The study region based on <i>regions_nomenclature</i> file.</xhtml>
+      <xhtml name="regions_nomenclature">Nomenclature of the cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas</xhtml>
+      <xhtml name="study_name">General name of the study.</xhtml>
+      <xhtml name="smoothing">Degree of smoothing (in millimetres).<br/>
+Default to 3.0 mm.</xhtml>
+      <xhtml name="erase_matrix">Option to erase the complete smoothed matrix in order to save some storage space on hard disk. Can be unchecked for debugging purposes or to specifically keep this matrix.<br/>
+Default to True.</xhtml>
+      <xhtml name="kmax">Maximal number of clusters used to parcellate the study region.<br/>
+Default to 12.</xhtml>
+      <xhtml name="probtrackx_indir">Subjects directory in a <b>FSL connectome</b> database, where the fiber tracts files can be found.</xhtml>
+      <xhtml name="keep_regions">Kept regions for the data analysis.</xhtml>
+      <xhtml name="regions_parcellation">Cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas (?h.aparc.annot).</xhtml>
+      <xhtml name="individual_white_mesh">Freesurfer white-grey interface of the cortex.<br/>
+Should not be inflated.</xhtml>
+      <xhtml name="method">Two methods are proposed: <br/>
+<i><b>(1) averaged approach</b></i> to obtain an average result on the group.<br/>
+<i><b>(2) concatenated approach</b></i> to obtain individual results across the group.<br/></xhtml>
+      <xhtml name="outputs_database">This parameter retrieves all databases with brainvisa ontology present in your configuration, the generated files will be written on the chosen one (see the documentation to add a database in the BrainVisa configuration).</xhtml>
+      <xhtml name="temp_outdir">Temporary directory where data files will be stored during importation phase.<br/>
+<u>Example</u>: <i>/tmp</i>, but this directory size should be large enough to store all the temporary files during the process.</xhtml>
     </d>
     <xhtml name="long"><p>A complete pipeline: an intra_subject chain which builds the individual connectivity matrices. The preprocessings are done using FreeSurfer for the anatomical data, and FSL for the diffusion data.</p>
 <p>The method implemented here is described in:</p>
 <p>S. Lefranc, P. Roca, M. Perrot, C. Poupon, D. Le Bihan, J.-F. Mangin, and D. Rivière. <b>Groupwise connectivity-based parcellation of the whole human cortical surface using watershed-driven dimension reduction.</b> <em>Medical Image Analysis</em>, 30:11-29, 2016. <a href="http://brainvisa.info/biblio/lnao/en/Year/2016.complete.html#Lefranc16">[bibtex-entry]</a>
-</p></xhtml>
+</p>
+
+<h2>Usage example</h2>
+
+<pre>regions_nomenclature:            /casa/build/share/brainvisa-share-4.6/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
+<pre>outputs_database:                /my/path/brainvisa_db </pre>
+<pre>study_name:                      studyA  </pre>
+<pre>method:                          averaged approach  </pre>
+<pre>region:                          lh.inferiorparietal</pre>
+<pre>probtrackx_indir:                /my/path/fsl_db/3T_fsl/omatrix1/100206</pre>
+<pre>temp_outdir:                     /tmp </pre>
+<pre>individual_white_mesh:           /my/path/freesurfer_db/100206/surf/bh.r.aims.white.gii</pre>
+<pre>regions_parcellation:            /my/path/freesurfer_db/group_analysis/average_group/average_brain/bh.annot.averagebrain.gii</pre>
+<pre>regions_selection:               Custom</pre>
+<pre>keep_regions:                    'lh.unknown' 'lh.bankssts' 'lh.inferiorparietal'</pre>
+<pre>min_fibers_length:               20.0  </pre>
+<pre>smoothing:                       3.0  </pre>
+<pre>kmax:                            12  </pre>
+<pre>normalize:                       True  </pre>
+<pre>erase_matrix:                    True  </pre></xhtml>
   </d>
 </d>
 </minf>

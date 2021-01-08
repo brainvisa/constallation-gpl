@@ -52,19 +52,23 @@ name = "Group Connectivity Mask"
 userLevel = 2
 
 signature = Signature(
+    "new_study_name", String(section="Study parameters"),
+
     # --inputs--
+    "subjects_group", ReadDiskItem("Group definition", "XML",
+                                   section="Group inputs"),
     "mean_individual_profiles", ListOf(
         ReadDiskItem("Connectivity Profile Texture", "Aims texture formats",
                      requiredAttributes={"ends_labelled": "all",
                                          "normed": "no",
-                                         "intersubject": "no"})),
-    "subjects_group", ReadDiskItem("Group definition", "XML"),
-    "new_study_name", String(),
+                                         "intersubject": "no"}),
+        section="Group inputs"),
 
     # --outputs--
     "group_mask", WriteDiskItem(
-        "Mask Texture", "Aims texture formats"), )
-
+        "Mask Texture", "Aims texture formats",
+        section="Outputs")
+)
 
 # ----------------------------Functions----------------------------------------
 

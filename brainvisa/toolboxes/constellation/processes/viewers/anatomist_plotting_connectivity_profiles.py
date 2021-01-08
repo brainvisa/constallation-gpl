@@ -46,7 +46,7 @@ def validation():
 
 name = "Anatomist Plotting Connectivity Profiles"
 roles = ("viewer",)
-userLevel = 0
+userLevel = 2
 
 signature = Signature(
     "connectivity_profiles", ListOf(

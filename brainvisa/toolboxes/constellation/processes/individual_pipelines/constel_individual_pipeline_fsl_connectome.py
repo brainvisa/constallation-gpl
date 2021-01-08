@@ -33,7 +33,7 @@ def validation(self):
     loaded. It checks some conditions for the process to be available.
     """
     try:
-        from constel.lib.utils.filetools import read_file
+        from constel.lib.utils.filetools import read_nomenclature_file
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -46,17 +46,18 @@ name = "Constellation Individual Pipeline - FSL connectome"
 userLevel = 1
 
 signature = Signature(
-    # --inputs--
-    "outputs_database", Choice(section="output database"),
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "outputs_database", Choice(section="Study parameters"),
+    "study_name", OpenChoice(section="Study parameters"),
     "method", Choice(
         ("averaged approach", "avg"),
         ("concatenated approach", "concat"),
-        section="output database"),
-    "study_name", OpenChoice(section="output database"),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File", section="nomenclature"),
-    "region", OpenChoice(section="nomenclature"),
+        section="Study parameters"),
+    "region", OpenChoice(section="Study parameters"),
 
+    # --inputs--
     "probtrackx_indir", ReadDiskItem("directory", "directory",
                                      section="FSL import"),
     "temp_outdir", ReadDiskItem("directory", "directory",
@@ -68,20 +69,21 @@ signature = Signature(
                             "vertex_corr": "Yes",
                             "inflated": "No",
                             "averaged": "No"},
-        section="Freesurfer mesh and parcellation"),
+        section="Freesurfer data"),
     "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"},
-        section="Freesurfer mesh and parcellation"),
+        section="Freesurfer data"),
 
     "regions_selection", Choice("All but main region", "All", "Custom",
-                                section="options"),
-    "keep_regions", ListOf(OpenChoice(section="options")),
-    "min_fibers_length", Float(section="options"),
-    "smoothing", Float(section="options"),
-    "normalize", Boolean(section="options"),
-    "kmax", Integer(section="options"),
+                                section="Options"),
+    "keep_regions", ListOf(OpenChoice(), section="Options"),
+    "min_fibers_length", Float(section="Options"),
+    "smoothing", Float(section="Options"),
+    "kmax", Integer(section="Options"),
+    "normalize", Boolean(section="Options"),
+    "erase_matrices", Boolean(section="Options"),
 )
 
 
@@ -103,7 +105,7 @@ def link_keep_regions_value(self, dummy, other=None, oother=None):
 def initialization(self):
     """Provides default values and link of parameters.
     """
-    from constel.lib.utils.filetools import read_file
+    from constel.lib.utils.filetools import read_nomenclature_file
     # list of possible databases, while respecting the ontology
     # ontology: brainvisa-3.2.0
     databases = [h.name for h in neuroHierarchy.hierarchies()
@@ -113,7 +115,8 @@ def initialization(self):
     if len(databases) != 0:
         self.outputs_database = databases[0]
     else:
-        self.signature["outputs_database"] = OpenChoice()
+        self.signature["outputs_database"] = OpenChoice(
+                                                section="Study parameters")
 
     self.signature['probtrackx_indir'].databaseUserLevel = 3
     self.signature['temp_outdir'].databaseUserLevel = 3
@@ -123,6 +126,7 @@ def initialization(self):
     self.min_fibers_length = 20.0
     self.kmax = 12
     self.normalize = True
+    self.erase_matrices = True
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -132,10 +136,10 @@ def initialization(self):
         """
         if self.regions_nomenclature is not None:
             s = []
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["keep_regions"] = ListOf(Choice(*s),
-                                                    section="options")
+                                                    section="Options")
             self.changeSignature(self.signature)
 
     def fill_study_choice(self, dummy=None):
@@ -172,11 +176,12 @@ def initialization(self):
             s = [("Select a region in this list", None)]
             # temporarily set a value which will remain valid
             self.region = s[0][1]
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s, section="nomenclature")
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)
@@ -248,7 +253,7 @@ def initialization(self):
                         "regions_nomenclature")
     eNode.addDoubleLink("confsl.region",
                         "region")
-    eNode.addDoubleLink("confsl.outdir",
+    eNode.addDoubleLink("confsl.temp_outdir",
                         "temp_outdir")
 
     ###########################################################################
@@ -300,7 +305,9 @@ def initialization(self):
     eNode.addDoubleLink("subpipeline.kmax",
                         "kmax")
     eNode.addDoubleLink("subpipeline.keep_regions",
-                        "keep_regions")
+                        "keep_regions"),
+    eNode.addDoubleLink("subpipeline.erase_matrices",
+                        "erase_matrices")
 
     self.setExecutionNode(eNode)
 

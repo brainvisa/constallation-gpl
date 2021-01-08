@@ -3,6 +3,7 @@
 <d>
   <d name="fr">
     <xhtml name="short"/>
+    <xhtml name="long"/>
     <d name="parameters">
       <xhtml name="mean_individual_profiles"/>
       <xhtml name="normed_individual_profiles"/>
@@ -26,43 +27,57 @@ Par exemple, vous pouvez utilser l'atlas Desikan-Killiany ou l'atlas Destrieux i
       <xhtml name="cortical_parcellation"/>
       <xhtml name="method"/>
     </d>
-    <xhtml name="long"/>
   </d>
   <d name="en">
-    <xhtml name="short"><img SRC="../../images/constellation/schema_group_concat.png" ALT="" height="300" width="900"/><br/>
+    <xhtml name="short">Provides a clustering of a group of subjects.<br/><br/>
+<img SRC="../../images/constellation/schema_group_concat.png" ALT="" height="300" width="900"/><br/>
 <img SRC="../../images/constellation/schema_group_avg.png" ALT="" height="300" width="900"/></xhtml>
     <d name="parameters">
-      <xhtml name="mean_individual_profiles">List of the all individual mean profiles for a group of subjects.</xhtml>
-      <xhtml name="normed_individual_profiles">List of the all individual normed profiles for a group of subjects.</xhtml>
-      <xhtml name="average_mesh">Both average white mesh (from a group of subject)</xhtml>
-      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed like that (The order of labels is not relevant.): <br/>
-<br/>
-<pre>1              nameA</pre>
-<pre>2              nameB</pre>
-<pre>3              nameC</pre>
-<pre>4              nameD</pre>
-<pre>5              nameE</pre>
-<pre>..             .....   </pre>
-<br/>
-For example, you can use the Desikan-Killiany Atlas or the Destrieux Atlas of the FreeSurfer software.</xhtml>
-      <xhtml name="new_study_name">In the group pipeline, you want to change the study name. In this case, the outputs will be written in the new study name directory.</xhtml>
-      <xhtml name="study_name">This mandatory parameter is free and allows to give a name to the pipeline. The value of "study_name" will be integrated into each output file name as well as the directory of the database that retrieves the output files.</xhtml>
-      <xhtml name="smoothing">Degree of smoothing (in millimetres)</xhtml>
-      <xhtml name="cortical_region">The list oflregion names, present in the text file 'cortical_regions_nomenclature' is proposed. <br/>
-You must choose a region. The study will be done on this region.</xhtml>
-      <xhtml name="constellation_subjects_group">The XML file corresponding the study group.</xhtml>
-      <xhtml name="cortical_parcellation">Parcellation of the cortical surface into anatomical region (lobes, gyri...). For example, FreeSurfer provides a cortical parcellation into gyri.<br/>
-A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
-      <xhtml name="method">Two methods are proposed: <br/>
-<i><b>(1) "averaged approach" </b></i> to obtain a single result group. <br/>
-<i><b>(2) "concatenated approach"</b></i> to obtain individual results across the group.  <br/>
+      <xhtml name="mean_individual_profiles">List of the mean individual profiles of the given group of subjects.</xhtml>
+      <xhtml name="normed_individual_profiles">List of the normed individual profiles of the given group of subjects.</xhtml>
+      <xhtml name="average_mesh">Freesurfer average white mesh of a group of subjects.</xhtml>
+      <xhtml name="new_study_name">Optional name given to the group study. <br/>
+Default to <i>study_name</i>.</xhtml>
+      <xhtml name="region">The study region based on <i>regions_nomenclature</i> file.</xhtml>
+      <xhtml name="regions_nomenclature">Nomenclature of the cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas</xhtml>
+      <xhtml name="study_name">General name of the study, links to corresponding study data in <i>output_database</i> to retrieve profiles computed during the individual processing.</xhtml>
+      <xhtml name="constellation_subjects_group">The XML file corresponding to the subjects group.</xhtml>
+      <xhtml name="nb_clusters">Maximal number of clusters used to parcellate the study region.<br/>
+Default to 12.</xhtml>
+      <xhtml name="regions_parcellation">Cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas (?h.aparc.annot).<br/>
 <br/>
 <img SRC="../../images/constellation/panneau_attention.jpg" ALT="" height="20" width="20"/>
-<span style="color:red;">Implications of the choice of method on the parameter "cortical_parcellation":</span><br/>
-<i><b>(1) "averaged approach" </b></i>, for this method, the parameter "cortical_parcellation" must be a file representing the average parcellation of a subjects group. <br/>
-<i><b>(2) "concatenated approach"</b></i>, the parameter "cortical_parcellation" is an individual parcellation. <br/></xhtml>
+<span style="color:red;">Implications of the choice of the <i>method</i> on the <i>regions_parcellation</i> parameter:</span><br/>
+<i><b>(1) averaged approach</b></i>: the <i>regions_parcellation</i> parameter must be a file representing the average parcellation of the group of subjects.<br/>
+<i><b>(2) concatenated approach</b></i>: the <i>regions_parcellation</i> parameter must be a list of files, each representing the individual parcellation of a subject of the group.<br/></xhtml>
+      <xhtml name="smoothing">Degree of smoothing (in millimetres).<br/>
+Default to 3.0 mm.</xhtml>
+      <xhtml name="method">Two methods are proposed: <br/>
+<i><b>(1) averaged approach</b></i> to obtain an average result on the group.<br/>
+<i><b>(2) concatenated approach</b></i> to obtain individual results across the group.<br/></xhtml>
     </d>
-    <xhtml name="long"/>
+    <xhtml name="long"><h2>Generalities</h2>
+<p/>
+<h2>Method</h2>
+<p/>
+<h2>Usage example</h2>
+
+<pre>regions_nomenclature:            /my/path/share/brainvisa-share-4.6/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
+<pre>study_name:                      studyA  </pre>
+<pre>new_study_name:                  group_studyA</pre>
+<pre>method:                          averaged approach</pre>
+<pre>region:                          lh.inferiorparietal</pre>
+<pre>subjects_group:                  /my/path/brainvisa_db/subjects/group_analysis/g1/g1_group.xml</pre>
+<pre>mean_individual_profiles:        '/my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/default_tracking_session/connectivity_parcellation/avg/
+                                 initiation/lh.inferiorparietal/clustering/smooth3.0/001_studyA_lh.inferiorparietal_mean_profile_20to500mm.gii'</pre>
+<pre>normed_individual_profiles:      '/my/path/brainvisa_db/subjects/001/diffusion/default_acquisition/default_analysis/default_tracking_session/connectivity_parcellation/avg/
+                                 initiation/lh.inferiorparietal/clustering/smooth3.0/001_studyA_lh.inferiorparietal_normed_mean_profile_20to500mm.gii'</pre>
+<pre>average_mesh:                    /my/path/freesurfer_db/group_analysis/average_mesh_group/average_brain/averagebrain.white.gii</pre>
+<pre>regions_parcellation:            '/my/path/freesurfer_db/group_analysis/average_mesh_group/average_brain/bh.annot.averagebrain.gii'</pre>
+<pre>smoothing:                       3.0  </pre>
+<pre>nb_clusters:                     12  </pre></xhtml>
   </d>
 </d>
 </minf>

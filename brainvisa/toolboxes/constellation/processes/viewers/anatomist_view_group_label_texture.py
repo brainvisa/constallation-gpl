@@ -22,7 +22,7 @@ def validation(self):
 
 
 name = 'Anatomist view Group Label Texture'
-userLevel = 0
+userLevel = 2
 roles = ('viewer', )
 
 signature = Signature(

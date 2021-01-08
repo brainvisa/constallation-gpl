@@ -27,11 +27,17 @@ from brainvisa.processes import SerialExecutionNode
 from brainvisa.processes import ProcessExecutionNode
 from brainvisa.processes import ValidationError
 
+
 # Package import
-try:
-    from constel.lib.utils.filetools import read_file
-except ImportError:
-    raise ValidationError("Please make sure that constel module is installed.")
+def validation(self):
+    """This function is executed at BrainVisa startup when the process is
+    loaded. It checks some conditions for the process to be available.
+    """
+    try:
+        from constel.lib.utils.filetools import read_nomenclature_file
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
 
 # ---------------------------Header--------------------------------------------
 
@@ -40,16 +46,17 @@ name = "Constellation Individual Clusters from atlas pipeline - FSL connectome"
 userLevel = 0
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
     # --inputs--
-    "outputs_database", Choice(section="output database"),
+    "outputs_database", Choice(section="Study parameters"),
+    "study_name", OpenChoice(section="Study parameters"),
     "method", Choice(
         ("averaged approach", "avg"),
         ("concatenated approach", "concat"),
-        section="output database"),
-    "study_name", OpenChoice(section="output database"),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File", section="nomenclature"),
-    "region", OpenChoice(section="nomenclature"),
+        section="Study parameters"),
+    "region", OpenChoice(section="Study parameters"),
 
     # FSL data
     "probtrackx_indir", ReadDiskItem("directory", "directory",
@@ -64,12 +71,12 @@ signature = Signature(
                             "vertex_corr": "Yes",
                             "inflated": "No",
                             "averaged": "No"},
-        section="Freesurfer mesh and parcellation"),
+        section="Freesurfer data"),
     "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"},
-        section="Freesurfer mesh and parcellation"),
+        section="Freesurfer data"),
 
     # --atlas inputs--
     "atlas_matrix", ReadDiskItem(
@@ -78,7 +85,7 @@ signature = Signature(
                             "reduced": "yes",
                             "intersubject": "yes",
                             "individual": "no"},
-        section="atlas inputs"),
+        section="Atlas inputs"),
     "filtered_reduced_group_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "yes",
@@ -86,7 +93,7 @@ signature = Signature(
                             "intersubject": "yes",
                             "step_time": "no",
                             "measure": "no"},
-        section="atlas inputs"),
+        section="Atlas inputs"),
     "group_clustering", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "no",
@@ -94,7 +101,20 @@ signature = Signature(
                             "intersubject": "yes",
                             "step_time": "yes",
                             "measure": "no"},
-        section="atlas inputs"),
+        section="Atlas inputs"),
+    "atlas_silhouette", ReadDiskItem("Clustering Silhouette",
+                                     "JSON file",
+                                     section="Atlas inputs"),
+
+    # options
+    "regions_selection", Choice("All but main region", "All", "Custom",
+                                section="Options"),
+    "keep_regions", ListOf(OpenChoice(), section="Options", userLevel=2),
+    "min_fibers_length", Float(section="Options"),
+    "smoothing", Float(section="Options"),
+    "kmax", Integer(section="Options"),
+    "normalize", Boolean(section="Options"),
+    "erase_matrices", Boolean(section="Options"),
 
     # --outputs--
     "complete_individual_matrix", WriteDiskItem(
@@ -103,23 +123,21 @@ signature = Signature(
                             "reduced": "no",
                             "intersubject": "no",
                             "individual": "yes"},
-        section="outputs"),
+        section="Outputs"),
     "complete_individual_smoothed_matrix", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
                             "intersubject": "no",
                             "individual": "yes"},
-        section="outputs"),
-
+        section="Outputs"),
     "reduced_matrix", WriteDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
                             "intersubject": "yes",
                             "individual": "yes"},
-        section="outputs"),
-
+        section="Outputs"),
     "individual_clustering", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "no",
@@ -127,35 +145,41 @@ signature = Signature(
                             "intersubject": "yes",
                             "step_time": "yes",
                             "measure": "no"},
-        section="outputs"),
+        section="Outputs"),
+    "optimal_clustering", WriteDiskItem("Connectivity ROI Texture",
+                                        "Aims texture formats",
+                                        requiredAttributes={
+                                            "roi_autodetect": "no",
+                                            "roi_filtered": "no",
+                                            "intersubject": "yes",
+                                            "step_time": "yes",
+                                            "measure": "no",
+                                            "optimal": "silhouette"},
+                                        section="Optimal result"),
 
-    # options
-    "regions_selection", Choice("All but main region", "All", "Custom",
-                                section="options"),
-    "keep_regions", ListOf(OpenChoice(), section="options", userLevel=3),
-    "min_fibers_length", Float(section="options"),
-    "smoothing", Float(section="options"),
-    "normalize", Boolean(section="options"),
-    "kmax", Integer(section="options"),
 )
 
 
 def initialization(self):
 
+    self.erase_matrices = True
+
     def link_keep_regions(self, dummy):
         """
         """
+        from constel.lib.utils.filetools import read_nomenclature_file
         if self.regions_nomenclature is not None:
             s = []
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["keep_regions"] = ListOf(Choice(*s),
-                                                    section="options")
+                                                    section="Options")
             self.changeSignature(self.signature)
 
     def fill_study_choice(self, dummy=None):
         """
         """
+
         choices = set()
         if self.outputs_database is not None:
             if neuroHierarchy.databases.hasDatabase(self.outputs_database):
@@ -181,17 +205,19 @@ def initialization(self):
         It also resets the region parameter to default state after
         the nomenclature changes.
         """
+        from constel.lib.utils.filetools import read_nomenclature_file
         current = self.region
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
             # temporarily set a value which will remain valid
             self.region = s[0][1]
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s, section="nomenclature")
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)
@@ -302,6 +328,7 @@ def initialization(self):
     eNode.addDoubleLink("min_fibers_length", "fsl_indiv.min_fibers_length")
     eNode.addDoubleLink("smoothing", "fsl_indiv.smoothing")
     eNode.addDoubleLink("normalize", "fsl_indiv.normalize")
+    eNode.addDoubleLink("erase_matrices", "fsl_indiv.erase_matrices")
     eNode.addDoubleLink("kmax", "fsl_indiv.kmax")
     eNode.addDoubleLink("complete_individual_matrix",
                         "fsl_indiv.import.complete_individual_matrix")
@@ -347,6 +374,8 @@ def initialization(self):
                         "reduced_matrix.individual_white_mesh")
     eNode.addDoubleLink("normalize",
                         "reduced_matrix.normalize")
+    eNode.addDoubleLink("erase_matrices",
+                        "reduced_matrix.erase_matrices")
 
     ###########################################################################
     #    link of parameters with the process:                                 #
@@ -371,6 +400,24 @@ def initialization(self):
                         "individual_clusters.regions_nomenclature")
     eNode.addDoubleLink("region",
                         "individual_clusters.region")
+
+    ###########################################################################
+    #    link of parameters with the process:                                 #
+    #        "Optimal Clustering"                                             #
+    ###########################################################################
+
+    eNode.addChild(
+        "optimal_clusters",
+        ProcessExecutionNode("constel_optimal_clustering",
+                             optional=True))
+    eNode.addDoubleLink("individual_clustering",
+                        "optimal_clusters.individual_clustering")
+    eNode.addDoubleLink("region",
+                        "optimal_clusters.region")
+    eNode.addDoubleLink("atlas_silhouette",
+                        "optimal_clusters.atlas_silhouette")
+    eNode.addDoubleLink("optimal_clustering",
+                        "optimal_clusters.optimal_clustering")
 
     self.setExecutionNode(eNode)
 

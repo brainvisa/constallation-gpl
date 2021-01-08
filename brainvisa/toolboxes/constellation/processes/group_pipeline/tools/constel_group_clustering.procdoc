@@ -3,7 +3,6 @@
 <d>
   <d name="fr">
     <xhtml name="short"/>
-    <xhtml name="long"/>
     <d name="parameters">
       <xhtml name="reduced_group_matrix"/>
       <xhtml name="average_mesh">Maillage moyen de la surface corticale, définie comme étant l'interface entre la substance blanche et la substance grise (également appelé interface gris/blanc).</xhtml>
@@ -34,41 +33,50 @@ Par exemple, vous pouvez utilser l'atlas Desikan-Killiany ou l'atlas Destrieux i
 <i><b>(2) "concatenated approach"</b></i>, le paramètre "ROIs_nomenclature" est une segmentation individuelle. <br/></xhtml>
       <xhtml name="nb_clusters"/>
     </d>
+    <xhtml name="long"/>
   </d>
   <d name="en">
-    <xhtml name="short"/>
+    <xhtml name="short">A K-medoids clustering of a group of subjects. Depending on the chosen method it produces a mean clustering (<i>averaged</i>) or a clustering for each subject of the group (<i>concatenated</i>).</xhtml>
     <d name="parameters">
-      <xhtml name="reduced_group_matrix"/>
-      <xhtml name="average_mesh">Average white mesh of the entire cortical surface (white/gray interface).</xhtml>
-      <xhtml name="cortical_regions_nomenclature">This parameter is a text file. It defines the relationship between the region name and its number present in the parcellation of the cortex, parameter 'cortical parcellation'. It is constructed like that (The order of labels is not relevant.): <br/>
-<br/>
-<pre>1              nameA</pre>
-<pre>2              nameB</pre>
-<pre>3              nameC</pre>
-<pre>4              nameD</pre>
-<pre>5              nameE</pre>
-<pre>..             .....   </pre>
-<br/>
-For example, you can use the Desikan-Killiany Atlas or the Destrieux Atlas of the FreeSurfer software.</xhtml>
-      <xhtml name="clustering_algorithms"/>
-      <xhtml name="nb_clusters"/>
-      <xhtml name="ROI_clustering"/>
-      <xhtml name="cortical_parcellation">Parcellation of the cortical surface into anatomical region (lobes, gyri...). For example, FreeSurfer provides a cortical parcellation into gyri.<br/>
-A point-to-point correspondence between subjects is mandatory to allow an analysis of group results (anatomical region in a subject is the same anatomical region to another subject).</xhtml>
-      <xhtml name="subjects_group">The XML file corresponding the study group.</xhtml>
-      <xhtml name="intersubject_reduced_matrices"/>
-      <xhtml name="method">Two methods are proposed: <br/>
-<i><b>(1) "averaged approach" </b></i> to obtain a single result group. <br/>
-<i><b>(2) "concatenated approach"</b></i> to obtain individual results across the group.  <br/>
+      <xhtml name="reduced_group_matrix">Group matrix dependant of the chosen <i>method</i>:<br/>
+<i><b>(1) averaged approach</b></i>: a mean matrix of the reduced matrices of the group subjects.<br/>
+<i><b>(2) concatenated approach</b></i>: a concatenation of the reduced matrices of the group subjects.<br/></xhtml>
+      <xhtml name="average_mesh">Freesurfer average white mesh of a group of subjects.</xhtml>
+      <xhtml name="ROI_clustering">A K-medoids clustering of the <i>reduced_group_matrix</i>.</xhtml>
+      <xhtml name="region">The study region based on <i>regions_nomenclature</i> file.</xhtml>
+      <xhtml name="regions_nomenclature">Nomenclature of the cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas</xhtml>
+      <xhtml name="subjects_group">The XML file corresponding to the subjects group.</xhtml>
+      <xhtml name="intersubject_reduced_matrices">Each subject obtains a reduced matrix from its individual complete matrix. There are as many reduced matrices as input subjects.</xhtml>
+      <xhtml name="regions_parcellation">Cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas (?h.aparc.annot).<br/>
 <br/>
 <img SRC="../../images/constellation/panneau_attention.jpg" ALT="" height="20" width="20"/>
-<span style="color:red;">Implications of the choice of method on the parameter "cortical_parcellation":</span><br/>
-<i><b>(1) "averaged approach" </b></i>, for this method, the parameter "cortical_parcellation" must be a file representing the average parcellation of a subjects group. <br/>
-<i><b>(2) "concatenated approach"</b></i>, the parameter "cortical_parcellation" is an individual parcellation. <br/></xhtml>
-      <xhtml name="cortical_region">The list oflregion names, present in the text file 'cortical_regions_nomenclature' is proposed. <br/>
-You must choose a region. The study will be done on this region.</xhtml>
+<span style="color:red;">Implications of the choice of the <i>method</i> on the <i>regions_parcellation</i> parameter:</span><br/>
+<i><b>(1) averaged approach</b></i>: the <i>regions_parcellation</i> parameter must be a file representing the average parcellation of the group of subjects.<br/>
+<i><b>(2) concatenated approach</b></i>: the <i>regions_parcellation</i> parameter must be a list of files, each representing the individual parcellation of a subject of the group.<br/></xhtml>
+      <xhtml name="method">Two methods are proposed: <br/>
+<i><b>(1) averaged approach</b></i> to obtain an average result on the group.<br/>
+<i><b>(2) concatenated approach</b></i> to obtain individual results across the group.<br/>
+</xhtml>
+      <xhtml name="nb_clusters">Maximal number of clusters used to parcellate the study region.<br/>
+Default to 12.</xhtml>
     </d>
-    <xhtml name="long"/>
+    <xhtml name="long"><h2>Usage example</h2>
+
+<pre>regions_nomenclature:            /my/path/share/brainvisa-share-4.6/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
+<pre>method:                          averaged approach</pre>
+<pre>region:                          lh.inferiorparietal</pre>
+<pre>subjects_group:                  /my/path/brainvisa_db/subjects/group_analysis/g1/g1_group.xml</pre>
+<pre>intersubject_reduced_matrces:    '/my/path/brainvisa_dbsubjects/group_analysis/g1/connectivity_clustering/avg/studyA/lh.inferiorparietal/smooth3.0
+                                 /g1_avg_studyA_lh.inferiorparietal_001_reduced_matrix_20to500mm.nii.gz'</pre>
+<pre>average_mesh:                    /my/path/freesurfer_db/group_analysis/average_mesh_group/average_brain/averagebrain.white.gii</pre>
+<pre>regions_parcellation:            '/my/path/freesurfer_db/group_analysis/average_mesh_group/average_brain/bh.annot.averagebrain.gii'</pre>
+<pre>nb_clusters:                     12  </pre>
+<pre>reduced_group_matrix:            /my/path/brainvisa_db/subjects/group_analysis/g1/connectivity_clustering/avg/studyA/lh.inferiorparietal/smooth3.0
+                                 /g1_avg_studyA_lh.inferiorparietal_group_reduced_matrix_20to500mm.ima</pre>
+<pre>ROI_clustering:                  '/my/path/brainvisa_db/subjects/group_analysis/g1/connectivity_clustering/avg/studyA/lh.inferiorparietal/smooth3.0
+                                 /g1_avg_studyA_lh.inferiorparietal_avgSubject_clustering_20to500mm.gii'</pre></xhtml>
   </d>
 </d>
 </minf>

@@ -43,12 +43,15 @@ signature = Signature(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
                             "normed": "yes",
-                            "intersubject": "no"}),
+                            "intersubject": "no"},
+        section="Normed profile"),
+
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
-                            "averaged": "No"}),
+                            "averaged": "No"},
+        section="Freesurfer data"),
 
     # outputs
     "reduced_individual_profile", WriteDiskItem(
@@ -57,7 +60,8 @@ signature = Signature(
                             "roi_filtered": "no",
                             "intersubject": "no",
                             "step_time": "no",
-                            "measure": "no"}),
+                            "measure": "no"},
+        section="Watershed"),
 )
 
 

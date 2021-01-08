@@ -44,7 +44,7 @@ def validation():
 
 name = "Anatomist Show Connectivity Profiles of a Specific Cortical Element"
 roles = ("viewer", )
-userLevel = 0
+userLevel = 2
 
 signature = Signature(
     "connectivity_matrix", ReadDiskItem(
@@ -153,7 +153,7 @@ def initialization(self):
 def execution(self, context):
     """
     """
-    from bainvisa import anatomist as ana
+    from brainvisa import anatomist as ana
     # instance of anatomist
     a = ana.Anatomist()
 

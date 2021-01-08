@@ -31,7 +31,7 @@ def validation(self):
     loaded. It checks some conditions for the process to be available.
     """
     try:
-        from constel.lib.utils.filetools import read_file
+        from constel.lib.utils.filetools import read_nomenclature_file
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -44,29 +44,38 @@ name = "Constellation Individual Sub-Pipeline"
 userLevel = 2
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "region", OpenChoice(section="Study parameters"),
+
     # --inputs--
     "complete_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
-                            "intersubject": "no"}),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", OpenChoice(),
-    "regions_parcellation", ReadDiskItem(
-        "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+                            "intersubject": "no"},
+        section="Input matrix"),
+
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
                             "inflated": "No",
-                            "averaged": "No"}),
-    "keep_regions", ListOf(OpenChoice()),
-    "smoothing", Float(),
-    "normalize", Boolean(),
-    "kmax", Integer(),
+                            "averaged": "No"},
+        section="Freesurfer data"),
+    "regions_parcellation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+
+    "keep_regions", ListOf(OpenChoice(), section="Options"),
+    "smoothing", Float(section="Options"),
+    "kmax", Integer(section="Options"),
+    "normalize", Boolean(section="Options"),
+    "erase_matrices", Boolean(section="Options")
+
 )
 
 
@@ -76,11 +85,12 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters.
     """
-    from constel.lib.utils.filetools import read_file
+    from constel.lib.utils.filetools import read_nomenclature_file
     # default value
     self.smoothing = 3.0
     self.kmax = 12
     self.normalize = True
+    self.erase_matrices = True
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -90,9 +100,10 @@ def initialization(self):
         """
         if self.regions_nomenclature is not None:
             s = []
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
-            self.signature["keep_regions"] = ListOf(Choice(*s))
+            self.signature["keep_regions"] = ListOf(Choice(*s),
+                                                    section="Options")
             self.changeSignature(self.signature)
 
     def reset_label(self, dummy):
@@ -109,11 +120,12 @@ def initialization(self):
             s = [("Select a region in this list", None)]
             # temporarily set a value which will remain valid
             self.region = s[0][1]
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s)
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)
@@ -150,6 +162,8 @@ def initialization(self):
                         "regions_parcellation")
     eNode.addDoubleLink("smoothing.smoothing",
                         "smoothing")
+    eNode.addDoubleLink("smoothing.erase_matrices",
+                        "erase_matrices")
 
     ###########################################################################
     #    link of parameters with the process: "Mean Connectivity Profile"     #
@@ -167,7 +181,8 @@ def initialization(self):
                         "region")
     eNode.addDoubleLink("MeanProfile.regions_parcellation",
                         "regions_parcellation")
-
+    eNode.addDoubleLink("MeanProfile.erase_matrices",
+                        "erase_matrices")
     ###########################################################################
     #    link of parameters with the process: "Remove Internal Connections"   #
     ###########################################################################

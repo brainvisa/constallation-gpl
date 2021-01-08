@@ -44,3 +44,6 @@ FileType("Connectivity Profile Texture", "Texture")
 
 #----------------------------Connectivity ROI texture--------------------------
 FileType("Connectivity ROI Texture", "ROI Texture")
+
+#----------------------------Silhouette--------------------------
+FileType("Clustering Silhouette", "Text File")

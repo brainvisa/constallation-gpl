@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Reorganization of FSL data into Constellation compatible data.</xhtml>
+    <d name="parameters">
+      <xhtml name="output_connectome">Connectivity matrix compatible with Constellation requirements.</xhtml>
+      <xhtml name="region">The study region based on <i>regions_nomenclature</i> file.</xhtml>
+      <xhtml name="regions_nomenclature">Nomenclature of the cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas</xhtml>
+      <xhtml name="probtrackx_indir">Subjects directory in a <b>FSL connectome</b> database, where the fiber tracts files can be found.</xhtml>
+      <xhtml name="regions_parcellation">Cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas (?h.aparc.annot).</xhtml>
+      <xhtml name="temp_outdir">Temporary directory where data files will be stored during importation phase.<br/>
+<u>Example</u>: <i>/tmp</i>, but this directory size should be large enough to store all the temporary files during the process.</xhtml>
+    </d>
+    <xhtml name="long"><h2>Usage example</h2>
+
+<pre>regions_nomenclature:            /casa/build/share/brainvisa-share-4.6/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
+<pre>region:                          lh.inferiorparietal</pre>
+<pre>probtrackx_indir:                /my/path/fsl_db/3T_fsl/omatrix1/100206</pre>
+<pre>regions_parcellation:            /my/path/freesurfer_db/group_analysis/average_group/average_brain/bh.annot.averagebrain.gii</pre>
+<pre>temp_outdir:                     /tmp </pre>
+<pre>output_connectome:               /tmp/100206/connectome_label8.imas</pre></xhtml>
+  </d>
+</d>
+</minf>

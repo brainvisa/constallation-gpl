@@ -53,21 +53,25 @@ name = "Group Connectivity Profile"
 userLevel = 2
 
 signature = Signature(
+    "new_study_name", String(section="Study parameters"),
+
     # --inputs--
     "normed_individual_profiles", ListOf(ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
                             "normed": "yes",
-                            "intersubject": "no"})),
-    "subjects_group", ReadDiskItem("Group definition", "XML"),
-    "new_study_name", String(),
+                            "intersubject": "no"}),
+        section="Group inputs"),
+    "subjects_group", ReadDiskItem("Group definition", "XML",
+                                   section="Group inputs"),
 
     # --outputs--
     "group_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
                             "normed": "no",
-                            "intersubject": "yes"}),
+                            "intersubject": "yes"},
+        section="Outputs"),
 )
 
 

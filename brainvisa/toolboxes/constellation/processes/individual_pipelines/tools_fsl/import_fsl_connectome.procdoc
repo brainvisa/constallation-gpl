@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Connectivity matrix import process from temporary directory to Brainvisa database.</xhtml>
+    <d name="parameters">
+      <xhtml name="min_fibers_length">A filtering parameter to exclude low length fibers.
+Default to 20mm.</xhtml>
+      <xhtml name="complete_individual_matrix">Imported connectivity matrix compatible with Constellation requirements.</xhtml>
+      <xhtml name="region">The study region based on <i>regions_nomenclature</i> file.</xhtml>
+      <xhtml name="regions_nomenclature">Nomenclature of the cortical parcellation used to partition the study.<br/>
+<i>Example :</i> Freesurfer Desikan_Killiany Atlas</xhtml>
+      <xhtml name="study_name">General name of the study.</xhtml>
+      <xhtml name="fsl_connectome">Connectivity matrix compatible with Constellation requirements.</xhtml>
+      <xhtml name="method">Two methods are proposed: <br/>
+<i><b>(1) averaged approach</b></i> to obtain an average result on the group.<br/>
+<i><b>(2) concatenated approach</b></i> to obtain individual results across the group.<br/></xhtml>
+      <xhtml name="outputs_database">This parameter retrieves all databases with brainvisa ontology present in your configuration, the generated files will be written on the chosen one (see the documentation to add a database in the BrainVisa configuration).</xhtml>
+    </d>
+    <xhtml name="long"><h2>Usage example</h2>
+
+<pre>regions_nomenclature:            /casa/build/share/brainvisa-share-4.6/nomenclature/translation/nomenclature_desikan_freesurfer.txt</pre>
+<pre>outputs_database:                /my/path/brainvisa_db </pre>
+<pre>study_name:                      studyA  </pre>
+<pre>method:                          averaged approach  </pre>
+<pre>region:                          lh.inferiorparietal</pre>
+<pre>fsl_connectome:                  /tmp/100206/connectome_label8.imas</pre>
+<pre>min_fibers_length:               20.0  </pre>
+<pre>complete_individual_matrix:      /my/path/brainvisa_db/subjects/100206/diffusion/default_acquisition/default_analysis/
+                                 default_tracking_session/connectivity_parcellation/avg/studyA/lh.inferiorparietal/
+                                 matrix/100206_studyA_lh.inferiorparietal_complete_matrix_smooth0.0_20.0to500.0mm.imas</pre>
+</xhtml>
+  </d>
+</d>
+</minf>

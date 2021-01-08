@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Computes and normalizes an average connectivity profile of a group of subjects, restricted to groupwise strongly connected regions.</xhtml>
+    <d name="parameters">
+      <xhtml name="group_profile">Average connectivity profile of the group of subjects.</xhtml>
+      <xhtml name="group_mask">The most representative connectivity pattern of a group of subjects.</xhtml>
+      <xhtml name="normed_group_profile">Mean normed profile of a group of subjects.</xhtml>
+    </d>
+    <xhtml name="long"><h2>Usage example</h2>
+
+<pre>group_mask:                     /my/path/brainvisa_db/subjects/group_analysis/g1/connectivity_clustering/avg/studyA/lh.inferiorparietal/smooth3.0
+                                /g1_avg_studyA_lh.inferiorparietal_mask_20to500mm.gii</pre>
+<pre>group_profile:                  /my/path/brainvisa_db/subjects/group_analysis/g1/connectivity_clustering/avg/studyA/lh.inferiorparietal/smooth3.0
+                                /g1_avg_studyA_lh.inferiorparietal_mean_profile_20to500mm.gii</pre>
+<pre>normed_group_profile:           /my/path/brainvisa_db/subjects/group_analysis/g1/connectivity_clustering/avg/initiation/lh.inferiorparietal/smooth3.0
+                                /g1_avg_initiation_lh.inferiorparietal_normed_mean_profile_20to500mm.gii</pre></xhtml>
+  </d>
+</d>
+</minf>

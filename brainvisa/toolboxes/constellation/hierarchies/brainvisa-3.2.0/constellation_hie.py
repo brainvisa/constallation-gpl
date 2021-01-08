@@ -251,9 +251,44 @@ insert("{center}/group_analysis/{group_of_subjects}",
                     "step_time", "yes",
                     "measure", "no"),
 
+    "<group_of_subjects>_<method>_<studyname>_<gyrus>_{sid}_silhouette_{smallerlength}to{greaterlength}mm",
+        SetType("Clustering Silhouette"),
+        SetWeakAttr("roi_autodetect", "no",
+                    "roi_filtered", "no",
+                    "intersubject", "yes",
+                    "step_time", "yes",
+                    "measure", "no"),
+
+"optimal", SetContent(
+
+    "<group_of_subjects>_<method>_<studyname>_<gyrus>_{sid}_{optimal}_clustering_{smallerlength}to{greaterlength}mm",
+        SetType("Connectivity ROI Texture"),
+        SetWeakAttr("roi_autodetect", "no",
+                    "roi_filtered", "no",
+                    "intersubject", "yes",
+                    "step_time", "yes",
+                    "measure", "no",
+                    "optimal", "silhouette"),
+),  # end optimal
 ),  # end smoothing
 ),  # end gyrus
+
+"desikan", SetContent(
+"smooth{smoothing}", SetContent(
+
+    "<group_of_subjects>_<method>_<studyname>_bh_{sid}_{optimal}_clustering_{smallerlength}to{greaterlength}mm",
+        SetType("Connectivity ROI Texture"),
+        SetWeakAttr("roi_autodetect", "no",
+                    "roi_filtered", "no",
+                    "intersubject", "yes",
+                    "step_time", "no",
+                    "measure", "no",
+                    "optimal", "silhouette",
+                    "concatenated", "yes"),
+
+),  # end smoothing
+),  # end desikan
 ),  # end texture
 ),  # end method
 ),  # end connectivity_clustering
-)  # end
+)   # end

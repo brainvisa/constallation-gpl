@@ -59,12 +59,15 @@ signature = Signature(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
                             "normed": "yes",
-                            "intersubject": "yes"}),
+                            "intersubject": "yes"},
+        section="Group profile inputs"),
+
     "average_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
-                            "averaged": "Yes"}),
+                            "averaged": "Yes"},
+        section="Freesurfer data"),
 
     # --outputs--
     "reduced_group_profile", WriteDiskItem(
@@ -73,14 +76,16 @@ signature = Signature(
                             "roi_filtered": "no",
                             "intersubject": "yes",
                             "step_time": "no",
-                            "measure": "no"}),
+                            "measure": "no"},
+        section="Watershed outputs"),
     "filtered_reduced_group_profile", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "yes",
                             "roi_filtered": "yes",
                             "intersubject": "yes",
                             "step_time": "no",
-                            "measure": "no"}),
+                            "measure": "no"},
+        section="Watershed outputs")
 )
 
 

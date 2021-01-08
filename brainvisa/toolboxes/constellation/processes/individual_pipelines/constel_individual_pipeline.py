@@ -32,7 +32,7 @@ def validation(self):
     loaded. It checks some conditions for the process to be available.
     """
     try:
-        from constel.lib.utils.filetools import read_file
+        from constel.lib.utils.filetools import read_nomenclature_file
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -45,45 +45,69 @@ name = "Constellation Individual Pipeline -  Connectomist"
 userLevel = 1
 
 signature = Signature(
-    # --inputs--
-    "outputs_database", Choice(),
-    "study_name", OpenChoice(),
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "outputs_database", Choice(section="Study parameters"),
+    "study_name", OpenChoice(section="Study parameters"),
     "method", Choice(
         ("averaged approach", "avg"),
-        ("concatenated approach", "concat")),
-    "subject_indir", ReadDiskItem("subject", "directory"),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", OpenChoice(),
-    "regions_parcellation", ReadDiskItem(
-        "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+        ("concatenated approach", "concat"),
+        section="Study parameters"),
+    "region", OpenChoice(section="Study parameters"),
+
+    # --inputs--
+    "subject_indir", ReadDiskItem("subject", "directory",
+                                  section="Tractography inputs"),
+
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes",
                             "inflated": "No",
-                            "averaged": "No"}),
+                            "averaged": "No"},
+        section="Freesurfer data"),
     "dw_to_t1", ReadDiskItem(
-        "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix"),
-    "keep_regions", ListOf(OpenChoice()),
-    "smoothing", Float(),
-    "fiber_tracts_format", Choice("bundles", "trk"),
-    "min_fibers_length", Float(),
-    "max_fibers_length", Float(),
-    "normalize", Boolean(),
-    "kmax", Integer(),
+        "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix",
+        section="Freesurfer data"),
+    "regions_parcellation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+
+    "regions_selection", Choice("All but main region", "All", "Custom",
+                                section="Options"),
+    "keep_regions", ListOf(OpenChoice(), section="Options"),
+    "fiber_tracts_format", Choice("bundles", "trk", section="Options"),
+    "min_fibers_length", Float(section="Options"),
+    "max_fibers_length", Float(section="Options"),
+    "smoothing", Float(section="Options"),
+    "kmax", Integer(section="Options"),
+    "normalize", Boolean(section="Options"),
+    "erase_matrices", Boolean(section="Options")
 )
 
 
 # ---------------------------Functions-----------------------------------------
 
 
+def link_keep_regions_value(self, dummy, other=None, oother=None):
+    s = [x[1] for x in self.signature["keep_regions"].contentType.values
+         if x[1] is not None]
+    if self.regions_selection == "All":
+        keep_regions = s
+    elif self.regions_selection == "All but main region":
+        keep_regions = [x for x in s if x != self.region]
+    else:
+        keep_regions = None
+    return keep_regions
+
+
 def initialization(self):
     """Provides default values and link of parameters.
     """
-    from constel.lib.utils.filetools import read_file
+    from constel.lib.utils.filetools import read_nomenclature_file
     # list of possible databases, while respecting the ontology
     # ontology: brainvisa-3.2.0
     databases = [h.name for h in neuroHierarchy.hierarchies()
@@ -92,7 +116,8 @@ def initialization(self):
     if len(databases) != 0:
         self.outputs_database = databases[0]
     else:
-        self.signature["outputs_database"] = OpenChoice()
+        self.signature["outputs_database"] = OpenChoice(
+                                                section="Study parameters")
 
     # default value
     self.smoothing = 3.0
@@ -100,6 +125,7 @@ def initialization(self):
     self.min_fibers_length = 20.
     self.max_fibers_length = 500.
     self.normalize = True
+    self.erase_matrices = True
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -109,9 +135,10 @@ def initialization(self):
         """
         if self.regions_nomenclature is not None:
             s = []
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
-            self.signature["keep_regions"] = ListOf(Choice(*s))
+            self.signature["keep_regions"] = ListOf(Choice(*s),
+                                                    section="Options")
             self.changeSignature(self.signature)
 
     def fill_study_choice(self, dummy=None):
@@ -148,11 +175,12 @@ def initialization(self):
             s = [("Select a region in this list", None)]
             # temporarily set a value which will remain valid
             self.region = s[0][1]
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s)
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)
@@ -167,7 +195,8 @@ def initialization(self):
             signature["regions_parcellation"] = ReadDiskItem(
                 "ROI Texture", "Aims texture formats",
                 requiredAttributes={"side": "both", "vertex_corr": "Yes",
-                                    "averaged": "Yes"})
+                                    "averaged": "Yes"},
+                section="Freesurfer data")
             self.changeSignature(signature)
             self.setValue("regions_parcellation",
                           signature["regions_parcellation"].findValue(
@@ -176,7 +205,8 @@ def initialization(self):
             signature["regions_parcellation"] = ReadDiskItem(
                 "ROI Texture", "Aims texture formats",
                 requiredAttributes={"side": "both", "vertex_corr": "Yes",
-                                    "averaged": "No"})
+                                    "averaged": "No"},
+                section="Freesurfer data")
             self.changeSignature(signature)
             self.setValue("regions_parcellation", link_label(self), True)
         fill_study_choice(self)
@@ -230,9 +260,12 @@ def initialization(self):
     self.linkParameters("regions_parcellation",
                         ["study_name", "subject_indir", "method"],
                         link_label)
-    self.linkParameters("keep_regions",
+    self.linkParameters(None,
                         "regions_nomenclature",
                         link_keep_regions)
+    self.addLink("keep_regions",
+                 ("regions_nomenclature", "regions_selection", "region"),
+                 self.link_keep_regions_value)
 
     method_changed(self, self.method)
 
@@ -334,6 +367,8 @@ def initialization(self):
                         "kmax")
     eNode.addDoubleLink("subpipeline.keep_regions",
                         "keep_regions")
+    eNode.addDoubleLink("subpipeline.erase_matrices",
+                        "erase_matrices")
 
     self.setExecutionNode(eNode)
 

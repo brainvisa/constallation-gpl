@@ -38,8 +38,9 @@ def validation():
             "environnement variable or please make sure that constel module "
             "is installed.")
     try:
-        from constel.lib.utils.texturetools import remove_labels, read_file,\
+        from constel.lib.utils.filetools import read_nomenclature_file,\
             select_ROI_number
+        from constel.lib.utils.texturetools import remove_labels
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -51,31 +52,38 @@ name = "Individual Regions Filtering"
 userLevel = 2
 
 signature = Signature(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+
+    "region", OpenChoice(section="Study parameters"),
+
     # --inputs--
     "complete_matrix_smoothed", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
                             "intersubject": "no",
-                            "individual": "yes"}),
+                            "individual": "yes"},
+        section="Individual inputs"),
     "reduced_individual_profile", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "yes",
                             "roi_filtered": "no",
                             "intersubject": "no",
                             "step_time": "no",
-                            "measure": "no"}),
-    "regions_parcellation", ReadDiskItem(
-        "ROI Texture", "Aims texture formats",
-        requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+                            "measure": "no"},
+        section="Individual inputs"),
+
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File"),
-    "region", OpenChoice(),
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
+    "regions_parcellation", ReadDiskItem(
+        "ROI Texture", "Aims texture formats",
+        requiredAttributes={"side": "both",
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
 
     # --outputs--
     "sum_vertices_patch", WriteDiskItem(
@@ -84,21 +92,24 @@ signature = Signature(
                             "roi_filtered": "no",
                             "intersubject": "no",
                             "step_time": "no",
-                            "measure": "sum"}),
+                            "measure": "sum"},
+        section="Outputs"),
     "duplication_value_patch", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "no",
                             "roi_filtered": "no",
                             "intersubject": "no",
                             "step_time": "no",
-                            "measure": "spread"}),
+                            "measure": "spread"},
+        section="Outputs"),
     "filtered_reduced_individual_profile", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "yes",
                             "roi_filtered": "yes",
                             "intersubject": "no",
                             "step_time": "no",
-                            "measure": "no"}),
+                            "measure": "no"},
+        section="Watershed outputs"),
 )
 
 
@@ -108,7 +119,7 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters
     """
-    from constel.lib.utils.texturetools import read_file
+    from constel.lib.utils.filetools import read_nomenclature_file
     # default value
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
@@ -126,11 +137,12 @@ def initialization(self):
             s = [("Select a region in this list", None)]
             # temporarily set a value which will remain valid
             self.region = s[0][1]
-            s += read_file(
+            s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
             self.signature["region"].setChoices(*s)
             if isinstance(self.signature["region"], OpenChoice):
-                self.signature["region"] = Choice(*s)
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
                 self.changeSignature(self.signature)
             if current not in s:
                 self.setValue("region", s[0][1], True)
@@ -170,7 +182,8 @@ def execution(self, context):
 
     Compute reduced connectivity matrix
     """
-    from constel.lib.utils.texturetools import select_ROI_number, remove_labels
+    from constel.lib.utils.texturetools import remove_labels
+    from constel.lib.utils.texturetools import select_ROI_number
     # selects the ROI label corresponding to ROI name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)
