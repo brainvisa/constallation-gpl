@@ -45,7 +45,7 @@ add_dependencies( install-constellation-gpl install-constel-atlas )
 # ensure the installed database file is newer than the rest - rebuild it after
 # all toolboxes are installed
 add_custom_target( constel_install_shared_index
-    COMMAND if [ -f \"$(BRAINVISA_INSTALL_PREFIX)/bin/bv_env\" ] \; then "$(BRAINVISA_INSTALL_PREFIX)/bin/bv_env" "axon-runprocess" "--enabledb" "updateDatabases" "databases=['$(BRAINVISA_INSTALL_PREFIX)/share/constellation-${BRAINVISA_PACKAGE_VERSION_MAJOR}.${BRAINVISA_PACKAGE_VERSION_MINOR}/constellation_atlas_hcp_200s/constellation_matrix', '$(BRAINVISA_INSTALL_PREFIX)/share/constellation-${BRAINVISA_PACKAGE_VERSION_MAJOR}.${BRAINVISA_PACKAGE_VERSION_MINOR}/constellation_atlas_hcp_200s/freesurfer_gyri']" \; fi
+    COMMAND if [ -f \"$(BRAINVISA_INSTALL_PREFIX)/bin/bv_env\" ] \; then "$(BRAINVISA_INSTALL_PREFIX)/bin/bv_env" "axon-runprocess" "--enabledb" "updateDatabases" "databases=[\\'$(BRAINVISA_INSTALL_PREFIX)/share/constellation-${BRAINVISA_PACKAGE_VERSION_MAJOR}.${BRAINVISA_PACKAGE_VERSION_MINOR}/constellation_atlas_hcp_200s/constellation_matrix\\', \\'$(BRAINVISA_INSTALL_PREFIX)/share/constellation-${BRAINVISA_PACKAGE_VERSION_MAJOR}.${BRAINVISA_PACKAGE_VERSION_MINOR}/constellation_atlas_hcp_200s/freesurfer_gyri\\']" \; fi
 )
 
 add_dependencies( post-install constel_install_shared_index )
