@@ -130,7 +130,4 @@ def execution(self, context):
                    "-verbose", 1)
 
     if self.erase_matrices:
-        matrix_database = self.complete_matrix_smoothed.get('_database')
-        if matrix_database:
-            db = neuroHierarchy.databases.database(matrix_database)
-            db.removeDiskItem(self.complete_matrix_smoothed, eraseFiles=True)
+        self.complete_matrix_smoothed.eraseFiles(remove_from_database=True)
