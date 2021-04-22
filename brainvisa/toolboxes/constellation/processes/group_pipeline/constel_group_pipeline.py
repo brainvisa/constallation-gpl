@@ -376,6 +376,8 @@ def initialization(self):
             "constel_reduced_individual_matrices_from_group_regions",
             optional=1))
 
+    eNode.addDoubleLink("ReducedGroupMatrix.regions_nomenclature",
+                        "regions_nomenclature")
     eNode.addDoubleLink("ReducedGroupMatrix.subjects_group",
                         "subjects_group")
     eNode.addDoubleLink("ReducedGroupMatrix.study_name",
@@ -394,6 +396,8 @@ def initialization(self):
                    ProcessExecutionNode("constel_group_clustering",
                                         optional=1))
 
+    eNode.addDoubleLink("GroupClustering.regions_nomenclature",
+                        "regions_nomenclature")
     eNode.addDoubleLink("GroupClustering.subjects_group",
                         "subjects_group")
     eNode.addDoubleLink("GroupClustering.method", "method")
