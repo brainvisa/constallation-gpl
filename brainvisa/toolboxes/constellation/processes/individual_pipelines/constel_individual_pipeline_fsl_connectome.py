@@ -118,8 +118,8 @@ def initialization(self):
         self.signature["outputs_database"] = OpenChoice(
                                                 section="Study parameters")
 
-    self.signature['probtrackx_indir'].databaseUserLevel = 3
-    self.signature['temp_outdir'].databaseUserLevel = 3
+    self.signature['probtrackx_indir'].databaseUserLevel = 2
+    self.signature['temp_outdir'].databaseUserLevel = 2
 
     # default value
     self.smoothing = 3.0
