@@ -22,6 +22,7 @@ from brainvisa.processes import Integer
 from brainvisa.group_utils import Subject
 from brainvisa.processes import Signature
 from brainvisa.processes import OpenChoice
+from brainvisa.processes import Boolean
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import neuroHierarchy
 from brainvisa.configuration import neuroConfig
@@ -122,6 +123,7 @@ signature = Signature(
 
     "smoothing", Float(section="Options"),
     "nb_clusters", Integer(section="Options"),
+    "erase_matrices", Boolean(section="Options")
 )
 
 
@@ -145,6 +147,7 @@ def initialization(self):
     # default value
     self.smoothing = 3.0
     self.nb_clusters = 12
+    self.erase_matrices = False
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -386,7 +389,9 @@ def initialization(self):
     eNode.addDoubleLink("ReducedGroupMatrix.regions_parcellation",
                         "regions_parcellation")
     eNode.addDoubleLink("ReducedGroupMatrix.filtered_reduced_group_profile",
-                        "GroupRegionsFiltering.filtered_reduced_group_profile")
+                        "GroupRegionsFiltering.filtered_reduced_group_profile"),
+    eNode.addDoubleLink("ReducedGroupMatrix.erase_matrices",
+                        "erase_matrices")
 
     ###########################################################################
     #        link of parameters for the "Clustering of Group" process         #

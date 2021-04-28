@@ -92,6 +92,7 @@ signature = Signature(
         section="Freesurfer data"),
 
     "normalize", Boolean(section="Options"),
+    "erase_matrices", Boolean(section="Options"),
 
     # --outputs--
     "intersubject_reduced_matrices", ListOf(WriteDiskItem(
@@ -133,6 +134,7 @@ def afterChildAddedCallback(self, parent, key, child):
     child.regions_nomenclature = parent.regions_nomenclature
     child.region = parent.region
     child.normalize = parent.normalize
+    child.erase_matrices = parent.erase_matrices
 
     # Add link between eNode.ListOf_Input_3dImage and pNode.Input_3dImage
     # Creates a double link source -> destination and destination -> source.
@@ -143,6 +145,7 @@ def afterChildAddedCallback(self, parent, key, child):
                          "regions_nomenclature")
     parent.addDoubleLink(key + ".region", "region")
     parent.addDoubleLink(key + ".normalize", "normalize")
+    parent.addDoubleLink(key + ".erase_matrices", "erase_matrices")
 
 
 def beforeChildRemovedCallback(self, parent, key, child):
@@ -155,12 +158,14 @@ def beforeChildRemovedCallback(self, parent, key, child):
                             "regions_nomenclature")
     parent.removeDoubleLink(key + ".region", "region")
     parent.removeDoubleLink(key + ".normalize", "normalize")
+    parent.removeDoubleLink(key + ".erase_matrices", "erase_matrices")
 
 
 def initialization(self):
     """Provides default values and link of parameters.
     """
 
+    self.erase_matrices = False
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
