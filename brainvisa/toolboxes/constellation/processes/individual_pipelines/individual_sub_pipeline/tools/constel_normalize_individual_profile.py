@@ -89,6 +89,7 @@ def initialization(self):
         """
         """
         if self.regions_nomenclature is not None:
+            self.keep_regions = None
             s = []
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
