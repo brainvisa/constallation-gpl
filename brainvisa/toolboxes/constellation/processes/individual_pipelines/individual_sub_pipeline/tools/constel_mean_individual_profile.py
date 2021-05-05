@@ -19,6 +19,8 @@ from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
 from brainvisa.processes import Boolean
+from brainvisa.processes import OpenChoice
+from brainvisa.processes import Choice
 from brainvisa.data import neuroHierarchy
 
 # Soma module
@@ -50,7 +52,7 @@ signature = Signature(
     "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File", section="Nomenclature"),
 
-    "region", String(section="Study parameters"),
+    "region", OpenChoice(section="Study parameters"),
 
     # --inputs--
     "complete_matrix_smoothed", ReadDiskItem(
@@ -83,6 +85,8 @@ signature = Signature(
 
 def initialization(self):
     """Provides default values and link of parameters"""
+    from constel.lib.utils.filetools import read_nomenclature_file
+
     # default value
     self.erase_matrices = True
     self.regions_nomenclature = self.signature[
@@ -98,7 +102,36 @@ def initialization(self):
             name = self.signature["region"].findValue(s)
         return name
 
+    def reset_label(self, dummy):
+        """Read and/or reset the region parameter.
+
+        This callback reads the labels nomenclature and proposes them in the
+        signature 'region' of process.
+        It also resets the region parameter to default state after
+        the nomenclature changes.
+        """
+        current = self.region
+        self.setValue("region", current, True)
+        if self.regions_nomenclature is not None:
+            s = [("Select a region in this list", None)]
+            # temporarily set a value which will remain valid
+            self.region = s[0][1]
+            s += read_nomenclature_file(
+                self.regions_nomenclature.fullPath(), mode=2)
+            self.signature["region"].setChoices(*s)
+            if isinstance(self.signature["region"], OpenChoice):
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
+                self.changeSignature(self.signature)
+            if current not in s:
+                self.setValue("region", s[0][1], True)
+            else:
+                self.setValue("region", current, True)
+
     # link of parameters for autocompletion
+    self.linkParameters(None,
+                        "regions_nomenclature",
+                        reset_label)
     self.linkParameters("region",
                         "complete_matrix_smoothed",
                         link_matrix2label)

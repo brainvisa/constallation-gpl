@@ -234,5 +234,3 @@ def execution(self, context):
 
     # Delete the temporary directory after import
     self.fsl_connectome.eraseFiles()
-    # os.rmdir(os.path.dirname(src))
-    # shutil.rmtree(os.path.dirname(src))

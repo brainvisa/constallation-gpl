@@ -45,7 +45,7 @@ signature = Signature(
     "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File", section="Nomenclature"),
 
-    "region", String(section="Study parameters"),
+    "region", OpenChoice(section="Study parameters"),
 
     # --inputs--
     "mean_individual_profile", ReadDiskItem(
@@ -61,6 +61,8 @@ signature = Signature(
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
 
+    "regions_selection", Choice("All but main region", "All", "Custom",
+                                section="Options"),
     "keep_regions", ListOf(OpenChoice(), section="Options"),
 
     # --outputs--
@@ -74,6 +76,17 @@ signature = Signature(
 
 
 # ---------------------------Functions-----------------------------------------
+
+def link_keep_regions_value(self, dummy, other=None, oother=None):
+    s = [x[1] for x in self.signature["keep_regions"].contentType.values
+         if x[1] is not None]
+    if self.regions_selection == "All":
+        keep_regions = s
+    elif self.regions_selection == "All but main region":
+        keep_regions = [x for x in s if x != self.region]
+    else:
+        keep_regions = None
+    return keep_regions
 
 
 def initialization(self):
@@ -108,14 +121,46 @@ def initialization(self):
             name = ""
         return name
 
+    def reset_label(self, dummy):
+        """Read and/or reset the region parameter.
+
+        This callback reads the labels nomenclature and proposes them in the
+        signature 'region' of process.
+        It also resets the region parameter to default state after
+        the nomenclature changes.
+        """
+        current = self.region
+        self.setValue("region", current, True)
+        if self.regions_nomenclature is not None:
+            s = [("Select a region in this list", None)]
+            # temporarily set a value which will remain valid
+            self.region = s[0][1]
+            s += read_nomenclature_file(
+                self.regions_nomenclature.fullPath(), mode=2)
+            self.signature["region"].setChoices(*s)
+            if isinstance(self.signature["region"], OpenChoice):
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
+                self.changeSignature(self.signature)
+            if current not in s:
+                self.setValue("region", s[0][1], True)
+            else:
+                self.setValue("region", current, True)
+
     # link of parameters for autocompletion
     self.linkParameters(
         "region", "mean_individual_profile", link_matrix2label)
     self.linkParameters(
         "normed_individual_profile", "mean_individual_profile")
     self.linkParameters(
-        "keep_regions", "regions_nomenclature",
+        None, "regions_nomenclature",
+        reset_label)
+    self.linkParameters(
+        None, "regions_nomenclature",
         link_keep_regions)
+    self.addLink("keep_regions",
+                 ("regions_nomenclature", "regions_selection", "region"),
+                 self.link_keep_regions_value)
 
 
 # ---------------------------Main program--------------------------------------

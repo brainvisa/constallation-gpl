@@ -27,7 +27,6 @@ from brainvisa.processes import ProcessExecutionNode
 from brainvisa.processes import ValidationError
 import os
 
-
 def validation(self):
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
@@ -271,9 +270,9 @@ def initialization(self):
     eNode.addDoubleLink("import.method",
                         "method")
     eNode.addDoubleLink("import.regions_nomenclature",
-                        "confsl.regions_nomenclature")
+                        "regions_nomenclature")
     eNode.addDoubleLink("import.region",
-                        "confsl.region")
+                        "region")
     eNode.addDoubleLink("import.min_fibers_length",
                         "min_fibers_length")
     eNode.addDoubleLink("import.fsl_connectome",
@@ -305,8 +304,6 @@ def initialization(self):
                         "normalize")
     eNode.addDoubleLink("subpipeline.kmax",
                         "kmax")
-    eNode.addDoubleLink("subpipeline.keep_regions",
-                        "keep_regions"),
     eNode.addDoubleLink("subpipeline.erase_matrices",
                         "erase_matrices")
 

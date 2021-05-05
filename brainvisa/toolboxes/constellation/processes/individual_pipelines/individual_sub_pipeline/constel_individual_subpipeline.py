@@ -70,6 +70,8 @@ signature = Signature(
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
 
+    "regions_selection", Choice("All but main region", "All", "Custom",
+                                section="Options"),
     "keep_regions", ListOf(OpenChoice(), section="Options"),
     "smoothing", Float(section="Options"),
     "kmax", Integer(section="Options"),
@@ -80,6 +82,17 @@ signature = Signature(
 
 
 # ---------------------------Functions-----------------------------------------
+
+def link_keep_regions_value(self, dummy, other=None, oother=None):
+    s = [x[1] for x in self.signature["keep_regions"].contentType.values
+         if x[1] is not None]
+    if self.regions_selection == "All":
+        keep_regions = s
+    elif self.regions_selection == "All but main region":
+        keep_regions = [x for x in s if x != self.region]
+    else:
+        keep_regions = None
+    return keep_regions
 
 
 def initialization(self):
@@ -137,9 +150,12 @@ def initialization(self):
     self.linkParameters(None,
                         "regions_nomenclature",
                         reset_label)
-    self.linkParameters("keep_regions",
+    self.linkParameters(None,
                         "regions_nomenclature",
                         link_keep_regions)
+    self.addLink("keep_regions",
+                 ("regions_nomenclature", "regions_selection", "region"),
+                 self.link_keep_regions_value)
 
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
@@ -200,8 +216,6 @@ def initialization(self):
                         "region")
     eNode.addDoubleLink("InternalConnections.regions_parcellation",
                         "regions_parcellation")
-    eNode.addDoubleLink("InternalConnections.keep_regions",
-                        "keep_regions")
 
     ###########################################################################
     #        link of parameters with the process: "Watershed"                 #

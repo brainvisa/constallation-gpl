@@ -28,7 +28,7 @@ Author: Sandrine Lefranc, 2015
 from __future__ import absolute_import
 from brainvisa.processes import Signature, ValidationError, ReadDiskItem, \
     WriteDiskItem, String, ListOf, ParallelExecutionNode, ExecutionNode, \
-    mapValuesToChildrenParameters, Boolean
+    mapValuesToChildrenParameters, Boolean, OpenChoice, Choice
 from brainvisa.group_utils import Subject
 
 # Soma-base modules
@@ -41,6 +41,11 @@ def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
+    try:
+        from constel.lib.utils.filetools import read_nomenclature_file
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
     if not find_in_path("constelConnectionDensityTexture"):
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -57,7 +62,7 @@ signature = Signature(
         "Nomenclature ROIs File", "Text File", section="Nomenclature"),
 
     "study_name", String(section="Study parameters"),
-    "region", String(section="Study parameters"),
+    "region", OpenChoice(section="Study parameters"),
 
     # --inputs--
     "subjects_group", ReadDiskItem("Group definition", "XML",
@@ -164,11 +169,37 @@ def beforeChildRemovedCallback(self, parent, key, child):
 def initialization(self):
     """Provides default values and link of parameters.
     """
-
     self.erase_matrices = False
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
+
+    def reset_label(self, dummy):
+        """Read and/or reset the region parameter.
+
+        This callback reads the labels nomenclature and proposes them in the
+        signature 'region' of process.
+        It also resets the region parameter to default state after
+        the nomenclature changes.
+        """
+        from constel.lib.utils.filetools import read_nomenclature_file
+        current = self.region
+        self.setValue("region", current, True)
+        if self.regions_nomenclature is not None:
+            s = [("Select a region in this list", None)]
+            # temporarily set a value which will remain valid
+            self.region = s[0][1]
+            s += read_nomenclature_file(
+                self.regions_nomenclature.fullPath(), mode=2)
+            self.signature["region"].setChoices(*s)
+            if isinstance(self.signature["region"], OpenChoice):
+                self.signature["region"] = Choice(*s,
+                                                  section="Study parameters")
+                self.changeSignature(self.signature)
+            if current not in s:
+                self.setValue("region", s[0][1], True)
+            else:
+                self.setValue("region", current, True)
 
     def link_watershed(self, dummy):
         """Function of link between the filtered watershed and the
@@ -275,7 +306,9 @@ def initialization(self):
     self.linkParameters(
         "intersubject_reduced_matrices",
         ("subjects_group", "filtered_reduced_group_profile"), link_matrices)
-
+    self.linkParameters(None,
+                        "regions_nomenclature",
+                        reset_label)
     # define the main node of the pipeline
     eNode = ParallelExecutionNode(
         "Reduced_connectivity_matrix", parameterized=self,

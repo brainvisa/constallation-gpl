@@ -81,8 +81,6 @@ def initialization(self):
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
-    self.signature["output_connectome"].userLevel = 2
-
     def reset_label(self, dummy):
         """Read and/or reset the region parameter.
 
