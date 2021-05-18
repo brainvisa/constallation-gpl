@@ -230,7 +230,7 @@ def execution(self, context):
 
     dst = os.path.join(dstdir, matrix_name)
 
-    shutil.copy2(src, dst)
+    shutil.copy(src, dst)
 
     # Delete the temporary directory after import
     self.fsl_connectome.eraseFiles()
