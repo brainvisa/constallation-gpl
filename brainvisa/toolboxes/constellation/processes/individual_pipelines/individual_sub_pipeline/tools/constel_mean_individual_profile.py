@@ -68,7 +68,7 @@ signature = Signature(
         requiredAttributes={"side": "both", "vertex_corr": "Yes"},
         section="Freesurfer data"),
 
-    "erase_matrices", Boolean(section="Options"),
+    "erase_smoothed_matrix", Boolean(section="Options"),
 
     # --ouputs--
     "mean_individual_profile", WriteDiskItem(
@@ -88,7 +88,7 @@ def initialization(self):
     from constel.lib.utils.filetools import read_nomenclature_file
 
     # default value
-    self.erase_matrices = True
+    self.erase_smoothed_matrix = True
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -162,5 +162,5 @@ def execution(self, context):
                    "-normalize", 0,
                    "-verbose", 1)
 
-    if self.erase_matrices:
+    if self.erase_smoothed_matrix:
         self.complete_matrix_smoothed.eraseFiles(remove_from_database=True)

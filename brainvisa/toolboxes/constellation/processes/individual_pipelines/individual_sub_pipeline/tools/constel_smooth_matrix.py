@@ -79,8 +79,6 @@ signature = Signature(
 
     "smoothing", Float(section="Options"),
 
-    "erase_matrices", Boolean(section="Options"),
-
     # --outputs--
     "complete_matrix_smoothed", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
@@ -101,7 +99,6 @@ def initialization(self):
 
     # default values
     self.smoothing = 3.
-    self.erase_matrices = True
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -187,6 +184,3 @@ def execution(self, context):
                    "-p", label_number)
 
     replace_negative_values(self.complete_individual_matrix.fullPath())
-
-    if self.erase_matrices:
-        self.complete_individual_matrix.eraseFiles(remove_from_database=True)

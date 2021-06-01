@@ -114,7 +114,7 @@ signature = Signature(
     "smoothing", Float(section="Options"),
     "kmax", Integer(section="Options"),
     "normalize", Boolean(section="Options"),
-    "erase_matrices", Boolean(section="Options"),
+    "erase_smoothed_matrix", Boolean(section="Options"),
 
     # --outputs--
     "complete_individual_matrix", WriteDiskItem(
@@ -162,7 +162,7 @@ signature = Signature(
 
 def initialization(self):
 
-    self.erase_matrices = True
+    self.erase_smoothed_matrix = True
 
     def link_keep_regions(self, dummy):
         """
@@ -329,7 +329,7 @@ def initialization(self):
     eNode.addDoubleLink("min_fibers_length", "fsl_indiv.min_fibers_length")
     eNode.addDoubleLink("smoothing", "fsl_indiv.smoothing")
     eNode.addDoubleLink("normalize", "fsl_indiv.normalize")
-    eNode.addDoubleLink("erase_matrices", "fsl_indiv.erase_matrices")
+    eNode.addDoubleLink("erase_smoothed_matrix", "fsl_indiv.erase_smoothed_matrix")
     eNode.addDoubleLink("kmax", "fsl_indiv.kmax")
     eNode.addDoubleLink("complete_individual_matrix",
                         "fsl_indiv.import.complete_individual_matrix")
@@ -375,8 +375,8 @@ def initialization(self):
                         "reduced_matrix.individual_white_mesh")
     eNode.addDoubleLink("normalize",
                         "reduced_matrix.normalize")
-    eNode.addDoubleLink("erase_matrices",
-                        "reduced_matrix.erase_matrices")
+    eNode.addDoubleLink("erase_smoothed_matrix",
+                        "reduced_matrix.erase_smoothed_matrix")
 
     ###########################################################################
     #    link of parameters with the process:                                 #

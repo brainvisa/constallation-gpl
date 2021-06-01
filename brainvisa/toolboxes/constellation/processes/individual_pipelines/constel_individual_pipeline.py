@@ -85,7 +85,7 @@ signature = Signature(
     "smoothing", Float(section="Options"),
     "kmax", Integer(section="Options"),
     "normalize", Boolean(section="Options"),
-    "erase_matrices", Boolean(section="Options")
+    "erase_smoothed_matrix", Boolean(section="Options")
 )
 
 
@@ -125,7 +125,7 @@ def initialization(self):
     self.min_fibers_length = 20.
     self.max_fibers_length = 500.
     self.normalize = True
-    self.erase_matrices = True
+    self.erase_smoothed_matrix = True
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
@@ -368,8 +368,8 @@ def initialization(self):
                         "kmax")
     eNode.addDoubleLink("subpipeline.keep_regions",
                         "keep_regions")
-    eNode.addDoubleLink("subpipeline.erase_matrices",
-                        "erase_matrices")
+    eNode.addDoubleLink("subpipeline.erase_smoothed_matrix",
+                        "erase_smoothed_matrix")
 
     self.setExecutionNode(eNode)
 

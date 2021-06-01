@@ -86,7 +86,7 @@ signature = Signature(
         section="Freesurfer data"),
 
     "normalize", Boolean(section="Options"),
-    "erase_matrices", Boolean(section="Options"),
+    "erase_smoothed_matrix", Boolean(section="Options"),
 
     # --outputs--
     "reduced_individual_matrix", WriteDiskItem(
@@ -109,7 +109,7 @@ def initialization(self):
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
     self.normalize = True
-    self.erase_matrices = True
+    self.erase_smoothed_matrix = True
 
     def reset_label(self, dummy):
         """Read and/or reset the region parameter.
@@ -194,5 +194,5 @@ def execution(self, context):
     if not self.normalize:
         save_normalization(self.reduced_individual_matrix.fullPath())
 
-    if self.erase_matrices:
+    if self.erase_smoothed_matrix:
         self.complete_matrix_smoothed.eraseFiles(remove_from_database=True)
