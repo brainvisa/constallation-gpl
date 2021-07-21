@@ -27,6 +27,7 @@ from brainvisa.processes import ProcessExecutionNode
 from brainvisa.processes import ValidationError
 import os
 
+
 def validation(self):
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
@@ -302,6 +303,10 @@ def initialization(self):
                         "smoothing")
     eNode.addDoubleLink("subpipeline.normalize",
                         "normalize")
+    eNode.addDoubleLink("subpipeline.regions_selection",
+                        "regions_selection")
+    eNode.addDoubleLink("subpipeline.keep_regions",
+                        "keep_regions")
     eNode.addDoubleLink("subpipeline.kmax",
                         "kmax")
     eNode.addDoubleLink("subpipeline.erase_smoothed_matrix",
