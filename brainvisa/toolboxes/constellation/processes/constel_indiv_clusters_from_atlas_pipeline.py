@@ -409,7 +409,7 @@ def initialization(self):
 
     eNode.addChild(
         "optimal_clusters",
-        ProcessExecutionNode("constel_optimal_clustering",
+        ProcessExecutionNode("constel_optimal_clustering_atlas",
                              optional=True))
     eNode.addDoubleLink("individual_clustering",
                         "optimal_clusters.individual_clustering")

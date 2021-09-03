@@ -29,7 +29,7 @@ def validation(self):
 # ---------------------------Header--------------------------------------------
 
 
-name = "Constellation Optimal Clustering From Silhouette"
+name = "Constellation Optimal Clustering From Atlas"
 userLevel = 1
 
 signature = Signature(
@@ -44,9 +44,9 @@ signature = Signature(
                                             "measure": "no"},
                                           section="Clustering inputs"),
     "region", OpenChoice(section="Clustering inputs"),
-    "silhouette", ReadDiskItem("Clustering Silhouette",
-                               "JSON file",
-                               section="Silhouette inputs"),
+    "atlas_silhouette", ReadDiskItem("Clustering Silhouette",
+                                     "JSON file",
+                                     section="Atlas inputs"),
 
     # outputs
     "optimal_clustering", WriteDiskItem("Connectivity ROI Texture",
@@ -91,13 +91,13 @@ def initialization(self):
 
 
 def execution(self, context):
-    """Run the command 'constel_select_optimal_clustering.py'.
+    """Run the command 'constel_select_optimal_clustering_from_atlas.py'.
     """
 
-    cmd = ["constel_select_optimal_clustering.py",
+    cmd = ["constel_select_optimal_clustering_from_atlas.py",
            self.individual_clustering,
            self.region,
-           self.silhouette,
+           self.atlas_silhouette,
            self.optimal_clustering]
 
     context.pythonSystem(*cmd)
