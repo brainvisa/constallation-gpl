@@ -43,7 +43,6 @@ signature = Signature(
                                             "step_time": "yes",
                                             "measure": "no"},
                                           section="Clustering inputs"),
-    "region", OpenChoice(section="Clustering inputs"),
     "silhouette", ReadDiskItem("Clustering Silhouette",
                                "JSON file",
                                section="Silhouette inputs"),
@@ -79,13 +78,14 @@ def initialization(self):
         """
         """
         if self.individual_clustering:
-            return self.individual_clustering.hierarchyAttributes()['gyrus']
+            match = dict(self.individual_clustering.hierarchyAttributes())
+            return self.signature["silhouette"].findValue(match)
 
     self.linkParameters("optimal_clustering",
                         "individual_clustering",
                         link_optimal_cluster)
 
-    self.linkParameters("region",
+    self.linkParameters("silhouette",
                         "individual_clustering",
                         link_region)
 
@@ -96,7 +96,6 @@ def execution(self, context):
 
     cmd = ["constel_select_optimal_clustering.py",
            self.individual_clustering,
-           self.region,
            self.silhouette,
            self.optimal_clustering]
 
