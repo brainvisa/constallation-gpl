@@ -368,8 +368,8 @@ def initialization(self):
                         "kmax")
     eNode.addDoubleLink("subpipeline.regions_selection",
                         "regions_selection")
-    eNode.addDoubleLink("subpipeline.keep_regions",
-                        "keep_regions")
+    # eNode.addDoubleLink("subpipeline.keep_regions",
+    #                     "keep_regions")
     eNode.addDoubleLink("subpipeline.erase_smoothed_matrix",
                         "erase_smoothed_matrix")
 

@@ -214,6 +214,8 @@ def initialization(self):
                         "region")
     eNode.addDoubleLink("InternalConnections.regions_parcellation",
                         "regions_parcellation")
+    eNode.addDoubleLink("InternalConnections.regions_selection",
+                        "regions_selection")
 
     ###########################################################################
     #        link of parameters with the process: "Watershed"                 #
