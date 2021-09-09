@@ -8,7 +8,7 @@ BRAINVISA_PROJECT()
 BRAINVISA_DEPENDENCY( RUN DEPENDS "axon" RUN "= ${axon_VERSION}" )
 BRAINVISA_DEPENDENCY( RUN RECOMMENDS "anatomist-gpl" RUN "= ${anatomist-gpl_VERSION}" )
 BRAINVISA_DEPENDENCY( DEV RECOMMENDS "anatomist-gpl" DEV "= ${anatomist-gpl_VERSION}" )
-BRAINVISA_DEPENDENCY( RUN RECOMMENDS "constellation-private" RUN "= ${constellation-private_VERSION}" )
+BRAINVISA_DEPENDENCY( RUN RECOMMENDS "constellation-nonfree" RUN "= ${constellation-nonfree_VERSION}" )
 
 BRAINVISA_COPY_PYTHON_DIRECTORY( "${CMAKE_CURRENT_SOURCE_DIR}/python"
                                  ${PROJECT_NAME} )
