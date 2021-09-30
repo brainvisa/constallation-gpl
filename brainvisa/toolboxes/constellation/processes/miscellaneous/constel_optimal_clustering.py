@@ -11,6 +11,7 @@ from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import OpenChoice
+from brainvisa.processes import Boolean
 
 # soma module
 from soma.path import find_in_path
@@ -58,6 +59,8 @@ signature = Signature(
                                             "measure": "no",
                                             "optimal": "silhouette"},
                                         section="Optimal result"),
+    # options
+    "exclude_2_clusters", Boolean(section="Options"),
 )
 
 # ---------------------------Functions-----------------------------------------
@@ -66,6 +69,8 @@ signature = Signature(
 def initialization(self):
     """
     """
+    # default value
+    self.exclude_2_clusters = False
 
     def link_optimal_cluster(self, dummy):
         """
@@ -97,6 +102,7 @@ def execution(self, context):
     cmd = ["constel_select_optimal_clustering.py",
            self.individual_clustering,
            self.silhouette,
-           self.optimal_clustering]
+           self.optimal_clustering,
+           self.exclude_2_clusters]
 
     context.pythonSystem(*cmd)
