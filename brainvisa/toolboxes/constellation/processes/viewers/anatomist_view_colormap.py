@@ -64,7 +64,11 @@ def execution(self, context):
                          self.palette)
 
     vol_palette = aims.read(self.palette.fullPath())
-    RGBA_colors = np.asarray(vol_palette).flatten().tolist()
+    RGBA_colors = vol_palette.np['v'].flatten().tolist()
+    if vol_palette['v'].shape[-1] == 4:
+        mode = 'RGBA'
+    else:
+        mode = 'RGB'
 
     # instance of Anatomist
     a = ana.Anatomist()
@@ -78,8 +82,8 @@ def execution(self, context):
 
     # set the custom palette
     palette = a.createPalette('colormap')
-    palette.setColors(colors=RGBA_colors, color_mode="RGBA")
-    gyri.setPalette("colormap", absoluteMode=True)
+    palette.setColors(colors=RGBA_colors, color_mode=mode)
+    gyri.setPalette("colormap", minVal=0., maxVal=1.)
 
     # set interpolation
     a.execute('TexturingParams', objects=[gyri], interpolation='rgb')
@@ -89,6 +93,5 @@ def execution(self, context):
 
     # add the object in the windows
     win.addObjects(surftex)
-    # a.execute('SetMaterial', objects=[surftex])
 
     return [win, gyri, mesh, surftex]
