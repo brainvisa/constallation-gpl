@@ -64,7 +64,7 @@ def execution(self, context):
                          self.palette)
 
     vol_palette = aims.read(self.palette.fullPath())
-    RGBA_colors = np.asarray(vol_palette)[:, 0, 0, 0, 0].flatten().tolist()
+    RGBA_colors = np.asarray(vol_palette).flatten().tolist()
 
     # instance of Anatomist
     a = ana.Anatomist()
@@ -89,6 +89,6 @@ def execution(self, context):
 
     # add the object in the windows
     win.addObjects(surftex)
-    a.execute('SetMaterial', objects=[surftex])
+    # a.execute('SetMaterial', objects=[surftex])
 
     return [win, gyri, mesh, surftex]
