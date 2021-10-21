@@ -45,7 +45,6 @@ signature = Signature(
                             "normed": "yes",
                             "intersubject": "no"},
         section="Normed profile"),
-
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",

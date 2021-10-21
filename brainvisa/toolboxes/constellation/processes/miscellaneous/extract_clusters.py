@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Oct 20 09:35:29 2014
-
-@author: sl236442
-"""
 
 # Axon python API module
 from __future__ import absolute_import
@@ -65,6 +60,7 @@ def initialization(self):
 
 def execution(self, context):
     from soma import aims
+
     # load the clustering individual of concatenated approach
     clustering_texture = aims.read(self.clustering_texture.fullPath())
     # error if the number is too great or small

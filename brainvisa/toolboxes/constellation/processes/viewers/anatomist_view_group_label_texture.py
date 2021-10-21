@@ -33,6 +33,9 @@ signature = Signature(
 
 
 def initialization(self):
+    """
+    """
+
     def link_mesh(self, dummy):
         if self.label_texture is not None:
             mesh_type = self.signature['mesh']
@@ -79,6 +82,9 @@ def initialization(self):
 
 
 def execution(self, context):
+    """
+    """
+
     objs = context.runProcess('AnatomistShowTexture',
                               read=self.label_texture,
                               mesh=self.mesh, palette='random',

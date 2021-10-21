@@ -50,7 +50,7 @@ name = 'Fiber number by region'
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
+    # inputs
     "fiber_tracts", ReadDiskItem(
         "Fascicles Bundles", "Aims writable bundles formats"),
     "cortical_regions_nomenclature", ReadDiskItem(
@@ -58,7 +58,7 @@ signature = Signature(
     "cortical_region", String(),
     "sort", Boolean(),
 
-    # --ouput--
+    # ouput
     "filename", String(),
 )
 
@@ -69,6 +69,7 @@ signature = Signature(
 def initialization(self):
     """
     """
+
     self.sort = False
     # default value
     self.cortical_regions_nomenclature = self.signature[
@@ -95,6 +96,7 @@ def execution(self, context):
     """Execute the python command "constel_fibers_histogram".
     """
     from constel.lib.utils.texturetools import select_ROI_number
+
     # selects the label number corresponding to label name
     label_number = select_ROI_number(
         self.cortical_regions_nomenclature.fullPath(), self.cortical_region)

@@ -19,7 +19,6 @@ from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
 from brainvisa.processes import OpenChoice
 from brainvisa.processes import Choice
-from brainvisa.processes import String
 from brainvisa.processes import ListOf
 
 
@@ -28,8 +27,8 @@ def validation():
     loaded. It checks some conditions for the process to be available.
     """
     try:
-        from constel.lib.utils.filetools import read_nomenclature_file,\
-            select_ROI_number
+        from constel.lib.utils.filetools import read_nomenclature_file
+        from constel.lib.utils.filetools import select_ROI_number
     except ImportError:
         raise ValidationError(
             "Please make sure that constel module is installed.")
@@ -44,7 +43,6 @@ userLevel = 2
 signature = Signature(
     "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File", section="Nomenclature"),
-
     "region", OpenChoice(section="Study parameters"),
 
     # --inputs--
@@ -54,13 +52,11 @@ signature = Signature(
                             "normed": "no",
                             "intersubject": "no"},
         section="Mean profile"),
-
     "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
-
     "regions_selection", Choice("All but main region", "All", "Custom",
                                 section="Options"),
     "keep_regions", ListOf(OpenChoice(), section="Options"),
@@ -93,6 +89,7 @@ def initialization(self):
     """Provides default values and link of parameters.
     """
     from constel.lib.utils.filetools import read_nomenclature_file
+
     # default value
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
@@ -133,7 +130,6 @@ def initialization(self):
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
@@ -173,6 +169,7 @@ def execution(self, context):
     STEP 2/2: The profile is normalized.
     """
     from constel.lib.utils.filetools import select_ROI_number
+
     # selects the label number corresponding to label name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)

@@ -51,7 +51,7 @@ signature = Signature(
 
     "region", String(section="Study parameters"),
 
-    # --inputs--
+    # inputs
     "oversampled_semilabeled_fibers", ReadDiskItem(
         "Filtered Fascicles Bundles", "Aims readable bundles formats",
         requiredAttributes={"ends_labelled": "one",
@@ -62,7 +62,6 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "both",
                             "oversampled": "no"},
         section="Filtered tracts"),
-
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
@@ -78,7 +77,7 @@ signature = Signature(
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
 
-    # --ouputs--
+    # ouputs
     "matrix_semilabeled_fibers", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "one",
@@ -179,6 +178,7 @@ def execution(self, context):
                both ends of fibers are well identified.
     """
     from constel.lib.utils.filetools import select_ROI_number
+
     # selects the label number corresponding to label name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)

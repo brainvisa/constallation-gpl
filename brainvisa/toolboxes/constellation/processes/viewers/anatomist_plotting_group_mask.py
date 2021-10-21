@@ -14,8 +14,6 @@ This script does the following:
 * the possibility to use the mesh : inflated, not inflated, group or individual
 
 Main dependencies: PyQt
-
-Author: Sandrine Lefranc, 2015
 """
 
 # ----------------------------Imports------------------------------------------
@@ -24,6 +22,7 @@ from __future__ import print_function
 
 from __future__ import absolute_import
 import six
+
 # module PyQt4
 from soma.qt_gui.qt_backend import QtGui
 
@@ -73,6 +72,7 @@ def get_screen_config():
                 - size,
                 - resolution.
     """
+
     # the screen contains all monitors
     desktop = QtGui.qApp.desktop()
     print("desktop size: %d x %d" % (desktop.width(), desktop.height()))
@@ -102,6 +102,7 @@ def execution(self, context):
     """
     """
     from brainvisa import anatomist as ana
+
     # instance of anatomist
     a = ana.Anatomist()
 

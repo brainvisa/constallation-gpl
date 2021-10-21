@@ -17,7 +17,6 @@ from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
-from brainvisa.processes import Boolean
 
 
 def validation(self):
@@ -43,8 +42,7 @@ signature = Signature(
         section="Inputs"),
     "palette", WriteDiskItem(
         "4D Volume", "BrainVISA volume formats",
-        section="Outputs"),
-    "temporary_palette", Boolean(section="Options"),)
+        section="Outputs"))
 
 
 def initialization(self):

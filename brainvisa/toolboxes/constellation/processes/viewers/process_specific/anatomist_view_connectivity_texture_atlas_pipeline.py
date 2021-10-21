@@ -29,6 +29,9 @@ signature = Signature(
 
 
 def execution(self, context):
+    """
+    """
+
     viewer = getProcessInstance('anatomist_view_connectivity_texture')
     if not hasattr(self, 'reference_process'):
         return context.runProcess(viewer, self.connectivity_texture)

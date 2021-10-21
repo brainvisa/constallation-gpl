@@ -17,7 +17,7 @@ from brainvisa.processes import ValidationError
 from brainvisa.processes import Boolean
 
 # soma module
-# from soma.path import find_in_path
+from soma.path import find_in_path
 
 # ---------------------------Imports-------------------------------------------
 
@@ -26,9 +26,9 @@ def validation(self):
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
     """
-    # if not find_in_path("constel_cut_region.py"):
-    #     raise ValidationError(
-    #         "Please make sure that constel module is installed.")
+    if not find_in_path("constel_cut_region.py"):
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
     try:
         from constel.lib.utils.filetools import select_ROI_number
     except ImportError:
@@ -42,7 +42,7 @@ name = "Constellation Cutter"
 userLevel = 1
 
 signature = Signature(
-    # --inputs
+    # inputs
     "regions_nomenclature", ReadDiskItem("Nomenclature ROIs File",
                                          "Text File",
                                          section="Inputs"),

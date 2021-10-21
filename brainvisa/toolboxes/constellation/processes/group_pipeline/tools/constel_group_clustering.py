@@ -17,8 +17,6 @@ This script does the following:
   'constel_inter_subject_clustering'.
 
 Main dependencies: Axon python API, Soma-base, constel
-
-Author: Sandrine Lefranc, 2015
 """
 
 # ---------------------------Imports-------------------------------------------
@@ -70,7 +68,7 @@ signature = Signature(
         section="Study parameters"),
     "region", String(section="Study parameters"),
 
-    # --inputs--
+    # inputs
     "subjects_group", ReadDiskItem(
         "Group definition", "XML", section="Group inputs"),
     "intersubject_reduced_matrices", ListOf(ReadDiskItem(
@@ -95,7 +93,7 @@ signature = Signature(
 
     "nb_clusters", Integer(section="Options"),
 
-    # --outputs--
+    # outputs
     "reduced_group_matrix", WriteDiskItem(
         "Connectivity Matrix", "Gis image",
         requiredAttributes={"ends_labelled": "all",
@@ -230,6 +228,7 @@ def execution(self, context):
     as dissimilarity measure.
     """
     from constel.lib.utils.filetools import select_ROI_number
+
     # selects the label number corresponding to label name
     label_number = select_ROI_number(
         self.regions_nomenclature.fullPath(), self.region)

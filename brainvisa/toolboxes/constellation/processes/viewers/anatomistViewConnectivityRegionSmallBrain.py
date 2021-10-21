@@ -29,7 +29,6 @@ def validation(self):
 
 name = 'Anatomist view mozaic visualization of fibers'
 userLevel = 2
-# roles = ('viewer', )
 
 
 signature = Signature(
@@ -55,6 +54,9 @@ signature = Signature(
 
 
 def initialization(self):
+    """
+    """
+
     def link_trans(self, dummy):
         if len(self.bundles) != 0:
             return self.bundles[0]
@@ -100,6 +102,7 @@ def execution_mainthread(self, context):
     usinf fiber tracts.
     """
     from brainvisa import anatomist as ana
+
     # instance of anatomist
     a = ana.Anatomist()
 
@@ -184,4 +187,7 @@ def execution_mainthread(self, context):
 
 
 def execution(self, context):
+    """
+    """
+
     return mainThreadActions().call(self.execution_mainthread, context)

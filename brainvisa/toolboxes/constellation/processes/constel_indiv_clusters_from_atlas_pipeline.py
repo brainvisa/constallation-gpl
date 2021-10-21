@@ -28,7 +28,6 @@ from brainvisa.processes import ProcessExecutionNode
 from brainvisa.processes import ValidationError
 
 
-# Package import
 def validation(self):
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.
@@ -49,7 +48,7 @@ signature = Signature(
     "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File", section="Nomenclature"),
 
-    # --inputs--
+    # inputs
     "outputs_database", Choice(section="Study parameters"),
     "study_name", OpenChoice(section="Study parameters"),
     "method", Choice(
@@ -78,7 +77,7 @@ signature = Signature(
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
 
-    # --atlas inputs--
+    # atlas inputs
     "atlas_matrix", ReadDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
@@ -116,7 +115,7 @@ signature = Signature(
     "normalize", Boolean(section="Options"),
     "erase_smoothed_matrix", Boolean(section="Options"),
 
-    # --outputs--
+    # outputs
     "complete_individual_matrix", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
@@ -180,7 +179,6 @@ def initialization(self):
     def fill_study_choice(self, dummy=None):
         """
         """
-
         choices = set()
         if self.outputs_database is not None:
             if neuroHierarchy.databases.hasDatabase(self.outputs_database):
@@ -211,7 +209,6 @@ def initialization(self):
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
@@ -227,9 +224,6 @@ def initialization(self):
 
     def link_atlas_matrix(self, dummy):
         match = {
-            # "method":
-            # self.executionNode().child("fsl_indiv")._process.method,
-            # force averaged method to match the atlas
             "method": "avg",
             "gyrus": self.region,
         }
@@ -241,14 +235,12 @@ def initialization(self):
             match = dict(
                 self.complete_individual_smoothed_matrix.hierarchyAttributes())
             match.update({
-                # "database":
-                # self.complete_individual_smoothed_matrix.get("_database"),
                 "group_of_subjects":
                     self.atlas_matrix.get("group_of_subjects"),
                 "sid": self.complete_individual_smoothed_matrix.get("subject"),
                 "reduced": "yes",
                 "intersubject": "yes",
-                "_format": "gz compressed NIFTI-1 image",  # bug in findValue ?
+                "_format": "gz compressed NIFTI-1 image",
             })
             for att in ["name_serie", "tracking_session", "subject",
                         "analysis", "acquisition"]:
@@ -270,9 +262,6 @@ def initialization(self):
             # strangely, findValues() returns 1 element....
             match["_format"] = 'GIFTI file'
             return self.signature["individual_clustering"].findValue(match)
-
-    self.signature['probtrackx_indir'].databaseUserLevel = 3
-    self.signature['temp_outdir'].databaseUserLevel = 3
 
     # link of parameters for autocompletion
     self.linkParameters(None,
@@ -329,7 +318,8 @@ def initialization(self):
     eNode.addDoubleLink("min_fibers_length", "fsl_indiv.min_fibers_length")
     eNode.addDoubleLink("smoothing", "fsl_indiv.smoothing")
     eNode.addDoubleLink("normalize", "fsl_indiv.normalize")
-    eNode.addDoubleLink("erase_smoothed_matrix", "fsl_indiv.erase_smoothed_matrix")
+    eNode.addDoubleLink("erase_smoothed_matrix",
+                        "fsl_indiv.erase_smoothed_matrix")
     eNode.addDoubleLink("kmax", "fsl_indiv.kmax")
     eNode.addDoubleLink("complete_individual_matrix",
                         "fsl_indiv.import.complete_individual_matrix")

@@ -42,6 +42,9 @@ signature = Signature(
 
 
 def initialization(self):
+    """
+    """
+
     self.linkParameters('mesh', 'clusters')
     self.linkParameters('seed_gyri', 'mesh')
     self.linkParameters('reduced_matrix', 'clusters')
@@ -49,6 +52,7 @@ def initialization(self):
 
 def exec_main_thread(self, context, meshes, clusters, measurements,
                      seed_gyri, matrix):
+
     if hasattr(self, 'gui'):
         gui = self.gui
         parent = gui.parentWidget()
@@ -85,10 +89,12 @@ def execution(self, context):
     from constel.anatomist.clusters_inspect import ClustersInspectorWidget,\
                                                   load_clusters_inspector_files
     from constel.anatomist import clusters_inspect
+
     reload(clusters_inspect)
     global ClustersInspectorWidget, load_clusters_inspector_files
     ClustersInspectorWidget = clusters_inspect.ClustersInspectorWidget
-    load_clusters_inspector_files = clusters_inspect.load_clusters_inspector_files
+    load_clusters_inspector_files = clusters_inspect \
+        .load_clusters_inspector_files
 
     meshes, clusters, measurements, seed_gyri, matrix \
         = load_clusters_inspector_files(

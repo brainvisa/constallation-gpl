@@ -62,12 +62,10 @@ signature = Signature(
                             "intersubject": "no",
                             "individual": "yes"},
         section="Smoothed matrix"),
-
     "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"},
         section="Freesurfer data"),
-
     "erase_smoothed_matrix", Boolean(section="Options"),
 
     # --ouputs--
@@ -114,7 +112,6 @@ def initialization(self):
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
@@ -148,6 +145,7 @@ def execution(self, context):
     Compute the connectivity profile (no normalize) from connectivity matrix.
     """
     from constel.lib.utils.filetools import select_ROI_number
+
     # selects the label number corresponding to label name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)

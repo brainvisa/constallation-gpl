@@ -25,7 +25,6 @@ def validation(self):
 
 name = 'Anatomist view connectivity'
 userLevel = 2
-# roles = ('viewer', )
 
 signature = Signature(
     'bundles', ReadDiskItem(
@@ -39,8 +38,6 @@ signature = Signature(
                             "averaged": "No"}),
     'clustering_texture', ReadDiskItem(
         'Connectivity ROI Texture', 'anatomist texture formats'),
-    # 'watershed', ReadDiskItem(
-    # 'Connectivity ROI Texture', 'anatomist texture formats'),
     'cluster_number', Integer(),
     'max_number_of_fibers', Integer(),
     'clustering_texture_timestep', Integer(),
@@ -49,6 +46,9 @@ signature = Signature(
 
 
 def initialization(self):
+    """
+    """
+
     def link_mesh(self, dummy):
         if self.bundles is not None:
             atts = ['center', 'subject']
@@ -105,6 +105,7 @@ def execution_mainthread(self, context):
     """
     """
     from brainvisa import anatomist
+
     # instance of Anatomist
     a = anatomist.Anatomist()
 
@@ -203,4 +204,7 @@ def execution_mainthread(self, context):
 
 
 def execution(self, context):
+    """
+    """
+
     return mainThreadActions().call(self.execution_mainthread, context)

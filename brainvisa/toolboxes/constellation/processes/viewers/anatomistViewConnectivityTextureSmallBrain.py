@@ -44,7 +44,6 @@ def validation():
 
 name = "Anatomist view mozaic visualization of textured mesh"
 userLevel = 2
-# roles = ("viewer", )
 
 
 signature = Signature(
@@ -84,6 +83,9 @@ signature = Signature(
 
 
 def initialization(self):
+    """
+    """
+
     self.linkParameters("mesh", "connectivity_matrix")
     self.linkParameters("basins_texture", "connectivity_matrix")
     self.linkParameters("clustering_texture", "connectivity_matrix")
@@ -102,6 +104,7 @@ def execution_mainthread(self, context):
     import constel
     import constel.lib.utils.matrixtools as clcmt
     from constel.lib.utils.texturetools import geodesic_gravity_center
+
     # instance of anatomist
     a = anatomist.Anatomist()
 
@@ -297,4 +300,7 @@ def execution_mainthread(self, context):
 
 
 def execution(self, context):
+    """
+    """
+
     return mainThreadActions().call(self.execution_mainthread, context)

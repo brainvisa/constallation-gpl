@@ -20,8 +20,6 @@ This script does the following:
       - option 5: cluster of ROI --> basins
 
 Main dependencies:
-
-Author: Sandrine Lefranc, 2015
 """
 
 # ----------------------------Imports------------------------------------------
@@ -53,7 +51,6 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
                             "intersubject": "yes",
-                            # "individual": "no",
                             }),
     "white_mesh", ReadDiskItem("White Mesh", "anatomist mesh formats",
                                requiredAttributes={"side": "both",
@@ -72,6 +69,9 @@ signature = Signature(
 
 
 def initialization(self):
+    """
+    """
+
     def link_mesh(self, dummy):
         if self.connectivity_matrix is not None:
             cm = self.connectivity_matrix
@@ -154,6 +154,7 @@ def execution(self, context):
     """
     """
     from brainvisa import anatomist as ana
+
     # instance of anatomist
     a = ana.Anatomist()
 

@@ -49,14 +49,13 @@ signature = Signature(
 
     "region", OpenChoice(section="Study parameters"),
 
-    # --inputs--
+    # inputs
     "complete_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "no",
                             "intersubject": "no"},
         section="Input matrix"),
-
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
@@ -69,7 +68,6 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
-
     "regions_selection", Choice("All but main region", "All", "Custom",
                                 section="Options"),
     "keep_regions", ListOf(OpenChoice(), section="Options"),
@@ -77,7 +75,6 @@ signature = Signature(
     "kmax", Integer(section="Options"),
     "normalize", Boolean(section="Options"),
     "erase_smoothed_matrix", Boolean(section="Options")
-
 )
 
 
@@ -99,6 +96,7 @@ def initialization(self):
     """Provides default values and link of parameters.
     """
     from constel.lib.utils.filetools import read_nomenclature_file
+
     # default value
     self.smoothing = 3.0
     self.kmax = 12
@@ -132,7 +130,6 @@ def initialization(self):
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)

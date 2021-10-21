@@ -43,7 +43,7 @@ name = 'Write the connectome of a given parcellation'
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
+    # inputs
     "subject_gyri_path", ReadDiskItem("directory", "directory"),
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
@@ -61,7 +61,7 @@ signature = Signature(
     "aal_regions", Boolean(),
     "constellation_regions", Boolean(),
 
-    # --ouput--
+    # ouput
     "reduced_individual_connectome", String(),
 )
 
@@ -72,6 +72,7 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters
     """
+
     # default value
     self.cortical_regions_nomenclature = self.signature[
         "cortical_regions_nomenclature"].findValue(
@@ -87,6 +88,7 @@ def initialization(self):
 def execution(self, context):
     """
     """
+
     # define the command parameters
     cmd = ["constel_calculate_reduced_connectome.py",
            self.cortical_parcellation,

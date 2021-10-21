@@ -16,8 +16,6 @@ This script does the following:
   silhouette width in order to obtain the optimal number of clusters.
 
 Main dependencies: axon python API, soma-base, constel
-
-Author: Sandrine Lefranc, 2015
 """
 
 # ----------------------------Imports------------------------------------------
@@ -83,7 +81,9 @@ signature = Signature(
 
 
 def initialization(self):
-    pass
+    """
+    """
+
     self.time_step_max = 10
     self.setOptional("ybound")
     self.ignore_Kopt2 = False
@@ -92,6 +92,7 @@ def initialization(self):
 def execution(self, context):
     """
     """
+
     cortical_region = self.clustering_1.get("gyrus")
     if self.clustering_1.get("subject") == "avgSubject":
         group1 = self.clustering_1.get("group_of_subjects")

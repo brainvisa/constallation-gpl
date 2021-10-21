@@ -41,12 +41,12 @@ name = 'Merge white and nuclei meshes'
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
+    # inputs
     "white_dir", String(),
     "nuclei_dir", String(),
     "texture_dir", String(),
 
-    # --ouput--
+    # ouput
     "out_tex_filename", String(),
     "out_mesh_filename", String(),
 )
@@ -67,6 +67,7 @@ def initialization(self):
 def execution(self, context):
     """
     """
+
     # define the command parameters
     cmd = ["constel_merge_nuclei_cortex.py",
            self.white_dir,

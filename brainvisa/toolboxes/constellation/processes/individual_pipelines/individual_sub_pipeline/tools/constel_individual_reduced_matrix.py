@@ -13,7 +13,6 @@
 
 # Axon python API modules
 from __future__ import absolute_import
-from brainvisa.processes import String
 from brainvisa.processes import Boolean
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
@@ -21,7 +20,6 @@ from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
 from brainvisa.processes import OpenChoice
 from brainvisa.processes import Choice
-from brainvisa.data import neuroHierarchy
 
 # Soma module
 from soma.path import find_in_path
@@ -73,7 +71,6 @@ signature = Signature(
                             "step_time": "no",
                             "measure": "no"},
         section="Inputs"),
-
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
@@ -84,7 +81,6 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
-
     "normalize", Boolean(section="Options"),
     "erase_smoothed_matrix", Boolean(section="Options"),
 
@@ -124,7 +120,6 @@ def initialization(self):
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)

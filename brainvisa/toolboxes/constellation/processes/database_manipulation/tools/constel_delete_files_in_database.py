@@ -51,7 +51,7 @@ name = "Remove Individual Constellation Files"
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
+    # inputs
     "database", Choice(),
     "method", Choice(("averaged approach", "avg"),
                      ("concatenated approach", "concat")),
@@ -70,7 +70,7 @@ signature = Signature(
     "mean_profile", Boolean(),
     "normed_mean_profile", Boolean(),
 
-    # --outputs--
+    # outputs
     "rm_textfile", WriteDiskItem("Text file", "Text file"),
 )
 
@@ -81,6 +81,7 @@ signature = Signature(
 def initialization(self):
     """Provides default values and link of parameters.
     """
+
     # default values
     self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({
         "atlasname": "desikan_freesurfer"})
@@ -137,11 +138,10 @@ def initialization(self):
 
 
 def execution(self, context):
-    """
-    """
     """Remove the Constellation files and write a text file on the status of
     the database.
     """
+
     # name of the command
     cmd = [sys.executable, find_in_path("constel_remove_data.py")]
 

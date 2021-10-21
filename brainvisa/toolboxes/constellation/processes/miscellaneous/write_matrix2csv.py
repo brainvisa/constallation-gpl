@@ -18,8 +18,6 @@ This script does the following:
   connections (per rows, in percent)
 
 Main dependencies: axon python API, soma-base, constel
-
-Author: Sandrine Lefranc, 2015
 """
 
 # ----------------------------Imports------------------------------------------
@@ -83,6 +81,7 @@ signature = Signature(
 def initialization(self):
     """
     """
+
     self.number_of_clusters = 5
 
 # ----------------------------Main program-------------------------------------
@@ -93,6 +92,7 @@ def execution(self, context):
     """
     from constel.lib.utils.matrixtools import write_matrix2csv,\
         calculate_percentage, compute_mclusters_by_nbasins_matrix
+
     # read the matrix by converting it into numpy array
     reduced_matrix = aims.read(self.reduced_matrix.fullPath())
     matrix = numpy.array(reduced_matrix)[:, :, 0, 0]

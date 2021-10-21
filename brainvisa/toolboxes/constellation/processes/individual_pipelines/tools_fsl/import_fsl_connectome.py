@@ -59,7 +59,7 @@ signature = Signature(
                                          "Text File",
                                          section="Nomenclature"),
 
-    # --inputs--
+    # inputs
     "outputs_database", Choice(section="Study parameters"),
     "study_name", OpenChoice(section="Study parameters"),
     "method", Choice(("averaged approach", "avg"),
@@ -72,7 +72,7 @@ signature = Signature(
 
     "min_fibers_length", Float(section="Options"),
 
-    # --outputs--
+    # outputs
     "complete_individual_matrix", WriteDiskItem("Connectivity Matrix",
                                                 "Sparse Matrix",
                                                 requiredAttributes={
@@ -95,7 +95,7 @@ def initialization(self):
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
-    # Get a list of possible databases, while respecting the ontology
+    # Get a list of possible databases while respecting the ontology
     databases = [h.name for h in neuroHierarchy.hierarchies()
                  if h.fso.name == "brainvisa-3.2.0"]
     self.signature["outputs_database"].setChoices(*databases)
@@ -162,7 +162,6 @@ def initialization(self):
         self.setValue('region', current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # Temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)

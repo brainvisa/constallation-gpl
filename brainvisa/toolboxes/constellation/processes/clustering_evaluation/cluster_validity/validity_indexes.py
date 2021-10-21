@@ -16,8 +16,6 @@ This script does the following:
   silhouette width in order to obtain the optimal number of clusters.
 
 Main dependencies: axon python API, soma-base, constel
-
-Author: Sandrine Lefranc, 2015
 """
 
 # ----------------------------Imports------------------------------------------
@@ -72,6 +70,7 @@ signature = Signature(
 def initialization(self):
     """
     """
+
     self.kmax = 12
     self.nbIter = 100
     self.indexFile = "/tmp/validityindexes.pdf"
@@ -80,6 +79,7 @@ def initialization(self):
 def execution(self, context):
     """
     """
+
     cortical_region = self.matrix.get("gyrus")
 
     context.system(sys.executable,

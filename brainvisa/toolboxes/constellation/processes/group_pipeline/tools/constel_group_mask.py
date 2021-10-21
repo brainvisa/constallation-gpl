@@ -17,8 +17,6 @@ This script does the following:
 the mask of the all individual profiles is computed.
 
 Main dependencies: axon python API, soma, constel
-
-Author: Sandrine Lefranc, 2015
 """
 
 # ----------------------------Imports------------------------------------------
@@ -54,7 +52,7 @@ userLevel = 2
 signature = Signature(
     "new_study_name", String(section="Study parameters"),
 
-    # --inputs--
+    # inputs
     "subjects_group", ReadDiskItem("Group definition", "XML",
                                    section="Group inputs"),
     "mean_individual_profiles", ListOf(
@@ -64,7 +62,7 @@ signature = Signature(
                                          "intersubject": "no"}),
         section="Group inputs"),
 
-    # --outputs--
+    # outputs
     "group_mask", WriteDiskItem(
         "Mask Texture", "Aims texture formats",
         section="Outputs")

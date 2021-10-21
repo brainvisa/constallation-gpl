@@ -38,8 +38,8 @@ def validation():
             "environnement variable or please make sure that constel module "
             "is installed.")
     try:
-        from constel.lib.utils.filetools import read_nomenclature_file,\
-            select_ROI_number
+        from constel.lib.utils.filetools import read_nomenclature_file
+        from constel.lib.utils.filetools import select_ROI_number
         from constel.lib.utils.texturetools import remove_labels
     except ImportError:
         raise ValidationError(
@@ -73,7 +73,6 @@ signature = Signature(
                             "step_time": "no",
                             "measure": "no"},
         section="Individual inputs"),
-
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
@@ -120,6 +119,7 @@ def initialization(self):
     """Provides default values and link of parameters
     """
     from constel.lib.utils.filetools import read_nomenclature_file
+
     # default value
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
@@ -135,7 +135,6 @@ def initialization(self):
         self.setValue('region', current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
@@ -184,6 +183,7 @@ def execution(self, context):
     """
     from constel.lib.utils.texturetools import remove_labels
     from constel.lib.utils.texturetools import select_ROI_number
+
     # selects the ROI label corresponding to ROI name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)

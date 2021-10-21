@@ -44,11 +44,11 @@ name = 'Write the fiber lengths in a text file'
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
+    # inputs
     "fiber_tracts", ReadDiskItem(
         "Fascicles Bundles", "Aims writable bundles formats"),
 
-    # --ouput--
+    # ouput
     "lengths_filename", String(),
 )
 
@@ -68,6 +68,7 @@ def initialization(self):
 def execution(self, context):
     """Execute the python command "constel_fibers_histogram".
     """
+
     # Give the name of the command
     cmd = ["constel_write_fibers_histogram.py"]
 

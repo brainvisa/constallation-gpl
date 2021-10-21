@@ -16,6 +16,7 @@ signature = Signature(
 
 
 def initialization(self):
+
     # list of possible databases, while respecting the ontology
     # ontology: brainvisa-3.2.0, non-builtin first
     databases = [
@@ -34,6 +35,7 @@ def initialization(self):
 
 
 def execution(self, context):
+
     dtypes = ['Mask Texture', 'Connectivity Profile Texture',
               'Connectivity Profile Texture',
               'Connectivity ROI Texture', 'Connectivity Matrix',

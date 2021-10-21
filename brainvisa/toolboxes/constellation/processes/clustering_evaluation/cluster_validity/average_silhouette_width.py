@@ -16,8 +16,6 @@ This script does the following:
   silhouette width in order to obtain the optimal number of clusters.
 
 Main dependencies: axon python API, soma-base, constel
-
-Author: Sandrine Lefranc, 2015
 """
 
 # ---------------------------Imports-------------------------------------------
@@ -59,7 +57,6 @@ signature = Signature(
                                    requiredAttributes={"ends_labelled": "all",
                                                        "reduced": "yes",
                                                        "intersubject": "yes"},
-                                                      # "individual": "yes"},
                                    section="Clustering inputs"),
     "individual_clustering", ReadDiskItem("Connectivity ROI Texture",
                                           "Aims texture formats",
@@ -86,6 +83,7 @@ signature = Signature(
 def initialization(self):
     """
     """
+
     self.kmin = 2
     self.kmax = 12
 

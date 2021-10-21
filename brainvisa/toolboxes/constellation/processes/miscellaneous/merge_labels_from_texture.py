@@ -14,8 +14,6 @@ This script does the following:
 *
 
 Main dependencies:
-
-Author: Sandrine Lefranc
 """
 
 
@@ -26,6 +24,7 @@ Author: Sandrine Lefranc
 from __future__ import absolute_import
 from brainvisa.processes import Signature, String, ReadDiskItem, Boolean,\
     WriteDiskItem, OpenChoice, ValidationError, Choice, ListOf
+
 # soma module
 from soma.path import find_in_path
 
@@ -55,7 +54,7 @@ name = "Merge Labels From texture"
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
+    # inputs
     "cortical_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
@@ -64,7 +63,7 @@ signature = Signature(
     "cortical_regions", OpenChoice(),
     "new_cortical_region", String(),
 
-    # --outputs--
+    # outputs
     "new_cortical_parcellation", WriteDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
@@ -79,6 +78,7 @@ signature = Signature(
 def initialization(self):
     """
     """
+
     self.keep_only_merged_regions = False
     self.cortical_regions_nomenclature = self.signature[
         "cortical_regions_nomenclature"].findValue(
@@ -107,6 +107,7 @@ def execution(self, context):
     """
     from constel.lib.utils.filetools import select_ROI_number,\
         add_region_in_nomenclature, delete_regions_in_nomenclature
+
     cmd_args = []
     nb = []
     for region in self.cortical_regions:

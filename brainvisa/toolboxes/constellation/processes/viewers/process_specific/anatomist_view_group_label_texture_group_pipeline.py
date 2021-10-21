@@ -27,6 +27,8 @@ def get_process(process):
 
 
 def execution(self, context):
+    """
+    """
     viewer = getProcessInstance('anatomist_view_group_label_texture')
     if not hasattr(self, 'reference_process'):
         return context.runProcess(viewer, self.label_texture)

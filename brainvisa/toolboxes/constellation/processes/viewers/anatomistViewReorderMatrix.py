@@ -69,6 +69,7 @@ signature = Signature(
 def initialization(self):
     """
     """
+
     self.linkParameters("connectivity_matrix", "clustering_texture")
 
 # ----------------------------Main program-------------------------------------
@@ -147,12 +148,12 @@ def execution(self, context):
     win1 = a.createWindow("Axial", block=wgroup)
     win2 = a.createWindow("Axial", block=wgroup)
     win3 = a.createWindow("Axial", block=wgroup)
-    # win4 = a.createWindow('Axial', block = wgroup)
+
     br = a.createWindow("Browser", block=wgroup)
     win1.addObjects(mat_ima)
     win2.addObjects(dissmat_ima)
     win3.addObjects(labels_ima)
-    # win4.addObjects( [ mat_ima, labels_ima ] )
+
     br.addObjects([mat_ima, dissmat_ima, labels_ima])
 
     return [win1, win2, win3, br, labels_ima, mat_ima, dissmat_ima]

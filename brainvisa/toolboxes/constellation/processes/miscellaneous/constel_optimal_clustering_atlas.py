@@ -33,7 +33,7 @@ name = "Constellation Optimal Clustering From Atlas"
 userLevel = 1
 
 signature = Signature(
-    # --inputs
+    # inputs
     "individual_clustering", ReadDiskItem("Connectivity ROI Texture",
                                           "Aims texture formats",
                                           requiredAttributes={

@@ -25,6 +25,7 @@ signature = Signature(
 
 
 def get_process(process):
+
     allowed = ('constel_indiv_clusters_from_atlas_pipeline',
                'database_qc_table',
                'constel_individual_pipeline_fsl_connectome',
@@ -38,13 +39,15 @@ def get_process(process):
 
 
 def execution(self, context):
+    """
+    """
+
     viewer = getProcessInstance('AnatomistViewConnMatrix')
     if not hasattr(self, 'reference_process'):
         return context.runProcess(viewer, self.connectivity_matrix)
     process = get_process(self.reference_process)
     context.write('process:', process.id())
 
-    # -------
     # constel_indiv_clusters_from_atlas_pipeline case
     if process.id() in ('constel_indiv_clusters_from_atlas_pipeline',
                         'constel_individual_pipeline_fsl_connectome'):
@@ -61,7 +64,6 @@ def execution(self, context):
             white_mesh=white_mesh,
             gyrus_texture=gyrus_texture)
 
-    # -------
     # database_qc_table case
     if process.id() == 'database_qc_table':
         match = {
@@ -109,7 +111,6 @@ def execution(self, context):
                 white_mesh=mesh,
                 gyrus_texture=gyri)
 
-    # -------
     # constel_group_pipeline case
     if process.id() in ('constel_group_pipeline', ):
         white_mesh = process.average_mesh

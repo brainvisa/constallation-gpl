@@ -35,6 +35,9 @@ signature = Signature(
 
 
 def initialization(self):
+    """
+    """
+
     def link_mesh(self, dummy):
         if self.connectivity_roi_texture is not None:
             ct = self.connectivity_roi_texture
@@ -101,6 +104,9 @@ def initialization(self):
 
 
 def execution(self, context):
+    """
+    """
+
     objs = context.runProcess('AnatomistShowTexture',
                               read=self.connectivity_roi_texture,
                               mesh=self.mesh, palette='random',

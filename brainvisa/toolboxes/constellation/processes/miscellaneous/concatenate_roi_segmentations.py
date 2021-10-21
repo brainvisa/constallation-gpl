@@ -14,8 +14,6 @@ This script does the following:
 *
 
 Main dependencies:
-
-Author: Sandrine Lefranc
 """
 
 
@@ -81,8 +79,6 @@ def initialization(self):
         """
         """
         if self.ROI_clustering:
-            # for clustering in self.individual_clustering:
-            #     if clustering.hierarchyAttributes()['sid'] !=
             match = dict(self.ROI_clustering[0].hierarchyAttributes())
             if "gyrus" in match:
                 del match["gyrus"]

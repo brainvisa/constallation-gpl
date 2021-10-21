@@ -17,8 +17,6 @@ This script does the following:
   profile.
 
 Main dependencies: axon python API, soma, constel
-
-Author: Sandrine Lefranc, 2015
 """
 
 # ----------------------------Imports------------------------------------------
@@ -35,7 +33,7 @@ from brainvisa.processes import Signature, ReadDiskItem, WriteDiskItem, \
 from soma.path import find_in_path
 
 
-# Plot constel module
+# Verify constel module
 def validation():
     """This function is executed at BrainVisa startup when the process is
     loaded. It checks some conditions for the process to be available.

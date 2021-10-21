@@ -40,6 +40,9 @@ signature = Signature(
 
 
 def initialization(self):
+    """
+    """
+
     def link_mesh(self, dummy):
         if self.connectivity_matrix is not None:
             cm = self.connectivity_matrix
@@ -134,9 +137,7 @@ def execution(self, context):
     win.camera(view_quaternion=[0.5, 0.5, 0.5, 0.5])
 
     win.addObjects(conn)
-#    win1.addObjects(conn)
     win.setControl('ConnectivityMatrixControl')
-#    win1.setControl('ConnectivityMatrixControl')
 
     mainThreadActions().push(wgroup.widgetProxy().widget.resize, 600, 500)
 

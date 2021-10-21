@@ -47,7 +47,7 @@ def validation():
 # ---------------------------Header--------------------------------------------
 
 
-name = "FSL Connectome."
+name = "FSL Connectome"
 userLevel = 2
 
 signature = Signature(
@@ -57,7 +57,7 @@ signature = Signature(
 
     "region", OpenChoice(section="Study parameters"),
 
-    # --inputs--
+    # inputs
     "probtrackx_indir", ReadDiskItem("directory",
                                      "directory",
                                      section="FSL import"),
@@ -66,7 +66,7 @@ signature = Signature(
                                          "Aims texture formats",
                                          section="Freesurfer data"),
 
-    # --outputs--
+    # outputs
     "temp_outdir", WriteDiskItem("directory", "directory",
                                  section="Temporary outputs"),
     "output_connectome", String(section="Temporary outputs"),
@@ -94,7 +94,6 @@ def initialization(self):
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
@@ -143,11 +142,12 @@ def execution(self, context):
 
     Compute connectome from the FSL outputs (probtrackx2)."""
     from constel.lib.utils.filetools import select_ROI_number
+
     # Selects the label number corresponding to label name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)
 
-    # matrix smoothing: -s in millimetres
+    # matrix smoothing: -s in millimeters
     context.pythonSystem("constel_reorganize_fsl_connectome.py",
                          self.probtrackx_indir,
                          self.regions_parcellation,

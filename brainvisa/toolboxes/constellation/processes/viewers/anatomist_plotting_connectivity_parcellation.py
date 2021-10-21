@@ -14,8 +14,6 @@ This script does the following:
 * the possibility to use the mesh : inflated, not inflated, group or individual
 
 Main dependencies: PyQt
-
-Author: Sandrine Lefranc, 2015
 """
 
 # ----------------------------Imports------------------------------------------
@@ -140,6 +138,7 @@ def execution(self, context):
     """
     """
     from brainvisa import anatomist as ana
+
     # instance of anatomist
     a = ana.Anatomist()
 

@@ -41,13 +41,12 @@ def validation(self):
 # ---------------------------Header--------------------------------------------
 
 
-name = "Constellation Individual Pipeline -  Connectomist"
+name = "Constellation Individual Pipeline - Connectomist"
 userLevel = 1
 
 signature = Signature(
     "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File", section="Nomenclature"),
-
     "outputs_database", Choice(section="Study parameters"),
     "study_name", OpenChoice(section="Study parameters"),
     "method", Choice(
@@ -55,8 +54,6 @@ signature = Signature(
         ("concatenated approach", "concat"),
         section="Study parameters"),
     "region", OpenChoice(section="Study parameters"),
-
-    # --inputs--
     "subject_indir", ReadDiskItem("subject", "directory",
                                   section="Tractography inputs"),
 
@@ -75,7 +72,6 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
-
     "regions_selection", Choice("All but main region", "All", "Custom",
                                 section="Options"),
     "keep_regions", ListOf(OpenChoice(), section="Options"),
@@ -108,8 +104,8 @@ def initialization(self):
     """Provides default values and link of parameters.
     """
     from constel.lib.utils.filetools import read_nomenclature_file
-    # list of possible databases, while respecting the ontology
-    # ontology: brainvisa-3.2.0
+
+    # Get a list of possible databases while respecting the ontology
     databases = [h.name for h in neuroHierarchy.hierarchies()
                  if h.fso.name == "brainvisa-3.2.0"]
     self.signature["outputs_database"].setChoices(*databases)
@@ -230,7 +226,6 @@ def initialization(self):
         """
         roi_type = self.signature["regions_parcellation"]
         if self.method == "avg" and self.study_name:
-            # just in case study_name corresponds to subjects group...
             res = roi_type.findValue(
                 {"freesurfer_group_of_subjects": self.study_name})
             if res is None:
@@ -368,8 +363,6 @@ def initialization(self):
                         "kmax")
     eNode.addDoubleLink("subpipeline.regions_selection",
                         "regions_selection")
-    # eNode.addDoubleLink("subpipeline.keep_regions",
-    #                     "keep_regions")
     eNode.addDoubleLink("subpipeline.erase_smoothed_matrix",
                         "erase_smoothed_matrix")
 

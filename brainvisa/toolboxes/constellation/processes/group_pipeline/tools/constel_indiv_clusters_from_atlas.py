@@ -16,8 +16,6 @@ This script does the following:
 * executes the command 'constel_clusters_from_atlas.py':
 
 Main dependencies: axon python API, soma, constel
-
-Author: Sandrine Lefranc, 2016
 """
 
 # ---------------------------Imports-------------------------------------------
@@ -58,7 +56,7 @@ name = "Individual clusters from atlas"
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
+    # inputs
     "individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
@@ -84,8 +82,7 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"}),
 
-
-    # --outputs--
+    # outputs
     "individual_clustering", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "no",
@@ -115,7 +112,6 @@ def initialization(self):
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
@@ -142,6 +138,7 @@ def execution(self, context):
     """Run the command 'constel_clusters_from_atlas'.
     """
     from constel.lib.utils.filetools import select_ROI_number
+
     sup_args = []
     if self.individual_regions_parcellation is not None:
         sup_args.append(self.individual_regions_parcellation)
@@ -149,6 +146,7 @@ def execution(self, context):
         label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                          self.region)
         sup_args.append(label_number)
+
     context.pythonSystem("constel_clusters_from_atlas.py",
                          self.individual_matrix,
                          self.atlas_matrix,

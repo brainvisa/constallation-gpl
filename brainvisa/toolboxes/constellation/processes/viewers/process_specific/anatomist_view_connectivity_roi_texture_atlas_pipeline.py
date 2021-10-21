@@ -31,12 +31,14 @@ def get_process(process):
 
 
 def execution(self, context):
+    """
+    """
+
     viewer = getProcessInstance('anatomist_view_connectivity_roi_texture')
     if not hasattr(self, 'reference_process'):
         return context.runProcess(viewer, self.connectivity_roi_texture)
     process = get_process(self.reference_process)
 
-    # -------
     # constel_indiv_clusters_from_atlas_pipeline case
     if process.id() == 'constel_indiv_clusters_from_atlas_pipeline':
         mesh = ReadDiskItem(
@@ -50,7 +52,6 @@ def execution(self, context):
             viewer, connectivity_roi_texture=self.connectivity_roi_texture,
             mesh=mesh)
 
-    # -------
     # database_qc_table case
     if process.id() == 'database_qc_table':
         match = {
@@ -70,7 +71,6 @@ def execution(self, context):
             viewer, connectivity_roi_texture=self.connectivity_roi_texture,
             mesh=mesh)
 
-    # -------
     # constel_group_pipeline case
     if process.id() == 'constel_group_pipeline':
         sid = self.connectivity_roi_texture.get('sid')

@@ -18,8 +18,6 @@ This script does the following:
    profile.
 
 Main dependencies: Axon python API, Soma-base, constel
-
-Author: Sandrine Lefranc
 """
 
 
@@ -79,6 +77,7 @@ def initialization(self):
     '''
     Declare the default value.
     '''
+
     # Default value
     self.kmax = 12
 

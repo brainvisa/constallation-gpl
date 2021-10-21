@@ -14,8 +14,6 @@ This script does the following:
 *
 
 Main dependencies:
-
-Author: Sandrine Lefranc
 """
 
 
@@ -31,8 +29,6 @@ from brainvisa.processes import ValidationError
 
 # soma module
 from soma.path import find_in_path
-
-# from constel.lib.utils.processtools import write_filelog
 
 
 def validation():
@@ -53,7 +49,7 @@ userLevel = 2
 
 
 signature = Signature(
-    # --inputs--
+    # inputs
     'gyri_texture', ReadDiskItem(
         'ROI Texture', 'Aims texture formats',
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
@@ -61,7 +57,7 @@ signature = Signature(
         'White Mesh', 'Aims mesh formats',
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),
 
-    # --outputs--
+    # outputs
     'clean_gyri_texture', WriteDiskItem(
         'ROI Texture', 'Aims texture formats',
         requiredAttributes={"side": "both", "vertex_corr": "Yes"}),)
@@ -73,6 +69,7 @@ signature = Signature(
 def initialization(self):
     """
     """
+
     self.linkParameters('mesh', 'gyri_texture')
     self.linkParameters('clean_gyri_texture', 'gyri_texture')
 
@@ -83,7 +80,7 @@ def initialization(self):
 def execution(self, context):
     """
     """
-    # write_filelog()
+
     context.pythonSystem('AimsGyriTextureCleaningIsolatedVertices.py',
                          self.gyri_texture,
                          self.mesh,

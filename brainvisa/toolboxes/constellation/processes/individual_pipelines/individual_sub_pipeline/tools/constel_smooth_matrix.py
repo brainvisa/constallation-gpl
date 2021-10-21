@@ -14,15 +14,12 @@
 # Axon python API module
 from __future__ import absolute_import
 from brainvisa.processes import Float
-from brainvisa.processes import String
 from brainvisa.processes import Signature
-from brainvisa.processes import Boolean
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import OpenChoice
 from brainvisa.processes import Choice
 from brainvisa.processes import ValidationError
-from brainvisa.data import neuroHierarchy
 
 # Soma module
 from soma.path import find_in_path
@@ -33,7 +30,7 @@ def validation():
     loaded. It checks some conditions for the process to be available.
     """
     cmd = "AimsSparseMatrixSmoothing"
-    if not find_in_path(cmd):  # checks command
+    if not find_in_path(cmd):
         raise ValidationError(
             "'{0}' is not contained in PATH environnement variable. "
             "Please make sure that AIMS C++ library is installed.".format(cmd))
@@ -57,7 +54,8 @@ signature = Signature(
         "Nomenclature ROIs File", "Text File", section="Nomenclature"),
 
     "region", OpenChoice(section="Study parameters"),
-    # --inputs--
+
+    # inputs
     "complete_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
@@ -70,7 +68,6 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
-
     "regions_parcellation", ReadDiskItem(
         "ROI Texture", "Aims texture formats",
         requiredAttributes={"side": "both",
@@ -79,7 +76,7 @@ signature = Signature(
 
     "smoothing", Float(section="Options"),
 
-    # --outputs--
+    # outputs
     "complete_matrix_smoothed", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
         requiredAttributes={"ends_labelled": "all",
@@ -135,7 +132,6 @@ def initialization(self):
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
@@ -170,6 +166,7 @@ def execution(self, context):
     Smoothing of the individual matrix."""
     from constel.lib.utils.filetools import select_ROI_number
     from constel.lib.utils.matrixtools import replace_negative_values
+
     # selects the label number corresponding to label name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)

@@ -51,6 +51,7 @@ def execution(self, context):
     """
     """
     from brainvisa import anatomist as ana
+
     # create dictionnaire, relation betwenn state and neighbors
     items = create_relationship_region2neighbors(
         self.white_mesh.fullPath(), self.ROIs_segmentation.fullPath())

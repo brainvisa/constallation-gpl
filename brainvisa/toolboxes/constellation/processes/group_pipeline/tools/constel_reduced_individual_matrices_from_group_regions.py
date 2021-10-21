@@ -15,9 +15,7 @@ This script does the following:
     - the linked parameters
 *
 
-Main dependencies:
-
-Author: Sandrine Lefranc, 2015
+Main dependencies: axon python API, soma, constel
 """
 
 
@@ -64,7 +62,7 @@ signature = Signature(
     "study_name", String(section="Study parameters"),
     "region", OpenChoice(section="Study parameters"),
 
-    # --inputs--
+    # inputs
     "subjects_group", ReadDiskItem("Group definition", "XML",
                                    section="Group inputs"),
     "complete_individual_matrices", ListOf(ReadDiskItem(
@@ -99,7 +97,7 @@ signature = Signature(
     "normalize", Boolean(section="Options"),
     "erase_smoothed_matrix", Boolean(section="Options"),
 
-    # --outputs--
+    # outputs
     "intersubject_reduced_matrices", ListOf(WriteDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
@@ -117,8 +115,8 @@ signature = Signature(
 def afterChildAddedCallback(self, parent, key, child):
     """
     """
-    # Removes a link added with addLink() function.
-    # (destination, source)
+
+    # Remove a link added with addLink() function.
     child.removeLink("filtered_reduced_individual_profile",
                      "complete_matrix_smoothed")
     child.removeLink("region",
@@ -150,7 +148,8 @@ def afterChildAddedCallback(self, parent, key, child):
                          "regions_nomenclature")
     parent.addDoubleLink(key + ".region", "region")
     parent.addDoubleLink(key + ".normalize", "normalize")
-    parent.addDoubleLink(key + ".erase_smoothed_matrix", "erase_smoothed_matrix")
+    parent.addDoubleLink(key + ".erase_smoothed_matrix",
+                         "erase_smoothed_matrix")
 
 
 def beforeChildRemovedCallback(self, parent, key, child):
@@ -163,7 +162,8 @@ def beforeChildRemovedCallback(self, parent, key, child):
                             "regions_nomenclature")
     parent.removeDoubleLink(key + ".region", "region")
     parent.removeDoubleLink(key + ".normalize", "normalize")
-    parent.removeDoubleLink(key + ".erase_smoothed_matrix", "erase_smoothed_matrix")
+    parent.removeDoubleLink(key + ".erase_smoothed_matrix",
+                            "erase_smoothed_matrix")
 
 
 def initialization(self):
@@ -187,7 +187,6 @@ def initialization(self):
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
@@ -268,8 +267,6 @@ def initialization(self):
                 atts["reduced"] = "yes"
                 atts["individual"] = "yes"
                 atts["intersubject"] = "yes"
-                # bug in axon ? 2 DI with same filename, and differing
-                # attributes for tracking_session, analysis, acquisition...
                 atts['tracking_session'] = ''
                 matrix = self.signature[
                     "intersubject_reduced_matrices"].contentType.findValue(

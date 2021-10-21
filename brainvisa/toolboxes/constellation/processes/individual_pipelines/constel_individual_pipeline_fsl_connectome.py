@@ -106,8 +106,8 @@ def initialization(self):
     """Provides default values and link of parameters.
     """
     from constel.lib.utils.filetools import read_nomenclature_file
-    # list of possible databases, while respecting the ontology
-    # ontology: brainvisa-3.2.0
+
+    # Get a list of possible databases while respecting the ontology
     databases = [h.name for h in neuroHierarchy.hierarchies()
                  if h.fso.name == "brainvisa-3.2.0" and not h.builtin
                  and not h.read_only]
@@ -121,7 +121,7 @@ def initialization(self):
     self.signature['probtrackx_indir'].databaseUserLevel = 2
     self.signature['temp_outdir'].databaseUserLevel = 2
 
-    # default value
+    # default values
     self.smoothing = 3.0
     self.min_fibers_length = 20.0
     self.kmax = 12
@@ -175,7 +175,6 @@ def initialization(self):
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
@@ -211,7 +210,6 @@ def initialization(self):
                     "freesurfer_group_of_subjects")
             res = self.signature["regions_parcellation"].findValue(match)
             if res is None:
-                # in case ther is only one (non-matching) group
                 del match["freesurfer_group_of_subjects"]
                 res = self.signature["regions_parcellation"].findValue(match)
             return match
@@ -227,8 +225,6 @@ def initialization(self):
                         "regions_nomenclature",
                         link_keep_regions)
     self.linkParameters("individual_white_mesh", "probtrackx_indir", link_mesh)
-    # linkParameters does not keep firing after region is modified once or
-    # twice - I don't know why.
     self.addLink("keep_regions",
                  ("regions_nomenclature", "regions_selection", "region"),
                  self.link_keep_regions_value)
@@ -305,8 +301,6 @@ def initialization(self):
                         "normalize")
     eNode.addDoubleLink("subpipeline.regions_selection",
                         "regions_selection")
-    # eNode.addDoubleLink("subpipeline.keep_regions",
-    #                     "keep_regions")
     eNode.addDoubleLink("subpipeline.kmax",
                         "kmax")
     eNode.addDoubleLink("subpipeline.erase_smoothed_matrix",

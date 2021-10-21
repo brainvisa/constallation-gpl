@@ -27,7 +27,7 @@ name = "Constellation Cleaner"
 userLevel = 1
 
 signature = Signature(
-    # --inputs
+    # inputs
     "original_texture", ReadDiskItem("Connectivity ROI Texture",
                                      "Aims texture formats"),
 

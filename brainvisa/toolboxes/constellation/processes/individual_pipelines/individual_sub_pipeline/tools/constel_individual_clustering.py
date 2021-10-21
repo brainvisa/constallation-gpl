@@ -13,7 +13,6 @@
 
 # Axon python API module
 from __future__ import absolute_import
-from brainvisa.processes import String
 from brainvisa.processes import Integer
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
@@ -62,7 +61,6 @@ signature = Signature(
                             "intersubject": "no",
                             "individual": "yes"},
         section="Reduced matrix"),
-
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
@@ -73,8 +71,6 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
-
-
     "kmax", Integer(section="Options"),
 
     # outputs
@@ -114,7 +110,6 @@ def initialization(self):
         self.setValue("region", current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
@@ -157,6 +152,7 @@ def execution(self, context):
     Reduced connectivity matrix is clustered using the kmedoids algorithm.
     """
     from constel.lib.utils.filetools import select_ROI_number
+
     # selects the label number corresponding to label name
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)

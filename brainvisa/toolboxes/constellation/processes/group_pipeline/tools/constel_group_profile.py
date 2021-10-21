@@ -17,8 +17,6 @@ This script does the following:
 the mean group profile is computed.
 
 Main dependencies: axon python API, soma, constel
-
-Author: sandrine.lefranc@cea.fr
 """
 
 
@@ -55,7 +53,7 @@ userLevel = 2
 signature = Signature(
     "new_study_name", String(section="Study parameters"),
 
-    # --inputs--
+    # inputs
     "normed_individual_profiles", ListOf(ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
@@ -65,7 +63,7 @@ signature = Signature(
     "subjects_group", ReadDiskItem("Group definition", "XML",
                                    section="Group inputs"),
 
-    # --outputs--
+    # outputs
     "group_profile", WriteDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",

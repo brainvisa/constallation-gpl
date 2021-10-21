@@ -56,8 +56,6 @@ userLevel = 2
 signature = Signature(
     "regions_nomenclature", ReadDiskItem(
         "Nomenclature ROIs File", "Text File", section="Nomenclature"),
-
-
     "outputs_database", Choice(section="Study parameters"),
     "study_name", OpenChoice(section="Study parameters"),
     "method", Choice(
@@ -66,10 +64,9 @@ signature = Signature(
         section="Study parameters"),
     "region", OpenChoice(section="Study parameters"),
 
-    # --inputs--
+    # inputs
     "subject_indir", ReadDiskItem(
         "subject", "directory", section="Tractography inputs"),
-
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
@@ -84,12 +81,11 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
-
     "fiber_tracts_format", Choice("bundles", "trk", section="Options"),
     "min_fibers_length", Float(section="Options"),
     "max_fibers_length", Float(section="Options"),
 
-    # --outputs--
+    # outputs
     "labeled_fibers", WriteDiskItem(
         "Filtered Fascicles Bundles", "Aims writable bundles formats",
         requiredAttributes={"ends_labelled": "both",
@@ -116,7 +112,7 @@ def initialization(self):
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
-    # Get a list of possible databases, while respecting the ontology
+    # Get a list of possible databases while respecting the ontology
     databases = [h.name for h in neuroHierarchy.hierarchies()
                  if h.fso.name == "brainvisa-3.2.0"]
     self.signature["outputs_database"].setChoices(*databases)
@@ -160,7 +156,6 @@ def initialization(self):
         self.setValue('region', current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # Temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
@@ -229,6 +224,7 @@ def execution(self, context):
     """
     from constel.lib.utils.filetools import select_ROI_number
     from constel.lib.utils.fibertools import load_fiber_tracts
+
     # Select all fiber tracts of the given subject.
     list_fiber_tracts = load_fiber_tracts(self.subject_indir.fullPath(),
                                           self.fiber_tracts_format)

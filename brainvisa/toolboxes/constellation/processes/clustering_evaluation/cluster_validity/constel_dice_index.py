@@ -16,8 +16,6 @@ This script does the following:
 * executes the command 'constel_calculate_dice_index.py'
 
 Main dependencies: axon python API, soma, constel
-
-Author: Sandrine Lefranc, 2016
 """
 
 # ----------------------------Imports------------------------------------------
@@ -50,7 +48,7 @@ name = "Dice Index"
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
+    # inputs
     "individual_clustering",
     ReadDiskItem("Connectivity ROI Texture", "Aims texture formats",
                  requiredAttributes={"roi_autodetect": "no",
@@ -71,7 +69,7 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"}),
 
-    # --output--
+    # output
     "stem_plot_pdffile", String(),
 )
 
@@ -81,6 +79,7 @@ signature = Signature(
 
 def initialization(self):
     """Provides link of parameters"""
+
     self.nb_individual_clusters = 5
     self.nb_atlas_clusters = 5
 
@@ -91,9 +90,10 @@ def initialization(self):
 def execution(self, context):
     """Run the command 'constel_clusters_from_atlas'.
     """
+
     # Check the input parameter
     if (self.nb_individual_clusters < 2 or self.nb_atlas_clusters < 2):
-        raise ValueError("The cluster number must be largest tha '2'.")
+        raise ValueError("The cluster number must be larger than '2'.")
 
     # In the Constellation toolbox, the minimun of clusters is '2'.
     # For nb_clusters = 2, python indexation is 0.

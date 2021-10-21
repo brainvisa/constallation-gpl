@@ -70,7 +70,7 @@ if neuroConfig.gui:
             create_btn = QtGui.QPushButton()
             create_btn.setIcon(GroupCreatorEditor.new_icon)
             create_btn.setIconSize(buttonIconSize)
-            create_btn.setToolTip(_t_("Create new group"))  # PEP8 issue
+            create_btn.setToolTip(_t_("Create new group"))
             create_btn.setFixedSize(buttonIconSize + buttonMargin)
             create_btn.setFocusPolicy(QtCore.Qt.NoFocus)
             self.layout().addWidget(create_btn)
@@ -197,7 +197,6 @@ def initialization(self):
         self.setValue('region', current, True)
         if self.regions_nomenclature is not None:
             s = [("Select a region in this list", None)]
-            # temporarily set a value which will remain valid
             self.region = s[0][1]
             s += read_nomenclature_file(
                 self.regions_nomenclature.fullPath(), mode=2)
@@ -305,10 +304,6 @@ def initialization(self):
                          "subjects_group"],
                         link_regions_parcellation)
 
-    # visibility level for the user
-    self.signature["mean_individual_profiles"].userLevel = 2
-    self.signature["normed_individual_profiles"].userLevel = 2
-
     # define the main node of a pipeline
     eNode = SerialExecutionNode(self.name, parameterized=self)
 
@@ -388,8 +383,9 @@ def initialization(self):
     eNode.addDoubleLink("ReducedGroupMatrix.average_mesh", "average_mesh")
     eNode.addDoubleLink("ReducedGroupMatrix.regions_parcellation",
                         "regions_parcellation")
-    eNode.addDoubleLink("ReducedGroupMatrix.filtered_reduced_group_profile",
-                        "GroupRegionsFiltering.filtered_reduced_group_profile"),
+    eNode.addDoubleLink(
+        "ReducedGroupMatrix.filtered_reduced_group_profile",
+        "GroupRegionsFiltering.filtered_reduced_group_profile"),
     eNode.addDoubleLink("ReducedGroupMatrix.erase_smoothed_matrix",
                         "erase_smoothed_matrix")
 

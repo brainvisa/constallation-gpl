@@ -49,7 +49,7 @@ name = "Check Constellation Files"
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
+    # inputs
     "database", Choice(),
     "method", Choice(("averaged approach", "avg"),
                      ("concatenated approach", "concat")),
@@ -57,7 +57,7 @@ signature = Signature(
     "ROIs_nomenclature", ReadDiskItem("Nomenclature ROIs File", "Text File"),
     "ROI", OpenChoice(),
 
-    # --outputs--
+    # outputs
     "result_in_textfile", WriteDiskItem("Text file", "Text file"),
 )
 
@@ -69,6 +69,7 @@ def initialization(self):
     """Provides default values and link of parameters
     """
     from constel.lib.utils.filetools import read_nomenclature_file
+
     # default values
     self.ROIs_nomenclature = self.signature["ROIs_nomenclature"].findValue({
         "atlasname": "desikan_freesurfer"})
@@ -116,6 +117,7 @@ def execution(self, context):
     """Check the Constellation files and write a text file like report on the
     status of the database.
     """
+
     context.system(sys.executable,
                    find_in_path("constel_datacheck.py"),
                    self.database,

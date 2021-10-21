@@ -10,7 +10,6 @@
 from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
-from brainvisa.processes import OpenChoice
 from brainvisa.processes import Boolean
 
 # soma module
@@ -34,7 +33,7 @@ name = "Constellation Optimal Clustering From Silhouette"
 userLevel = 1
 
 signature = Signature(
-    # --inputs
+    # inputs
     "individual_clustering", ReadDiskItem("Connectivity ROI Texture",
                                           "Aims texture formats",
                                           requiredAttributes={
@@ -69,6 +68,7 @@ signature = Signature(
 def initialization(self):
     """
     """
+
     # default value
     self.exclude_2_clusters = False
 

@@ -15,8 +15,6 @@ This script does the following:
 * executes the command "":
 
 Main dependencies: axon python API, soma-base, constel
-
-Author: Sandrine Lefranc, 2015
 """
 
 # ----------------------------Imports------------------------------------------
@@ -50,7 +48,7 @@ name = "Dendrogram"
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
+    # inputs
     "connectivity_matrix", ReadDiskItem(
         "Connectivity Matrix", "GIS image",
         requiredAttributes={"ends_labelled": "all",
@@ -71,6 +69,7 @@ signature = Signature(
 def initialization(self):
     """
     """
+
     self.distance = "Euclidean"
     self.method_1 = "centroid"
     self.method_2 = "average"
@@ -83,6 +82,7 @@ def initialization(self):
 def execution(self, context):
     """
     """
+
     # Load connectivity matrix
     redmat = aims.read(self.connectivity_matrix.fullPath())
     if self.transpose:

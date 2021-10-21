@@ -44,7 +44,7 @@ name = "Write a different measures in csv file"
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
+    # inputs
     "clusters", ReadDiskItem(
         "Connectivity ROI texture", "aims texture formats",
         requiredAttributes={'step_time': 'yes'}),
@@ -58,7 +58,7 @@ signature = Signature(
                             "intersubject": "yes",
                             "individual": "no"}),
 
-    # --outputs--
+    # outputs
     "csvfile", WriteDiskItem("Any Type", getAllFormats()),
 )
 

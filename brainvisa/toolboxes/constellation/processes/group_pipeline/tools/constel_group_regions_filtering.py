@@ -14,12 +14,10 @@ This script does the following:
     - the parameters initialization
     - the linked parameters
 * this process executes the command 'AimsMeshWatershed.py' and
-  'constel_filtering_watershed.py': the ROI profile is computede from the mean
+  'constel_filtering_watershed.py': the ROI profile is computed from the mean
    profile.
 
 Main dependencies: Axon python API, Soma-base, constel
-
-Author: Sandrine Lefranc
 """
 
 # ---------------------------Imports-------------------------------------------
@@ -54,7 +52,7 @@ name = "Group Regions Filtering"
 userLevel = 2
 
 signature = Signature(
-    # --inputs--
+    # inputs
     "normed_group_profile", ReadDiskItem(
         "Connectivity Profile Texture", "Aims texture formats",
         requiredAttributes={"ends_labelled": "all",
@@ -69,7 +67,7 @@ signature = Signature(
                             "averaged": "Yes"},
         section="Freesurfer data"),
 
-    # --outputs--
+    # outputs
     "reduced_group_profile", WriteDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "yes",
@@ -94,6 +92,7 @@ signature = Signature(
 
 def initialization(self):
     """Provides default values and link of parameters"""
+
     self.linkParameters("reduced_group_profile", "normed_group_profile")
     self.linkParameters("filtered_reduced_group_profile",
                         "normed_group_profile")
