@@ -17,6 +17,7 @@ from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
+from brainvisa.processes import Choice
 
 
 def validation(self):
@@ -40,6 +41,10 @@ signature = Signature(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"},
         section="Inputs"),
+    "nb_colors", Choice(
+        "minimal", "5", "6", "7", "8",
+        section="Options"
+    ),
     "palette", WriteDiskItem(
         "4D Volume", "BrainVISA volume formats",
         section="Outputs"))
@@ -58,6 +63,7 @@ def execution(self, context):
     context.pythonSystem('constel_colormap.py',
                          self.ROIs_segmentation,
                          self.white_mesh,
+                         self.nb_colors,
                          self.palette)
 
     vol_palette = aims.read(self.palette.fullPath())
