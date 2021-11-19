@@ -18,9 +18,17 @@ from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
 from brainvisa.processes import Choice
+from brainvisa.processes import OpenChoice
+from brainvisa.processes import ListOf
 
 
 def validation(self):
+    try:
+        from constel.lib.utils.filetools import select_ROI_number
+        from constel.lib.utils.filetools import read_nomenclature_file
+    except ImportError:
+        raise ValidationError(
+            "Please make sure that constel module is installed.")
     try:
         from brainvisa import anatomist as ana
     except ImportError:
@@ -45,13 +53,38 @@ signature = Signature(
         "minimal", "5", "6", "7", "8",
         section="Options"
     ),
+    "regions_nomenclature", ReadDiskItem("Nomenclature ROIs File",
+                                         "Text File",
+                                         section="Options"),
+    "default_regions", ListOf(OpenChoice(), section="Options"),
     "palette", WriteDiskItem(
         "4D Volume", "BrainVISA volume formats",
         section="Outputs"))
 
 
 def initialization(self):
-    pass
+    from constel.lib.utils.filetools import read_nomenclature_file
+
+    # self.setOptional("palette")
+    self.setOptional("regions_nomenclature")
+    self.setOptional("default_regions")
+
+    def link_default_regions(self, dummy):
+        """
+        """
+        if self.regions_nomenclature is not None:
+            self.default_regions = None
+            s = []
+            s += read_nomenclature_file(
+                self.regions_nomenclature.fullPath(), mode=2)
+            self.signature["default_regions"] = ListOf(Choice(*s),
+                                                       section="Options")
+            self.setOptional("default_regions")
+            self.changeSignature(self.signature)
+
+    self.linkParameters(None,
+                        "regions_nomenclature",
+                        link_default_regions)
 
 
 def execution(self, context):
@@ -59,11 +92,20 @@ def execution(self, context):
     """
     from brainvisa import anatomist as ana
     from soma import aims
+    from constel.lib.utils.filetools import select_ROI_number
+
+    # Selects the label numbers corresponding to label names
+    labels = []
+    for region in self.default_regions:
+        label = select_ROI_number(self.regions_nomenclature.fullPath(),
+                                  region)
+        labels.append(int(label))
 
     context.pythonSystem('constel_colormap.py',
                          self.ROIs_segmentation,
                          self.white_mesh,
                          self.nb_colors,
+                         labels,
                          self.palette)
 
     vol_palette = aims.read(self.palette.fullPath())
@@ -84,9 +126,9 @@ def execution(self, context):
     gyri = a.loadObject(self.ROIs_segmentation)
 
     # set the custom palette
-    palette = a.createPalette('colormap')
+    palette = a.createPalette('constel_colormap')
     palette.setColors(colors=RGBA_colors, color_mode=mode)
-    gyri.setPalette("colormap", minVal=0., maxVal=1.)
+    gyri.setPalette("constel_colormap", minVal=0., maxVal=1.)
 
     # set interpolation
     a.execute('TexturingParams', objects=[gyri], interpolation='rgb')
