@@ -47,3 +47,6 @@ FileType("Connectivity ROI Texture", "ROI Texture")
 
 #----------------------------Silhouette--------------------------
 FileType("Clustering Silhouette", "Text File")
+
+#----------------------------Colors dictionary--------------------------
+FileType("Colors dictionary", "Text File")

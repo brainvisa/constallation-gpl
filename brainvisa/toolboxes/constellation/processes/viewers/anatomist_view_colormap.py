@@ -49,6 +49,8 @@ signature = Signature(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both", "vertex_corr": "Yes"},
         section="Inputs"),
+    "colors_dict", ReadDiskItem("Colors dictionary",
+                                "JSON file", section="Options"),
     "nb_colors", Choice(
         "minimal", "5", "6", "7", "8",
         section="Options"
@@ -64,10 +66,11 @@ signature = Signature(
 
 def initialization(self):
     from constel.lib.utils.filetools import read_nomenclature_file
-
+    from soma import aims
     # self.setOptional("palette")
     self.setOptional("regions_nomenclature")
     self.setOptional("default_regions")
+    self.setOptional("colors_dict")
 
     def link_default_regions(self, dummy):
         """
@@ -82,9 +85,23 @@ def initialization(self):
             self.setOptional("default_regions")
             self.changeSignature(self.signature)
 
+    # def link_nb_colors_to_colors_dict(self, dummy):
+    #     if self.colors_dict is not None:
+    #         colors_dict = aims.read(self.colors_dict)
+    #         print(colors_dict)
+    #         s = ["minimal"]
+    #         for n in colors_dict.keys():
+    #             if int(n) >= 5:
+    #                 s += str(n)
+    #         self.signature["nb_colors"] = Choice(*s, section="Options")
+
     self.linkParameters(None,
                         "regions_nomenclature",
                         link_default_regions)
+
+    # self.linkParameters(None,
+    #                     "colors_dict",
+    #                     link_nb_colors_to_colors_dict)
 
 
 def execution(self, context):
@@ -104,6 +121,7 @@ def execution(self, context):
     context.pythonSystem('constel_colormap.py',
                          self.ROIs_segmentation,
                          self.white_mesh,
+                         self.colors_dict,
                          self.nb_colors,
                          labels,
                          self.palette)
