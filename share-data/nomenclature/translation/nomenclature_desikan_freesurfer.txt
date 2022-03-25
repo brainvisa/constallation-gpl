@@ -15,7 +15,7 @@
 14 lh.medialorbitofrontal
 15 lh.middletemporal
 16 lh.parahippocampal
-17 lh.paracentral 
+17 lh.paracentral
 18 lh.parsopercularis
 19 lh.parsorbitalis
 20 lh.parstriangularis
@@ -69,4 +69,4 @@
 69 rh.frontalpole
 70 rh.temporalpole
 71 rh.transversetemporal
-72 rh.insula 
+72 rh.insula
