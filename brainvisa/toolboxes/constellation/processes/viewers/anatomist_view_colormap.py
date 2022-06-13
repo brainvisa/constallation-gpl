@@ -20,6 +20,7 @@ from brainvisa.processes import ValidationError
 from brainvisa.processes import Choice
 from brainvisa.processes import OpenChoice
 from brainvisa.processes import ListOf
+from brainvisa.processes import Boolean
 
 
 def validation(self):
@@ -52,7 +53,7 @@ signature = Signature(
     "colors_dict", ReadDiskItem("Colors dictionary",
                                 "JSON file", section="Options"),
     "nb_colors", Choice(
-        "minimal", "5", "6", "7", "8",
+        "minimal", "exclusive", "5", "6", "7", "8", "9", "10", "11",
         section="Options"
     ),
     "regions_nomenclature", ReadDiskItem("Nomenclature ROIs File",
@@ -61,7 +62,8 @@ signature = Signature(
     "default_regions", ListOf(OpenChoice(), section="Options"),
     "palette", WriteDiskItem(
         "4D Volume", "BrainVISA volume formats",
-        section="Outputs"))
+        section="Outputs"),
+    "view_coloring", Boolean(section="Options"))
 
 
 def initialization(self):
@@ -71,6 +73,7 @@ def initialization(self):
     self.setOptional("regions_nomenclature")
     self.setOptional("default_regions")
     self.setOptional("colors_dict")
+    self.view_coloring = True
 
     def link_default_regions(self, dummy):
         """
@@ -126,35 +129,36 @@ def execution(self, context):
                          labels,
                          self.palette)
 
-    vol_palette = aims.read(self.palette.fullPath())
-    RGBA_colors = vol_palette.np['v'].flatten().tolist()
-    if vol_palette['v'].shape[-1] == 4:
-        mode = 'RGBA'
-    else:
-        mode = 'RGB'
+    if self.view_coloring:
+        vol_palette = aims.read(self.palette.fullPath())
+        RGBA_colors = vol_palette.np['v'].flatten().tolist()
+        if vol_palette['v'].shape[-1] == 4:
+            mode = 'RGBA'
+        else:
+            mode = 'RGB'
 
-    # instance of Anatomist
-    a = ana.Anatomist()
+        # instance of Anatomist
+        a = ana.Anatomist()
 
-    # view an object (window)
-    win = a.createWindow("3D")
+        # view an object (window)
+        win = a.createWindow("3D")
 
-    # load objects
-    mesh = a.loadObject(self.white_mesh)
-    gyri = a.loadObject(self.ROIs_segmentation)
+        # load objects
+        mesh = a.loadObject(self.white_mesh)
+        gyri = a.loadObject(self.ROIs_segmentation)
 
-    # set the custom palette
-    palette = a.createPalette('constel_colormap')
-    palette.setColors(colors=RGBA_colors, color_mode=mode)
-    gyri.setPalette("constel_colormap", minVal=0., maxVal=1.)
+        # set the custom palette
+        palette = a.createPalette('constel_colormap')
+        palette.setColors(colors=RGBA_colors, color_mode=mode)
+        gyri.setPalette("constel_colormap", minVal=0., maxVal=1.)
 
-    # set interpolation
-    a.execute('TexturingParams', objects=[gyri], interpolation='rgb')
+        # set interpolation
+        a.execute('TexturingParams', objects=[gyri], interpolation='rgb')
 
-    # fusion of the mesh with the gyri segmentation
-    surftex = a.fusionObjects([mesh, gyri], method="FusionTexSurfMethod")
+        # fusion of the mesh with the gyri segmentation
+        surftex = a.fusionObjects([mesh, gyri], method="FusionTexSurfMethod")
 
-    # add the object in the windows
-    win.addObjects(surftex)
+        # add the object in the windows
+        win.addObjects(surftex)
 
-    return [win, gyri, mesh, surftex]
+        return [win, gyri, mesh, surftex]
