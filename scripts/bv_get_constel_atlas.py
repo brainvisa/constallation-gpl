@@ -34,7 +34,7 @@ class Context(object):
         return filename
 
 download_url = 'ftp://ftp.cea.fr/pub/dsv/anatomist/data'
-atlasversion = '1.0'
+atlasversion = '1.1'
 
 parser = OptionParser(
     'get and unzip Constellation atlas in a given directory')
