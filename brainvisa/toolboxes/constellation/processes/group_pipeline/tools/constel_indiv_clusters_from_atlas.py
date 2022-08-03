@@ -57,30 +57,34 @@ userLevel = 2
 
 signature = Signature(
     # inputs
-    "individual_matrix", ReadDiskItem(
+    "reduced_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
-                            "intersubject": "yes"}),
+                            "intersubject": "yes"},
+        section="Inputs"),
     "atlas_matrix", ReadDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
-                            "intersubject": "yes"}),
+                            "intersubject": "yes"},
+        section="Atlas inputs"),
     "group_clustering", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "no",
                             "roi_filtered": "no",
                             "intersubject": "yes",
                             "step_time": "yes",
-                            "measure": "no"}),
+                            "measure": "no"},
+        section="Atlas inputs"),
     "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File", section="nomenclature"),
-    "region", OpenChoice(section="nomenclature"),
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+    "region", OpenChoice(section="Study parameters"),
     "individual_regions_parcellation", ReadDiskItem(
         "ROI Texture", "aims texture formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
 
     # outputs
     "individual_clustering", WriteDiskItem(
@@ -89,7 +93,8 @@ signature = Signature(
                             "roi_filtered": "no",
                             "intersubject": "yes",
                             "step_time": "yes",
-                            "measure": "no"}),
+                            "measure": "no"},
+        section="Outputs")
 )
 
 

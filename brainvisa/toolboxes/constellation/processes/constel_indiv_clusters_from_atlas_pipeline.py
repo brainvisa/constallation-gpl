@@ -146,6 +146,18 @@ signature = Signature(
 )
 
 
+def link_keep_regions_value(self, dummy, other=None, oother=None):
+    s = [x[1] for x in self.signature["keep_regions"].contentType.values
+         if x[1] is not None]
+    if self.regions_selection == "All":
+        keep_regions = s
+    elif self.regions_selection == "All but main region":
+        keep_regions = [x for x in s if x != self.region]
+    else:
+        keep_regions = None
+    return keep_regions
+
+
 def initialization(self):
 
     self.erase_smoothed_matrix = True
@@ -260,6 +272,9 @@ def initialization(self):
     self.linkParameters(None,
                         "regions_nomenclature",
                         link_keep_regions)
+    self.addLink("keep_regions",
+                 ("regions_nomenclature", "regions_selection", "region"),
+                 self.link_keep_regions_value)
     self.linkParameters("atlas_matrix", "region", link_atlas_matrix)
     self.linkParameters("filtered_reduced_group_profile", "atlas_matrix")
     self.linkParameters("reduced_matrix",
@@ -283,7 +298,7 @@ def initialization(self):
         ProcessExecutionNode("constel_individual_pipeline_fsl_connectome",
                              optional=True))
     fsl_indiv = eNode.child("fsl_indiv")._process
-    fsl_indiv.method = 'concat'
+    fsl_indiv.method = 'avg'
     fsl_indiv.executionNode().child("subpipeline").child(
         'MeanProfile').setSelected(False)
     fsl_indiv.executionNode().child("subpipeline").child(
@@ -301,7 +316,6 @@ def initialization(self):
     eNode.addDoubleLink("probtrackx_indir", "fsl_indiv.probtrackx_indir")
     eNode.addDoubleLink("temp_outdir", "fsl_indiv.temp_outdir")
     eNode.addDoubleLink("regions_selection", "fsl_indiv.regions_selection")
-    eNode.addDoubleLink("keep_regions", "fsl_indiv.keep_regions")
     eNode.addDoubleLink("min_fibers_length", "fsl_indiv.min_fibers_length")
     eNode.addDoubleLink("smoothing", "fsl_indiv.smoothing")
     eNode.addDoubleLink("normalize", "fsl_indiv.normalize")
@@ -354,6 +368,10 @@ def initialization(self):
                         "reduced_matrix.normalize")
     eNode.addDoubleLink("erase_smoothed_matrix",
                         "reduced_matrix.erase_smoothed_matrix")
+    eNode.addDoubleLink("region",
+                        "reduced_matrix.region")
+    eNode.addDoubleLink("regions_nomenclature",
+                        "reduced_matrix.regions_nomenclature")
 
     ###########################################################################
     #    link of parameters with the process:                                 #
@@ -365,7 +383,7 @@ def initialization(self):
         ProcessExecutionNode("constel_indiv_clusters_from_atlas",
                              optional=True))
     eNode.addDoubleLink("reduced_matrix",
-                        "individual_clusters.individual_matrix")
+                        "individual_clusters.reduced_individual_matrix")
     eNode.addDoubleLink("atlas_matrix",
                         "individual_clusters.atlas_matrix")
     eNode.addDoubleLink("group_clustering",
