@@ -153,7 +153,7 @@ def execution(self, context):
         sup_args.append(label_number)
 
     context.pythonSystem("constel_clusters_from_atlas.py",
-                         self.individual_matrix,
+                         self.reduced_individual_matrix,
                          self.atlas_matrix,
                          self.group_clustering,
                          self.individual_clustering,
