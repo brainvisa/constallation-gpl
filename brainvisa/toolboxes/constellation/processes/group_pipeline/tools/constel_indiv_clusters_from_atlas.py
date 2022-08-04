@@ -129,7 +129,7 @@ def initialization(self):
                 self.setValue("region", s[0][1], True)
             else:
                 self.setValue("region", current, True)
-    
+
     def link_clusters(self, dummy):
         if self.reduced_individual_matrix:
             match = dict(self.reduced_individual_matrix.hierarchyAttributes())
@@ -167,7 +167,8 @@ def initialization(self):
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
     self.linkParameters("atlas_matrix", "region", link_atlas_matrix)
-    self.linkParameters("group_clustering", "atlas_matrix", link_group_clustering)
+    self.linkParameters("group_clustering", "atlas_matrix",
+                        link_group_clustering)
 
 # ---------------------------Main program--------------------------------------
 
