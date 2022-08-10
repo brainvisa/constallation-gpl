@@ -68,6 +68,8 @@ signature = Signature(
     # inputs
     "tractography", ReadDiskItem(
         "Fascicles bundles", getAllFormats(), section="Tractography inputs"),
+    "weights_file", ReadDiskItem("Fiber weights", "Text File",
+                                 section="Tractography inputs"),
     "dw_to_mesh", ReadDiskItem(
         "Transform T2 Diffusion MR to Raw T1 MRI",
         "Transformation matrix",
@@ -111,6 +113,8 @@ def initialization(self):
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
+
+    self.setOptional("weights_file")
 
     # Get a list of possible databases while respecting the ontology
     databases = [h.name for h in neuroHierarchy.hierarchies()
@@ -250,6 +254,9 @@ def execution(self, context):
         "--nimlmax", self.max_fibers_length,
         "--verbose"
     ]
+
+    if self.weights_file:
+        cmd += ["--weights", self.weights_file]
 
     # Execute the command.
     context.system(*cmd)

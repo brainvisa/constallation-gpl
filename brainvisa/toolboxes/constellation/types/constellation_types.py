@@ -25,6 +25,7 @@ FileType("Nomenclature ROIs File", "Text file")
 
 #----------------------------Fiber tracts--------------------------------------
 FileType("Filtered Fascicles Bundles", "Fascicles bundles")
+FileType("Fiber weights", "Text file")
 
 
 #----------------------------Connectivity matrix-------------------------------

@@ -57,6 +57,8 @@ signature = Signature(
     "region", OpenChoice(section="Study parameters"),
     "tractography", ReadDiskItem("Fascicles bundles", getAllFormats(),
                                  section="Tractography inputs"),
+    "weights_file", ReadDiskItem("Fiber weights", "Text File",
+                                 section="Tractography inputs"),
     "dw_to_mesh", ReadDiskItem(
         "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix",
         section="Tractography inputs"),
@@ -124,6 +126,8 @@ def initialization(self):
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
+
+    self.setOptional("weights_file")
 
     def link_keep_regions(self, dummy):
         """
@@ -287,6 +291,8 @@ def initialization(self):
                         "study_name")
     eNode.addDoubleLink("filter.tractography",
                         "tractography")
+    eNode.addDoubleLink("filter.weights_file",
+                        "weights_file")
     eNode.addDoubleLink("filter.regions_parcellation",
                         "regions_parcellation")
     eNode.addDoubleLink("filter.individual_white_mesh",
