@@ -57,30 +57,35 @@ userLevel = 2
 
 signature = Signature(
     # inputs
-    "individual_matrix", ReadDiskItem(
+    "regions_nomenclature", ReadDiskItem(
+        "Nomenclature ROIs File", "Text File", section="Nomenclature"),
+    "region", OpenChoice(section="Study parameters"),
+    "reduced_individual_matrix", ReadDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
-                            "intersubject": "yes"}),
+                            "intersubject": "yes"},
+        section="Inputs"),
     "atlas_matrix", ReadDiskItem(
         "Connectivity Matrix", "Aims matrix formats",
         requiredAttributes={"ends_labelled": "all",
                             "reduced": "yes",
-                            "intersubject": "yes"}),
+                            "intersubject": "yes",
+                            "individual": "no"},
+        section="Atlas inputs"),
     "group_clustering", ReadDiskItem(
         "Connectivity ROI Texture", "Aims texture formats",
         requiredAttributes={"roi_autodetect": "no",
                             "roi_filtered": "no",
                             "intersubject": "yes",
                             "step_time": "yes",
-                            "measure": "no"}),
-    "regions_nomenclature", ReadDiskItem(
-        "Nomenclature ROIs File", "Text File", section="nomenclature"),
-    "region", OpenChoice(section="nomenclature"),
+                            "measure": "no"},
+        section="Atlas inputs"),
     "individual_regions_parcellation", ReadDiskItem(
         "ROI Texture", "aims texture formats",
         requiredAttributes={"side": "both",
-                            "vertex_corr": "Yes"}),
+                            "vertex_corr": "Yes"},
+        section="Freesurfer data"),
 
     # outputs
     "individual_clustering", WriteDiskItem(
@@ -89,7 +94,8 @@ signature = Signature(
                             "roi_filtered": "no",
                             "intersubject": "yes",
                             "step_time": "yes",
-                            "measure": "no"}),
+                            "measure": "no"},
+        section="Outputs")
 )
 
 
@@ -124,12 +130,45 @@ def initialization(self):
             else:
                 self.setValue("region", current, True)
 
+    def link_clusters(self, dummy):
+        if self.reduced_individual_matrix:
+            match = dict(self.reduced_individual_matrix.hierarchyAttributes())
+            for att in ["name_serie", "tracking_session",
+                        "analysis", "acquisition", "ends_labelled", "reduced",
+                        "individual"]:
+                if att in match:
+                    del match[att]
+            # artificially add format in match. If we do not do this, existing
+            # (GIFTI) files and potential output ones (.tex) do not appear to
+            # have the same attributes, and findValue() cannot decide.
+            # strangely, findValues() returns 1 element....
+            match["_format"] = 'GIFTI file'
+            return self.signature["individual_clustering"].findValue(match)
+
+    def link_atlas_matrix(self, dummy):
+        match = {
+            "method": "avg",
+            "gyrus": self.region,
+        }
+        return self.signature["atlas_matrix"].findValue(match)
+
+    def link_group_clustering(self, dummy):
+        if self.atlas_matrix:
+            match = dict(self.atlas_matrix.hierarchyAttributes())
+            match["sid"] = 'avgSubject'
+            return self.signature["group_clustering"].findValue(match)
+
     self.linkParameters(None,
                         "regions_nomenclature",
                         reset_label)
+    self.linkParameters("individual_clustering", "reduced_individual_matrix",
+                        link_clusters)
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
+    self.linkParameters("atlas_matrix", "region", link_atlas_matrix)
+    self.linkParameters("group_clustering", "atlas_matrix",
+                        link_group_clustering)
 
 # ---------------------------Main program--------------------------------------
 
@@ -148,7 +187,7 @@ def execution(self, context):
         sup_args.append(label_number)
 
     context.pythonSystem("constel_clusters_from_atlas.py",
-                         self.individual_matrix,
+                         self.reduced_individual_matrix,
                          self.atlas_matrix,
                          self.group_clustering,
                          self.individual_clustering,
