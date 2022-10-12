@@ -98,6 +98,10 @@ signature = Signature(
         requiredAttributes={"ends_labelled": "one",
                             "oversampled": "no"},
         section="Filtered tracts"),
+    "labeled_fibers_weights", WriteDiskItem("Fiber weights", "Text File",
+                                            section="Weights outputs"),
+    "semilabeled_fibers_weights", WriteDiskItem("Fiber weights", "Text File",
+                                                section="Weights outputs"),
 )
 
 
@@ -115,6 +119,8 @@ def initialization(self):
         {"atlasname": "desikan_freesurfer"})
 
     self.setOptional("weights_file")
+    self.setOptional("labeled_fibers_weights")
+    self.setOptional("semilabeled_fibers_weights")
 
     # Get a list of possible databases while respecting the ontology
     databases = [h.name for h in neuroHierarchy.hierarchies()
@@ -126,6 +132,22 @@ def initialization(self):
         self.signature["outputs_database"] = OpenChoice(
                                                 section="Study parameters"
         )
+
+    def link_labeled_weights(self, dummy):
+        """Set the name of weights file. Hard coded for now.
+        """
+        if self.labeled_fibers:
+            filename = os.path.splitext(self.labeled_fibers.fullPath())[0]
+            weights_filename = filename + '_weights.txt'
+            return weights_filename
+
+    def link_semilabeled_weights(self, dummy):
+        """Set the name of weights file. Hard coded for now.
+        """
+        if self.semilabeled_fibers:
+            filename = os.path.splitext(self.semilabeled_fibers.fullPath())[0]
+            weights_filename = filename + '_weights.txt'
+            return weights_filename
 
     def fill_study_choice(self, dummy=None):
         """
@@ -208,7 +230,12 @@ def initialization(self):
                         link_filtered_bundles)
     self.linkParameters("semilabeled_fibers",
                         "labeled_fibers")
-
+    self.linkParameters("labeled_fibers_weights",
+                        "labeled_fibers",
+                        link_labeled_weights)
+    self.linkParameters("semilabeled_fibers_weights",
+                        "semilabeled_fibers",
+                        link_semilabeled_weights)
     fill_study_choice(self)
 
 
@@ -256,7 +283,7 @@ def execution(self, context):
     ]
 
     if self.weights_file:
-        cmd += ["--weights", self.weights_file]
+        cmd += ["--weightsFilename", self.weights_file]
 
     # Execute the command.
     context.system(*cmd)

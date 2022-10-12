@@ -337,6 +337,10 @@ def initialization(self):
                         "individual_white_mesh")
     eNode.addDoubleLink("ConnectivityMatrix.dw_to_t1",
                         "filter.dw_to_mesh")
+    eNode.addDoubleLink("ConnectivityMatrix.labeled_fibers_weights",
+                        "filter.labeled_fibers_weights")
+    eNode.addDoubleLink("ConnectivityMatrix.semilabeled_fibers_weights",
+                        "filter.semilabeled_fibers_weights")
 
     ###########################################################################
     #    "Constellation Individual Sub-pipeline"                              #
