@@ -1,4 +1,4 @@
-###############################################################################
+##############################################################################
 # This software and supporting documentation are distributed by CEA/NeuroSpin,
 # Batiment 145, 91191 Gif-sur-Yvette cedex, France. This software is governed
 # by the CeCILL license version 2 under French law and abiding by the rules of
@@ -21,6 +21,7 @@ from brainvisa.processes import ValidationError
 
 # Soma module
 from soma.path import find_in_path
+import os
 
 
 def validation():
@@ -76,7 +77,11 @@ signature = Signature(
         requiredAttributes={"side": "both",
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
-
+    # weights
+    "labeled_fibers_weights", ReadDiskItem("Fiber weights", "Text File",
+                                           section="Weights inputs"),
+    "semilabeled_fibers_weights", ReadDiskItem("Fiber weights", "Text File",
+                                               section="Weights inputs"),
     # ouputs
     "matrix_semilabeled_fibers", WriteDiskItem(
         "Connectivity Matrix", "Sparse Matrix",
@@ -123,6 +128,26 @@ def initialization(self):
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
 
+    self.setOptional("labeled_fibers_weights")
+    self.setOptional("semilabeled_fibers_weights")
+
+    def link_labeled_weights(self, dummy):
+        """Set the name of weights file. Hard coded for now.
+        """
+        if self.labeled_fibers:
+            filename = os.path.splitext(self.labeled_fibers.fullPath())[0]
+            weights_filename = filename + '_weights.txt'
+            return weights_filename
+
+    def link_semilabeled_weights(self, dummy):
+        """Set the name of weights file. Hard coded for now.
+        """
+        if self.oversampled_semilabeled_fibers:
+            semilabeled = self.oversampled_semilabeled_fibers.fullPath().replace('_oversampled_', '_')
+            filename = os.path.splitext(semilabeled)[0]
+            weights_filename = filename + '_weights.txt'
+            return weights_filename
+
     def link_fibertracts2label(self, dummy):
         """Define the attribut 'gyrus' from fibertracts pattern for the
         signature 'region'.
@@ -161,7 +186,12 @@ def initialization(self):
     self.linkParameters("complete_individual_matrix",
                         "matrix_semilabeled_fibers",
                         link_smooth)
-
+    self.linkParameters("labeled_fibers_weights",
+                        "labeled_fibers",
+                        link_labeled_weights)
+    self.linkParameters("semilabeled_fibers_weights",
+                        "oversampled_semilabeled_fibers",
+                        link_semilabeled_weights)
 
 # ---------------------------Main program--------------------------------------
 
@@ -189,6 +219,7 @@ def execution(self, context):
                    "-bundles", self.oversampled_semilabeled_fibers,
                    "-connmatrix", self.matrix_semilabeled_fibers,
                    "-matrixcompute", "meshintersectionpoint",
+                   "-weightsFilename", self.semilabeled_fibers_weights,
                    "-dist", 0.0,  # no smoothing
                    "-wthresh", 0.001,
                    "-distmax", 5.0,
@@ -205,6 +236,7 @@ def execution(self, context):
     context.system("constelConnectivityMatrix",
                    "-bundles", self.labeled_fibers,
                    "-connmatrix", self.matrix_labeled_fibers,
+                   "-weightsFilename", self.labeled_fibers_weights,
                    "-dist", 0.0,  # no smoothing
                    "-seedregionstex", self.regions_parcellation,
                    "-outconntex", self.profile_labeled_fibers,

@@ -321,7 +321,8 @@ def initialization(self):
 
     eNode.addChild(
         "ConnectivityMatrix",
-        ProcessExecutionNode("constel_sparse_individual_matrices", optional=1))
+        ProcessExecutionNode("constel_sparse_individual_matrices_mrtrix",
+                             optional=1))
 
     eNode.addDoubleLink("ConnectivityMatrix.oversampled_semilabeled_fibers",
                         "oversampler.oversampled_semilabeled_fibers")
