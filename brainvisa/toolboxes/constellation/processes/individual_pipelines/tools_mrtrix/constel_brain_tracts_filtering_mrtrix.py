@@ -67,7 +67,8 @@ signature = Signature(
 
     # inputs
     "tractography", ReadDiskItem(
-        "Fascicles bundles", getAllFormats(), section="Tractography inputs"),
+        "Fascicles bundles", "Aims readable bundles formats",
+        section="Tractography inputs"),
     "weights_file", ReadDiskItem("Fiber weights", "Text File",
                                  section="Tractography inputs"),
     "dw_to_mesh", ReadDiskItem(
