@@ -62,7 +62,7 @@ signature = Signature(
                                  section="Tractography inputs"),
     "dw_to_mesh", ReadDiskItem(
         "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix",
-        section="Tractography inputs"),
+        section="Freesurfer data"),
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
         requiredAttributes={"side": "both",
@@ -127,7 +127,7 @@ def initialization(self):
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
-
+    self.method = "avg"
     self.setOptional("weights_file")
 
     def link_keep_regions(self, dummy):
@@ -249,9 +249,9 @@ def initialization(self):
     self.linkParameters(None,
                         "regions_nomenclature",
                         reset_label)
-    self.linkParameters(None,
-                        "method",
-                        method_changed)
+    # self.linkParameters(None,
+    #                     "method",
+    #                     method_changed)
     self.linkParameters("individual_white_mesh",
                         "tractography")
     self.linkParameters(None,
