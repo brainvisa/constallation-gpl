@@ -61,6 +61,7 @@ signature = Signature(
     "tractography", ReadDiskItem("Fascicles bundles",
                                  "Aims readable bundles formats",
                                  section="Tractography inputs"),
+    "apply_weights", Boolean(section="Tractography inputs"),
     "weights_file", ReadDiskItem("Fiber weights", "Text File",
                                  section="Tractography inputs"),
 
@@ -167,6 +168,7 @@ def initialization(self):
     self.erase_smoothed_matrix = True
     self.setOptional("weights_file")
     self.method = "avg"
+    self.apply_weights = True
 
     def link_keep_regions(self, dummy):
         """
@@ -366,6 +368,7 @@ def initialization(self):
     eNode.addDoubleLink("individual_white_mesh",
                         "mrtrix_indiv.individual_white_mesh")
     eNode.addDoubleLink("tractography", "mrtrix_indiv.tractography")
+    eNode.addDoubleLink("apply_weights", "mrtrix_indiv.apply_weights")
     eNode.addDoubleLink("weights_file", "mrtrix_indiv.weights_file")
     eNode.addDoubleLink("dw_to_mesh", "mrtrix_indiv.dw_to_mesh")
     eNode.addDoubleLink("regions_selection", "mrtrix_indiv.regions_selection")
