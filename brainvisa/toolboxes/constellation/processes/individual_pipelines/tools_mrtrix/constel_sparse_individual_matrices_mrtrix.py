@@ -18,6 +18,7 @@ from brainvisa.processes import Signature
 from brainvisa.processes import ReadDiskItem
 from brainvisa.processes import WriteDiskItem
 from brainvisa.processes import ValidationError
+from brainvisa.processes import Boolean
 
 # Soma module
 from soma.path import find_in_path
@@ -78,6 +79,7 @@ signature = Signature(
                             "vertex_corr": "Yes"},
         section="Freesurfer data"),
     # weights
+    "apply_weights", Boolean(section="Weights inputs"),
     "labeled_fibers_weights", ReadDiskItem("Fiber weights", "Text File",
                                            section="Weights inputs"),
     "semilabeled_fibers_weights", ReadDiskItem("Fiber weights", "Text File",
@@ -127,6 +129,8 @@ def initialization(self):
     self.regions_nomenclature = self.signature[
         "regions_nomenclature"].findValue(
         {"atlasname": "desikan_freesurfer"})
+
+    self.apply_weights = True
 
     self.setOptional("labeled_fibers_weights")
     self.setOptional("semilabeled_fibers_weights")
@@ -213,13 +217,21 @@ def execution(self, context):
     label_number = select_ROI_number(self.regions_nomenclature.fullPath(),
                                      self.region)
 
+    # trick if the user doesn't want to apply weights
+    if self.apply_weights:
+        sfw = self.semilabeled_fibers_weights
+        lfw = self.labeled_fibers_weights
+    else:
+        sfw = ''
+        lfw = ''
+
     # case 1
     # this command is mostly concerned with fibers leaving the brain stem
     context.system("constelConnectivityMatrix",
                    "-bundles", self.oversampled_semilabeled_fibers,
                    "-connmatrix", self.matrix_semilabeled_fibers,
                    "-matrixcompute", "meshintersectionpoint",
-                   "-weightsFilename", self.semilabeled_fibers_weights,
+                   "-weightsFilename", sfw,
                    "-dist", 0.0,  # no smoothing
                    "-wthresh", 0.001,
                    "-distmax", 5.0,
@@ -236,7 +248,7 @@ def execution(self, context):
     context.system("constelConnectivityMatrix",
                    "-bundles", self.labeled_fibers,
                    "-connmatrix", self.matrix_labeled_fibers,
-                   "-weightsFilename", self.labeled_fibers_weights,
+                   "-weightsFilename", lfw,
                    "-dist", 0.0,  # no smoothing
                    "-seedregionstex", self.regions_parcellation,
                    "-outconntex", self.profile_labeled_fibers,

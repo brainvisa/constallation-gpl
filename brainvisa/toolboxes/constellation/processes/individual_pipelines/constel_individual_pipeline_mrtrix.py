@@ -58,6 +58,7 @@ signature = Signature(
     "tractography", ReadDiskItem("Fascicles bundles",
                                  "Aims readable bundles formats",
                                  section="Tractography inputs"),
+    "apply_weights", Boolean(section="Tractography inputs"),
     "weights_file", ReadDiskItem("Fiber weights", "Text File",
                                  section="Tractography inputs"),
     "dw_to_mesh", ReadDiskItem(
@@ -122,6 +123,7 @@ def initialization(self):
     self.kmax = 12
     self.min_fibers_length = 20.
     self.max_fibers_length = 500.
+    self.apply_weights = True
     self.normalize = True
     self.erase_smoothed_matrix = True
     self.regions_nomenclature = self.signature[
@@ -343,6 +345,8 @@ def initialization(self):
                         "filter.labeled_fibers_weights")
     eNode.addDoubleLink("ConnectivityMatrix.semilabeled_fibers_weights",
                         "filter.semilabeled_fibers_weights")
+    eNode.addDoubleLink("ConnectivityMatrix.apply_weights",
+                        "apply_weights")
 
     ###########################################################################
     #    "Constellation Individual Sub-pipeline"                              #
