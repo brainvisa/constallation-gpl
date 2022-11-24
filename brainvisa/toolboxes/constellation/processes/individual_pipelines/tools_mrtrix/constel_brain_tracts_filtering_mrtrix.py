@@ -14,6 +14,7 @@
 # System modules
 from __future__ import absolute_import
 import os
+import fnmatch
 
 # Axon python API module
 from brainvisa.processes import Float
@@ -207,11 +208,15 @@ def initialization(self):
             attrs["_database"] = self.outputs_database
             attrs["method"] = self.method
             attrs["studyname"] = self.study_name
-            attrs["subject"] = os.path.basename(
-                os.path.dirname(self.tractography.fullPath()))
             attrs["gyrus"] = str(self.region)
             attrs["smallerlength"] = str(int(self.min_fibers_length))
             attrs["greaterlength"] = str(int(self.max_fibers_length))
+            directory = os.path.dirname(self.tractography.fullPath())
+            dir_match = os.path.basename(os.path.dirname(directory))
+            if fnmatch.fnmatch(dir_match, 'sub-*'):  # ukb
+                attrs["subject"] = dir_match
+            else:  # hcp
+                attrs["subject"] = os.path.basename(directory)
             filename = self.signature["labeled_fibers"].findValue(attrs)
             return filename
 
