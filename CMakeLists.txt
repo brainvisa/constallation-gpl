@@ -28,7 +28,7 @@ BRAINVISA_COPY_DIRECTORY( "${CMAKE_CURRENT_SOURCE_DIR}/share-data"
                           share/brainvisa-share-${brainvisa-share_VERSION_MAJOR}.${brainvisa-share_VERSION_MINOR}
                           ${PROJECT_NAME} )
 
-set( CONSTEL_ATLAS_DOWNLOAD_SOURCE "https://brainvisa.info/download/data" CACHE FILEPATH "URL for Constellation atlas data download" )
+set( CONSTEL_ATLAS_DOWNLOAD_SOURCE "https://brainvisa.info/download/data" CACHE STRING "URL for Constellation atlas data download" )
 
 set( get_models_cmd
   "${CMAKE_CURRENT_SOURCE_DIR}/scripts/bv_get_constel_atlas.py" )
