@@ -72,8 +72,8 @@ signature = Signature(
         section="Tractography inputs"),
     "weights_file", ReadDiskItem("Fiber weights", "Text File",
                                  section="Tractography inputs"),
-    "dw_to_mesh", ReadDiskItem(
-        "Transform T2 Diffusion MR to Raw T1 MRI",
+    "tractography_to_mesh", ReadDiskItem(
+        "Transform tractography referential to mesh referential",
         "Transformation matrix",
         section="Tractography inputs"),
     "individual_white_mesh", ReadDiskItem(
@@ -227,7 +227,7 @@ def initialization(self):
     self.linkParameters(None,
                         "outputs_database",
                         fill_study_choice)
-    self.linkParameters("dw_to_mesh",
+    self.linkParameters("tractography_to_mesh",
                         "tractography")
     self.linkParameters("labeled_fibers",
                         ("outputs_database", "tractography", "method",
@@ -275,7 +275,7 @@ def execution(self, context):
         "-n", self.semilabeled_fibers,
         "--mesh", self.individual_white_mesh,
         "--tex", self.regions_parcellation,
-        "--trs", self.dw_to_mesh,
+        "--trs", self.tractography_to_mesh,
         "--mode", "Name1_Name2orNotInMesh",
         "--names", "^" + str(region_number) + "_[+-]?[0-9]+$",
         "--names", "^[+-]?[0-9]+_" + str(region_number) + "$",

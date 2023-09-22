@@ -66,8 +66,9 @@ signature = Signature(
                                  section="Tractography inputs"),
 
     # Freesurfer mesh / parcellation
-    "dw_to_mesh", ReadDiskItem(
-        "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix",
+    "tractography_to_mesh", ReadDiskItem(
+        "Transform tractography referential to mesh referential",
+        "Transformation matrix",
         section="Freesurfer data"),
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
@@ -370,7 +371,8 @@ def initialization(self):
     eNode.addDoubleLink("tractography", "mrtrix_indiv.tractography")
     eNode.addDoubleLink("apply_weights", "mrtrix_indiv.apply_weights")
     eNode.addDoubleLink("weights_file", "mrtrix_indiv.weights_file")
-    eNode.addDoubleLink("dw_to_mesh", "mrtrix_indiv.dw_to_mesh")
+    eNode.addDoubleLink("tractography_to_mesh",
+                        "mrtrix_indiv.tractography_to_mesh")
     eNode.addDoubleLink("regions_selection", "mrtrix_indiv.regions_selection")
     eNode.addDoubleLink("min_fibers_length", "mrtrix_indiv.min_fibers_length")
     eNode.addDoubleLink("smoothing", "mrtrix_indiv.smoothing")

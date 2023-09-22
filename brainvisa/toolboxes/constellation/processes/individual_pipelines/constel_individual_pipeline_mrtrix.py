@@ -61,8 +61,9 @@ signature = Signature(
     "apply_weights", Boolean(section="Tractography inputs"),
     "weights_file", ReadDiskItem("Fiber weights", "Text File",
                                  section="Tractography inputs"),
-    "dw_to_mesh", ReadDiskItem(
-        "Transform T2 Diffusion MR to Raw T1 MRI", "Transformation matrix",
+    "tractography_to_mesh", ReadDiskItem(
+        "Transform tractography referential to mesh referential",
+        "Transformation matrix",
         section="Freesurfer data"),
     "individual_white_mesh", ReadDiskItem(
         "White Mesh", "Aims mesh formats",
@@ -300,8 +301,8 @@ def initialization(self):
                         "regions_parcellation")
     eNode.addDoubleLink("filter.individual_white_mesh",
                         "individual_white_mesh")
-    eNode.addDoubleLink("filter.dw_to_mesh",
-                        "dw_to_mesh")
+    eNode.addDoubleLink("filter.tractography_to_mesh",
+                        "tractography_to_mesh")
     eNode.addDoubleLink("filter.min_fibers_length",
                         "min_fibers_length")
     eNode.addDoubleLink("filter.max_fibers_length",
@@ -340,7 +341,7 @@ def initialization(self):
     eNode.addDoubleLink("ConnectivityMatrix.individual_white_mesh",
                         "individual_white_mesh")
     eNode.addDoubleLink("ConnectivityMatrix.dw_to_t1",
-                        "filter.dw_to_mesh")
+                        "filter.tractography_to_mesh")
     eNode.addDoubleLink("ConnectivityMatrix.labeled_fibers_weights",
                         "filter.labeled_fibers_weights")
     eNode.addDoubleLink("ConnectivityMatrix.semilabeled_fibers_weights",
