@@ -73,7 +73,7 @@ signature = Signature(
     "weights_file", ReadDiskItem("Fiber weights", "Text File",
                                  section="Tractography inputs"),
     "tractography_to_mesh", ReadDiskItem(
-        "Transform tractography referential to mesh referential",
+        "Transformation matrix",
         "Transformation matrix",
         section="Tractography inputs"),
     "individual_white_mesh", ReadDiskItem(

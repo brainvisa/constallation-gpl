@@ -67,7 +67,7 @@ signature = Signature(
 
     # Freesurfer mesh / parcellation
     "tractography_to_mesh", ReadDiskItem(
-        "Transform tractography referential to mesh referential",
+        "Transformation matrix",
         "Transformation matrix",
         section="Freesurfer data"),
     "individual_white_mesh", ReadDiskItem(
