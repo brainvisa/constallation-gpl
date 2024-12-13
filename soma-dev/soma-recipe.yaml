@@ -1,0 +1,11 @@
+package:
+  name: constellation
+
+soma-dev:
+  components:
+    constellation-nonfree: ["https://github.com/brainvisa/constellation-nonfree.git", "master"]
+
+  internal-dependencies:
+    - morphologist
+
+  type: compiled
