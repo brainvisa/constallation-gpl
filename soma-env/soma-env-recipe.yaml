@@ -3,7 +3,7 @@ package:
 
 soma-env:
   components:
-    constellation-nonfree: ["https://github.com/brainvisa/constellation-nonfree.git", "master"]
+    constellation-nonfree: ["https://github.com/brainvisa/constellation-nonfree.git", "soma-env-6.0"]
 
   internal-dependencies:
     - morphologist
