@@ -2,6 +2,7 @@ package:
   name: constellation
 
 soma-env:
+  publication: brainvisa-cea
   components:
     constellation-nonfree: ["https://github.com/brainvisa/constellation-nonfree.git", "master"]
 
