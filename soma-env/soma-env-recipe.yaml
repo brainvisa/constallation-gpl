@@ -4,7 +4,8 @@ package:
 soma-env:
   publication: brainvisa-cea
   components:
-    constellation-nonfree: ["https://github.com/brainvisa/constellation-nonfree.git", "master"]
+    - constellation-gpl
+    - constellation-nonfree
 
   internal-dependencies:
     - morphologist
